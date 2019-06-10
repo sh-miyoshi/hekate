@@ -1,0 +1,10 @@
+user(, client)
+    create
+    delete
+    update(change password)
+    get
+role
+    add to user, client
+    delete
+get token
+set token status
