@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
 type flagConfig struct {
@@ -44,12 +45,15 @@ func setAPI(r *mux.Router) {
 func main() {
 	parseCmdlineArgs()
 
+	logger.InitLogger(config.ModeDebug, config.LogFile)
+
 	r := mux.NewRouter()
 	setAPI(r)
 
 	corsObj := handlers.AllowedOrigins([]string{"*"})
 
 	addr := fmt.Sprintf("%s:%d", config.BindAddr, config.Port)
+	logger.Info("start server with %s", addr)
 	if err := http.ListenAndServe(addr, handlers.CORS(corsObj)(r)); err != nil {
 		os.Exit(1)
 	}
