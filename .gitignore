@@ -1,2 +1,5 @@
 # do not upload binary
 jwt-server
+
+# do not upload local user database
+userdb.csv
