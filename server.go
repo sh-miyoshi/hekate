@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 )
 
 type globalConfig struct {
@@ -49,7 +50,7 @@ func initDB(dbfile string) error {
 	}
 
 	admin := db.UserRequest{
-		Name:     config.AdminName,
+		ID:       config.AdminName,
 		Password: config.AdminPassword,
 	}
 	if err := db.GetInst().CreateUser(admin); err != nil {
@@ -58,7 +59,7 @@ func initDB(dbfile string) error {
 	}
 
 	// Add admin roles
-	if err := db.GetInst().AddRoleToUser(db.RoleUserAdit, "0"); err != nil {
+	if err := db.GetInst().AddRoleToUser(db.RoleUserAdit, config.AdminName); err != nil {
 		logger.Error("Failed to add role: %v", err)
 		return err
 	}
@@ -70,6 +71,7 @@ func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
 
 	// TODO Add API
+	r.HandleFunc(basePath+"/token", tokenapiv1.CreateTokenHandler).Methods("POST")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {

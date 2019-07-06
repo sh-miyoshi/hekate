@@ -10,12 +10,12 @@ import (
 type RoleType int
 
 const (
-	// NameLengthMin is minimum length of name
-	NameLengthMin = 4
-	// NameLengthMax is maximum length of name
-	NameLengthMax = 32
-	// NameValidChar is regular expression of name (only permit a-z, A-Z, 0-9, ., -, _)
-	NameValidChar = `[^a-zA-Z0-9\.\-\_]`
+	// IDLengthMin is minimum length of ID
+	IDLengthMin = 4
+	// IDLengthMax is maximum length of ID
+	IDLengthMax = 32
+	// IDValidChar is regular expression of ID (only permit a-z, A-Z, 0-9, ., -, _)
+	IDValidChar = `[^a-zA-Z0-9\.\-\_]`
 
 	// PasswordLengthMin is minimum length of password
 	PasswordLengthMin = 8
@@ -38,14 +38,13 @@ var (
 // User is a structure of user
 type User struct {
 	ID       string
-	Name     string
 	Password string
 	Roles    []RoleType
 }
 
 //UserRequest is a request param for user method
 type UserRequest struct {
-	Name     string
+	ID       string
 	Password string
 }
 
@@ -57,14 +56,14 @@ type TokenConfig struct {
 
 // Validate method validates UserRequest
 func (r *UserRequest) Validate() error {
-	if len(r.Name) < NameLengthMin {
-		return errors.New("Name Length is too small")
+	if len(r.ID) < IDLengthMin {
+		return errors.New("ID Length is too small")
 	}
-	if len(r.Name) > NameLengthMax {
-		return errors.New("Name Length is too long")
+	if len(r.ID) > IDLengthMax {
+		return errors.New("ID Length is too long")
 	}
-	if regexp.MustCompile(NameValidChar).Match([]byte(r.Name)) {
-		return errors.New("Name include unpermitted charactor")
+	if regexp.MustCompile(IDValidChar).Match([]byte(r.ID)) {
+		return errors.New("ID include unpermitted charactor")
 	}
 
 	if len(r.Password) < PasswordLengthMin {

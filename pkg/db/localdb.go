@@ -17,10 +17,9 @@ const (
 )
 
 type localDBHandler struct {
-	DBHandler
+	Handler
 
 	dbFileName string
-	nextID     int
 	mu         sync.Mutex
 }
 
@@ -52,7 +51,7 @@ func (l *localDBHandler) saveUsers(users []User) error {
 			roles += fmt.Sprintf("%d%s", role, roleSeparator)
 		}
 		roles = strings.TrimSuffix(roles, roleSeparator)
-		fmt.Fprintf(file, "%s,%s,%s,%s", user.ID, user.Name, user.Password, roles)
+		fmt.Fprintf(file, "%s,%s,%s", user.ID, user.Password, roles)
 	}
 
 	return nil
@@ -69,7 +68,6 @@ func (l *localDBHandler) ConnectDB(connectString string) error {
 	// TODO check file broken
 
 	l.dbFileName = connectString
-	l.nextID = 0
 	return nil
 }
 
@@ -81,7 +79,7 @@ func (l *localDBHandler) CreateUser(newUser UserRequest) error {
 	}
 
 	for _, user := range users {
-		if user.Name == newUser.Name {
+		if user.ID == newUser.ID {
 			return ErrUserAlreadyExists
 		}
 	}
@@ -89,17 +87,15 @@ func (l *localDBHandler) CreateUser(newUser UserRequest) error {
 	// add new user
 	hashed := base64.StdEncoding.EncodeToString([]byte(newUser.Password))
 	users = append(users, User{
-		ID:       strconv.Itoa(l.nextID),
-		Name:     newUser.Name,
+		ID:       newUser.ID,
 		Password: hashed,
 	})
 
 	l.mu.Lock()
 	l.saveUsers(users)
-	l.nextID++
 	l.mu.Unlock()
 
-	logger.Info("User %s is successfully created", newUser.Name)
+	logger.Info("User %s is successfully created", newUser.ID)
 	return nil
 }
 
@@ -143,8 +139,8 @@ func (l *localDBHandler) GetUserList() ([]User, error) {
 
 	for _, line := range data {
 		roles := []RoleType{}
-		if len(line) == 3 { // If data have roles
-			roleStrs := strings.Split(line[3], roleSeparator)
+		if len(line) == 2 { // If data have roles
+			roleStrs := strings.Split(line[2], roleSeparator)
 			for _, roleStr := range roleStrs {
 				role, err := strconv.Atoi(roleStr)
 				if err != nil {
@@ -155,8 +151,7 @@ func (l *localDBHandler) GetUserList() ([]User, error) {
 		}
 		ret = append(ret, User{
 			ID:       line[0],
-			Name:     line[1],
-			Password: line[2],
+			Password: line[1],
 			Roles:    roles,
 		})
 	}
@@ -166,6 +161,23 @@ func (l *localDBHandler) GetUserList() ([]User, error) {
 func (l *localDBHandler) UpdatePassowrd(newPassword string) error {
 	// Not Implemented yet
 	return nil
+}
+
+func (l *localDBHandler) Authenticate(id string, password string) error {
+	users, err := l.GetUserList()
+	if err != nil {
+		return nil
+	}
+	for _, user := range users {
+		if user.ID == id {
+			hashed := base64.StdEncoding.EncodeToString([]byte(password))
+			if user.Password == hashed {
+				return nil
+			}
+			return fmt.Errorf("Failed to authenticate with id(%s): password(%s)", id, password)
+		}
+	}
+	return fmt.Errorf("Failed to authenticate with id(%s): password(%s)", id, password)
 }
 
 func (l *localDBHandler) AddRoleToUser(addRole RoleType, userID string) error {

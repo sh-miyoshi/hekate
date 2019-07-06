@@ -6,24 +6,25 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
-// DBType is type of database
-type DBType int
+// Type is type of database
+type Type int
 
 const (
 	// DBRemote use remote database
-	DBRemote DBType = iota
+	DBRemote Type = iota
 	// DBLocal use local csv file for database
 	DBLocal
 )
 
-// DBHandler is an interface for handler of db
-type DBHandler interface {
+// Handler is an interface for handler of db
+type Handler interface {
 	ConnectDB(connectString string) error
 
 	CreateUser(newUser UserRequest) error
 	DeleteUser(userID string) error
 	GetUserList() ([]User, error)
 	UpdatePassowrd(newPassword string) error
+	Authenticate(id string, password string) error
 
 	AddRoleToUser(role RoleType, userID string) error
 	RemoveRoleFromUser(role RoleType, userID string) error
@@ -32,10 +33,10 @@ type DBHandler interface {
 	GetTokenConfig() (TokenConfig, error)
 }
 
-var instance DBHandler
+var instance Handler
 
 // InitDBHandler initialize handler for user
-func InitDBHandler(dbType DBType) error {
+func InitDBHandler(dbType Type) error {
 	switch dbType {
 	case DBRemote:
 		logger.Info("Run User DB as Remote Mode")
@@ -49,6 +50,6 @@ func InitDBHandler(dbType DBType) error {
 }
 
 // GetInst return a instance of handler
-func GetInst() DBHandler {
+func GetInst() Handler {
 	return instance
 }
