@@ -1,9 +1,2 @@
-# do not upload binary
-jwt-server
-*.exe
-
-# do not upload local user database
-userdb.csv
-
 # temporary directory
 tmp/*

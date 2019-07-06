@@ -1,0 +1,6 @@
+# do not upload binary
+server
+server.exe
+
+# do not upload local user database
+userdb.csv
