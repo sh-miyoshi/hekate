@@ -1,7 +1,8 @@
-package userdb
+package db
 
 import (
 	"fmt"
+
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
@@ -15,18 +16,26 @@ const (
 	DBLocal
 )
 
-// UserHandler is an interface for handler of user
-type UserHandler interface {
+// DBHandler is an interface for handler of db
+type DBHandler interface {
 	ConnectDB(connectString string) error
-	Authenticate(req UserRequest) (string, error)
+
 	CreateUser(newUser UserRequest) error
-	DeleteUser(userName string) error
+	DeleteUser(userID string) error
+	GetUserList() ([]User, error)
+	UpdatePassowrd(newPassword string) error
+
+	AddRoleToUser(role RoleType, userID string) error
+	RemoveRoleFromUser(role RoleType, userID string) error
+
+	SetTokenConfig(config TokenConfig) error
+	GetTokenConfig() (TokenConfig, error)
 }
 
-var instance UserHandler
+var instance DBHandler
 
-// InitUserHandler initialize handler for user
-func InitUserHandler(dbType DBType) error {
+// InitDBHandler initialize handler for user
+func InitDBHandler(dbType DBType) error {
 	switch dbType {
 	case DBRemote:
 		logger.Info("Run User DB as Remote Mode")
@@ -40,6 +49,6 @@ func InitUserHandler(dbType DBType) error {
 }
 
 // GetInst return a instance of handler
-func GetInst() UserHandler {
+func GetInst() DBHandler {
 	return instance
 }

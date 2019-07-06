@@ -8,8 +8,8 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/userdb"
 )
 
 type globalConfig struct {
@@ -38,21 +38,21 @@ func parseCmdlineArgs() {
 
 func initDB(dbfile string) error {
 	// TODO(use localdb)
-	if err := userdb.InitUserHandler(userdb.DBLocal); err != nil {
+	if err := db.InitDBHandler(db.DBLocal); err != nil {
 		logger.Error("Failed to initialize DB: %v", err)
 		return err
 	}
 
-	if err := userdb.GetInst().ConnectDB(dbfile); err != nil {
+	if err := db.GetInst().ConnectDB(dbfile); err != nil {
 		logger.Error("Failed to connect DB: %v", err)
 		return err
 	}
 
-	admin := userdb.UserRequest{
+	admin := db.UserRequest{
 		Name:     config.AdminName,
 		Password: config.AdminPassword,
 	}
-	if err := userdb.GetInst().CreateUser(admin); err != nil {
+	if err := db.GetInst().CreateUser(admin); err != nil {
 		logger.Error("Falied to create system admin: %v", err)
 		return err
 	}

@@ -1,18 +1,18 @@
-package userdb
+package db
 
 import (
 	"encoding/base64"
 	"encoding/csv"
 	"fmt"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"io"
 	"os"
 	"sync"
+
+	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
 type localDBHandler struct {
-	UserHandler
+	DBHandler
 
 	userFileName string
 	mu           sync.Mutex
@@ -47,27 +47,6 @@ func (l *localDBHandler) ConnectDB(connectString string) error {
 	return nil
 }
 
-func (l *localDBHandler) Authenticate(req UserRequest) (string, error) {
-	data, err := csvReadAll(l.userFileName)
-	if err != nil {
-		return "", err
-	}
-
-	for _, line := range data {
-		if line[0] == req.Name {
-			hashed := base64.StdEncoding.EncodeToString([]byte(req.Password))
-			if hashed == line[1] {
-				return token.Generate() // Generate JWT Token
-			}
-			logger.Info("wrong password for user: %s", req.Name)
-			return "", ErrAuthFailed
-		}
-	}
-
-	logger.Info("no such user %s", req.Name)
-	return "", ErrAuthFailed
-}
-
 func (l *localDBHandler) CreateUser(newUser UserRequest) error {
 	// User is already exists?
 	data, err := csvReadAll(l.userFileName)
@@ -91,6 +70,7 @@ func (l *localDBHandler) CreateUser(newUser UserRequest) error {
 
 	l.mu.Lock()
 	hashed := base64.StdEncoding.EncodeToString([]byte(newUser.Password))
+	// TODO(add other data)
 	fmt.Fprintf(file, "%s,%s", newUser.Name, hashed)
 	l.mu.Unlock()
 
@@ -145,4 +125,26 @@ func (l *localDBHandler) DeleteUser(userName string) error {
 
 	logger.Info("User %s is successfully delete", userName)
 	return nil
+}
+
+// Not Implemented yet
+func (l *localDBHandler) GetUserList() ([]User, error) {
+	return []User{}, nil
+}
+func (l *localDBHandler) UpdatePassowrd(newPassword string) error {
+	return nil
+}
+
+func (l *localDBHandler) AddRoleToUser(role RoleType, userID string) error {
+	return nil
+}
+func (l *localDBHandler) RemoveRoleFromUser(role RoleType, userID string) error {
+	return nil
+}
+
+func (l *localDBHandler) SetTokenConfig(config TokenConfig) error {
+	return nil
+}
+func (l *localDBHandler) GetTokenConfig() (TokenConfig, error) {
+	return TokenConfig{}, nil
 }

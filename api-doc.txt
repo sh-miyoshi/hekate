@@ -1,10 +1,12 @@
 user(, client)
     create
     delete
+    get user list
     update(change password)
-    get
 role
-    add to user, client
-    delete
-get token
-set token status
+    add to user
+    remove from user
+token
+    create
+    set config
+        expired time, ...

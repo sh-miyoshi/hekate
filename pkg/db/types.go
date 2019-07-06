@@ -1,9 +1,13 @@
-package userdb
+package db
 
 import (
 	"errors"
 	"regexp"
+	"time"
 )
+
+// RoleType ...
+type RoleType int
 
 const (
 	// NameLengthMin is minimum length of name
@@ -17,6 +21,13 @@ const (
 	PasswordLengthMin = 8
 	// PasswordLengthMax is maximum length of password
 	PasswordLengthMax = 128
+
+	// RoleAdmin is admin role
+	RoleAdmin RoleType = 1
+	// RoleWrite is write role
+	RoleWrite RoleType = 2
+	// RoleRead is read role
+	RoleRead RoleType = 4
 )
 
 var (
@@ -28,10 +39,31 @@ var (
 	ErrNoSuchUser = errors.New("No such user")
 )
 
+// Role ...
+type Role struct {
+	ID   string
+	Type RoleType
+	// TargetResource TODO(now only user)
+}
+
+// User is a structure of user
+type User struct {
+	ID       string
+	Name     string
+	Password string
+	Roles    []Role
+}
+
 //UserRequest is a request param for user method
 type UserRequest struct {
 	Name     string
 	Password string
+}
+
+// TokenConfig is a structure for token config
+type TokenConfig struct {
+	ExpiredTime time.Time
+	Issuer      string
 }
 
 // Validate method validates UserRequest
