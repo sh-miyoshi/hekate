@@ -57,6 +57,12 @@ func initDB(dbfile string) error {
 		return err
 	}
 
+	// Add admin roles
+	if err := db.GetInst().AddRoleToUser(db.RoleUserAdit, "0"); err != nil {
+		logger.Error("Failed to add role: %v", err)
+		return err
+	}
+
 	return nil
 }
 

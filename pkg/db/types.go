@@ -22,12 +22,8 @@ const (
 	// PasswordLengthMax is maximum length of password
 	PasswordLengthMax = 128
 
-	// RoleAdmin is admin role
-	RoleAdmin RoleType = 1
-	// RoleWrite is write role
-	RoleWrite RoleType = 2
-	// RoleRead is read role
-	RoleRead RoleType = 4
+	// RoleUserAdit allows user create/delete
+	RoleUserAdit RoleType = 1
 )
 
 var (
@@ -39,19 +35,12 @@ var (
 	ErrNoSuchUser = errors.New("No such user")
 )
 
-// Role ...
-type Role struct {
-	ID   string
-	Type RoleType
-	// TargetResource TODO(now only user)
-}
-
 // User is a structure of user
 type User struct {
 	ID       string
 	Name     string
 	Password string
-	Roles    []Role
+	Roles    []RoleType
 }
 
 //UserRequest is a request param for user method
