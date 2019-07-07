@@ -22,7 +22,7 @@ func CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authenticate request user
 	if err := db.GetInst().Authenticate(req.ID, req.Password); err != nil {
-		logger.Info("Failed to decode authenticate user: %v", err)
+		logger.Info("Failed to authenticate user: %v", err)
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
