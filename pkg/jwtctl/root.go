@@ -7,6 +7,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type config struct {
+	ServerAddr string
+}
+
+var globalConfig config
+
 var rootCmd = &cobra.Command{
 	Use:   "jwtctl",
 	Short: "jwtctl is a command tool for jwt-server",
@@ -17,7 +23,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init(){
-	// TODO(set server addr)
+	rootCmd.PersistentFlags().StringVar(&globalConfig.ServerAddr, "server", "http://localhost:8080", "server address")
 }
 
 // Execute ...
