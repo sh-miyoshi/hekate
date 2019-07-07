@@ -11,7 +11,13 @@ var rootCmd = &cobra.Command{
 	Use:   "jwtctl",
 	Short: "jwtctl is a command tool for jwt-server",
 	Long:  "jwtctl is a command tool for jwt-server",
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Run:   func(cmd *cobra.Command, args []string) {
+		cmd.Help()
+	},
+}
+
+func init(){
+	// TODO(set server addr)
 }
 
 // Execute ...
