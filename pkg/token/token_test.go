@@ -2,9 +2,11 @@ package token
 
 import (
 	"testing"
+	"time"
 )
 
 func TestParseHTTPHeaderToken(t *testing.T) {
+	InitConfig(time.Minute*5, "jwt-server", "testtest")
 	validToken, _ := Generate()
 
 	// Test Cases

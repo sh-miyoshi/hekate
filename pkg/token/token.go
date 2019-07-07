@@ -2,15 +2,27 @@ package token
 
 import (
 	"fmt"
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"strings"
 	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
-// TODO(use secure key)
-const testSecretKey = "hjsoeirjhgrokwrejrhoir4owjpjkrghpljrwoi34j"
-const issuer = "jwt-server"
+type tokenConfig struct {
+	ExpiredTime time.Duration
+	Issuer      string
+	SecretKey   string
+}
+
+var config tokenConfig
+
+// InitConfig initialize config of token package
+func InitConfig(expiredTime time.Duration, issuer string, secretKey string) {
+	config.ExpiredTime = expiredTime
+	config.Issuer = issuer
+	config.SecretKey = secretKey
+}
 
 func validate(claims jwt.Claims, tokenString string) error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -18,7 +30,7 @@ func validate(claims jwt.Claims, tokenString string) error {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(testSecretKey), nil
+		return []byte(config.SecretKey), nil
 	})
 
 	if err != nil {
@@ -49,16 +61,14 @@ func ParseHTTPHeaderToken(tokenString string) (string, error) {
 
 // Generate returns jwt token for user
 func Generate() (string, error) {
-	// TODO(set args)
-
 	claims := &jwt.StandardClaims{
-		Issuer:    issuer,
-		ExpiresAt: time.Now().Add(time.Hour * 2).Unix(), // Expired at 2 hours
+		Issuer:    config.Issuer,
+		ExpiresAt: time.Now().Add(config.ExpiredTime).Unix(), // Expired at 2 hours
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(testSecretKey))
+	return token.SignedString([]byte(config.SecretKey))
 }
 
 // Authenticate validates token
@@ -72,9 +82,9 @@ func Authenticate(reqToken string) error {
 	logger.Debug("claims in token: %v", claims)
 
 	// Validate claims
-	if claims.Issuer != issuer {
-		logger.Info("Issuer want %s, but got %s", issuer, claims.Issuer)
-		return fmt.Errorf("Issuer want %s, but got %s", issuer, claims.Issuer)
+	if claims.Issuer != config.Issuer {
+		logger.Info("Issuer want %s, but got %s", config.Issuer, claims.Issuer)
+		return fmt.Errorf("Issuer want %s, but got %s", config.Issuer, claims.Issuer)
 	}
 
 	now := time.Now().Unix()
