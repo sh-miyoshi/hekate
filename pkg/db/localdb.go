@@ -65,8 +65,6 @@ func (l *localDBHandler) ConnectDB(connectString string) error {
 		return err
 	}
 
-	// TODO check file broken
-
 	l.dbFileName = connectString
 	return nil
 }

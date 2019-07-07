@@ -49,7 +49,7 @@ func parseCmdlineArgs() {
 }
 
 func initDB(dbfile string) error {
-	// TODO(use localdb)
+	// TODO(now using localdb)
 	if err := db.InitDBHandler(db.DBLocal); err != nil {
 		logger.Error("Failed to initialize DB: %v", err)
 		return err
@@ -81,7 +81,7 @@ func initDB(dbfile string) error {
 func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
 
-	// TODO Add API
+	// Add API
 	r.HandleFunc(basePath+"/token", tokenapiv1.CreateTokenHandler).Methods("POST")
 
 	// Health Check

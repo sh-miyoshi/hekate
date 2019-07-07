@@ -6,6 +6,7 @@ import (
 
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/token"
 )
 
 // CreateTokenHandler create a token
@@ -27,9 +28,15 @@ func CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(create jwt token)
+	// Create jwt token
+	resToken, err := token.Generate()
+	if err != nil {
+		logger.Info("Failed to generate token: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 	res := TokenCreateResponse{
-		Token: "dummy_token",
+		Token: resToken,
 	}
 
 	resRaw, err := json.Marshal(res)
