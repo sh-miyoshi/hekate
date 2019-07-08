@@ -60,10 +60,11 @@ func ParseHTTPHeaderToken(tokenString string) (string, error) {
 }
 
 // Generate returns jwt token for user
-func Generate() (string, error) {
+func Generate(userID string) (string, error) {
 	claims := &jwt.StandardClaims{
 		Issuer:    config.Issuer,
 		ExpiresAt: time.Now().Add(config.ExpiredTime).Unix(), // Expired at 2 hours
+		Audience:  userID,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

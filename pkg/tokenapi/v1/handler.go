@@ -29,7 +29,7 @@ func CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create jwt token
-	resToken, err := token.Generate()
+	resToken, err := token.Generate(req.ID)
 	if err != nil {
 		logger.Info("Failed to generate token: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
