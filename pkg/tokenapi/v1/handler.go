@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 )
@@ -22,8 +21,8 @@ func CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authenticate request user
-	if err := db.GetInst().Authenticate(req.ID, req.Password); err != nil {
-		logger.Info("Failed to authenticate user: %v", err)
+	if req.ID != config.ID || req.Password != config.Password {
+		logger.Info("ID or Password is wrong")
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}

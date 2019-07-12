@@ -1,2 +1,6 @@
 # temporary directory
 tmp/*
+
+# binary files
+jwt-server
+jwt-server.exe

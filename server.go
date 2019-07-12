@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
@@ -48,36 +47,6 @@ func parseCmdlineArgs() {
 	flag.Parse()
 }
 
-func initDB(dbfile string) error {
-	// TODO(now using localdb)
-	if err := db.InitDBHandler(db.DBLocal); err != nil {
-		logger.Error("Failed to initialize DB: %v", err)
-		return err
-	}
-
-	if err := db.GetInst().ConnectDB(dbfile); err != nil {
-		logger.Error("Failed to connect DB: %v", err)
-		return err
-	}
-
-	admin := db.UserRequest{
-		ID:       config.AdminName,
-		Password: config.AdminPassword,
-	}
-	if err := db.GetInst().CreateUser(admin); err != nil {
-		logger.Error("Falied to create system admin: %v", err)
-		return err
-	}
-
-	// Add admin roles
-	if err := db.GetInst().AddRoleToUser(db.RoleUserAdit, config.AdminName); err != nil {
-		logger.Error("Failed to add role: %v", err)
-		return err
-	}
-
-	return nil
-}
-
 func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
 
@@ -94,8 +63,6 @@ func main() {
 	parseCmdlineArgs()
 
 	logger.InitLogger(config.ModeDebug, config.LogFile)
-
-	initDB("userdb.csv")
 
 	// Initialize Token Config
 	secretKey := uuid.New().String()
