@@ -1,4 +1,4 @@
 Dockerfile
 kubernetes.yaml
 config.yaml
-run with os environment
+run with custom jwt token format
