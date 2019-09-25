@@ -7,7 +7,7 @@ import (
 
 func TestParseHTTPHeaderToken(t *testing.T) {
 	InitConfig(time.Minute*5, "jwt-server", "testtest")
-	validToken, _ := Generate()
+	validToken, _ := Generate("my_user_id")
 
 	// Test Cases
 	tt := []struct {
