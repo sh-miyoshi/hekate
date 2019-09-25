@@ -40,7 +40,7 @@ func CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	resRaw, err := json.Marshal(res)
 	if err != nil {
-		logger.Error("Failed to marshal hobby %v", err)
+		logger.Error("Failed to marshal token %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
