@@ -1,4 +1,0 @@
-Dockerfile
-kubernetes.yaml
-config.yaml
-run with custom jwt token format
