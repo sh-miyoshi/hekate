@@ -19,6 +19,25 @@
 - import/export setting(?)
 - refresh token
 
+## keycloak
+
+- project
+  - settings
+    - name, enabled, endpoints(open id connect, saml, ...)
+    - encrypt_type
+    - cache
+    - token
+      - timeout, refresh_token, offline_token, revoke
+  - clients(users?)
+  - roles
+  - user federation
+  - authentication
+    - password policy
+  - audit events
+    - config
+  - import/export
+
+
 ## operation enhancement
 
 - add kubernetes yaml file
