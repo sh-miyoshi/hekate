@@ -1,0 +1,97 @@
+openapi: 3.0.0
+info:
+  title: JWT Server
+  description: API specification for JWT Server
+  version: '1.0'
+  license:
+    name: 'Apache 2.0'
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  '/v1/project':
+    post:
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/projectInfo'
+      responses:
+        '204':
+          description: 'Created'
+        '400':
+          description: 'Bad Request'
+        '409':
+          description: 'Project Already Exists'
+  '/v1/project/{projectID}':
+    get:
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully get project info'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/projectInfo'
+        '404':
+          description: 'Project Not Found'
+    patch:
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/projectInfo'
+      responses:
+        '200':
+          description: 'Updated'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'Project Not Found'
+    delete:
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Deleted'
+        '404':
+          description: 'Project Not Found'
+components:
+  schemas:
+    projectInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        enabled:
+          type: boolean
+        users:
+          type: array
+          description: 'An array of user ID'
+          items:
+            type: string
+        token:
+          $ref: '#/components/schemas/token'
+    token:
+      type: object
+      properties:
+        accessTokenLifeSpan:
+          type: integer
+        refreshTokenLifeSpan:
+          type: integer
+# TODO(user, role, audit events, user federation, import/export)
