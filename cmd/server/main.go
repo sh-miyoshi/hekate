@@ -7,6 +7,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/cmd/server/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
+	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	userapiv1 "github.com/sh-miyoshi/jwt-server/pkg/userapi/v1"
 	"net/http"
@@ -21,6 +23,11 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/token", tokenapiv1.TokenCreateHandler).Methods("POST")
 
 	// Project API
+	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project", projectapiv1.ProjectCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectID}", projectapiv1.ProjectDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectID}", projectapiv1.ProjectGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectID}", projectapiv1.ProjectUpdateHandler).Methods("PUT")
 
 	// User API
 	r.HandleFunc(basePath+"/project/{projectID}/user", userapiv1.AllUserGetHandler).Methods("GET")
@@ -30,6 +37,13 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}", userapiv1.UserUpdateHandler).Methods("PUT")
 	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}/role/{roleID}", userapiv1.UserRoleAddHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}/role/{roleID}", userapiv1.UserRoleDeleteHandler).Methods("DELETE")
+
+	// Role API
+	r.HandleFunc(basePath+"/project/{projectID}/role", roleapiv1.AllRoleGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectID}/role", roleapiv1.RoleCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectID}/role/{roleID}", roleapiv1.RoleDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectID}/role/{roleID}", roleapiv1.RoleGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectID}/role/{roleID}", roleapiv1.RoleUpdateHandler).Methods("PUT")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
