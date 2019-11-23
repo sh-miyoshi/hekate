@@ -13,12 +13,25 @@ var (
 	logger      = log.New(os.Stdout, "", log.LstdFlags)
 )
 
-func writeLog(level string, format string, a ...interface{}) {
+func writeLog(level string, isAll bool, format string, a ...interface{}) {
 	msg := fmt.Sprintf(format, a...)
 	_, fname, line, _ := runtime.Caller(2)
 	fname = filepath.Base(fname)
 
 	logger.Printf("%s:%d [%s] %s\n", fname, line, level, msg)
+
+	if isAll {
+		i := 3
+		for {
+			_, fname, line, ok := runtime.Caller(i)
+			if !ok {
+				break
+			}
+			fname = filepath.Base(fname)
+			logger.Printf("  called from: %s:%d\n", fname, line)
+			i++
+		}
+	}
 }
 
 // InitLogger initialize variables for logger
@@ -39,16 +52,16 @@ func InitLogger(debugMode bool, fileName string) error {
 // Debug method outputs log as DEBUG Level
 func Debug(format string, a ...interface{}) {
 	if logEnvDebug {
-		writeLog("DEBUG", format, a...)
+		writeLog("DEBUG", false, format, a...)
 	}
 }
 
 // Info method outputs log as INFO Level
 func Info(format string, a ...interface{}) {
-	writeLog("INFO", format, a...)
+	writeLog("INFO", false, format, a...)
 }
 
 // Error method outputs log as ERROR Level
 func Error(format string, a ...interface{}) {
-	writeLog("ERROR", format, a...)
+	writeLog("ERROR", true, format, a...)
 }
