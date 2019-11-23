@@ -3,17 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
-
-	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
+	"net/http"
+	"os"
+	"strconv"
 )
 
 type globalConfig struct {
@@ -73,7 +69,7 @@ func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
 
 	// Add API
-	r.HandleFunc(basePath+"/token", tokenapiv1.CreateTokenHandler).Methods("POST")
+	r.HandleFunc(basePath+"/token", tokenapiv1.TokenCreateHandler).Methods("POST")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
@@ -86,11 +82,6 @@ func main() {
 	parseCmdlineArgs()
 
 	logger.InitLogger(config.ModeDebug, config.LogFile)
-
-	// Initialize Token Config
-	secretKey := uuid.New().String()
-	expiredTime := time.Second * time.Duration(config.TokenExpiredTimeSec)
-	token.InitConfig(expiredTime, config.TokenIssuer, secretKey)
 
 	r := mux.NewRouter()
 	setAPI(r)

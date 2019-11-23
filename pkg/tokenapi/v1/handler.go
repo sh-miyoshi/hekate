@@ -1,52 +1,16 @@
 package tokenapi
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
 )
 
-// CreateTokenHandler create a token
-func CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Debug("call CreateTokenHandler method with Body: %v", r.Body)
+// TokenCreateHandler method create JWT token
+func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Parse request body
-	var req TokenCreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		logger.Info("Failed to decode Create Token params: %v", err)
-		http.Error(w, "Invalid Request Body", http.StatusBadRequest)
-		return
-	}
-
-	// Authenticate request user
-	if req.ID != config.ID || req.Password != config.Password {
-		logger.Info("ID or Password is wrong")
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	// Create jwt token
-	resToken, err := token.Generate(req.ID)
-	if err != nil {
-		logger.Info("Failed to generate token: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	res := TokenCreateResponse{
-		Token: resToken,
-	}
-
-	resRaw, err := json.Marshal(res)
-	if err != nil {
-		logger.Error("Failed to marshal token %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	w.Write(resRaw)
-	logger.Info("Successfully finished CreateTokenHandler")
+	logger.Info("TokenCreateHandler method is not implemented yet")
+	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	// w.WriteHeader(http.StatusOK)
 }
