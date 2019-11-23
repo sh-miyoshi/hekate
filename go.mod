@@ -7,4 +7,5 @@ require (
 	github.com/gorilla/mux v1.7.2
 	github.com/spf13/cobra v0.0.5
 	golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9
+	gopkg.in/yaml.v2 v2.2.2
 )

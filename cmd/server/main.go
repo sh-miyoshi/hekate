@@ -5,65 +5,13 @@ import (
 	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/jwt-server/cmd/server/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"net/http"
 	"os"
-	"strconv"
+	"path/filepath"
 )
-
-type globalConfig struct {
-	Port                int
-	BindAddr            string
-	LogFile             string
-	ModeDebug           bool
-	AdminName           string
-	AdminPassword       string
-	TokenExpiredTimeSec int
-	TokenIssuer         string
-}
-
-var config globalConfig
-
-func parseCmdlineArgs() {
-	const DefaultPort = 8080
-	const DefaultBindAddr = "0.0.0.0"
-	const DefaultAdminUser = "admin"
-	const DefaultAdminPassword = "password"
-	const DefaultTokenExpiredTime = 3600 // 1h
-	const DefaultTokenIssuer = "jwt-server"
-
-	flag.IntVar(&config.Port, "port", DefaultPort, "set port number for server")
-	flag.StringVar(&config.BindAddr, "bind", DefaultBindAddr, "set bind address for server")
-	flag.StringVar(&config.LogFile, "logfile", "", "write log to file, output os.Stdout when do not set this option")
-	flag.BoolVar(&config.ModeDebug, "debug", false, "if true, run server as debug mode")
-	flag.StringVar(&config.AdminName, "admin-name", DefaultAdminUser, "user name of system admin")
-	flag.StringVar(&config.AdminPassword, "admin-password", DefaultAdminPassword, "password of system admin")
-	flag.IntVar(&config.TokenExpiredTimeSec, "expired-time", DefaultTokenExpiredTime, "JWT token expired time [second]")
-	flag.StringVar(&config.TokenIssuer, "issuer", DefaultTokenIssuer, "issuer of JWT token")
-	flag.Parse()
-}
-
-func setEnvVar(key string, target *string) {
-	val := os.Getenv(key)
-	if len(val) > 0 {
-		target = &val
-	}
-}
-
-func parseOSEnvironment() {
-	setEnvVar("JWT_SERVER_ADMIN_NAME", &config.AdminName)
-	setEnvVar("JWT_SERVER_ADMIN_PASSWORD", &config.AdminPassword)
-	setEnvVar("JWT_SERVER_TOKEN_ISSUER", &config.TokenIssuer)
-
-	// set token rexired time
-	if len(os.Getenv("JWT_SERVER_TOKEN_EXPIRED_TIME")) > 0 {
-		time, _ := strconv.Atoi(os.Getenv("JWT_SERVER_TOKEN_EXPIRED_TIME"))
-		if time > 0 {
-			config.TokenExpiredTimeSec = time
-		}
-	}
-}
 
 func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
@@ -78,19 +26,34 @@ func setAPI(r *mux.Router) {
 }
 
 func main() {
-	parseOSEnvironment()
-	parseCmdlineArgs()
+	const defaultConfigFilePath = "./config.yaml"
+	configFilePath := flag.String("config", defaultConfigFilePath, "file name of config.yaml")
+	flag.Parse()
 
-	logger.InitLogger(config.ModeDebug, config.LogFile)
+	configAbsFilePath, err := filepath.Abs(*configFilePath)
+	if err != nil {
+		fmt.Printf("Failed to get absolute config file path: %v", err)
+		os.Exit(1)
+	}
+
+	cfg, err := config.InitConfig(configAbsFilePath)
+	if err != nil {
+		fmt.Printf("Failed to set config: %v", err)
+		os.Exit(1)
+	}
+
+	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
+	logger.Debug("Start with config: %v", *cfg)
 
 	r := mux.NewRouter()
 	setAPI(r)
 
 	corsObj := handlers.AllowedOrigins([]string{"*"})
 
-	addr := fmt.Sprintf("%s:%d", config.BindAddr, config.Port)
+	addr := fmt.Sprintf("%s:%d", cfg.BindAddr, cfg.Port)
 	logger.Info("start server with %s", addr)
 	if err := http.ListenAndServe(addr, handlers.CORS(corsObj)(r)); err != nil {
+		logger.Error("Failed to run server: %v", err)
 		os.Exit(1)
 	}
 }

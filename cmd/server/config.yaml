@@ -1,0 +1,20 @@
+# Listen Port of Server
+server_port: 8080
+
+# Binding Address to Server
+server_bind_address: "0.0.0.0"
+
+# File Name of Output Log
+#   If set empty, output log to stdout
+logfile: ''
+
+# If true, output debug level log
+debug_mode: true
+
+# Name of Server Admin
+#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_NAME
+admin_name: admin
+
+# Password of Server Admin
+#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_PASSWORD
+admin_password: password
