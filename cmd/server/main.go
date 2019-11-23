@@ -30,12 +30,7 @@ func main() {
 	configFilePath := flag.String("config", defaultConfigFilePath, "file name of config.yaml")
 	flag.Parse()
 
-	configAbsFilePath, err := filepath.Abs(*configFilePath)
-	if err != nil {
-		fmt.Printf("Failed to get absolute config file path: %v", err)
-		os.Exit(1)
-	}
-
+	configAbsFilePath, _ := filepath.Abs(*configFilePath)
 	cfg, err := config.InitConfig(configAbsFilePath)
 	if err != nil {
 		fmt.Printf("Failed to set config: %v", err)
