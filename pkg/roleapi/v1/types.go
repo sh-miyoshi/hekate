@@ -18,7 +18,7 @@ type RoleGetResponse struct {
 
 // RolePutRequest ...
 type RolePutRequest struct {
-	Name           string   `json:"name,omitempty"`
-	TargetResource []string `json:"targetResource,omitempty"`
-	Type           string   `json:"type,omitempty"`
+	Name           string   `json:"name"`
+	TargetResource []string `json:"targetResource"`
+	Type           string   `json:"type"`
 }

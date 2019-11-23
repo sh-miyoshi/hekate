@@ -11,7 +11,7 @@ type TokenConfig struct {
 // ProjectCreateRequest ...
 type ProjectCreateRequest struct {
 	Name    string `json:"name"`
-	Enabled bool   `json:"enabled,omitempty"`
+	Enabled bool   `json:"enabled"`
 }
 
 // ProjectGetResponse ...
@@ -25,7 +25,7 @@ type ProjectGetResponse struct {
 
 // ProjectPutRequest ...
 type ProjectPutRequest struct {
-	Name        string       `json:"name,omitempty"`
-	Enabled     bool         `json:"enabled,omitempty"`
-	TokenConfig *TokenConfig `json:"tokenConfig,omitempty"`
+	Name        string       `json:"name"`
+	Enabled     bool         `json:"enabled"`
+	TokenConfig *TokenConfig `json:"tokenConfig"`
 }
