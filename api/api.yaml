@@ -7,22 +7,76 @@ info:
     name: 'Apache 2.0'
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 paths:
-  '/v1/project':
+  '/api/v1/project/{projectID}/token':
     post:
+      tags:
+        - token
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
-              schema:
-                $ref: '#/components/schemas/projectInfo'
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
       responses:
-        '204':
+        '200':
+          description: 'Get token'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: 'Unauthorized'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project':
+    post:
+      tags:
+        - project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreateRequest'
+      responses:
+        '200':
           description: 'Created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectGetResponse'
         '400':
           description: 'Bad Request'
+        '403':
+          description: 'Forbidden'
         '409':
           description: 'Project Already Exists'
-  '/v1/project/{projectID}':
+        '500':
+          description: 'Internal Server Error'
     get:
+      tags:
+        - project
+      responses:
+        '200':
+          description: 'Get All Project IDs'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectID}':
+    get:
+      tags:
+        - project
       parameters:
         - name: projectID
           in: path
@@ -35,10 +89,16 @@ paths:
           content: 
             application/json:
               schema:
-                $ref: '#/components/schemas/projectInfo'
+                $ref: '#/components/schemas/ProjectGetResponse'
         '404':
           description: 'Project Not Found'
-    patch:
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    put:
+      tags:
+        - project
       parameters:
         - name: projectID
           in: path
@@ -48,16 +108,22 @@ paths:
       requestBody:
         content:
           application/json:
-              schema:
-                $ref: '#/components/schemas/projectInfo'
+            schema:
+              $ref: '#/components/schemas/ProjectPutRequest'
       responses:
-        '200':
+        '204':
           description: 'Updated'
         '400':
           description: 'Bad Request'
         '404':
           description: 'Project Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
     delete:
+      tags:
+        - project
       parameters:
         - name: projectID
           in: path
@@ -69,9 +135,349 @@ paths:
           description: 'Deleted'
         '404':
           description: 'Project Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectID}/user':
+    post:
+      tags:
+        - user
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '200':
+          description: 'Created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserGetResponse'
+        '400':
+          description: 'Bad Request'
+        '409':
+          description: 'User Already Exists'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    get:
+      tags:
+        - user
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Get All User IDs'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: 'User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectID}/user/{userID}':
+    get:
+      tags:
+        - user
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully get user info'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserGetResponse'
+        '404':
+          description: 'User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    put:
+      tags:
+        - user
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPutRequest'
+      responses:
+        '204':
+          description: 'Updated'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    delete:
+      tags:
+        - user
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Deleted'
+        '404':
+          description: 'User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectID}/user/{userID}/role/{roleID}':
+    post:
+      tags:
+        - user
+      description: 'Add a role to the user'
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Added'
+        '404':
+          description: 'User or Project or Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    delete:
+      tags:
+        - user
+      description: 'Delete a role from the user'
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Deleted'
+        '404':
+          description: 'User or Project or Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectID}/role':
+    post:
+      tags:
+        - role
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleCreateRequest'
+      responses:
+        '200':
+          description: 'Created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleGetResponse'
+        '400':
+          description: 'Bad Request'
+        '409':
+          description: 'Role Already Exists'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    get:
+      tags:
+        - role
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Get All Role IDs'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: 'Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectID}/role/{roleID}':
+    get:
+      tags:
+        - role
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully get role info'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleGetResponse'
+        '404':
+          description: 'Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    put:
+      tags:
+        - role
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePutRequest'
+      responses:
+        '204':
+          description: 'Updated'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    delete:
+      tags:
+        - role
+      parameters:
+        - name: projectID
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Deleted'
+        '404':
+          description: 'Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
 components:
   schemas:
-    projectInfo:
+    ProjectCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+    ProjectGetResponse:
       type: object
       properties:
         id:
@@ -80,18 +486,152 @@ components:
           type: string
         enabled:
           type: boolean
-        users:
-          type: array
-          description: 'An array of user ID'
-          items:
-            type: string
-        token:
-          $ref: '#/components/schemas/token'
-    token:
+        createdAt:
+          type: string
+          format: date
+        tokenConfig:
+          $ref: '#/components/schemas/TokenConfig'
+    ProjectPutRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        tokenConfig:
+          $ref: '#/components/schemas/TokenConfig'
+    TokenConfig:
       type: object
       properties:
         accessTokenLifeSpan:
           type: integer
         refreshTokenLifeSpan:
           type: integer
-# TODO(user, role, audit events, user federation, import/export)
+    UserCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        password:
+          type: string
+          format: password
+        enabled:
+          type: boolean
+    UserGetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        enabled:
+          type: boolean
+        passwordHash:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        roles:
+          description: 'Array of role IDs'
+          type: array
+          items:
+            type: string
+    UserPutRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        password:
+          type: string
+        roles:
+          description: 'Array of role IDs'
+          type: array
+          items:
+            type: string
+    RoleCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        targetResource:
+          type: array
+          items:
+            type: string
+            enum:
+              - cluster
+              - project
+              - user
+              - role
+        type:
+          type: string
+          enum:
+            - read
+            - write
+            - manage
+    RoleGetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        targetResource:
+          type: array
+          items:
+            type: string
+            enum:
+              - cluster
+              - project
+              - user
+              - role
+        type:
+          type: string
+          enum:
+            - read
+            - write
+            - manage
+        createdAt:
+          type: string
+          format: date
+    RolePutRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        targetResource:
+          type: array
+          items:
+            type: string
+            enum:
+              - cluster
+              - project
+              - user
+              - role
+        type:
+          type: string
+          enum:
+            - read
+            - write
+            - manage
+    TokenRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        secret:
+          type: string
+        authType:
+          type: string
+          enum:
+            - password
+            - refreshToken
+            - clientSecret
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
