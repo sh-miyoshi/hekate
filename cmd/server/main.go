@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/cmd/server/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
+	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
@@ -51,6 +52,24 @@ func setAPI(r *mux.Router) {
 	}).Methods("GET")
 }
 
+func initDB(dbType, connStr, adminName, adminPassword string) error {
+	if err := db.InitDBManager(dbType, connStr); err != nil {
+		return err
+	}
+
+	// Set Master Project if not exsits
+	err := db.GetInst().Project.Add(&model.ProjectInfo{
+		ID:   "master",
+		Name: "master",
+	})
+	if err != nil {
+		logger.Info("Master Project is already exists. So nothing to do.")
+		return nil
+	}
+
+	return nil
+}
+
 func main() {
 	// Read command line args
 	const defaultConfigFilePath = "./config.yaml"
@@ -69,7 +88,7 @@ func main() {
 	logger.Debug("Start with config: %v", *cfg)
 
 	// Initalize Database
-	if err := db.InitDBManager("local", "./db"); err != nil {
+	if err := initDB("local", "./db", cfg.AdminName, cfg.AdminPassword); err != nil {
 		logger.Error("Failed to initialize database: %v", err)
 		os.Exit(1)
 	}

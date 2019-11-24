@@ -35,3 +35,8 @@ func InitDBManager(dbType string, connStr string) error {
 
 	return nil
 }
+
+// GetInst returns an instance of DB Manager
+func GetInst() *Manager {
+	return inst
+}
