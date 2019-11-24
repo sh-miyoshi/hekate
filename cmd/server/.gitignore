@@ -1,3 +1,6 @@
 # binary files
 server
 server.exe
+
+# data
+db/

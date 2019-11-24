@@ -69,7 +69,7 @@ func main() {
 	logger.Debug("Start with config: %v", *cfg)
 
 	// Initalize Database
-	if err := db.InitDBManager("local"); err != nil {
+	if err := db.InitDBManager("local", "./db"); err != nil {
 		logger.Error("Failed to initialize database: %v", err)
 		os.Exit(1)
 	}
