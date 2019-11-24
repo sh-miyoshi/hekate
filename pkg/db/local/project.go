@@ -1,6 +1,7 @@
 package local
 
 import (
+	"encoding/csv"
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"os"
@@ -23,14 +24,38 @@ func NewHandler(dbDir string) (*ProjectInfoHandler, error) {
 	}
 
 	res := &ProjectInfoHandler{
-		filePath: filepath.Join(dbDir, "projects.txt"),
+		filePath: filepath.Join(dbDir, "projects.csv"),
 	}
 	return res, nil
 }
 
 // Add ...
 func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
-	// TODO(not implemented yet)
+	if ent.ID == "" {
+		return fmt.Errorf("id of entry is empty")
+	}
+
+	fp, err := os.OpenFile(h.filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
+
+	reader := csv.NewReader(fp)
+	for {
+		project, err := reader.Read()
+		if err != nil {
+			// TODO(consider not EOF err)
+			break
+		}
+		if project[0] == ent.ID {
+			return model.ErrProjectAlreadyExists
+		}
+	}
+
+	// append new project
+	fmt.Fprintf(fp, "%s,%s\n", ent.ID, ent.Name)
+
 	return nil
 }
 
