@@ -13,10 +13,10 @@ func setEnvVar(key string, target *string) {
 }
 
 // InitConfig ...
-func InitConfig(absFilePath string) (*GlobalConfig, error) {
+func InitConfig(filePath string) (*GlobalConfig, error) {
 	res := &GlobalConfig{}
 
-	fp, err := os.Open(absFilePath)
+	fp, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}

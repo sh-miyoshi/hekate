@@ -14,7 +14,6 @@ import (
 	userapiv1 "github.com/sh-miyoshi/jwt-server/pkg/userapi/v1"
 	"net/http"
 	"os"
-	"path/filepath"
 )
 
 func setAPI(r *mux.Router) {
@@ -59,8 +58,7 @@ func main() {
 	flag.Parse()
 
 	// Read configure
-	configAbsFilePath, _ := filepath.Abs(*configFilePath)
-	cfg, err := config.InitConfig(configAbsFilePath)
+	cfg, err := config.InitConfig(*configFilePath)
 	if err != nil {
 		fmt.Printf("Failed to set config: %v", err)
 		os.Exit(1)
