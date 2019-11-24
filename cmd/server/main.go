@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/cmd/server/config"
+	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
@@ -68,6 +69,12 @@ func main() {
 	// Initialize logger
 	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
 	logger.Debug("Start with config: %v", *cfg)
+
+	// Initalize Database
+	if err := db.InitDBManager("local"); err != nil {
+		logger.Error("Failed to initialize database: %v", err)
+		os.Exit(1)
+	}
 
 	// Setup API
 	r := mux.NewRouter()
