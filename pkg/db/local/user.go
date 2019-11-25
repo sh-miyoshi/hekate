@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 )
 
-// ProjectInfoHandler implement db.ProjectInfoHandler
-type ProjectInfoHandler struct {
+// UserInfoHandler implement db.UserInfoHandler
+type UserInfoHandler struct {
 	filePath string
 }
 
-// NewProjectHandler ...
-func NewProjectHandler(dbDir string) (*ProjectInfoHandler, error) {
+// NewUserHandler ...
+func NewUserHandler(dbDir string) (*UserInfoHandler, error) {
 	fileInfo, err := os.Stat(dbDir)
 	if err != nil {
 		return nil, err
@@ -23,14 +23,14 @@ func NewProjectHandler(dbDir string) (*ProjectInfoHandler, error) {
 		return nil, fmt.Errorf("%s is not directory", dbDir)
 	}
 
-	res := &ProjectInfoHandler{
-		filePath: filepath.Join(dbDir, "projects.csv"),
+	res := &UserInfoHandler{
+		filePath: filepath.Join(dbDir, "users.csv"),
 	}
 	return res, nil
 }
 
 // Add ...
-func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
+func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 	if ent.ID == "" {
 		return fmt.Errorf("id of entry is empty")
 	}
@@ -43,42 +43,46 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 
 	reader := csv.NewReader(fp)
 	for {
-		project, err := reader.Read()
+		user, err := reader.Read()
 		if err != nil {
 			// TODO(consider not EOF err)
 			break
 		}
-		if project[0] == ent.ID {
-			return model.ErrProjectAlreadyExists
+		if user[0] == ent.ID {
+			return model.ErrUserAlreadyExists
 		}
 	}
 
 	// append new project
-	fmt.Fprintf(fp, "%s,%s\n", ent.ID, ent.Name)
+	fmt.Fprintf(fp, "%s,%s,%s,%t,%s,%s", ent.ID, ent.ProjectID, ent.Name, ent.Enabled, ent.CreatedAt, ent.PasswordHash)
+	for _, role := range ent.Roles {
+		fmt.Fprintf(fp, ",%s", role)
+	}
+	fmt.Fprintf(fp, "\n")
 
 	return nil
 }
 
 // Delete ...
-func (h *ProjectInfoHandler) Delete(id string) error {
+func (h *UserInfoHandler) Delete(id string) error {
 	// TODO(not implemented yet)
 	return nil
 }
 
 // GetList ...
-func (h *ProjectInfoHandler) GetList() []string {
+func (h *UserInfoHandler) GetList() []string {
 	// TODO(not implemented yet)
 	return []string{}
 }
 
 // Get ...
-func (h *ProjectInfoHandler) Get(id string) (*model.ProjectInfo, error) {
+func (h *UserInfoHandler) Get(id string) (*model.UserInfo, error) {
 	// TODO(not implemented yet)
 	return nil, nil
 }
 
 // Update ...
-func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
+func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	// TODO(not implemented yet)
 	return nil
 }

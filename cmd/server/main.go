@@ -59,13 +59,29 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 
 	// Set Master Project if not exsits
 	err := db.GetInst().Project.Add(&model.ProjectInfo{
-		ID:   "master",
-		Name: "master",
+		ID:        "master",
+		Name:      "master",
+		Enabled:   true,
+		CreatedAt: "now", // TODO
+		TokenConfig: &model.TokenConfig{
+			AccessTokenLifeSpan:  0, // TODO
+			RefreshTokenLifeSpan: 0, // TODO
+		},
 	})
 	if err != nil {
 		logger.Info("Master Project is already exists. So nothing to do.")
 		return nil
 	}
+
+	err = db.GetInst().User.Add(&model.UserInfo{
+		ID:           adminName, // TODO
+		ProjectID:    "master",
+		Name:         adminName,
+		Enabled:      true,
+		CreatedAt:    "now",         // TODO
+		PasswordHash: adminPassword, // TODO
+		Roles:        []string{},    // TODO
+	})
 
 	return nil
 }

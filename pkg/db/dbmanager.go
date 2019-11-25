@@ -9,6 +9,7 @@ import (
 // Manager ...
 type Manager struct {
 	Project ProjectInfoHandler
+	User    UserInfoHandler
 }
 
 var inst *Manager
@@ -22,12 +23,18 @@ func InitDBManager(dbType string, connStr string) error {
 	switch dbType {
 	case "local":
 		logger.Info("Initialize with local file storage")
-		prjHandler, err := local.NewHandler(connStr)
+		prjHandler, err := local.NewProjectHandler(connStr)
 		if err != nil {
 			return err
 		}
+		userHandler, err := local.NewUserHandler(connStr)
+		if err != nil {
+			return err
+		}
+
 		inst = &Manager{
 			Project: prjHandler,
+			User:    userHandler,
 		}
 	default:
 		return fmt.Errorf("Database Type %s is not implemented yet", dbType)
