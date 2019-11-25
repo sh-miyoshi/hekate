@@ -8,7 +8,7 @@ import (
 type ProjectInfoHandler interface {
 	Add(ent *model.ProjectInfo) error
 	Delete(id string) error
-	GetList() []string
+	GetList() ([]string, error)
 	Get(id string) (*model.ProjectInfo, error)
 	Update(ent *model.ProjectInfo) error
 }
@@ -17,7 +17,7 @@ type ProjectInfoHandler interface {
 type UserInfoHandler interface {
 	Add(ent *model.UserInfo) error
 	Delete(id string) error
-	GetList() []string
+	GetList() ([]string, error)
 	Get(id string) (*model.UserInfo, error)
 	Update(ent *model.UserInfo) error
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -123,15 +124,61 @@ func (h *ProjectInfoHandler) Delete(id string) error {
 }
 
 // GetList ...
-func (h *ProjectInfoHandler) GetList() []string {
-	// TODO(not implemented yet)
-	return []string{}
+func (h *ProjectInfoHandler) GetList() ([]string, error) {
+	fp, err := os.Open(h.filePath)
+	if err != nil {
+		return []string{}, err
+	}
+	defer fp.Close()
+
+	results := []string{}
+
+	reader := csv.NewReader(fp)
+	for {
+		project, err := reader.Read()
+		if err != nil {
+			// TODO(consider not EOF err)
+			break
+		}
+		results = append(results, project[0])
+	}
+
+	return results, nil
 }
 
 // Get ...
 func (h *ProjectInfoHandler) Get(id string) (*model.ProjectInfo, error) {
-	// TODO(not implemented yet)
-	return nil, nil
+	fp, err := os.Open(h.filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer fp.Close()
+
+	reader := csv.NewReader(fp)
+	for {
+		project, err := reader.Read()
+		if err != nil {
+			// TODO(consider not EOF err)
+			break
+		}
+		enabled, _ := strconv.ParseBool(project[2])
+		accessTokenLifeSpan, _ := strconv.Atoi(project[4])
+		refreshTokenLifeSpan, _ := strconv.Atoi(project[5])
+
+		if project[0] == id {
+			return &model.ProjectInfo{
+				ID:        project[0],
+				Name:      project[1],
+				Enabled:   enabled,
+				CreatedAt: project[3],
+				TokenConfig: &model.TokenConfig{
+					AccessTokenLifeSpan:  accessTokenLifeSpan,
+					RefreshTokenLifeSpan: refreshTokenLifeSpan,
+				},
+			}, nil
+		}
+	}
+	return nil, model.ErrNoSuchProject
 }
 
 // Update ...

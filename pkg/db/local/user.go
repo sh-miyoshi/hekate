@@ -70,9 +70,9 @@ func (h *UserInfoHandler) Delete(id string) error {
 }
 
 // GetList ...
-func (h *UserInfoHandler) GetList() []string {
+func (h *UserInfoHandler) GetList() ([]string, error) {
 	// TODO(not implemented yet)
-	return []string{}
+	return []string{}, nil
 }
 
 // Get ...

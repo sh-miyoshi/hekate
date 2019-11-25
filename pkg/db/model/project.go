@@ -6,8 +6,8 @@ import (
 
 // TokenConfig ...
 type TokenConfig struct {
-	AccessTokenLifeSpan  int32
-	RefreshTokenLifeSpan int32
+	AccessTokenLifeSpan  int
+	RefreshTokenLifeSpan int
 }
 
 // ProjectInfo ...
