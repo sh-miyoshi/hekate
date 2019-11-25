@@ -1,18 +1,20 @@
 package local
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"os"
 	"path/filepath"
 	"strings"
-	"bufio"
+	"sync"
 )
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
 type ProjectInfoHandler struct {
 	filePath string
+	mu       sync.Mutex
 }
 
 // NewProjectHandler ...
@@ -33,6 +35,9 @@ func NewProjectHandler(dbDir string) (*ProjectInfoHandler, error) {
 
 // Add ...
 func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if ent.ID == "" {
 		return fmt.Errorf("id of entry is empty")
 	}
@@ -63,23 +68,26 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 
 // Delete ...
 func (h *ProjectInfoHandler) Delete(id string) error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if id == "" {
-        return fmt.Errorf("id of entry is empty")
-    }
+		return fmt.Errorf("id of entry is empty")
+	}
 
 	if id == "master" {
 		return fmt.Errorf("master project can not delete")
 	}
 
-    fp, err := os.OpenFile(h.filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-    if err != nil {
-        return err
-    }
-    defer fp.Close()
+	fp, err := os.OpenFile(h.filePath, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer fp.Close()
 
 	deleted := false
 	scanner := bufio.NewScanner(fp)
-	result := []string{}
+	results := []string{}
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -89,9 +97,9 @@ func (h *ProjectInfoHandler) Delete(id string) error {
 			return err
 		}
 		if project[0] == id {
-            deleted = true
-        } else {
-			result = append(result, line)
+			deleted = true
+		} else {
+			results = append(results, line)
 		}
 	}
 	if err := scanner.Err(); err != nil {
@@ -99,10 +107,17 @@ func (h *ProjectInfoHandler) Delete(id string) error {
 	}
 
 	if !deleted {
-		return fmt.Errorf("No such project")
+		return model.ErrNoSuchProject
 	}
 
-	// TODO(write result)
+	// Remove all data at first
+	fp.Truncate(0)
+	fp.Seek(0, 0)
+
+	// Write results
+	for _, line := range results {
+		fmt.Fprintln(fp, line)
+	}
 
 	return nil
 }

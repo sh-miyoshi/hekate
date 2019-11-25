@@ -22,4 +22,7 @@ type ProjectInfo struct {
 var (
 	// ErrProjectAlreadyExists ...
 	ErrProjectAlreadyExists = errors.New("Project Already Exists")
+
+	// ErrNoSuchProject ...
+	ErrNoSuchProject = errors.New("No such project")
 )
