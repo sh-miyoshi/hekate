@@ -6,6 +6,8 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"os"
 	"path/filepath"
+	"strings"
+	"bufio"
 )
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
@@ -61,7 +63,47 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 
 // Delete ...
 func (h *ProjectInfoHandler) Delete(id string) error {
-	// TODO(not implemented yet)
+	if id == "" {
+        return fmt.Errorf("id of entry is empty")
+    }
+
+	if id == "master" {
+		return fmt.Errorf("master project can not delete")
+	}
+
+    fp, err := os.OpenFile(h.filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+    if err != nil {
+        return err
+    }
+    defer fp.Close()
+
+	deleted := false
+	scanner := bufio.NewScanner(fp)
+	result := []string{}
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		reader := csv.NewReader(strings.NewReader(line))
+		project, err := reader.Read()
+		if err != nil {
+			return err
+		}
+		if project[0] == id {
+            deleted = true
+        } else {
+			result = append(result, line)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	if !deleted {
+		return fmt.Errorf("No such project")
+	}
+
+	// TODO(write result)
+
 	return nil
 }
 
