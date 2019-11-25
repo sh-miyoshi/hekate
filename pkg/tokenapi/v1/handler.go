@@ -8,6 +8,10 @@ import (
 
 // TokenCreateHandler method create JWT token
 func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse Request
+	// Validate Request
+	// Password Authenticate
+	// Return JWT Token
 	logger.Info("TokenCreateHandler method is not implemented yet")
 	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }
