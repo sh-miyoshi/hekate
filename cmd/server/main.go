@@ -15,6 +15,7 @@ import (
 	userapiv1 "github.com/sh-miyoshi/jwt-server/pkg/userapi/v1"
 	"net/http"
 	"os"
+	"github.com/google/uuid"
 )
 
 func setAPI(r *mux.Router) {
@@ -74,7 +75,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	}
 
 	err = db.GetInst().User.Add(&model.UserInfo{
-		ID:           adminName, // TODO
+		ID:           uuid.New().String(),
 		ProjectID:    "master",
 		Name:         adminName,
 		Enabled:      true,
