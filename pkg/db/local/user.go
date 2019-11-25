@@ -48,7 +48,7 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 			// TODO(consider not EOF err)
 			break
 		}
-		if user[0] == ent.ID {
+		if user[0] == ent.ID || user[2] == ent.Name {
 			return model.ErrUserAlreadyExists
 		}
 	}

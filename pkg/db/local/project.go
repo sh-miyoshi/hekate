@@ -55,13 +55,13 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 			// TODO(consider not EOF err)
 			break
 		}
-		if project[0] == ent.ID {
+		if project[0] == ent.ID || project[1] == ent.Name {
 			return model.ErrProjectAlreadyExists
 		}
 	}
 
 	// append new project
-	fmt.Fprintf(fp, "%s,%s\n", ent.ID, ent.Name)
+	fmt.Fprintf(fp, "%s,%s,%t,%s,%d,%d\n", ent.ID, ent.Name, ent.Enabled, ent.CreatedAt, ent.TokenConfig.AccessTokenLifeSpan, ent.TokenConfig.RefreshTokenLifeSpan)
 
 	return nil
 }
