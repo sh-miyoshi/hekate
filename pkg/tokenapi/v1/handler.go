@@ -32,35 +32,40 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		if err == model.ErrNoSuchUser || err == os.ErrNotExist {
 			http.Error(w, "User or Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get project info: %v", err)
+			logger.Error("Failed to get user id: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
 	}
 	logger.Debug("User ID: %s", userID)
 
-	// TODO(not implemented yet)
-	//user, err := db.GetInst().User.Get(projectID, userID)
-	// if err != nil {
-	// 	if err == model.ErrNoSuchProject {
-	// 		http.Error(w, "Project Not Found", http.StatusNotFound)
-	// 	}else{
-	// 		logger.Error("Failed to get project info: %v", err)
-	// 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	// 	}
-	// 	return
-	// }
+	user, err := db.GetInst().User.Get(projectID, userID)
+	if err != nil {
+		if err == model.ErrNoSuchUser {
+			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to get user info: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
 
-	// // Password Authenticate
-	// // TODO(hash password)
+	// Password Authenticate
+	// TODO(hash password)
 
-	// switch request.AuthType {
-	// case: "password"
-	// default:
-	// 	logger.Error("Invalid Authentication Type: %s", request.AuthType)
-	// 	http.Error(w, "Bad Request", http.StatusBadRequest)
-	// 	return
-	// }
+	switch request.AuthType {
+	case "password":
+		if user.PasswordHash != request.Secret {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+	default:
+		logger.Error("Invalid Authentication Type: %s", request.AuthType)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// TODO(Generate JWT Token)
 
 	// Return JWT Token
 	logger.Info("TokenCreateHandler method is not implemented yet")
