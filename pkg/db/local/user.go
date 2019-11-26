@@ -31,7 +31,7 @@ func NewUserHandler(dbDir string) (*UserInfoHandler, error) {
 
 // Add ...
 func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
-	if err := ent.Validate(); err!=nil {
+	if err := ent.Validate(); err != nil {
 		return err
 	}
 
@@ -91,9 +91,7 @@ func (h *UserInfoHandler) Get(projectID string, userID string) (*model.UserInfo,
 			break
 		}
 		if user[0] == userID {
-			return &model.UserInfo{
-
-			}, nil
+			return &model.UserInfo{}, nil
 		}
 	}
 
@@ -107,7 +105,7 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 }
 
 // GetIDByName ...
-func (h *UserInfoHandler) GetIDByName(projectID string, userName string) (string, error){
+func (h *UserInfoHandler) GetIDByName(projectID string, userName string) (string, error) {
 	fp, err := os.Open(h.getFilePath(projectID))
 	if err != nil {
 		return "", err
@@ -130,5 +128,5 @@ func (h *UserInfoHandler) GetIDByName(projectID string, userName string) (string
 }
 
 func (h *UserInfoHandler) getFilePath(projectID string) string {
-	return filepath.Join(h.fileDir, projectID + "_users.csv")
+	return filepath.Join(h.fileDir, projectID+"_users.csv")
 }

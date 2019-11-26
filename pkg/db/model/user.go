@@ -26,7 +26,7 @@ var (
 // Validate ...
 func (ui *UserInfo) Validate() error {
 	if ui.ID == "" {
-		return errors.New("User ID is empty") 
+		return errors.New("User ID is empty")
 	}
 
 	if ui.ProjectID == "" {
