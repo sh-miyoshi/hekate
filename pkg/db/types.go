@@ -16,8 +16,9 @@ type ProjectInfoHandler interface {
 // UserInfoHandler ...
 type UserInfoHandler interface {
 	Add(ent *model.UserInfo) error
-	Delete(id string) error
-	GetList() ([]string, error)
-	Get(id string) (*model.UserInfo, error)
+	Delete(projectID string, userID string) error
+	GetList(projectID string) ([]string, error)
+	Get(projectID string, userID string) (*model.UserInfo, error)
 	Update(ent *model.UserInfo) error
+	GetIDByName(projectID string, userName string) (string, error)
 }

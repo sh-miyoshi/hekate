@@ -18,6 +18,9 @@ type UserInfo struct {
 var (
 	// ErrUserAlreadyExists ...
 	ErrUserAlreadyExists = errors.New("User Already Exists")
+
+	// ErrNoSuchUser ...
+	ErrNoSuchUser = errors.New("No Such User")
 )
 
 // Validate ...

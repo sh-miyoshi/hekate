@@ -64,27 +64,69 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 }
 
 // Delete ...
-func (h *UserInfoHandler) Delete(id string) error {
+func (h *UserInfoHandler) Delete(projectID string, userID string) error {
 	// TODO(not implemented yet)
 	return nil
 }
 
 // GetList ...
-func (h *UserInfoHandler) GetList() ([]string, error) {
+func (h *UserInfoHandler) GetList(projectID string) ([]string, error) {
 	// TODO(not implemented yet)
 	return []string{}, nil
 }
 
 // Get ...
-func (h *UserInfoHandler) Get(id string) (*model.UserInfo, error) {
-	// TODO(not implemented yet)
-	return nil, nil
+func (h *UserInfoHandler) Get(projectID string, userID string) (*model.UserInfo, error) {
+	fp, err := os.Open(h.getFilePath(projectID))
+	if err != nil {
+		return nil, err
+	}
+	defer fp.Close()
+
+	reader := csv.NewReader(fp)
+	for {
+		user, err := reader.Read()
+		if err != nil {
+			// TODO(consider not EOF err)
+			break
+		}
+		if user[0] == userID {
+			return &model.UserInfo{
+
+			}, nil
+		}
+	}
+
+	return nil, model.ErrNoSuchUser
 }
 
 // Update ...
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	// TODO(not implemented yet)
 	return nil
+}
+
+// GetIDByName ...
+func (h *UserInfoHandler) GetIDByName(projectID string, userName string) (string, error){
+	fp, err := os.Open(h.getFilePath(projectID))
+	if err != nil {
+		return "", err
+	}
+	defer fp.Close()
+
+	reader := csv.NewReader(fp)
+	for {
+		user, err := reader.Read()
+		if err != nil {
+			// TODO(consider not EOF err)
+			break
+		}
+		if user[2] == userName {
+			return user[0], nil
+		}
+	}
+
+	return "", model.ErrNoSuchUser
 }
 
 func (h *UserInfoHandler) getFilePath(projectID string) string {
