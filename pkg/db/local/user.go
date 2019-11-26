@@ -10,7 +10,7 @@ import (
 
 // UserInfoHandler implement db.UserInfoHandler
 type UserInfoHandler struct {
-	filePath string
+	fileDir string
 }
 
 // NewUserHandler ...
@@ -24,18 +24,18 @@ func NewUserHandler(dbDir string) (*UserInfoHandler, error) {
 	}
 
 	res := &UserInfoHandler{
-		filePath: filepath.Join(dbDir, "users.csv"),
+		fileDir: dbDir,
 	}
 	return res, nil
 }
 
 // Add ...
 func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
-	if ent.ID == "" {
-		return fmt.Errorf("id of entry is empty")
+	if err := ent.Validate(); err!=nil {
+		return err
 	}
 
-	fp, err := os.OpenFile(h.filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	fp, err := os.OpenFile(h.getFilePath(ent.ProjectID), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return err
 	}
@@ -85,4 +85,8 @@ func (h *UserInfoHandler) Get(id string) (*model.UserInfo, error) {
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	// TODO(not implemented yet)
 	return nil
+}
+
+func (h *UserInfoHandler) getFilePath(projectID string) string {
+	return filepath.Join(h.fileDir, projectID + "_users.csv")
 }

@@ -84,6 +84,10 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		Roles:        []string{},    // TODO
 	})
 
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
