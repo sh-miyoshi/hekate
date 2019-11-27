@@ -88,7 +88,13 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return JWT Token
-	// TODO
+	w.Header().Add("Content-Type", "application/json")
+
+	if err := json.NewEncoder(w).Encode(&res); err != nil {
+		logger.Error("Failed to encode a response for JWT token create: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	logger.Info("TokenCreateHandler method successfully finished")
 
