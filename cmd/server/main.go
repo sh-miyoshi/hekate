@@ -9,6 +9,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
@@ -80,7 +81,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		Name:         adminName,
 		Enabled:      true,
 		CreatedAt:    "now",         // TODO
-		PasswordHash: adminPassword, // TODO
+		PasswordHash: util.CreateHash(adminPassword),
 		Roles:        []string{},    // TODO
 	})
 

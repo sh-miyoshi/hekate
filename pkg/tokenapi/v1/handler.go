@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"net/http"
 	"os"
@@ -50,12 +51,11 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Password Authenticate
-	// TODO(hash password)
-
+	// Secret Authenticate
+	hash := util.CreateHash(request.Secret)
 	switch request.AuthType {
 	case "password":
-		if user.PasswordHash != request.Secret {
+		if user.PasswordHash != hash {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
