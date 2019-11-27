@@ -18,6 +18,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"os"
+	"time"
 )
 
 func setAPI(r *mux.Router) {
@@ -65,7 +66,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		ID:        "master",
 		Name:      "master",
 		Enabled:   true,
-		CreatedAt: "now", // TODO
+		CreatedAt: time.Now().String(),
 		TokenConfig: &model.TokenConfig{
 			AccessTokenLifeSpan:  0, // TODO
 			RefreshTokenLifeSpan: 0, // TODO
@@ -81,7 +82,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		ProjectID:    "master",
 		Name:         adminName,
 		Enabled:      true,
-		CreatedAt:    "now", // TODO
+		CreatedAt:    time.Now().String(),
 		PasswordHash: util.CreateHash(adminPassword),
 		Roles:        []string{}, // TODO
 	})
