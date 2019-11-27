@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 )
 
@@ -16,7 +15,6 @@ var (
 func writeLog(level string, isAll bool, format string, a ...interface{}) {
 	msg := fmt.Sprintf(format, a...)
 	_, fname, line, _ := runtime.Caller(2)
-	fname = filepath.Base(fname)
 
 	logger.Printf("%s:%d [%s] %s\n", fname, line, level, msg)
 
@@ -27,7 +25,6 @@ func writeLog(level string, isAll bool, format string, a ...interface{}) {
 			if !ok {
 				break
 			}
-			fname = filepath.Base(fname)
 			logger.Printf("  called from: %s:%d\n", fname, line)
 			i++
 		}
