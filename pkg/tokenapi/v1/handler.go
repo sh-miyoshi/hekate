@@ -6,9 +6,10 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
-	"os"
+	"time"
 )
 
 // TokenCreateHandler method create JWT token
@@ -18,10 +19,17 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO(Validate project ID)
 
+	// Get Project Info for Token Config
+	project, err := db.GetInst().Project.Get(projectID)
+	if err == model.ErrNoSuchProject {
+		http.Error(w, "Project Not Found", http.StatusNotFound)
+		return
+	}
+
 	// Parse Request
 	var request TokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		logger.Info(projectID, "Failed to decode token create request: %v", err)
+		logger.Info("Failed to decode token create request: %v", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
@@ -30,8 +38,8 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := db.GetInst().User.GetIDByName(projectID, request.Name)
 	if err != nil {
-		if err == model.ErrNoSuchUser || err == os.ErrNotExist {
-			http.Error(w, "User or Project Not Found", http.StatusNotFound)
+		if err == model.ErrNoSuchUser {
+			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get user id: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -65,9 +73,23 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(Generate JWT Token)
+	// Generate JWT Token
+	tokenReq := token.Request{
+		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+		Audience:    user.ID,
+	}
+
+	res := TokenResponse{}
+	res.AccessToken, err = token.Generate(tokenReq)
+	if err != nil {
+		logger.Error("Failed to get JWT token: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	// Return JWT Token
-	logger.Info("TokenCreateHandler method is not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	// TODO
+
+	logger.Info("TokenCreateHandler method successfully finished")
+
 }

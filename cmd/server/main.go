@@ -25,7 +25,7 @@ func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
 
 	// Token API
-	r.HandleFunc(basePath+"/token", tokenapiv1.TokenCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectID}/token", tokenapiv1.TokenCreateHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")

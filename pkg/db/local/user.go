@@ -91,7 +91,9 @@ func (h *UserInfoHandler) Get(projectID string, userID string) (*model.UserInfo,
 			break
 		}
 		if user[0] == userID {
-			return &model.UserInfo{}, nil
+			res := &model.UserInfo{}
+			// TODO(set res)
+			return res, nil
 		}
 	}
 
