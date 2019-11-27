@@ -18,3 +18,10 @@ admin_name: admin
 # Password of Server Admin
 #   This parameter is overwritten by OS env JWT_SERVER_ADMIN_PASSWORD
 admin_password: password
+
+# Issuer of JWT Token
+token_issuer: jwt-server
+
+# Secret key for JWT Token sigining
+#   This parameter must be managed safely.
+token_secret_key: 33c8bea55c2cb2bd1e6f18bf5699d5d8e6c42810c94b5ec85f909a415e03281d

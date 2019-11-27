@@ -1,8 +1,8 @@
 package util
 
 import (
-	"fmt"
 	"crypto/sha512"
+	"fmt"
 )
 
 // CreateHash ...

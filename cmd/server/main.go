@@ -3,20 +3,21 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/cmd/server/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
+	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	userapiv1 "github.com/sh-miyoshi/jwt-server/pkg/userapi/v1"
+	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"os"
-	"github.com/google/uuid"
 )
 
 func setAPI(r *mux.Router) {
@@ -80,9 +81,9 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		ProjectID:    "master",
 		Name:         adminName,
 		Enabled:      true,
-		CreatedAt:    "now",         // TODO
+		CreatedAt:    "now", // TODO
 		PasswordHash: util.CreateHash(adminPassword),
-		Roles:        []string{},    // TODO
+		Roles:        []string{}, // TODO
 	})
 
 	if err != nil {
@@ -114,6 +115,9 @@ func main() {
 		logger.Error("Failed to initialize database: %v", err)
 		os.Exit(1)
 	}
+
+	// Initialize Token Config
+	token.InitConfig(cfg.TokenIssuer, cfg.TokenSecretKey)
 
 	// Setup API
 	r := mux.NewRouter()
