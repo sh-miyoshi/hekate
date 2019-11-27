@@ -6,6 +6,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
@@ -91,8 +92,18 @@ func (h *UserInfoHandler) Get(projectID string, userID string) (*model.UserInfo,
 			break
 		}
 		if user[0] == userID {
-			res := &model.UserInfo{}
-			// TODO(set res)
+			enabled, _ := strconv.ParseBool(user[3])
+			res := &model.UserInfo{
+				ID:           user[0],
+				ProjectID:    user[1],
+				Name:         user[2],
+				Enabled:      enabled,
+				CreatedAt:    user[4],
+				PasswordHash: user[5],
+			}
+			for i := 6; i < len(user); i++ {
+				res.Roles = append(res.Roles, user[i])
+			}
 			return res, nil
 		}
 	}
