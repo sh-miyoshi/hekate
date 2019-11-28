@@ -68,8 +68,8 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		Enabled:   true,
 		CreatedAt: time.Now().String(),
 		TokenConfig: &model.TokenConfig{
-			AccessTokenLifeSpan:  0, // TODO
-			RefreshTokenLifeSpan: 0, // TODO
+			AccessTokenLifeSpan:  5 * 60,            // 5 minutes, TODO(use const variable)
+			RefreshTokenLifeSpan: 14 * 24 * 60 * 60, // 14 days, TODO(use const variable)
 		},
 	})
 	if err != nil {
