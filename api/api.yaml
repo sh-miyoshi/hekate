@@ -635,3 +635,9 @@ components:
       properties:
         accessToken:
           type: string
+        accessExpiresIn:
+          type: int
+        refreshToken:
+          type: string
+        refreshExpiresIn:
+          type: int

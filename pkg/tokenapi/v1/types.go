@@ -10,5 +10,8 @@ type TokenRequest struct {
 
 // TokenResponse ...
 type TokenResponse struct {
-	AccessToken string `json:"accessToken"`
+	AccessToken      string `json:"accessToken"`
+	AccessExpiresIn  int    `json:"accessExpiresIn"`
+	RefreshToken     string `json:"refreshToken"`
+	RefreshExpiresIn int    `json:"refreshExpiresIn"`
 }
