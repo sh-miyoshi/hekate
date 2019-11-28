@@ -3,6 +3,7 @@ package token
 import (
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func InitConfig(issuer string, secretKey string) {
 // Generate ...
 func Generate(request Request) (string, error) {
 	if tokenIssuer == "" || tokenSecretKey == "" {
-		return "", fmt.Errorf("Did not initialize config yet")
+		return "", errors.Cause(fmt.Errorf("Did not initialize config yet"))
 	}
 
 	claims := &jwt.StandardClaims{

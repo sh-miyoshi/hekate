@@ -3,6 +3,7 @@ package local
 import (
 	"encoding/csv"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"os"
 	"path/filepath"
@@ -18,10 +19,10 @@ type UserInfoHandler struct {
 func NewUserHandler(dbDir string) (*UserInfoHandler, error) {
 	fileInfo, err := os.Stat(dbDir)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "no such dir")
 	}
 	if !fileInfo.IsDir() {
-		return nil, fmt.Errorf("%s is not directory", dbDir)
+		return nil, errors.Cause(fmt.Errorf("%s is not directory", dbDir))
 	}
 
 	res := &UserInfoHandler{
@@ -33,12 +34,12 @@ func NewUserHandler(dbDir string) (*UserInfoHandler, error) {
 // Add ...
 func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 	if err := ent.Validate(); err != nil {
-		return err
+		return errors.Wrap(err, "Failed to validate entry")
 	}
 
 	fp, err := os.OpenFile(h.getFilePath(ent.ProjectID), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to open user file")
 	}
 	defer fp.Close()
 
@@ -50,7 +51,7 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 			break
 		}
 		if user[0] == ent.ID || user[2] == ent.Name {
-			return model.ErrUserAlreadyExists
+			return errors.Cause(model.ErrUserAlreadyExists)
 		}
 	}
 
@@ -80,7 +81,7 @@ func (h *UserInfoHandler) GetList(projectID string) ([]string, error) {
 func (h *UserInfoHandler) Get(projectID string, userID string) (*model.UserInfo, error) {
 	fp, err := os.Open(h.getFilePath(projectID))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to open user file")
 	}
 	defer fp.Close()
 
@@ -108,7 +109,7 @@ func (h *UserInfoHandler) Get(projectID string, userID string) (*model.UserInfo,
 		}
 	}
 
-	return nil, model.ErrNoSuchUser
+	return nil, errors.Cause(model.ErrNoSuchUser)
 }
 
 // Update ...
@@ -121,7 +122,7 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 func (h *UserInfoHandler) GetIDByName(projectID string, userName string) (string, error) {
 	fp, err := os.Open(h.getFilePath(projectID))
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "Failed to open user file")
 	}
 	defer fp.Close()
 
@@ -137,7 +138,7 @@ func (h *UserInfoHandler) GetIDByName(projectID string, userName string) (string
 		}
 	}
 
-	return "", model.ErrNoSuchUser
+	return "", errors.Cause(model.ErrNoSuchUser)
 }
 
 func (h *UserInfoHandler) getFilePath(projectID string) string {

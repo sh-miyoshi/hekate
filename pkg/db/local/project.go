@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"os"
 	"path/filepath"
@@ -22,10 +23,10 @@ type ProjectInfoHandler struct {
 func NewProjectHandler(dbDir string) (*ProjectInfoHandler, error) {
 	fileInfo, err := os.Stat(dbDir)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "No such dir")
 	}
 	if !fileInfo.IsDir() {
-		return nil, fmt.Errorf("%s is not directory", dbDir)
+		return nil, errors.Cause(fmt.Errorf("%s is not directory", dbDir))
 	}
 
 	res := &ProjectInfoHandler{
@@ -40,12 +41,12 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 	defer h.mu.Unlock()
 
 	if ent.ID == "" {
-		return fmt.Errorf("id of entry is empty")
+		return errors.Cause(fmt.Errorf("id of entry is empty"))
 	}
 
 	fp, err := os.OpenFile(h.filePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to open file")
 	}
 	defer fp.Close()
 
@@ -57,7 +58,7 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 			break
 		}
 		if project[0] == ent.ID || project[1] == ent.Name {
-			return model.ErrProjectAlreadyExists
+			return errors.Cause(model.ErrProjectAlreadyExists)
 		}
 	}
 
@@ -73,16 +74,16 @@ func (h *ProjectInfoHandler) Delete(id string) error {
 	defer h.mu.Unlock()
 
 	if id == "" {
-		return fmt.Errorf("id of entry is empty")
+		return errors.Cause(fmt.Errorf("id of entry is empty"))
 	}
 
 	if id == "master" {
-		return fmt.Errorf("master project can not delete")
+		return errors.Cause(fmt.Errorf("master project can not delete"))
 	}
 
 	fp, err := os.OpenFile(h.filePath, os.O_RDWR, 0644)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to open file")
 	}
 	defer fp.Close()
 
@@ -95,7 +96,7 @@ func (h *ProjectInfoHandler) Delete(id string) error {
 		reader := csv.NewReader(strings.NewReader(line))
 		project, err := reader.Read()
 		if err != nil {
-			return err
+			return errors.Wrap(err, "Failed to read line")
 		}
 		if project[0] == id {
 			deleted = true
@@ -104,11 +105,11 @@ func (h *ProjectInfoHandler) Delete(id string) error {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return err
+		return errors.Wrap(err, "Failed to read csv")
 	}
 
 	if !deleted {
-		return model.ErrNoSuchProject
+		return errors.Cause(model.ErrNoSuchProject)
 	}
 
 	// Remove all data at first
@@ -127,7 +128,7 @@ func (h *ProjectInfoHandler) Delete(id string) error {
 func (h *ProjectInfoHandler) GetList() ([]string, error) {
 	fp, err := os.Open(h.filePath)
 	if err != nil {
-		return []string{}, err
+		return []string{}, errors.Wrap(err, "Failed to open project file")
 	}
 	defer fp.Close()
 
@@ -150,7 +151,7 @@ func (h *ProjectInfoHandler) GetList() ([]string, error) {
 func (h *ProjectInfoHandler) Get(id string) (*model.ProjectInfo, error) {
 	fp, err := os.Open(h.filePath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to open project file")
 	}
 	defer fp.Close()
 
@@ -178,7 +179,7 @@ func (h *ProjectInfoHandler) Get(id string) (*model.ProjectInfo, error) {
 			}, nil
 		}
 	}
-	return nil, model.ErrNoSuchProject
+	return nil, errors.Cause(model.ErrNoSuchProject)
 }
 
 // Update ...

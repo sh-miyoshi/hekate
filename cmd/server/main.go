@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/cmd/server/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
@@ -58,7 +59,7 @@ func setAPI(r *mux.Router) {
 
 func initDB(dbType, connStr, adminName, adminPassword string) error {
 	if err := db.InitDBManager(dbType, connStr); err != nil {
-		return err
+		return errors.Wrap(err, "Failed to init database manager")
 	}
 
 	// Set Master Project if not exsits
@@ -88,7 +89,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	})
 
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to create admin user")
 	}
 
 	return nil
@@ -113,7 +114,7 @@ func main() {
 
 	// Initalize Database
 	if err := initDB("local", "./db", cfg.AdminName, cfg.AdminPassword); err != nil {
-		logger.Error("Failed to initialize database: %v", err)
+		logger.Error("Failed to initialize database: %+v", err)
 		os.Exit(1)
 	}
 
@@ -129,7 +130,7 @@ func main() {
 	addr := fmt.Sprintf("%s:%d", cfg.BindAddr, cfg.Port)
 	logger.Info("start server with %s", addr)
 	if err := http.ListenAndServe(addr, handlers.CORS(corsObj)(r)); err != nil {
-		logger.Error("Failed to run server: %v", err)
+		logger.Error("Failed to run server: %+v", err)
 		os.Exit(1)
 	}
 }

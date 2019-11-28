@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 	"os"
 )
@@ -18,12 +19,12 @@ func InitConfig(filePath string) (*GlobalConfig, error) {
 
 	fp, err := os.Open(filePath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to open config file")
 	}
 	defer fp.Close()
 
 	if err := yaml.NewDecoder(fp).Decode(res); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to delete config yaml")
 	}
 
 	setEnvVar("JWT_SERVER_ADMIN_NAME", &res.AdminName)

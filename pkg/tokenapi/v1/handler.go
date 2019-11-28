@@ -41,7 +41,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		if err == model.ErrNoSuchUser {
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get user id: %v", err)
+			logger.Error("Failed to get user id: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -53,7 +53,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		if err == model.ErrNoSuchUser {
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get user info: %v", err)
+			logger.Error("Failed to get user info: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -83,7 +83,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	res.AccessExpiresIn = project.TokenConfig.AccessTokenLifeSpan
 	res.AccessToken, err = token.Generate(accessTokenReq)
 	if err != nil {
-		logger.Error("Failed to get JWT token: %v", err)
+		logger.Error("Failed to get JWT token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -96,7 +96,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
 	res.RefreshToken, err = token.Generate(refreshTokenReq)
 	if err != nil {
-		logger.Error("Failed to get JWT token: %v", err)
+		logger.Error("Failed to get JWT token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -105,7 +105,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
-		logger.Error("Failed to encode a response for JWT token create: %v", err)
+		logger.Error("Failed to encode a response for JWT token create: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
