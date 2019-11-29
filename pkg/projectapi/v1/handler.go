@@ -3,6 +3,7 @@ package projectapi
 import (
 	"encoding/json"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
@@ -38,6 +39,8 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
+
+	// TODO(Validate Request)
 
 	// Create Project Entry
 	project := model.ProjectInfo{
@@ -86,8 +89,27 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // ProjectDeleteHandler ...
 func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Info("Not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	vars := mux.Vars(r)
+	projectID := vars["projectID"]
+
+	if projectID == "master" {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	if err := db.GetInst().Project.Delete(projectID); err != nil {
+		if err == model.ErrNoSuchProject {
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to create project: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return 204 (No content) for success
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("ProjectDeleteHandler method successfully finished")
 }
 
 // ProjectGetHandler ...
