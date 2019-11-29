@@ -111,5 +111,4 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Info("TokenCreateHandler method successfully finished")
-
 }

@@ -1,7 +1,5 @@
 package projectapi
 
-// TODO(move to other directory)
-
 // TokenConfig ...
 type TokenConfig struct {
 	AccessTokenLifeSpan  int32 `json:"accessTokenLifeSpan"`
