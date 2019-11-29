@@ -2,14 +2,15 @@ package projectapi
 
 // TokenConfig ...
 type TokenConfig struct {
-	AccessTokenLifeSpan  int32 `json:"accessTokenLifeSpan"`
-	RefreshTokenLifeSpan int32 `json:"refreshTokenLifeSpan"`
+	AccessTokenLifeSpan  int `json:"accessTokenLifeSpan"`
+	RefreshTokenLifeSpan int `json:"refreshTokenLifeSpan"`
 }
 
 // ProjectCreateRequest ...
 type ProjectCreateRequest struct {
-	Name    string `json:"name"`
-	Enabled bool   `json:"enabled"`
+	Name        string       `json:"name"`
+	Enabled     bool         `json:"enabled"`
+	TokenConfig *TokenConfig `json:"tokenConfig"`
 }
 
 // ProjectGetResponse ...
