@@ -1,0 +1,8 @@
+{
+	"name": "admin",
+	"enabled": true,
+	"tokenConfig": {
+		"accessTokenLifeSpan": 300,
+		"refreshTokenLifeSpan": 3600
+	}
+}

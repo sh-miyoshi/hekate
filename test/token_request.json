@@ -1,0 +1,5 @@
+{
+	"name": "admin",
+	"secret": "password",
+	"authType": "password"
+}
