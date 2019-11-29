@@ -57,6 +57,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create New Project
 	if err := db.GetInst().Project.Add(&project); err != nil {
 		if err == model.ErrProjectAlreadyExists {
+			logger.Info("Project %s is already exists", request.Name)
 			http.Error(w, "Project Already Exists", http.StatusConflict)
 		} else {
 			logger.Error("Failed to create project: %+v", err)
@@ -93,12 +94,14 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	projectID := vars["projectID"]
 
 	if projectID == "master" {
+		logger.Info("Cannot delete master project")
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
 	if err := db.GetInst().Project.Delete(projectID); err != nil {
 		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectID)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to delete project: %+v", err)
@@ -121,6 +124,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().Project.Get(projectID)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectID)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
@@ -168,6 +172,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().Project.Get(projectID)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectID)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
