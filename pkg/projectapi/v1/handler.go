@@ -79,7 +79,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
-		logger.Error("Failed to encode a response for JWT token create: %+v", err)
+		logger.Error("Failed to encode a response for project create: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -101,7 +101,7 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		if err == model.ErrNoSuchProject {
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to create project: %+v", err)
+			logger.Error("Failed to delete project: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -114,8 +114,41 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 // ProjectGetHandler ...
 func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Info("Not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	vars := mux.Vars(r)
+	projectID := vars["projectID"]
+
+	// Create New Project
+	project, err := db.GetInst().Project.Get(projectID)
+	if err != nil {
+		if err == model.ErrNoSuchProject {
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to get project: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return Response
+	w.Header().Add("Content-Type", "application/json")
+	res := ProjectGetResponse{
+		ID:        project.ID,
+		Name:      project.Name,
+		Enabled:   project.Enabled,
+		CreatedAt: project.CreatedAt,
+		TokenConfig: &TokenConfig{
+			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
+			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
+		},
+	}
+
+	if err := json.NewEncoder(w).Encode(&res); err != nil {
+		logger.Error("Failed to encode a response for project get: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	logger.Info("ProjectGetHandler method successfully finished")
 }
 
 // ProjectUpdateHandler ...
