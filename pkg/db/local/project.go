@@ -184,6 +184,54 @@ func (h *ProjectInfoHandler) Get(id string) (*model.ProjectInfo, error) {
 
 // Update ...
 func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
-	// TODO(not implemented yet)
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	if ent.ID == "" {
+		return errors.Cause(fmt.Errorf("id of entry is empty"))
+	}
+
+	fp, err := os.OpenFile(h.filePath, os.O_RDWR, 0644)
+	if err != nil {
+		return errors.Wrap(err, "Failed to open file")
+	}
+	defer fp.Close()
+
+	updated := false
+	scanner := bufio.NewScanner(fp)
+	results := []string{}
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		reader := csv.NewReader(strings.NewReader(line))
+		project, err := reader.Read()
+		if err != nil {
+			return errors.Wrap(err, "Failed to read line")
+		}
+		if project[0] == ent.ID {
+			updated = true
+			newData := fmt.Sprintf("%s,%s,%t,%s,%d,%d\n", ent.ID, ent.Name, ent.Enabled, ent.CreatedAt, ent.TokenConfig.AccessTokenLifeSpan, ent.TokenConfig.RefreshTokenLifeSpan)
+			results = append(results, newData)
+		} else {
+			results = append(results, line)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return errors.Wrap(err, "Failed to read csv")
+	}
+
+	if !updated {
+		return errors.Cause(model.ErrNoSuchProject)
+	}
+
+	// Remove all data at first
+	fp.Truncate(0)
+	fp.Seek(0, 0)
+
+	// Write results
+	for _, line := range results {
+		fmt.Fprintln(fp, line)
+	}
+
 	return nil
 }
