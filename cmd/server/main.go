@@ -10,6 +10,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/cmd/server/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/jwt-server/pkg/defaultrole"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
@@ -120,6 +121,12 @@ func main() {
 
 	// Initialize Token Config
 	token.InitConfig(cfg.TokenIssuer, cfg.TokenSecretKey)
+
+	// Initialize Default Role Handler
+	if err := defaultrole.InitHandler(); err != nil {
+		logger.Error("Failed to initialize default role handler: %+v", err)
+		os.Exit(1)
+	}
 
 	// Setup API
 	r := mux.NewRouter()
