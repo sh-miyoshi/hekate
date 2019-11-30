@@ -20,21 +20,21 @@ func InitHandler() error {
 		return errors.Cause(fmt.Errorf("Default Role Handler is already initialized"))
 	}
 
-	resources := []string{
-		"project", "role", "user", "cluster",
-	}
-	types := []string{
-		"read", "write", "manage",
-	}
-
 	inst = &Handler{}
 
 	// Create default role
-	for _, res := range resources {
-		for _, typ := range types {
-			inst.createRole(res, typ)
-		}
-	}
+	inst.createRole(ResCluster, TypeManage)
+	inst.createRole(ResCluster, TypeRead)
+	inst.createRole(ResCluster, TypeWrite)
+	inst.createRole(ResProject, TypeManage)
+	inst.createRole(ResProject, TypeRead)
+	inst.createRole(ResProject, TypeWrite)
+	inst.createRole(ResRole, TypeManage)
+	inst.createRole(ResRole, TypeRead)
+	inst.createRole(ResRole, TypeWrite)
+	inst.createRole(ResUser, TypeManage)
+	inst.createRole(ResUser, TypeRead)
+	inst.createRole(ResUser, TypeWrite)
 
 	roles := []string{}
 	for _, role := range inst.roleList {
@@ -50,10 +50,10 @@ func GetInst() *Handler {
 	return inst
 }
 
-func (h *Handler) createRole(targetResource string, roleType string) {
+func (h *Handler) createRole(targetResource Resource, roleType Type) {
 	val := Info{
 		ID:             uuid.New().String(),
-		Name:           fmt.Sprintf("%s-%s", roleType, targetResource),
+		Name:           fmt.Sprintf("%s-%s", roleType.String(), targetResource.String()),
 		TargetResource: targetResource,
 		RoleType:       roleType,
 	}
