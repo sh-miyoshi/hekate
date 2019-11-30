@@ -58,8 +58,18 @@ func (h *UserInfoHandler) Delete(projectID string, userID string) error {
 
 // GetList ...
 func (h *UserInfoHandler) GetList(projectID string) ([]string, error) {
-	// TODO(not implemented yet)
-	return []string{}, nil
+	res := []string{}
+
+	if _, exists := h.userList[projectID]; !exists {
+		// project is created in Add method, so maybe empty project
+		return res, nil
+	}
+
+	for _, user := range h.userList[projectID] {
+		res = append(res, user.ID)
+	}
+
+	return res, nil
 }
 
 // Get ...
@@ -78,7 +88,16 @@ func (h *UserInfoHandler) Get(projectID string, userID string) (*model.UserInfo,
 
 // Update ...
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
-	// TODO(not implemented yet)
+	if _, exists := h.userList[ent.ProjectID]; !exists {
+		return errors.Cause(model.ErrNoSuchProject)
+	}
+
+	if _, exists := h.userList[ent.ProjectID][ent.ID]; !exists {
+		return errors.Cause(model.ErrNoSuchUser)
+	}
+
+	h.userList[ent.ProjectID][ent.ID] = *ent
+
 	return nil
 }
 
@@ -98,6 +117,8 @@ func (h *UserInfoHandler) GetIDByName(projectID string, userName string) (string
 
 // DeleteProjectDefine ...
 func (h *UserInfoHandler) DeleteProjectDefine(projectID string) error {
-	// TODO(not implemented yet)
+	if _, exists := h.userList[projectID]; exists {
+		delete(h.userList, projectID)
+	}
 	return nil
 }
