@@ -50,25 +50,6 @@ func GetInst() *Handler {
 	return inst
 }
 
-// GetList ...
-func (h *Handler) GetList() []string {
-	res := []string{}
-	for _, role := range h.roleList {
-		res = append(res, role.ID)
-	}
-	return res
-}
-
-// GetByID ...
-func (h *Handler) GetByID(id string) (*Info, error) {
-	for _, role := range h.roleList {
-		if role.ID == id {
-			return &role, nil
-		}
-	}
-	return nil, errors.New("No such role")
-}
-
 func (h *Handler) createRole(targetResource string, roleType string) {
 	val := Info{
 		ID:             uuid.New().String(),
