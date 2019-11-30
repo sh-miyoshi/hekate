@@ -76,12 +76,13 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate JWT Token
 	accessTokenReq := token.Request{
 		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
-		Audience:    user.ID,
+		ProjectID:   user.ProjectID,
+		UserID:      user.ID,
 	}
 
 	res := TokenResponse{}
 	res.AccessExpiresIn = project.TokenConfig.AccessTokenLifeSpan
-	res.AccessToken, err = token.Generate(accessTokenReq)
+	res.AccessToken, err = token.GenerateAccessToken(accessTokenReq)
 	if err != nil {
 		logger.Error("Failed to get JWT token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -90,11 +91,12 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	refreshTokenReq := token.Request{
 		ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
-		Audience:    user.ID,
+		ProjectID:   user.ProjectID,
+		UserID:      user.ID,
 	}
 
 	res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
-	res.RefreshToken, err = token.Generate(refreshTokenReq)
+	res.RefreshToken, err = token.GenerateRefreshToken(refreshTokenReq)
 	if err != nil {
 		logger.Error("Failed to get JWT token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

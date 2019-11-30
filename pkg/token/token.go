@@ -3,7 +3,9 @@ package token
 import (
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"strings"
 	"time"
 )
@@ -13,22 +15,49 @@ var (
 	tokenSecretKey string
 )
 
+type accessTokenClaims struct {
+	jwt.StandardClaims
+
+	roles []string
+}
+
+type refreshTokenClaims struct {
+	jwt.StandardClaims
+}
+
 // InitConfig ...
 func InitConfig(issuer string, secretKey string) {
 	tokenIssuer = issuer
 	tokenSecretKey = secretKey
 }
 
-// Generate ...
-func Generate(request Request) (string, error) {
+// GenerateAccessToken ...
+func GenerateAccessToken(request Request) (string, error) {
 	if tokenIssuer == "" || tokenSecretKey == "" {
-		return "", errors.Cause(fmt.Errorf("Did not initialize config yet"))
+		return "", errors.New("Did not initialize config yet")
 	}
 
-	claims := &jwt.StandardClaims{
-		Issuer:    tokenIssuer,
-		ExpiresAt: time.Now().Add(request.ExpiredTime).Unix(),
-		Audience:  request.Audience,
+	now := time.Now()
+	claims := &accessTokenClaims{
+		jwt.StandardClaims{
+			Id:        uuid.New().String(),
+			Issuer:    tokenIssuer,
+			IssuedAt:  now.Unix(),
+			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+			Audience:  request.UserID,
+			NotBefore: 0,
+			Subject:   request.UserID,
+		},
+		[]string{},
+	}
+
+	// Set user roles
+	user, err := db.GetInst().User.Get(request.ProjectID, request.UserID)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to get user")
+	}
+	for _, role := range user.Roles {
+		claims.roles = append(claims.roles, role)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -36,8 +65,31 @@ func Generate(request Request) (string, error) {
 	return token.SignedString([]byte(tokenSecretKey))
 }
 
-// Validate ...
-func Validate(tokenString string) error {
+// GenerateRefreshToken ...
+func GenerateRefreshToken(request Request) (string, error) {
+	if tokenIssuer == "" || tokenSecretKey == "" {
+		return "", errors.New("Did not initialize config yet")
+	}
+
+	now := time.Now()
+	claims := &refreshTokenClaims{
+		jwt.StandardClaims{
+			Id:        uuid.New().String(),
+			Issuer:    tokenIssuer,
+			IssuedAt:  now.Unix(),
+			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+			Audience:  request.UserID,
+			NotBefore: 0,
+			Subject:   request.UserID,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(tokenSecretKey))
+}
+
+// ValidateToken ...
+func ValidateToken(tokenString string) error {
 	claims := jwt.StandardClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

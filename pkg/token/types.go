@@ -7,5 +7,6 @@ import (
 // Request ...
 type Request struct {
 	ExpiredTime time.Duration
-	Audience    string
+	ProjectID   string
+	UserID      string
 }
