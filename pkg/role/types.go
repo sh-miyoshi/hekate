@@ -1,7 +1,7 @@
-package defaultrole
+package role
 
-// RoleInfo ...
-type RoleInfo struct {
+// Info ...
+type Info struct {
 	ID             string
 	Name           string
 	TargetResource string

@@ -1,4 +1,4 @@
-package defaultrole
+package role
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 
 // Handler ...
 type Handler struct {
-	roleList []RoleInfo
+	roleList []Info
 }
 
 var inst *Handler
@@ -60,7 +60,7 @@ func (h *Handler) GetList() []string {
 }
 
 // GetByID ...
-func (h *Handler) GetByID(id string) (*RoleInfo, error) {
+func (h *Handler) GetByID(id string) (*Info, error) {
 	for _, role := range h.roleList {
 		if role.ID == id {
 			return &role, nil
@@ -70,7 +70,7 @@ func (h *Handler) GetByID(id string) (*RoleInfo, error) {
 }
 
 func (h *Handler) createRole(targetResource string, roleType string) {
-	val := RoleInfo{
+	val := Info{
 		ID:             uuid.New().String(),
 		Name:           fmt.Sprintf("%s-%s", roleType, targetResource),
 		TargetResource: targetResource,
