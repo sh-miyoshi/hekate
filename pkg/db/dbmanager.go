@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/local"
+	"github.com/sh-miyoshi/jwt-server/pkg/db/memory"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
@@ -22,13 +22,13 @@ func InitDBManager(dbType string, connStr string) error {
 	}
 
 	switch dbType {
-	case "local":
-		logger.Info("Initialize with local file storage")
-		prjHandler, err := local.NewProjectHandler(connStr)
+	case "memory":
+		logger.Info("Initialize with local memory DB")
+		prjHandler, err := memory.NewProjectHandler()
 		if err != nil {
 			return errors.Wrap(err, "Failed to create project handler")
 		}
-		userHandler, err := local.NewUserHandler(connStr)
+		userHandler, err := memory.NewUserHandler(prjHandler)
 		if err != nil {
 			return errors.Wrap(err, "Failed to create user handler")
 		}

@@ -21,4 +21,5 @@ type UserInfoHandler interface {
 	Get(projectID string, userID string) (*model.UserInfo, error)
 	Update(ent *model.UserInfo) error
 	GetIDByName(projectID string, userName string) (string, error)
+	DeleteProjectDefine(projectID string) error
 }

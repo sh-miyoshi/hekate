@@ -114,7 +114,7 @@ func main() {
 	logger.Debug("Start with config: %v", *cfg)
 
 	// Initalize Database
-	if err := initDB("local", "./db", cfg.AdminName, cfg.AdminPassword); err != nil {
+	if err := initDB("memory", "", cfg.AdminName, cfg.AdminPassword); err != nil {
 		logger.Error("Failed to initialize database: %+v", err)
 		os.Exit(1)
 	}
