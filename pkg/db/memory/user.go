@@ -52,8 +52,15 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 
 // Delete ...
 func (h *UserInfoHandler) Delete(projectID string, userID string) error {
-	// TODO(not implemented yet)
-	return nil
+	if _, exists := h.userList[projectID]; !exists {
+		return errors.Cause(model.ErrNoSuchProject)
+	}
+
+	if _, exists := h.userList[projectID][userID]; exists {
+		delete(h.userList[projectID], userID)
+		return nil
+	}
+	return errors.Cause(model.ErrNoSuchUser)
 }
 
 // GetList ...
