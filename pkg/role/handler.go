@@ -61,6 +61,8 @@ func (h *Handler) GetList() []string {
 // Authorize ...
 func (h *Handler) Authorize(roles []string, targetResource Resource, roleType Type) bool {
 	name := fmt.Sprintf("%s-%s", roleType.String(), targetResource.String())
+	logger.Debug("Auth want: %s, have: %v", name, roles)
+
 	for _, role := range roles {
 		if role == name {
 			return true

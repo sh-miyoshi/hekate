@@ -24,7 +24,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authorize API Request
-	if role.GetInst().Authorize(claims.Roles, role.ResCluster, role.TypeRead) {
+	if !role.GetInst().Authorize(claims.Roles, role.ResCluster, role.TypeRead) {
 		logger.Info("Do not have authority")
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
