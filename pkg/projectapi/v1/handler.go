@@ -6,27 +6,15 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"net/http"
 	"time"
 )
 
 // AllProjectGetHandler ...
 func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
-	auth, ok := r.Header["Authorization"]
-	if !ok || len(auth) != 1 {
-		logger.Info("Failed to get Authorization header")
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-	tokenString, err := token.ParseHTTPHeaderToken(auth[0])
-	if err != nil {
-		logger.Info("Failed to get token from header")
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-	if err := token.ValidateToken(tokenString); err != nil {
+	if err := jwthttp.ValidateAPIRequest(r.Header); err != nil {
 		logger.Info("Failed to validate token: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return

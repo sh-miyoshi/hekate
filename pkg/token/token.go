@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
-	"strings"
 	"time"
 )
 
@@ -117,18 +116,4 @@ func ValidateToken(tokenString string) error {
 	}
 
 	return nil
-}
-
-// ParseHTTPHeaderToken return jwt token from http header
-func ParseHTTPHeaderToken(tokenString string) (string, error) {
-	var splitToken []string
-	if strings.Contains(tokenString, "bearer") {
-		splitToken = strings.Split(tokenString, "bearer")
-	} else if strings.Contains(tokenString, "Bearer") {
-		splitToken = strings.Split(tokenString, "Bearer")
-	} else {
-		return "", errors.New("token format is missing")
-	}
-	reqToken := strings.TrimSpace(splitToken[1])
-	return reqToken, nil
 }
