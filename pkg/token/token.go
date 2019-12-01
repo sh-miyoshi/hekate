@@ -14,16 +14,6 @@ var (
 	tokenSecretKey string
 )
 
-type accessTokenClaims struct {
-	jwt.StandardClaims
-
-	Roles []string `json:"roles"`
-}
-
-type refreshTokenClaims struct {
-	jwt.StandardClaims
-}
-
 // InitConfig ...
 func InitConfig(issuer string, secretKey string) {
 	tokenIssuer = issuer
@@ -37,7 +27,7 @@ func GenerateAccessToken(request Request) (string, error) {
 	}
 
 	now := time.Now()
-	claims := accessTokenClaims{
+	claims := AccessTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
 			Issuer:    tokenIssuer,
@@ -71,7 +61,7 @@ func GenerateRefreshToken(request Request) (string, error) {
 	}
 
 	now := time.Now()
-	claims := &refreshTokenClaims{
+	claims := &RefreshTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
 			Issuer:    tokenIssuer,
@@ -87,10 +77,9 @@ func GenerateRefreshToken(request Request) (string, error) {
 	return token.SignedString([]byte(tokenSecretKey))
 }
 
-// ValidateToken ...
-func ValidateToken(tokenString string) error {
-	claims := jwt.StandardClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+// ValidateAccessToken ...
+func ValidateAccessToken(claims *AccessTokenClaims, tokenString string) error {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.Cause(fmt.Errorf("Unexpected signing method: %v", token.Header["alg"]))
 		}

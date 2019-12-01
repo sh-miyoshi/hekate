@@ -8,14 +8,24 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/role"
 	"net/http"
 	"time"
 )
 
 // AllProjectGetHandler ...
 func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
-	if err := jwthttp.ValidateAPIRequest(r.Header); err != nil {
+	// Parse Bearer Token
+	claims, err := jwthttp.ValidateAPIRequest(r.Header)
+	if err != nil {
 		logger.Info("Failed to validate token: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	// Authorize API Request
+	if role.GetInst().Authorize(claims.Roles, role.ResCluster, role.TypeRead) {
+		logger.Info("Do not have authority")
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}

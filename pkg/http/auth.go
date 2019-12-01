@@ -21,17 +21,18 @@ func parseHTTPHeaderToken(tokenString string) (string, error) {
 }
 
 // ValidateAPIRequest ...
-func ValidateAPIRequest(header http.Header) error {
+func ValidateAPIRequest(header http.Header) (*token.AccessTokenClaims, error) {
 	auth, ok := header["Authorization"]
 	if !ok || len(auth) != 1 {
-		return errors.New("Failed to get Authorization header")
+		return nil, errors.New("Failed to get Authorization header")
 	}
 	tokenString, err := parseHTTPHeaderToken(auth[0])
 	if err != nil {
-		return errors.New("Failed to get token from header")
+		return nil, errors.New("Failed to get token from header")
 	}
-	if err := token.ValidateToken(tokenString); err != nil {
-		return errors.Wrap(err, "Failed to validate token")
+	claims := &token.AccessTokenClaims{}
+	if err := token.ValidateAccessToken(claims, tokenString); err != nil {
+		return nil, errors.Wrap(err, "Failed to validate token")
 	}
-	return nil
+	return claims, nil
 }
