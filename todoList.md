@@ -2,38 +2,21 @@
 
 ## application enhancement
 
-- run with custom jwt token format
-  - idea1: write jwt_return.json and jwt-server read it dynamically
-    - merit: user can create any form of json
-    - demerit: how to decide necessary field, and how to deal with it in golang
-  - idea2: write token_config.yaml and generate token_return.json from yaml
-    - merit: easy to control in golang
-    - demerit: user cannot create custom field
-- add user and role
-- multi tenant(?)
-- integrate to open id connect
+- open id connect連携
 - audit log
-- event hook
-- import/export setting(?)
-- refresh token
-
-## keycloak
-
-- project
-  - settings
-    - name, enabled, endpoints(open id connect, saml, ...)
-    - encrypt_type
-    - cache
-    - token
-      - timeout, refresh_token, offline_token, revoke
-  - clients(users?)
-  - roles
-  - user federation
-  - authentication
-    - password policy
-  - audit events
-    - config
-  - import/export
+- projectのimport/export
+- refresh tokenでの認証
+- Gatewayプログラムの追加
+  - keycloak-gatekeeperのようなものを想定
+- GUI画面の追加
+- 認可部分の関数化
+  - httpパッケージとして追加
+- 設定項目の追加
+  - パスワードポリシー
+  - refresh tokenのrevoke
+  - cache
+  - encrypt_type
+- enabledの有効化
 
 ## operation enhancement
 
