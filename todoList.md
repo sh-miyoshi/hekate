@@ -16,7 +16,11 @@
   - refresh tokenのrevoke
   - cache
   - encrypt_type
-- enabledの有効化
+- (project/user) enabledの有効化
+- SAML対応
+- テストの追加
+  - ロジック部分のunit test
+  - API部分のテスト
 
 ## operation enhancement
 
