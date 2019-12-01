@@ -18,7 +18,7 @@ var (
 type accessTokenClaims struct {
 	jwt.StandardClaims
 
-	roles []string
+	Roles []string `json:"roles"`
 }
 
 type refreshTokenClaims struct {
@@ -38,7 +38,7 @@ func GenerateAccessToken(request Request) (string, error) {
 	}
 
 	now := time.Now()
-	claims := &accessTokenClaims{
+	claims := accessTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
 			Issuer:    tokenIssuer,
@@ -57,7 +57,7 @@ func GenerateAccessToken(request Request) (string, error) {
 		return "", errors.Wrap(err, "Failed to get user")
 	}
 	for _, role := range user.Roles {
-		claims.roles = append(claims.roles, role)
+		claims.Roles = append(claims.Roles, role)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

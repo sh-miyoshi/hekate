@@ -2,7 +2,6 @@ package role
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
@@ -50,10 +49,20 @@ func GetInst() *Handler {
 	return inst
 }
 
+// GetList ...
+func (h *Handler) GetList() []string {
+	res := []string{}
+	for _, role := range h.roleList {
+		res = append(res, role.ID)
+	}
+	return res
+}
+
 func (h *Handler) createRole(targetResource Resource, roleType Type) {
+	name := fmt.Sprintf("%s-%s", roleType.String(), targetResource.String())
 	val := Info{
-		ID:             uuid.New().String(),
-		Name:           fmt.Sprintf("%s-%s", roleType.String(), targetResource.String()),
+		ID:             name,
+		Name:           name,
 		TargetResource: targetResource,
 		RoleType:       roleType,
 	}

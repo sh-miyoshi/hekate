@@ -12,7 +12,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
-	"github.com/sh-miyoshi/jwt-server/pkg/role"
+	defaultrole "github.com/sh-miyoshi/jwt-server/pkg/role"
 	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
@@ -86,7 +86,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		Enabled:      true,
 		CreatedAt:    time.Now().String(),
 		PasswordHash: util.CreateHash(adminPassword),
-		Roles:        []string{}, // TODO
+		Roles:        defaultrole.GetInst().GetList(), // set all roles
 	})
 
 	if err != nil {
@@ -113,18 +113,18 @@ func main() {
 	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
 	logger.Debug("Start with config: %v", *cfg)
 
-	// Initalize Database
-	if err := initDB("memory", "", cfg.AdminName, cfg.AdminPassword); err != nil {
-		logger.Error("Failed to initialize database: %+v", err)
+	// Initialize Default Role Handler
+	if err := defaultrole.InitHandler(); err != nil {
+		logger.Error("Failed to initialize default role handler: %+v", err)
 		os.Exit(1)
 	}
 
 	// Initialize Token Config
 	token.InitConfig(cfg.TokenIssuer, cfg.TokenSecretKey)
 
-	// Initialize Default Role Handler
-	if err := role.InitHandler(); err != nil {
-		logger.Error("Failed to initialize default role handler: %+v", err)
+	// Initalize Database
+	if err := initDB("memory", "", cfg.AdminName, cfg.AdminPassword); err != nil {
+		logger.Error("Failed to initialize database: %+v", err)
 		os.Exit(1)
 	}
 
