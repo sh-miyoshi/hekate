@@ -14,6 +14,7 @@ import (
 )
 
 // AllProjectGetHandler ...
+//   require role: cluster-read
 func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse Bearer Token
 	claims, err := jwthttp.ValidateAPIRequest(r.Header)
@@ -48,21 +49,22 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectCreateHandler ...
+//   require role: cluster-write
 func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse Bearer Token
-    claims, err := jwthttp.ValidateAPIRequest(r.Header)
-    if err != nil {
-        logger.Info("Failed to validate token: %v", err)
-        http.Error(w, "Forbidden", http.StatusForbidden)
-        return
-    }
+	claims, err := jwthttp.ValidateAPIRequest(r.Header)
+	if err != nil {
+		logger.Info("Failed to validate token: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
 
-    // Authorize API Request
-    if !role.GetInst().Authorize(claims.Roles, role.ResCluster, role.TypeWrite) {
-        logger.Info("Do not have authority")
-        http.Error(w, "Forbidden", http.StatusForbidden)
-        return
-    }
+	// Authorize API Request
+	if !role.GetInst().Authorize(claims.Roles, role.ResCluster, role.TypeWrite) {
+		logger.Info("Do not have authority")
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
 
 	// Parse Request
 	var request ProjectCreateRequest
@@ -121,7 +123,23 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectDeleteHandler ...
+//   require role: cluster-write
 func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse Bearer Token
+	claims, err := jwthttp.ValidateAPIRequest(r.Header)
+	if err != nil {
+		logger.Info("Failed to validate token: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	// Authorize API Request
+	if !role.GetInst().Authorize(claims.Roles, role.ResCluster, role.TypeWrite) {
+		logger.Info("Do not have authority")
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	projectID := vars["projectID"]
 
@@ -148,7 +166,23 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectGetHandler ...
+//   require role: project-read
 func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse Bearer Token
+	claims, err := jwthttp.ValidateAPIRequest(r.Header)
+	if err != nil {
+		logger.Info("Failed to validate token: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	// Authorize API Request
+	if !role.GetInst().Authorize(claims.Roles, role.ResProject, role.TypeRead) {
+		logger.Info("Do not have authority")
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	projectID := vars["projectID"]
 
@@ -188,7 +222,23 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectUpdateHandler ...
+//   require role: project-write
 func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse Bearer Token
+	claims, err := jwthttp.ValidateAPIRequest(r.Header)
+	if err != nil {
+		logger.Info("Failed to validate token: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	// Authorize API Request
+	if !role.GetInst().Authorize(claims.Roles, role.ResProject, role.TypeWrite) {
+		logger.Info("Do not have authority")
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
 	vars := mux.Vars(r)
 	projectID := vars["projectID"]
 

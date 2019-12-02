@@ -22,16 +22,12 @@ func InitHandler() error {
 	inst = &Handler{}
 
 	// Create default role
-	inst.createRole(ResCluster, TypeManage)
 	inst.createRole(ResCluster, TypeRead)
 	inst.createRole(ResCluster, TypeWrite)
-	inst.createRole(ResProject, TypeManage)
 	inst.createRole(ResProject, TypeRead)
 	inst.createRole(ResProject, TypeWrite)
-	inst.createRole(ResRole, TypeManage)
 	inst.createRole(ResRole, TypeRead)
 	inst.createRole(ResRole, TypeWrite)
-	inst.createRole(ResUser, TypeManage)
 	inst.createRole(ResUser, TypeRead)
 	inst.createRole(ResUser, TypeWrite)
 
