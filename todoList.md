@@ -5,12 +5,11 @@
 - open id connect連携
 - audit log
 - projectのimport/export
-- refresh tokenでの認証
+- (WIP)refresh tokenでの認証
 - Gatewayプログラムの追加
   - keycloak-gatekeeperのようなものを想定
+  - tokenを認証するようなAPIを追加
 - GUI画面の追加
-- 認可部分の関数化
-  - httpパッケージとして追加
 - 設定項目の追加
   - パスワードポリシー
   - refresh tokenのrevoke
