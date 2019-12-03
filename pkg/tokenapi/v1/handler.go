@@ -60,13 +60,22 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Secret Authenticate
-	hash := util.CreateHash(request.Secret)
 	switch request.AuthType {
 	case "password":
+		hash := util.CreateHash(request.Secret)
 		if user.PasswordHash != hash {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+	case "refresh":
+		// Parse secret which is refresh token
+		claims := &token.RefreshTokenClaims{}
+		if err := token.ValidateRefreshToken(claims, request.Secret); err != nil{
+			logger.Info("Failed to validate refresh token: %v", err)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		logger.Debug("%v", claims)
 	default:
 		logger.Error("Invalid Authentication Type: %s", request.AuthType)
 		http.Error(w, "Bad Request", http.StatusBadRequest)

@@ -106,3 +106,33 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string) error {
 
 	return nil
 }
+
+// ValidateRefreshToken ...
+func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string) error {
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.Cause(fmt.Errorf("Unexpected signing method: %v", token.Header["alg"]))
+		}
+
+		return []byte(tokenSecretKey), nil
+	})
+
+	if err != nil {
+		return errors.Wrap(err, "Failed to parse token")
+	}
+
+	if !token.Valid {
+		return errors.New("Invalid token is specifyed")
+	}
+
+	if claims.Issuer != tokenIssuer {
+		return errors.New("Unexpected token issuer")
+	}
+
+	now := time.Now().Unix()
+	if now > claims.ExpiresAt {
+		return errors.New("Token is expired")
+	}
+
+	return nil
+}
