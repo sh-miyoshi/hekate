@@ -5,7 +5,6 @@
 - open id connect連携
 - audit log
 - projectのimport/export
-- (WIP)refresh tokenでの認証
 - Gatewayプログラムの追加
   - keycloak-gatekeeperのようなものを想定
   - tokenを認証するようなAPIを追加
@@ -20,6 +19,10 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
+- 各種APIの実装
+  - role api
+  - user api
+- custom roleの有効化
 
 ## operation enhancement
 
