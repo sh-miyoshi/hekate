@@ -34,17 +34,23 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(Validate Request)
-
-	userID, err := db.GetInst().User.GetIDByName(projectID, request.Name)
-	if err != nil {
-		if err == model.ErrNoSuchUser {
-			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else {
-			logger.Error("Failed to get user id: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	userID := request.ID
+	if userID == "" {
+		if request.Name == "" {
+			logger.Info("Name or ID must be specified")
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
 		}
-		return
+		userID, err = db.GetInst().User.GetIDByName(projectID, request.Name)
+		if err != nil {
+			if err == model.ErrNoSuchUser {
+				http.Error(w, "User Not Found", http.StatusNotFound)
+			} else {
+				logger.Error("Failed to get user id: %+v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
 	}
 	logger.Debug("User ID: %s", userID)
 
@@ -70,12 +76,18 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	case "refresh":
 		// Parse secret which is refresh token
 		claims := &token.RefreshTokenClaims{}
-		if err := token.ValidateRefreshToken(claims, request.Secret); err != nil{
+		if err := token.ValidateRefreshToken(claims, request.Secret); err != nil {
 			logger.Info("Failed to validate refresh token: %v", err)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		logger.Debug("%v", claims)
+
+		if claims.Audience != userID {
+			logger.Info("Invalid refresh token audience")
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 	default:
 		logger.Error("Invalid Authentication Type: %s", request.AuthType)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
