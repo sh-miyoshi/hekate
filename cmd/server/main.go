@@ -13,7 +13,6 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	defaultrole "github.com/sh-miyoshi/jwt-server/pkg/role"
-	roleapiv1 "github.com/sh-miyoshi/jwt-server/pkg/roleapi/v1"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	userapiv1 "github.com/sh-miyoshi/jwt-server/pkg/userapi/v1"
@@ -44,13 +43,6 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}", userapiv1.UserUpdateHandler).Methods("PUT")
 	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}/role/{roleID}", userapiv1.UserRoleAddHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}/role/{roleID}", userapiv1.UserRoleDeleteHandler).Methods("DELETE")
-
-	// Role API
-	r.HandleFunc(basePath+"/project/{projectID}/role", roleapiv1.AllRoleGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectID}/role", roleapiv1.RoleCreateHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectID}/role/{roleID}", roleapiv1.RoleDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectID}/role/{roleID}", roleapiv1.RoleGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectID}/role/{roleID}", roleapiv1.RoleUpdateHandler).Methods("PUT")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {

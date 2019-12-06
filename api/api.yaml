@@ -333,141 +333,6 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectID}/role':
-    post:
-      tags:
-        - role
-      parameters:
-        - name: projectID
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RoleCreateRequest'
-      responses:
-        '200':
-          description: 'Created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleGetResponse'
-        '400':
-          description: 'Bad Request'
-        '409':
-          description: 'Role Already Exists'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-    get:
-      tags:
-        - role
-      parameters:
-        - name: projectID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Get All Role IDs'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-        '404':
-          description: 'Role Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/api/v1/project/{projectID}/role/{roleID}':
-    get:
-      tags:
-        - role
-      parameters:
-        - name: projectID
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: roleID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Successfully get role info'
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleGetResponse'
-        '404':
-          description: 'Role Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-    put:
-      tags:
-        - role
-      parameters:
-        - name: projectID
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: roleID
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RolePutRequest'
-      responses:
-        '204':
-          description: 'Updated'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'Role Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-    delete:
-      tags:
-        - role
-      parameters:
-        - name: projectID
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: roleID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: 'Deleted'
-        '404':
-          description: 'Role Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
 components:
   schemas:
     ProjectCreateRequest:
@@ -552,71 +417,6 @@ components:
           type: array
           items:
             type: string
-    RoleCreateRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        targetResource:
-          type: array
-          items:
-            type: string
-            enum:
-              - cluster
-              - project
-              - user
-              - role
-        type:
-          type: string
-          enum:
-            - read
-            - write
-            - manage
-    RoleGetResponse:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        targetResource:
-          type: array
-          items:
-            type: string
-            enum:
-              - cluster
-              - project
-              - user
-              - role
-        type:
-          type: string
-          enum:
-            - read
-            - write
-            - manage
-        createdAt:
-          type: string
-          format: date
-    RolePutRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        targetResource:
-          type: array
-          items:
-            type: string
-            enum:
-              - cluster
-              - project
-              - user
-              - role
-        type:
-          type: string
-          enum:
-            - read
-            - write
-            - manage
     TokenRequest:
       type: object
       properties:
@@ -638,8 +438,8 @@ components:
         accessToken:
           type: string
         accessExpiresIn:
-          type: int
+          type: integer
         refreshToken:
           type: string
         refreshExpiresIn:
-          type: int
+          type: integer
