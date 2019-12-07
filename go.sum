@@ -26,6 +26,8 @@ github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/sh-miyoshi/doraku v0.0.0-20190702140427-ca0bda809f42 h1:bsTfObeGVc/L/yn38wZ7mCweOvNgmPMHSfJxo8dMocg=
+github.com/sh-miyoshi/tag-based-search-engine v0.0.0-20191005072416-6397849ae593 h1:jAOso1af0wGnO+/sOYNMI9WBGdMNkdFBudwFzKCg9Pc=
+github.com/sh-miyoshi/tag-based-search-engine v0.0.0-20191005072416-6397849ae593/go.mod h1:KxJ6zof0JClayDbYSMQw7dhIXx1V01pXQt/8uetvi3I=
 github.com/spf13/afero v1.1.2/go.mod h1:j4pytiNVoe2o6bmDsKpLACNPDBIoEAkihy7loJ1B0CQ=
 github.com/spf13/cast v1.3.0/go.mod h1:Qx5cxh0v+4UWYiBimWS+eyWzqEqokIECu5etghLkUJE=
 github.com/spf13/cobra v0.0.5 h1:f0B+LkLX6DtmRH1isoNA9VTtNUK9K8xYd28JNNfOv/s=
