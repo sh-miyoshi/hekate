@@ -2,7 +2,6 @@ package output
 
 import (
 	"fmt"
-	"encoding/json"
 )
 
 var outputFormat string
@@ -17,16 +16,20 @@ func Init(format string) error {
 }
 
 // Print ...
-func Print(data interface{}) error {
+func Print(data Format) error {
 	switch outputFormat {
 	case "text":
-		fmt.Printf("%v\n", data)
-	case "json":
-		out, err := json.Marshal(data)
+		out, err := data.ToText()
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s\n", string(out))
+		fmt.Printf("%s\n", out)
+	case "json":
+		out, err := data.ToJSON()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%s\n", out)
 	}
 	return nil
 }
