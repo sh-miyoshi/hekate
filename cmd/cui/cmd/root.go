@@ -5,6 +5,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/cmd/cui/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/create"
+	"github.com/sh-miyoshi/jwt-server/pkg/cmd/login"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/spf13/cobra"
 
@@ -24,6 +25,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
 
 	rootCmd.AddCommand(create.GetCreateCommand())
+	rootCmd.AddCommand(login.GetLoginCommand())
 }
 
 func initOutput() {

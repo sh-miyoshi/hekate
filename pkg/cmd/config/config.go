@@ -8,8 +8,10 @@ import (
 
 // SystemConfig ...
 type SystemConfig struct {
+	ConfigDir   string
 	ServerAddr  string `yaml:"server_addr"`
 	EnableDebug bool   `yaml:"enable_debug_log"`
+	ProjectName string `yaml:"project_name"`
 }
 
 var sysConf SystemConfig
@@ -26,6 +28,8 @@ func InitConfig(confDir string) error {
 	if err = yaml.Unmarshal(buf, &sysConf); err != nil {
 		return err
 	}
+
+	sysConf.ConfigDir = confDir
 
 	return nil
 }
