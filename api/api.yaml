@@ -73,6 +73,29 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
+  '/api/v1/projectid/{projectName}':
+    get:
+      tags:
+        - projectID
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully get project info'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectIDGetResponse'
+        '404':
+          description: 'Project Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
   '/api/v1/project/{projectID}':
     get:
       tags:
@@ -335,6 +358,11 @@ paths:
           description: 'Internal Server Error'
 components:
   schemas:
+    ProjectIDGetResponse:
+      type: object
+      properties:
+        id:
+          type: string
     ProjectCreateRequest:
       type: object
       properties:
