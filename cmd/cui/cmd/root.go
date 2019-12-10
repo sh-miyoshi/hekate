@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"github.com/sh-miyoshi/jwt-server/cmd/cui/output"
 	"fmt"
+	"github.com/sh-miyoshi/jwt-server/cmd/cui/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/create"
+	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/spf13/cobra"
 	"os"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
 var serverAddr string
