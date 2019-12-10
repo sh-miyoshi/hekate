@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/sh-miyoshi/jwt-server/cmd/cui/output"
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/create"
 	"github.com/spf13/cobra"
@@ -8,13 +9,22 @@ import (
 )
 
 var serverAddr string
+var outputFormat string
 
 func init() {
 	const defaultServerAddr = "http://localhost:8080"
+	cobra.OnInitialize(initOutput)
 
 	rootCmd.PersistentFlags().StringVar(&serverAddr, "server", defaultServerAddr, "The address of jwt-server")
-
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
 	rootCmd.AddCommand(create.GetCreateCommand())
+}
+
+func initOutput() {
+	if err := output.Init(outputFormat); err != nil {
+		fmt.Fprintf(os.Stderr, "[ERROR] Failed to set output option: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 var rootCmd = &cobra.Command{
