@@ -15,7 +15,6 @@ type ProjectCreateRequest struct {
 
 // ProjectGetResponse ...
 type ProjectGetResponse struct {
-	ID          string       `json:"id"`
 	Name        string       `json:"name"`
 	Enabled     bool         `json:"enabled"`
 	CreatedAt   string       `json:"createdAt"`
@@ -24,7 +23,6 @@ type ProjectGetResponse struct {
 
 // ProjectPutRequest ...
 type ProjectPutRequest struct {
-	Name        string       `json:"name"`
 	Enabled     bool         `json:"enabled"`
 	TokenConfig *TokenConfig `json:"tokenConfig"`
 }

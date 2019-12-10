@@ -41,7 +41,7 @@ func GenerateAccessToken(request Request) (string, error) {
 	}
 
 	// Set user roles
-	user, err := db.GetInst().User.Get(request.ProjectID, request.UserID)
+	user, err := db.GetInst().User.Get(request.ProjectName, request.UserID)
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to get user")
 	}

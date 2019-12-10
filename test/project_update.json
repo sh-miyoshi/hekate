@@ -1,5 +1,4 @@
 {
-	"name": "project_updated",
 	"enabled": true,
 	"tokenConfig": {
 		"accessTokenLifeSpan": 300,

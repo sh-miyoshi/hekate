@@ -26,23 +26,23 @@ func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
 
 	// Token API
-	r.HandleFunc(basePath+"/project/{projectID}/token", tokenapiv1.TokenCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/token", tokenapiv1.TokenCreateHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project", projectapiv1.ProjectCreateHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectID}", projectapiv1.ProjectDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectID}", projectapiv1.ProjectGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectID}", projectapiv1.ProjectUpdateHandler).Methods("PUT")
+	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectUpdateHandler).Methods("PUT")
 
 	// User API
-	r.HandleFunc(basePath+"/project/{projectID}/user", userapiv1.AllUserGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectID}/user", userapiv1.UserCreateHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}", userapiv1.UserDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}", userapiv1.UserGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}", userapiv1.UserUpdateHandler).Methods("PUT")
-	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}/role/{roleID}", userapiv1.UserRoleAddHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectID}/user/{userID}/role/{roleID}", userapiv1.UserRoleDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/user", userapiv1.AllUserGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/user", userapiv1.UserCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.UserDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.UserGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.UserUpdateHandler).Methods("PUT")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", userapiv1.UserRoleAddHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", userapiv1.UserRoleDeleteHandler).Methods("DELETE")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,6 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 
 	// Set Master Project if not exsits
 	err := db.GetInst().Project.Add(&model.ProjectInfo{
-		ID:        "master",
 		Name:      "master",
 		Enabled:   true,
 		CreatedAt: time.Now().String(),
@@ -73,7 +72,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 
 	err = db.GetInst().User.Add(&model.UserInfo{
 		ID:           uuid.New().String(),
-		ProjectID:    "master",
+		ProjectName:    "master",
 		Name:         adminName,
 		Enabled:      true,
 		CreatedAt:    time.Now().String(),

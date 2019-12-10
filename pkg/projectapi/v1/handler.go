@@ -2,7 +2,6 @@ package projectapi
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
@@ -31,7 +30,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projectIDs, err := db.GetInst().Project.GetList()
+	projectNames, err := db.GetInst().Project.GetList()
 	if err != nil {
 		logger.Error("Failed to get project list: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -39,7 +38,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "application/json")
 
-	if err := json.NewEncoder(w).Encode(&projectIDs); err != nil {
+	if err := json.NewEncoder(w).Encode(&projectNames); err != nil {
 		logger.Error("Failed to encode a response for getting project list: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -78,7 +77,6 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create Project Entry
 	project := model.ProjectInfo{
-		ID:        uuid.New().String(),
 		Name:      request.Name,
 		Enabled:   request.Enabled,
 		CreatedAt: time.Now().String(),
@@ -103,7 +101,6 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Return Response
 	w.Header().Add("Content-Type", "application/json")
 	res := ProjectGetResponse{
-		ID:        project.ID,
 		Name:      project.Name,
 		Enabled:   project.Enabled,
 		CreatedAt: project.CreatedAt,
@@ -141,17 +138,17 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	projectID := vars["projectID"]
+	projectName := vars["projectName"]
 
-	if projectID == "master" {
+	if projectName == "master" {
 		logger.Info("Cannot delete master project")
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
-	if err := db.GetInst().Project.Delete(projectID); err != nil {
+	if err := db.GetInst().Project.Delete(projectName); err != nil {
 		if err == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectID)
+			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to delete project: %+v", err)
@@ -184,13 +181,13 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	projectID := vars["projectID"]
+	projectName := vars["projectName"]
 
 	// Get Project
-	project, err := db.GetInst().Project.Get(projectID)
+	project, err := db.GetInst().Project.Get(projectName)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectID)
+			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
@@ -202,7 +199,6 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Return Response
 	w.Header().Add("Content-Type", "application/json")
 	res := ProjectGetResponse{
-		ID:        project.ID,
 		Name:      project.Name,
 		Enabled:   project.Enabled,
 		CreatedAt: project.CreatedAt,
@@ -240,7 +236,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	projectID := vars["projectID"]
+	projectName := vars["projectName"]
 
 	// Parse Request
 	var request ProjectPutRequest
@@ -251,10 +247,10 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous Project Info
-	project, err := db.GetInst().Project.Get(projectID)
+	project, err := db.GetInst().Project.Get(projectName)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectID)
+			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
@@ -264,7 +260,6 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update Parameters
-	project.Name = request.Name
 	project.Enabled = request.Enabled
 	project.TokenConfig.AccessTokenLifeSpan = request.TokenConfig.AccessTokenLifeSpan
 	project.TokenConfig.RefreshTokenLifeSpan = request.TokenConfig.RefreshTokenLifeSpan

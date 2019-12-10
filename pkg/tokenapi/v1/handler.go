@@ -15,12 +15,12 @@ import (
 // TokenCreateHandler method create JWT token
 func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	projectID := vars["projectID"]
+	projectName := vars["projectName"]
 
 	// TODO(Validate project ID)
 
 	// Get Project Info for Token Config
-	project, err := db.GetInst().Project.Get(projectID)
+	project, err := db.GetInst().Project.Get(projectName)
 	if err == model.ErrNoSuchProject {
 		http.Error(w, "Project Not Found", http.StatusNotFound)
 		return
@@ -41,7 +41,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
-		userID, err = db.GetInst().User.GetIDByName(projectID, request.Name)
+		userID, err = db.GetInst().User.GetIDByName(projectName, request.Name)
 		if err != nil {
 			if err == model.ErrNoSuchUser {
 				http.Error(w, "User Not Found", http.StatusNotFound)
@@ -54,7 +54,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Debug("User ID: %s", userID)
 
-	user, err := db.GetInst().User.Get(projectID, userID)
+	user, err := db.GetInst().User.Get(projectName, userID)
 	if err != nil {
 		if err == model.ErrNoSuchUser {
 			http.Error(w, "User Not Found", http.StatusNotFound)
@@ -97,7 +97,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate JWT Token
 	accessTokenReq := token.Request{
 		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
-		ProjectID:   user.ProjectID,
+		ProjectName:   user.ProjectName,
 		UserID:      user.ID,
 	}
 
@@ -112,7 +112,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	refreshTokenReq := token.Request{
 		ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
-		ProjectID:   user.ProjectID,
+		ProjectName:   user.ProjectName,
 		UserID:      user.ID,
 	}
 

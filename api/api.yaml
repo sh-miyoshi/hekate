@@ -7,12 +7,12 @@ info:
     name: 'Apache 2.0'
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 paths:
-  '/api/v1/project/{projectID}/token':
+  '/api/v1/project/{projectName}/token':
     post:
       tags:
         - token
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -73,35 +73,12 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/projectid/{projectName}':
-    get:
-      tags:
-        - projectID
-      parameters:
-        - name: projectName
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: 'Successfully get project info'
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectIDGetResponse'
-        '404':
-          description: 'Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/api/v1/project/{projectID}':
+  '/api/v1/project/{projectName}':
     get:
       tags:
         - project
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -123,7 +100,7 @@ paths:
       tags:
         - project
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -148,7 +125,7 @@ paths:
       tags:
         - project
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -162,12 +139,12 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectID}/user':
+  '/api/v1/project/{projectName}/user':
     post:
       tags:
         - user
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -196,7 +173,7 @@ paths:
       tags:
         - user
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -216,12 +193,12 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectID}/user/{userID}':
+  '/api/v1/project/{projectName}/user/{userID}':
     get:
       tags:
         - user
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -248,7 +225,7 @@ paths:
       tags:
         - user
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -278,7 +255,7 @@ paths:
       tags:
         - user
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -297,13 +274,13 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectID}/user/{userID}/role/{roleID}':
+  '/api/v1/project/{projectName}/user/{userID}/role/{roleID}':
     post:
       tags:
         - user
       description: 'Add a role to the user'
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -332,7 +309,7 @@ paths:
         - user
       description: 'Delete a role from the user'
       parameters:
-        - name: projectID
+        - name: projectName
           in: path
           required: true
           schema:
@@ -358,11 +335,6 @@ paths:
           description: 'Internal Server Error'
 components:
   schemas:
-    ProjectIDGetResponse:
-      type: object
-      properties:
-        id:
-          type: string
     ProjectCreateRequest:
       type: object
       properties:
@@ -375,8 +347,6 @@ components:
     ProjectGetResponse:
       type: object
       properties:
-        id:
-          type: string
         name:
           type: string
         enabled:

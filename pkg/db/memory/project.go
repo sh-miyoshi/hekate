@@ -21,11 +21,11 @@ func NewProjectHandler() (*ProjectInfoHandler, error) {
 
 // Add ...
 func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
-	if ent.ID == "" {
-		return errors.Cause(fmt.Errorf("id of entry is empty"))
+	if ent.Name == "" {
+		return errors.Cause(fmt.Errorf("name of entry is empty"))
 	}
 
-	if _, exists := h.projectList[ent.ID]; exists {
+	if _, exists := h.projectList[ent.Name]; exists {
 		return errors.Cause(model.ErrProjectAlreadyExists)
 	}
 
@@ -35,22 +35,22 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 		}
 	}
 
-	h.projectList[ent.ID] = *ent
+	h.projectList[ent.Name] = *ent
 	return nil
 }
 
 // Delete ...
-func (h *ProjectInfoHandler) Delete(id string) error {
-	if id == "" {
-		return errors.Cause(fmt.Errorf("id of entry is empty"))
+func (h *ProjectInfoHandler) Delete(name string) error {
+	if name == "" {
+		return errors.Cause(fmt.Errorf("name of entry is empty"))
 	}
 
-	if id == "master" {
+	if name == "master" {
 		return errors.Cause(fmt.Errorf("master project can not delete"))
 	}
 
-	if _, exists := h.projectList[id]; exists {
-		delete(h.projectList, id)
+	if _, exists := h.projectList[name]; exists {
+		delete(h.projectList, name)
 		return nil
 	}
 	return errors.Cause(model.ErrNoSuchProject)
@@ -66,8 +66,8 @@ func (h *ProjectInfoHandler) GetList() ([]string, error) {
 }
 
 // Get ...
-func (h *ProjectInfoHandler) Get(id string) (*model.ProjectInfo, error) {
-	res, ok := h.projectList[id]
+func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
+	res, ok := h.projectList[name]
 	if ok {
 		return &res, nil
 	}
@@ -76,8 +76,8 @@ func (h *ProjectInfoHandler) Get(id string) (*model.ProjectInfo, error) {
 
 // Update ...
 func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
-	if _, ok := h.projectList[ent.ID]; ok {
-		h.projectList[ent.ID] = *ent
+	if _, ok := h.projectList[ent.Name]; ok {
+		h.projectList[ent.Name] = *ent
 		return nil
 	}
 	return errors.Cause(model.ErrNoSuchProject)

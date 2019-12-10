@@ -7,7 +7,7 @@ import (
 // UserInfo ...
 type UserInfo struct {
 	ID           string
-	ProjectID    string
+	ProjectName    string
 	Name         string
 	Enabled      bool
 	CreatedAt    string
@@ -29,8 +29,8 @@ func (ui *UserInfo) Validate() error {
 		return errors.New("User ID is empty")
 	}
 
-	if ui.ProjectID == "" {
-		return errors.New("Project ID is empty")
+	if ui.ProjectName == "" {
+		return errors.New("Project Name is empty")
 	}
 
 	if ui.Name == "" {
