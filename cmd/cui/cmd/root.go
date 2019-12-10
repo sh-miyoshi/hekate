@@ -3,34 +3,43 @@ package cmd
 import (
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/cmd/cui/output"
+	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/create"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/spf13/cobra"
+
 	"os"
 )
 
-var serverAddr string
-var outputFormat string
-var isDebug bool
+var (
+	outputFormat string
+	configDir    string
+)
 
 func init() {
-	const defaultServerAddr = "http://localhost:8080"
+	const defaultConfigDir = "./.config"
 	cobra.OnInitialize(initOutput)
 
-	rootCmd.PersistentFlags().StringVar(&serverAddr, "server", defaultServerAddr, "The address of jwt-server")
+	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of JWT clinet config")
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
-	rootCmd.PersistentFlags().BoolVar(&isDebug, "debug", false, "Output debug log")
 
 	rootCmd.AddCommand(create.GetCreateCommand())
 }
 
 func initOutput() {
+	if err := config.InitConfig(configDir); err != nil {
+		fmt.Fprintf(os.Stderr, "[ERROR] Failed to initialize config: %v\n", err)
+		os.Exit(1)
+	}
+
+	logger.InitLogger(config.Get().EnableDebug, "")
+
+	// TODO(set server addr)
+
 	if err := output.Init(outputFormat); err != nil {
 		fmt.Fprintf(os.Stderr, "[ERROR] Failed to set output option: %v\n", err)
 		os.Exit(1)
 	}
-
-	logger.InitLogger(isDebug, "")
 }
 
 var rootCmd = &cobra.Command{

@@ -2,6 +2,7 @@ package create
 
 import (
 	"fmt"
+	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	"github.com/spf13/cobra"
@@ -21,7 +22,7 @@ var createProjectCmd = &cobra.Command{
 	Short: "Create New Project",
 	Long:  "Create New Project",
 	Run: func(cmd *cobra.Command, args []string) {
-		serverAddr, _ := cmd.InheritedFlags().GetString("server")
+		serverAddr := config.Get().ServerAddr
 		logger.Debug("server address: %s", serverAddr)
 
 		req := projectapi.ProjectCreateRequest{

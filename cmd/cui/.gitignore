@@ -1,3 +1,6 @@
 # binary files
 cui
 cui.exe
+
+# secret file
+.config/secret
