@@ -2,9 +2,9 @@ package create
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
-	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
+	"github.com/spf13/cobra"
 )
 
 type projectInfo struct {
@@ -21,15 +21,19 @@ var createProjectCmd = &cobra.Command{
 	Short: "Create New Project",
 	Long:  "Create New Project",
 	Run: func(cmd *cobra.Command, args []string) {
+		serverAddr, _ := cmd.InheritedFlags().GetString("server")
+		logger.Debug("server address: %s", serverAddr)
+
 		req := projectapi.ProjectCreateRequest{
-			Name: project.Name,
+			Name:    project.Name,
 			Enabled: project.Enabled,
 			TokenConfig: &projectapi.TokenConfig{
-				AccessTokenLifeSpan: project.AccessTokenLifeSpan,
+				AccessTokenLifeSpan:  project.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: project.RefreshTokenLifeSpan,
 			},
 		}
 		logger.Debug("project create request: %v", req)
+
 		fmt.Println("create new project")
 	},
 }
