@@ -97,7 +97,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Generate JWT Token
 	accessTokenReq := token.Request{
 		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
-		ProjectName:   user.ProjectName,
+		ProjectName: user.ProjectName,
 		UserID:      user.ID,
 	}
 
@@ -112,7 +112,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	refreshTokenReq := token.Request{
 		ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
-		ProjectName:   user.ProjectName,
+		ProjectName: user.ProjectName,
 		UserID:      user.ID,
 	}
 

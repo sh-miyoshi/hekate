@@ -7,7 +7,7 @@ import (
 // UserInfo ...
 type UserInfo struct {
 	ID           string
-	ProjectName    string
+	ProjectName  string
 	Name         string
 	Enabled      bool
 	CreatedAt    string
