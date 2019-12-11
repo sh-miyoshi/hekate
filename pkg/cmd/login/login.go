@@ -47,15 +47,26 @@ var loginCmd = &cobra.Command{
 		}
 		httpReq.Header.Add("Content-Type", "application/json")
 		client := &http.Client{}
-		res, err := client.Do(httpReq)
+		httpRes, err := client.Do(httpReq)
 		if err != nil {
 			fmt.Printf("Failed to request server: %v", err)
 			return
 		}
-		defer res.Body.Close()
+		defer httpRes.Body.Close()
 
-		// TODO(print res)
-		fmt.Printf("result: %v\n", res)
+		switch httpRes.StatusCode {
+		case 200:
+			var res tokenapi.TokenResponse
+			if err := json.NewDecoder(httpRes.Body).Decode(&res);err!= nil{
+				logger.Error("<Program Bug> Failed to parse http response: %v", err)
+				return
+			}
+			// TODO(print res)
+			fmt.Printf("res: %v\n", res)
+			fmt.Println("Successfully logged in")
+		default:
+			// TODO(print message)
+		}
 	},
 }
 
