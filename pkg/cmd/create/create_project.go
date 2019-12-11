@@ -5,7 +5,12 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
+	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"github.com/spf13/cobra"
+	yaml "gopkg.in/yaml.v2"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 type projectInfo struct {
@@ -22,6 +27,21 @@ var createProjectCmd = &cobra.Command{
 	Short: "Create New Project",
 	Long:  "Create New Project",
 	Run: func(cmd *cobra.Command, args []string) {
+		// Get Secret Info
+		secretFile := filepath.Join(config.Get().ConfigDir, "secret")
+		buf, err := ioutil.ReadFile(secretFile)
+		if err != nil {
+			fmt.Printf("Failed to read secret file: %v\n", err)
+			fmt.Println("You need to `jwt login` at first")
+			os.Exit(1)
+		}
+
+		var secret tokenapi.TokenResponse
+		if err = yaml.Unmarshal(buf, &secret); err != nil {
+			logger.Error("<Program Bug> Failed to marshal secret yaml: %v", err)
+			os.Exit(1)
+		}
+
 		serverAddr := config.Get().ServerAddr
 		logger.Debug("server address: %s", serverAddr)
 

@@ -36,8 +36,6 @@ func initOutput() {
 
 	logger.InitLogger(config.Get().EnableDebug, "")
 
-	// TODO(set server addr)
-
 	if err := output.Init(outputFormat); err != nil {
 		fmt.Printf("[ERROR] Failed to set output option: %v\n", err)
 		os.Exit(1)

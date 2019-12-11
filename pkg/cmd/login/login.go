@@ -1,22 +1,22 @@
 package login
 
 import (
-	"github.com/spf13/cobra"
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
-	"encoding/json"
-	"fmt"
-	"net/http"
-	"bytes"
-	"path/filepath"
+	"github.com/spf13/cobra"
 	"io/ioutil"
+	"net/http"
 	"os"
+	"path/filepath"
 )
 
 var (
-	userName    string
-	password    string
+	userName string
+	password string
 )
 
 var loginCmd = &cobra.Command{
@@ -31,8 +31,8 @@ var loginCmd = &cobra.Command{
 		// TODO(input password in STDIN)
 
 		req := tokenapi.TokenRequest{
-			Name: userName,
-			Secret: password,
+			Name:     userName,
+			Secret:   password,
 			AuthType: "password",
 		}
 
@@ -60,12 +60,12 @@ var loginCmd = &cobra.Command{
 		switch httpRes.StatusCode {
 		case 200:
 			var res tokenapi.TokenResponse
-			if err := json.NewDecoder(httpRes.Body).Decode(&res);err!= nil{
+			if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 				logger.Error("<Program Bug> Failed to parse http response: %v", err)
 				os.Exit(1)
 			}
 			// Output to secret file
-			secretFile := filepath.Join(config.Get().ConfigDir,"secret")
+			secretFile := filepath.Join(config.Get().ConfigDir, "secret")
 			bytes, err := json.MarshalIndent(res, "", "  ")
 			if err != nil {
 				logger.Error("<Program Bug> Failed to marshal json: %v", err)
