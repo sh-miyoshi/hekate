@@ -1,18 +1,23 @@
 # TODO List
 
-## application enhancement
+## new commands
+
+- CLI Tool(jwtctl)
+  - ServerのAPIをたたくためのコマンドラインツール
+- Gateway
+  - Backendのユーザープログラムに対してアクセス制御するようなツール
+  - keycloak-gatekeeperのようなものを想定
+  - tokenを認証するようなAPIを追加(To Server)
+
+## server application enhancement
 
 - open id connect連携
 - audit log
 - projectのimport/export
-- Gatewayプログラムの追加
-  - keycloak-gatekeeperのようなものを想定
-  - tokenを認証するようなAPIを追加
 - GUI画面の追加
 - 設定項目の追加
   - パスワードポリシー
   - refresh tokenのrevoke
-  - cache
   - encrypt_type
 - (project/user) enabledの有効化
 - SAML対応
@@ -20,9 +25,9 @@
   - ロジック部分のunit test
   - API部分のテスト
 - 各種APIの実装
-  - role api
   - user api
 - custom roleの有効化
+- その他のDB Handlerの実装
 
 ## operation enhancement
 
