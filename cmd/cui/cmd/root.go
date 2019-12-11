@@ -30,7 +30,7 @@ func init() {
 
 func initOutput() {
 	if err := config.InitConfig(configDir); err != nil {
-		fmt.Fprintf(os.Stderr, "[ERROR] Failed to initialize config: %v\n", err)
+		fmt.Printf("[ERROR] Failed to initialize config: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -39,7 +39,7 @@ func initOutput() {
 	// TODO(set server addr)
 
 	if err := output.Init(outputFormat); err != nil {
-		fmt.Fprintf(os.Stderr, "[ERROR] Failed to set output option: %v\n", err)
+		fmt.Printf("[ERROR] Failed to set output option: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -56,7 +56,7 @@ var rootCmd = &cobra.Command{
 // Execute method run root command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintf(os.Stderr, "[ERROR] %v\n", err)
+		fmt.Printf("[ERROR] %v\n", err)
 		os.Exit(1)
 	}
 }

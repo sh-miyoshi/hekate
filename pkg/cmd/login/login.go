@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"bytes"
-	"os"
 )
 
 var (
@@ -50,7 +49,7 @@ var loginCmd = &cobra.Command{
 		client := &http.Client{}
 		res, err := client.Do(httpReq)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to request server: %v", err)
+			fmt.Printf("Failed to request server: %v", err)
 			return
 		}
 		defer res.Body.Close()
