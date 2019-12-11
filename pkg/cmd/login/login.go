@@ -9,6 +9,9 @@ import (
 	"fmt"
 	"net/http"
 	"bytes"
+	"path/filepath"
+	"io/ioutil"
+	"os"
 )
 
 var (
@@ -61,8 +64,15 @@ var loginCmd = &cobra.Command{
 				logger.Error("<Program Bug> Failed to parse http response: %v", err)
 				return
 			}
-			// TODO(print res)
-			fmt.Printf("res: %v\n", res)
+			// TODO(output to secret file)
+			secretFile := filepath.Join(config.Get().ConfigDir,"secret")
+			bytes, err := json.MarshalIndent(res, "", "  ")
+			if err != nil {
+				logger.Error("<Program Bug> Failed to marshal json: %v", err)
+				return
+			}
+
+			ioutil.WriteFile(secretFile, bytes, os.ModePerm)
 			fmt.Println("Successfully logged in")
 		default:
 			// TODO(print message)
