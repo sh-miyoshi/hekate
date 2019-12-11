@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 URL="http://localhost:8080/api/v1"
 PROJECT_NAME="master"

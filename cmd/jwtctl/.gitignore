@@ -1,6 +1,6 @@
 # binary files
-cui
-cui.exe
+jwtctl
+jwtctl.exe
 
 # secret file
 .config/secret

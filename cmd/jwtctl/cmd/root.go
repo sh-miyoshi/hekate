@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/sh-miyoshi/jwt-server/cmd/cui/output"
+	"github.com/sh-miyoshi/jwt-server/cmd/jwtctl/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/create"
 	"github.com/sh-miyoshi/jwt-server/pkg/cmd/login"
@@ -21,7 +21,7 @@ func init() {
 	const defaultConfigDir = "./.config"
 	cobra.OnInitialize(initOutput)
 
-	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of JWT clinet config")
+	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of jwtctl config")
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
 
 	rootCmd.AddCommand(create.GetCreateCommand())
@@ -43,9 +43,9 @@ func initOutput() {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "jwt",
-	Short: "jwt is a command line tool for jwt-server",
-	Long:  "jwt is a command line tool for jwt-server",
+	Use:   "jwtctl",
+	Short: "jwtctl is a command line tool for jwt-server",
+	Long:  "jwtctl is a command line tool for jwt-server",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

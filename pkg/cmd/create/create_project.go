@@ -34,7 +34,7 @@ var createProjectCmd = &cobra.Command{
 		buf, err := ioutil.ReadFile(secretFile)
 		if err != nil {
 			fmt.Printf("Failed to read secret file: %v\n", err)
-			fmt.Println("You need to `jwt login` at first")
+			fmt.Println("You need to `jwtctl login` at first")
 			os.Exit(1)
 		}
 
