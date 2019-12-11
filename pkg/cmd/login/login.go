@@ -64,7 +64,7 @@ var loginCmd = &cobra.Command{
 				logger.Error("<Program Bug> Failed to parse http response: %v", err)
 				return
 			}
-			// TODO(output to secret file)
+			// Output to secret file
 			secretFile := filepath.Join(config.Get().ConfigDir,"secret")
 			bytes, err := json.MarshalIndent(res, "", "  ")
 			if err != nil {
@@ -74,8 +74,14 @@ var loginCmd = &cobra.Command{
 
 			ioutil.WriteFile(secretFile, bytes, os.ModePerm)
 			fmt.Println("Successfully logged in")
+		case 401, 404:
+			fmt.Println("Failed to login to system")
+			fmt.Println("Please cheak user name or password (or project name)")
+		case 500:
+			fmt.Println("Internal Server Error is occured")
+			fmt.Println("Please contact to your server administrator")
 		default:
-			// TODO(print message)
+			logger.Error("<Program Bug> Unexpected http response code: %d", httpRes.StatusCode)
 		}
 	},
 }
