@@ -40,20 +40,20 @@ var loginCmd = &cobra.Command{
 		body, err := json.Marshal(req)
 		if err != nil {
 			logger.Error("<Program Bug> Failed to marshal JSON: %v", err)
-			return
+			os.Exit(1)
 		}
 
 		httpReq, err := http.NewRequest("POST", url, bytes.NewReader(body))
 		if err != nil {
 			logger.Error("<Program Bug> Failed to create http request: %v", err)
-			return
+			os.Exit(1)
 		}
 		httpReq.Header.Add("Content-Type", "application/json")
 		client := &http.Client{}
 		httpRes, err := client.Do(httpReq)
 		if err != nil {
 			fmt.Printf("Failed to request server: %v", err)
-			return
+			os.Exit(1)
 		}
 		defer httpRes.Body.Close()
 
@@ -62,14 +62,14 @@ var loginCmd = &cobra.Command{
 			var res tokenapi.TokenResponse
 			if err := json.NewDecoder(httpRes.Body).Decode(&res);err!= nil{
 				logger.Error("<Program Bug> Failed to parse http response: %v", err)
-				return
+				os.Exit(1)
 			}
 			// Output to secret file
 			secretFile := filepath.Join(config.Get().ConfigDir,"secret")
 			bytes, err := json.MarshalIndent(res, "", "  ")
 			if err != nil {
 				logger.Error("<Program Bug> Failed to marshal json: %v", err)
-				return
+				os.Exit(1)
 			}
 
 			ioutil.WriteFile(secretFile, bytes, os.ModePerm)
@@ -77,11 +77,14 @@ var loginCmd = &cobra.Command{
 		case 401, 404:
 			fmt.Println("Failed to login to system")
 			fmt.Println("Please cheak user name or password (or project name)")
+			os.Exit(1)
 		case 500:
 			fmt.Println("Internal Server Error is occured")
 			fmt.Println("Please contact to your server administrator")
+			os.Exit(1)
 		default:
 			logger.Error("<Program Bug> Unexpected http response code: %d", httpRes.StatusCode)
+			os.Exit(1)
 		}
 	},
 }
