@@ -5,6 +5,14 @@ import (
 	"time"
 )
 
+// Session ...
+type Session struct {
+	SessionID string
+	CreatedAt time.Time
+	ExpiresIn time.Time
+	FromIP    string // Used to identify the user using this session
+}
+
 // UserInfo ...
 type UserInfo struct {
 	ID           string
@@ -14,6 +22,7 @@ type UserInfo struct {
 	CreatedAt    time.Time
 	PasswordHash string
 	Roles        []string
+	Sessions     []Session
 }
 
 var (
