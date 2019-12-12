@@ -7,7 +7,7 @@ token_info=`curl -s -X POST -d '@token_request.json' $URL/project/$PROJECT_NAME/
 master_token=`echo $token_info | jq -r .accessToken`
 refresh_token=`echo $token_info | jq -r .refreshToken`
 
-if [ "x$master_token" = "x" || "x$refresh_token" = "x" ]; then
+if [ "x$master_token" = "x" -o "x$refresh_token" = "x" ]; then
     echo "Failed to get token"
     exit 1
 fi
