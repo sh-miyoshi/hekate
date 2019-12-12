@@ -233,8 +233,3 @@ func (h *UserInfoHandler) RevokeSession(projectName string, userID string, sessi
 
 	return nil
 }
-
-// ClearSessions ...
-func (h *UserInfoHandler) ClearSessions() {
-
-}

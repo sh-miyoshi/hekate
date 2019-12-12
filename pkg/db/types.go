@@ -27,5 +27,4 @@ type UserInfoHandler interface {
 	RemoveRole(projectName string, userID string, roleID string) error
 	NewSession(projectName string, userID string, session model.Session) error
 	RevokeSession(projectName string, userID string, sessionID string) error
-	ClearSessions()
 }
