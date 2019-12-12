@@ -12,6 +12,15 @@ if [ "x$master_token" = "x" -o "x$refresh_token" = "x" ]; then
     exit 1
 fi
 
+# Get All Users
+all_users=`curl -s -H "Authorization: Bearer $master_token" $URL/project/master/user`
+if [ "x$all_users" = "x" ]; then
+    echo "Failed to get users in master project"
+    exit 1
+fi
+
+echo "All Users: $all_users"
+
 # Create New Project
 project=`curl -s -X POST -d '@project_create.json' -H "Authorization: Bearer $master_token" $URL/project | jq .`
 project_name=`echo $project | jq -r .name`
