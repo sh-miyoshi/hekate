@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"time"
 )
 
 // TokenConfig ...
@@ -14,7 +15,7 @@ type TokenConfig struct {
 type ProjectInfo struct {
 	Name        string
 	Enabled     bool
-	CreatedAt   string
+	CreatedAt   time.Time
 	TokenConfig *TokenConfig
 }
 

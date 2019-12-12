@@ -79,7 +79,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	project := model.ProjectInfo{
 		Name:      request.Name,
 		Enabled:   request.Enabled,
-		CreatedAt: time.Now().String(),
+		CreatedAt: time.Now(),
 		TokenConfig: &model.TokenConfig{
 			AccessTokenLifeSpan:  request.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: request.TokenConfig.RefreshTokenLifeSpan,

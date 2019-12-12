@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"time"
 )
 
 // UserInfo ...
@@ -10,7 +11,7 @@ type UserInfo struct {
 	ProjectName  string
 	Name         string
 	Enabled      bool
-	CreatedAt    string
+	CreatedAt    time.Time
 	PasswordHash string
 	Roles        []string
 }

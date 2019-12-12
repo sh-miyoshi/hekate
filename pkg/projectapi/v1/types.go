@@ -1,5 +1,9 @@
 package projectapi
 
+import (
+	"time"
+)
+
 // TokenConfig ...
 type TokenConfig struct {
 	AccessTokenLifeSpan  int `json:"accessTokenLifeSpan"`
@@ -17,7 +21,7 @@ type ProjectCreateRequest struct {
 type ProjectGetResponse struct {
 	Name        string       `json:"name"`
 	Enabled     bool         `json:"enabled"`
-	CreatedAt   string       `json:"createdAt"`
+	CreatedAt   time.Time       `json:"createdAt"`
 	TokenConfig *TokenConfig `json:"tokenConfig"`
 }
 
