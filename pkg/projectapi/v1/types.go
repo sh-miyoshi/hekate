@@ -21,7 +21,7 @@ type ProjectCreateRequest struct {
 type ProjectGetResponse struct {
 	Name        string       `json:"name"`
 	Enabled     bool         `json:"enabled"`
-	CreatedAt   time.Time       `json:"createdAt"`
+	CreatedAt   time.Time    `json:"createdAt"`
 	TokenConfig *TokenConfig `json:"tokenConfig"`
 }
 

@@ -1,5 +1,9 @@
 package userapi
 
+import (
+	"time"
+)
+
 // UserCreateRequest ...
 type UserCreateRequest struct {
 	Name     string `json:"name"`
@@ -9,12 +13,12 @@ type UserCreateRequest struct {
 
 // UserGetResponse ...
 type UserGetResponse struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	Enabled      bool     `json:"enabled"`
-	PasswordHash string   `json:"passwordHash"`
-	CreatedAt    string   `json:"createdAt"`
-	Roles        []string `json:"roles"` // Array of role IDs
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	Enabled      bool      `json:"enabled"`
+	PasswordHash string    `json:"passwordHash"`
+	CreatedAt    time.Time `json:"createdAt"`
+	Roles        []string  `json:"roles"` // Array of role IDs
 }
 
 // UserPutRequest ...
