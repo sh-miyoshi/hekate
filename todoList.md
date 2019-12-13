@@ -38,10 +38,5 @@
 
 ## An Idea of revoke refresh token
 
-- user resoure have []Sessions
-- Session is a struct which includes
-  - sessionID string
-  - createdAt time.Time
-  - expiresIn time.Time
-  - fromIP string # Used to identify the user using this session
 - add api for `revoke session (useID, sessionID)`
+- add api for `get session detail (project, useID, sessionID)`

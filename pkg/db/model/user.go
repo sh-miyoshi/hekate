@@ -9,7 +9,7 @@ import (
 type Session struct {
 	SessionID string
 	CreatedAt time.Time
-	ExpiresIn time.Time
+	ExpiresIn int
 	FromIP    string // Used to identify the user using this session
 }
 

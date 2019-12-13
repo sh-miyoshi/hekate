@@ -2,6 +2,7 @@ package tokenapi
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
@@ -10,7 +11,6 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"time"
-	"github.com/google/uuid"
 )
 
 // TokenCreateHandler method create JWT token
@@ -130,11 +130,13 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	
-	// TODO(create session)
+
+	now := time.Now()
 	session := model.Session{
 		SessionID: sessionID,
-
+		CreatedAt: now,
+		ExpiresIn: res.RefreshExpiresIn,
+		FromIP:    r.RemoteAddr,
 	}
 
 	if err := db.GetInst().User.NewSession(projectName, userID, session); err != nil {
