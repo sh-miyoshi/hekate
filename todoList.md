@@ -17,7 +17,6 @@
 - GUI画面の追加
 - 設定項目の追加
   - パスワードポリシー
-  - refresh tokenのrevoke
   - encrypt_type
 - (project/user) enabledの有効化
 - SAML対応
@@ -28,6 +27,7 @@
   - user api
 - custom roleの有効化
 - その他のDB Handlerの実装
+- add api for `get session detail (project, useID, sessionID)`
 
 ## operation enhancement
 
@@ -35,8 +35,3 @@
 - write usage to README.md
 - create public docker image
 - configure CI
-
-## An Idea of revoke refresh token
-
-- add api for `revoke session (useID, sessionID)`
-- add api for `get session detail (project, useID, sessionID)`

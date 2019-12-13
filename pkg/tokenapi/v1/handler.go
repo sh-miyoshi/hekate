@@ -90,10 +90,21 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// TODO(check session is alive or not)
-
-		// revoke previous session
-		db.GetInst().User.RevokeSession(projectName, userID, claims.SessionID)
+		// Check session is alive or not
+		alive := false
+		for _, s := range user.Sessions {
+			if s.SessionID == claims.SessionID {
+				alive = true
+				// revoke previous session
+				db.GetInst().User.RevokeSession(projectName, userID, claims.SessionID)
+				break
+			}
+		}
+		if !alive {
+			logger.Info("Token is already revoked")
+			http.Error(w, "Token Revoked", http.StatusUnauthorized)
+			return
+		}
 	default:
 		logger.Error("Invalid Authentication Type: %s", request.AuthType)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
