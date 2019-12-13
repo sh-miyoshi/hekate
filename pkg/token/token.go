@@ -55,7 +55,7 @@ func GenerateAccessToken(request Request) (string, error) {
 }
 
 // GenerateRefreshToken ...
-func GenerateRefreshToken(request Request) (string, error) {
+func GenerateRefreshToken(sessionID string, request Request) (string, error) {
 	if tokenIssuer == "" || tokenSecretKey == "" {
 		return "", errors.New("Did not initialize config yet")
 	}
@@ -71,6 +71,7 @@ func GenerateRefreshToken(request Request) (string, error) {
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
+		sessionID,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

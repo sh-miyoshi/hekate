@@ -22,4 +22,6 @@ type AccessTokenClaims struct {
 // RefreshTokenClaims ...
 type RefreshTokenClaims struct {
 	jwt.StandardClaims
+
+	SessionID string `json:"sessionID"`
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"time"
+	"github.com/google/uuid"
 )
 
 // TokenCreateHandler method create JWT token
@@ -89,7 +90,10 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// TODO(revoke previous session)
+		// TODO(check session is alive or not)
+
+		// revoke previous session
+		db.GetInst().User.RevokeSession(projectName, userID, claims.SessionID)
 	default:
 		logger.Error("Invalid Authentication Type: %s", request.AuthType)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -118,14 +122,26 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		UserID:      user.ID,
 	}
 
+	sessionID := uuid.New().String()
 	res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
-	res.RefreshToken, err = token.GenerateRefreshToken(refreshTokenReq)
+	res.RefreshToken, err = token.GenerateRefreshToken(sessionID, refreshTokenReq)
 	if err != nil {
 		logger.Error("Failed to get JWT token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	// TODO(register refresh session to user)
+	
+	// TODO(create session)
+	session := model.Session{
+		SessionID: sessionID,
+
+	}
+
+	if err := db.GetInst().User.NewSession(projectName, userID, session); err != nil {
+		logger.Error("Failed to register refresh token session token: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	// Return JWT Token
 	w.Header().Add("Content-Type", "application/json")
