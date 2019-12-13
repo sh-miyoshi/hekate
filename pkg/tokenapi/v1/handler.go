@@ -88,6 +88,8 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+
+		// TODO(revoke previous session)
 	default:
 		logger.Error("Invalid Authentication Type: %s", request.AuthType)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -123,6 +125,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	// TODO(register refresh session to user)
 
 	// Return JWT Token
 	w.Header().Add("Content-Type", "application/json")
