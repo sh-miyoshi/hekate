@@ -8,26 +8,28 @@
   - Backendのユーザープログラムに対してアクセス制御するようなツール
   - keycloak-gatekeeperのようなものを想定
   - tokenを認証するようなAPIを追加(To Server)
+- GUI画面(portal)
 
 ## server application enhancement
 
-- open id connect連携
-- audit log
-- projectのimport/export
-- GUI画面の追加
-- 設定項目の追加
-  - パスワードポリシー
-  - encrypt_type
-- (project/user) enabledの有効化
-- SAML対応
+- 各種APIの実装
+  - user api全般
+  - sessionの詳細取得(引数: project, useID, sessionID)
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
-- 各種APIの実装
-  - user api
-- custom roleの有効化
+- (project/user) enabledの有効化
 - その他のDB Handlerの実装
-- add api for `get session detail (project, useID, sessionID)`
+  - mongodb driver
+- http errorの充実
+- audit log
+- projectのimport/export
+- 設定項目の追加
+  - パスワードポリシー
+  - encrypt_type
+- custom roleの有効化
+- SAML対応
+- open id connect連携
 
 ## operation enhancement
 
