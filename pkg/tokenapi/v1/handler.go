@@ -90,17 +90,9 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Check session is alive or not
-		alive := false
-		for _, s := range user.Sessions {
-			if s.SessionID == claims.SessionID {
-				alive = true
-				// revoke previous session
-				db.GetInst().User.RevokeSession(projectName, userID, claims.SessionID)
-				break
-			}
-		}
-		if !alive {
+		// Revoke previous session
+		if err := db.GetInst().User.RevokeSession(projectName, userID, claims.SessionID); err != nil {
+			// Not found the session
 			logger.Info("Token is already revoked")
 			http.Error(w, "Token Revoked", http.StatusUnauthorized)
 			return
