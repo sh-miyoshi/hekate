@@ -26,7 +26,7 @@ jobs:
       run: |
         cd cmd/server
         go build
-        ./server
+        ./server &
     - name: API Test
       run: |
         cd test
