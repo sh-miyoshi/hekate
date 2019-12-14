@@ -22,13 +22,28 @@ func TestValidateAPIRequest(t *testing.T) {
 			"bearer " + validToken,
 			true,
 		},
+		{
+			"Authorization",
+			"Bearer " + validToken,
+			true,
+		},
+		{
+			"Authorization",
+			validToken,
+			false,
+		},
+		{
+			"AuthorizationDummy",
+			"bearer " + validToken,
+			false,
+		},
 	}
 
 	for _, target := range tt {
 		header := http.Header{}
 		header.Add(target.headerKey, target.headerValue)
 
-		_, err := ValidateAPIRequest(header)
+		_, err := validateAPIRequest(header)
 		if target.expectSuccess && err != nil {
 			t.Errorf("ValidateAPIRequest returns wrong status. got %v, want nil", err)
 		}

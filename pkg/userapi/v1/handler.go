@@ -14,17 +14,9 @@ import (
 // AllUserGetHandler ...
 //   require role: project-read
 func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse Bearer Token
-	claims, err := jwthttp.ValidateAPIRequest(r.Header)
-	if err != nil {
-		logger.Info("Failed to validate token: %v", err)
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
 	// Authorize API Request
-	if !role.GetInst().Authorize(claims.Roles, role.ResProject, role.TypeRead) {
-		logger.Info("Do not have authority")
+	if err := jwthttp.AuthHeader(r.Header, role.ResProject, role.TypeRead); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -70,17 +62,9 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 // UserGetHandler ...
 //   require role: user-read
 func UserGetHandler(w http.ResponseWriter, r *http.Request) {
-	// Parse Bearer Token
-	claims, err := jwthttp.ValidateAPIRequest(r.Header)
-	if err != nil {
-		logger.Info("Failed to validate token: %v", err)
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
 	// Authorize API Request
-	if !role.GetInst().Authorize(claims.Roles, role.ResUser, role.TypeRead) {
-		logger.Info("Do not have authority")
+	if err := jwthttp.AuthHeader(r.Header, role.ResUser, role.TypeRead); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}

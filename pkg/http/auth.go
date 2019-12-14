@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/jwt-server/pkg/role"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"net/http"
 	"strings"
@@ -20,8 +21,7 @@ func parseHTTPHeaderToken(tokenString string) (string, error) {
 	return reqToken, nil
 }
 
-// ValidateAPIRequest ...
-func ValidateAPIRequest(header http.Header) (*token.AccessTokenClaims, error) {
+func validateAPIRequest(header http.Header) (*token.AccessTokenClaims, error) {
 	auth, ok := header["Authorization"]
 	if !ok || len(auth) != 1 {
 		return nil, errors.New("Failed to get Authorization header")
@@ -35,4 +35,19 @@ func ValidateAPIRequest(header http.Header) (*token.AccessTokenClaims, error) {
 		return nil, errors.Wrap(err, "Failed to validate token")
 	}
 	return claims, nil
+}
+
+// AuthHeader ...
+func AuthHeader(header http.Header, reqTrgRes role.Resource, reqRoleType role.Type) error {
+	claims, err := validateAPIRequest(header)
+	if err != nil {
+		return errors.Wrap(err, "Failed to validate token")
+	}
+
+	// Authorize API Request
+	if !role.GetInst().Authorize(claims.Roles, role.ResCluster, role.TypeRead) {
+		return errors.New("Do not have authority")
+	}
+
+	return nil
 }
