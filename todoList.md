@@ -15,6 +15,7 @@
 - 各種APIの実装
   - user api全般
   - sessionの詳細取得(引数: project, useID, sessionID)
+  - 特定ユーザのすべてのsessionのrevoke
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
