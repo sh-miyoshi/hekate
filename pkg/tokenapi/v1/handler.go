@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
@@ -148,14 +149,5 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Return JWT Token
-	w.Header().Add("Content-Type", "application/json")
-
-	if err := json.NewEncoder(w).Encode(&res); err != nil {
-		logger.Error("Failed to encode a response for JWT token create: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	logger.Info("TokenCreateHandler method successfully finished")
+	jwthttp.ResponseWrite(w, "TokenCreateHandler", &res)
 }

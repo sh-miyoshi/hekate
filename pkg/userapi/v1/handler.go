@@ -1,7 +1,6 @@
 package userapi
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
@@ -36,15 +35,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-
-	if err := json.NewEncoder(w).Encode(&users); err != nil {
-		logger.Error("Failed to encode a response for getting user list: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	logger.Info("AllUserGetHandler method successfully finished")
+	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &users)
 }
 
 // UserCreateHandler ...
@@ -98,15 +89,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		res.Sessions = append(res.Sessions, s.SessionID)
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-
-	if err := json.NewEncoder(w).Encode(&res); err != nil {
-		logger.Error("Failed to encode a response for getting user: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	logger.Info("UserGetHandler method successfully finished")
+	jwthttp.ResponseWrite(w, "UserGetHandler", &res)
 }
 
 // UserUpdateHandler ...
