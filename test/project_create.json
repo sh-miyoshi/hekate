@@ -1,5 +1,5 @@
 {
-	"name": "project1",
+	"name": "new-project",
 	"enabled": true,
 	"tokenConfig": {
 		"accessTokenLifeSpan": 300,
