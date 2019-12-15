@@ -236,8 +236,38 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 // UserRoleAddHandler ...
 //   require role: user-write
 func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Info("Not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	// Authorize API Request
+	if err := jwthttp.AuthHeader(r.Header, role.ResUser, role.TypeWrite); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+	roleID := vars["roleID"]
+
+	// Get Previous User Info
+	if err := db.GetInst().User.AppendRole(projectName, userID, roleID); err != nil {
+		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectName)
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if err == model.ErrNoSuchUser {
+			logger.Info("No such user: %s", userID)
+			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else if err == model.ErrRoleAlreadyAppended {
+			logger.Info("Role %s is already appended", roleID)
+			http.Error(w, "Role Already Appended", http.StatusConflict)
+		} else {
+			logger.Error("Failed to get user: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	logger.Info("UserRoleAddHandler method successfully finished")
 }
 
 // UserRoleDeleteHandler ...

@@ -143,7 +143,7 @@ func (h *UserInfoHandler) AppendRole(projectName string, userID string, roleID s
 	roles := h.userList[projectName][userID].Roles
 	for _, r := range roles {
 		if r == roleID {
-			return errors.New("Role already appended")
+			return errors.Cause(model.ErrRoleAlreadyAppended)
 		}
 	}
 

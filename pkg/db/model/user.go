@@ -30,6 +30,9 @@ var (
 
 	// ErrNoSuchUser ...
 	ErrNoSuchUser = errors.New("No Such User")
+
+	// ErrRoleAlreadyAppended ...
+	ErrRoleAlreadyAppended = errors.New("Role already appended")
 )
 
 // Validate ...
