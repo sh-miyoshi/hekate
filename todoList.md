@@ -12,22 +12,24 @@
 
 ## server application enhancement
 
-- 各種APIの実装
-  - user api全般
-  - sessionの詳細取得(引数: project, useID, sessionID)
-  - 特定ユーザのすべてのsessionのrevoke
 - apiのvalidateionの追加
   - project name: URL形式
   - user nameなど
 - その他のDB Handlerの実装
   - mongodb driver
+- 各種APIの実装
+  - sessionの詳細取得(引数: project, useID, sessionID)
+  - 特定ユーザのすべてのsessionのrevoke
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - audit log
-  - use middleware
+  - time
+  - resource type (or url path and method)
+  - client
+  - success or failed
 - projectのimport/export
 - 設定項目の追加
   - パスワードポリシー
