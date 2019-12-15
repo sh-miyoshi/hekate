@@ -1,5 +1,4 @@
 {
 	"name": "user1",
-	"password": "password",
-	"enabled": true
+	"password": "password"
 }

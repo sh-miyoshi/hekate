@@ -19,10 +19,10 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
-- (project/user) enabledの有効化
 - その他のDB Handlerの実装
   - mongodb driver
 - http errorの充実
+  - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - audit log
   - use middleware
 - projectのimport/export
@@ -31,6 +31,9 @@
   - encrypt_type
 - custom roleの有効化
 - SAML対応
+- (project/user) enabledの有効化
+- user federation
+  - user情報を外部に保存し、それと連携する
 - open id connect連携
 
 ## operation enhancement

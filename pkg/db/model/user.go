@@ -18,7 +18,6 @@ type UserInfo struct {
 	ID           string
 	ProjectName  string
 	Name         string
-	Enabled      bool
 	CreatedAt    time.Time
 	PasswordHash string
 	Roles        []string

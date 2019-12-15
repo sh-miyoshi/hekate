@@ -79,7 +79,6 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	res := UserGetResponse{
 		ID:           user.ID,
 		Name:         user.Name,
-		Enabled:      user.Enabled,
 		PasswordHash: user.PasswordHash,
 		CreatedAt:    user.CreatedAt.String(),
 		Roles:        user.Roles,

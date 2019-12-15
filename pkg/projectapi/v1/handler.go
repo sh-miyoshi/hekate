@@ -55,7 +55,6 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Create Project Entry
 	project := model.ProjectInfo{
 		Name:      request.Name,
-		Enabled:   request.Enabled,
 		CreatedAt: time.Now(),
 		TokenConfig: &model.TokenConfig{
 			AccessTokenLifeSpan:  request.TokenConfig.AccessTokenLifeSpan,
@@ -78,7 +77,6 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Return Response
 	res := ProjectGetResponse{
 		Name:      project.Name,
-		Enabled:   project.Enabled,
 		CreatedAt: project.CreatedAt,
 		TokenConfig: &TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
@@ -154,7 +152,6 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	res := ProjectGetResponse{
 		Name:      project.Name,
-		Enabled:   project.Enabled,
 		CreatedAt: project.CreatedAt,
 		TokenConfig: &TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
@@ -206,7 +203,6 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update Parameters
-	project.Enabled = request.Enabled
 	project.TokenConfig.AccessTokenLifeSpan = request.TokenConfig.AccessTokenLifeSpan
 	project.TokenConfig.RefreshTokenLifeSpan = request.TokenConfig.RefreshTokenLifeSpan
 

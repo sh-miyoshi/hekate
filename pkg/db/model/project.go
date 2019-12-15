@@ -14,7 +14,6 @@ type TokenConfig struct {
 // ProjectInfo ...
 type ProjectInfo struct {
 	Name        string
-	Enabled     bool
 	CreatedAt   time.Time
 	TokenConfig *TokenConfig
 }

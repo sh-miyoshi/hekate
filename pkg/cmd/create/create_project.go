@@ -17,7 +17,6 @@ import (
 
 type projectInfo struct {
 	Name                 string
-	Enabled              bool
 	AccessTokenLifeSpan  int
 	RefreshTokenLifeSpan int
 }
@@ -48,8 +47,7 @@ var createProjectCmd = &cobra.Command{
 
 		serverAddr := config.Get().ServerAddr
 		req := projectapi.ProjectCreateRequest{
-			Name:    project.Name,
-			Enabled: project.Enabled,
+			Name: project.Name,
 			TokenConfig: &projectapi.TokenConfig{
 				AccessTokenLifeSpan:  project.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: project.RefreshTokenLifeSpan,

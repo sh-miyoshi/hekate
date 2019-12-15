@@ -58,7 +58,6 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	// Set Master Project if not exsits
 	err := db.GetInst().Project.Add(&model.ProjectInfo{
 		Name:      "master",
-		Enabled:   true,
 		CreatedAt: time.Now(),
 		TokenConfig: &model.TokenConfig{
 			AccessTokenLifeSpan:  5 * 60,            // 5 minutes, TODO(use const variable)
@@ -74,7 +73,6 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		ID:           uuid.New().String(),
 		ProjectName:  "master",
 		Name:         adminName,
-		Enabled:      true,
 		CreatedAt:    time.Now(),
 		PasswordHash: util.CreateHash(adminPassword),
 		Roles:        defaultrole.GetInst().GetList(), // set all roles
