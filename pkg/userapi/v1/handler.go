@@ -107,8 +107,34 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 // UserDeleteHandler ...
 //   require role: project-write
 func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Info("Not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	// Authorize API Request
+	if err := jwthttp.AuthHeader(r.Header, role.ResProject, role.TypeWrite); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	if err := db.GetInst().User.Delete(projectName, userID); err != nil {
+		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectName)
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if err == model.ErrNoSuchUser {
+			logger.Info("No such user: %s", userID)
+			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to delete project: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return 204 (No content) for success
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("ProjectDeleteHandler method successfully finished")
 }
 
 // UserGetHandler ...
