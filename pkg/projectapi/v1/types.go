@@ -6,8 +6,8 @@ import (
 
 // TokenConfig ...
 type TokenConfig struct {
-	AccessTokenLifeSpan  int `json:"accessTokenLifeSpan"`
-	RefreshTokenLifeSpan int `json:"refreshTokenLifeSpan"`
+	AccessTokenLifeSpan  uint `json:"accessTokenLifeSpan"`
+	RefreshTokenLifeSpan uint `json:"refreshTokenLifeSpan"`
 }
 
 // ProjectCreateRequest ...
