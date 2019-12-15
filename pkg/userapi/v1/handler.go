@@ -33,7 +33,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get project: %+v", err)
+			logger.Error("Failed to get user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -58,7 +58,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse Request
 	var request UserCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		logger.Info("Failed to decode project create request: %v", err)
+		logger.Info("Failed to decode user create request: %v", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
@@ -83,7 +83,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("User %s is already exists", user.Name)
 			http.Error(w, "User already exists", http.StatusConflict)
 		} else {
-			logger.Error("Failed to get project: %+v", err)
+			logger.Error("Failed to get user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -126,7 +126,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to delete project: %+v", err)
+			logger.Error("Failed to delete user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -134,7 +134,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return 204 (No content) for success
 	w.WriteHeader(http.StatusNoContent)
-	logger.Info("ProjectDeleteHandler method successfully finished")
+	logger.Info("PUserDeleteHandler method successfully finished")
 }
 
 // UserGetHandler ...
@@ -157,7 +157,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get project: %+v", err)
+			logger.Error("Failed to get user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -181,8 +181,56 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 // UserUpdateHandler ...
 //   require role: user-write
 func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Info("Not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	// Authorize API Request
+	if err := jwthttp.AuthHeader(r.Header, role.ResUser, role.TypeWrite); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Parse Request
+	var request UserPutRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		logger.Info("Failed to decode user update request: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Get Previous User Info
+	user, err := db.GetInst().User.Get(projectName, userID)
+	if err != nil {
+		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectName)
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if err == model.ErrNoSuchUser {
+			logger.Info("No such user: %s", userID)
+			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to get user: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Update Parameters
+	// name, password, roles
+	user.Name = request.Name
+	user.PasswordHash = util.CreateHash(request.Password)
+	user.Roles = request.Roles
+
+	// Update DB
+	if err := db.GetInst().User.Update(user); err != nil {
+		logger.Error("Failed to update user: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("UserUpdateHandler method successfully finished")
 }
 
 // UserRoleAddHandler ...
