@@ -176,7 +176,7 @@ func (h *UserInfoHandler) RemoveRole(projectName string, userID string, roleID s
 	h.userList[projectName][userID].Roles = roles
 
 	if !deleted {
-		return errors.New("User do not have such role")
+		return errors.Cause(model.ErrNoSuchRoleInUser)
 	}
 
 	return nil

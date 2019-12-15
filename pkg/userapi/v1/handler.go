@@ -83,7 +83,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("User %s is already exists", user.Name)
 			http.Error(w, "User already exists", http.StatusConflict)
 		} else {
-			logger.Error("Failed to get user: %+v", err)
+			logger.Error("Failed to create user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -210,7 +210,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get user: %+v", err)
+			logger.Error("Failed to update user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -260,7 +260,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Role %s is already appended", roleID)
 			http.Error(w, "Role Already Appended", http.StatusConflict)
 		} else {
-			logger.Error("Failed to get user: %+v", err)
+			logger.Error("Failed to add role to user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -273,6 +273,39 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 // UserRoleDeleteHandler ...
 //   require role: user-write
 func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Authorize API Request
+	if err := jwthttp.AuthHeader(r.Header, role.ResUser, role.TypeWrite); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+	roleID := vars["roleID"]
+
+	// Get Previous User Info
+	if err := db.GetInst().User.RemoveRole(projectName, userID, roleID); err != nil {
+		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectName)
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if err == model.ErrNoSuchUser {
+			logger.Info("No such user: %s", userID)
+			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else if err == model.ErrNoSuchRoleInUser {
+			logger.Info("User %s do not have Role %s", userID, roleID)
+			http.Error(w, "No Such Role in User", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to delete role from user: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	logger.Info("UserRoleDeleteHandler method successfully finished")
+
 	logger.Info("Not implemented yet")
 	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }
