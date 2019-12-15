@@ -16,6 +16,9 @@
   - user api全般
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのすべてのsessionのrevoke
+- apiのvalidateionの追加
+  - project name: URL形式
+  - user nameなど
 - その他のDB Handlerの実装
   - mongodb driver
 - テストの追加
