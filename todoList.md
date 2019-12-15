@@ -16,11 +16,11 @@
   - user api全般
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのすべてのsessionのrevoke
+- その他のDB Handlerの実装
+  - mongodb driver
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
-- その他のDB Handlerの実装
-  - mongodb driver
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - audit log

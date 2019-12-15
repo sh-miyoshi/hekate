@@ -1,13 +1,17 @@
 package userapi
 
 import (
+	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/role"
+	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
+	"time"
 )
 
 // AllUserGetHandler ...
@@ -39,12 +43,69 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserCreateHandler ...
+//   require role: project-write
 func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
+	// Authorize API Request
+	if err := jwthttp.AuthHeader(r.Header, role.ResProject, role.TypeWrite); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
+	// Parse Request
+	var request UserCreateRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		logger.Info("Failed to decode project create request: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// TODO(Validate Request)
+
+	// Create User Entry
+	user := model.UserInfo{
+		ID:           uuid.New().String(),
+		ProjectName:  projectName,
+		Name:         request.Name,
+		CreatedAt:    time.Now(),
+		PasswordHash: util.CreateHash(request.Password),
+		Roles:        request.Roles,
+	}
+
+	if err := db.GetInst().User.Add(&user); err != nil {
+		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectName)
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if err == model.ErrUserAlreadyExists {
+			logger.Info("User %s is already exists", user.Name)
+			http.Error(w, "User already exists", http.StatusConflict)
+		} else {
+			logger.Error("Failed to get project: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return Response
+	res := UserGetResponse{
+		ID:           user.ID,
+		Name:         user.Name,
+		PasswordHash: user.PasswordHash,
+		CreatedAt:    user.CreatedAt.String(),
+		Roles:        user.Roles,
+	}
+
+	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
+
 	logger.Info("Not implemented yet")
 	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }
 
 // UserDeleteHandler ...
+//   require role: project-write
 func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Not implemented yet")
 	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
@@ -92,18 +153,21 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserUpdateHandler ...
+//   require role: user-write
 func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Not implemented yet")
 	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }
 
 // UserRoleAddHandler ...
+//   require role: user-write
 func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Not implemented yet")
 	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }
 
 // UserRoleDeleteHandler ...
+//   require role: user-write
 func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Not implemented yet")
 	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)

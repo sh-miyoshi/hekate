@@ -374,6 +374,11 @@ components:
         password:
           type: string
           format: password
+        roles:
+          description: 'Array of role IDs'
+          type: array
+          items:
+            type: string
     UserGetResponse:
       type: object
       properties:

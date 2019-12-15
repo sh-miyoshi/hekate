@@ -2,8 +2,9 @@ package userapi
 
 // UserCreateRequest ...
 type UserCreateRequest struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	Name     string   `json:"name"`
+	Password string   `json:"password"`
+	Roles    []string `json:"roles"`
 }
 
 // UserGetResponse ...
