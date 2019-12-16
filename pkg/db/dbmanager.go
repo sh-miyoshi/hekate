@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/memory"
+	"github.com/sh-miyoshi/jwt-server/pkg/db/mongo"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
@@ -32,6 +33,20 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create user handler")
 		}
+
+		inst = &Manager{
+			Project: prjHandler,
+			User:    userHandler,
+		}
+	case "mongo":
+		logger.Info("Initialize with mongo DB")
+		dbClient, err := mongo.NewClient(connStr)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create db client")
+		}
+
+		prjHandler := mongo.NewProjectHandler(dbClient)
+		userHandler := mongo.NewUserHandler(dbClient, prjHandler)
 
 		inst = &Manager{
 			Project: prjHandler,
