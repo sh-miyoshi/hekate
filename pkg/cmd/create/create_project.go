@@ -17,8 +17,8 @@ import (
 
 type projectInfo struct {
 	Name                 string
-	AccessTokenLifeSpan  int
-	RefreshTokenLifeSpan int
+	AccessTokenLifeSpan  uint
+	RefreshTokenLifeSpan uint
 }
 
 var project projectInfo
@@ -92,7 +92,7 @@ var createProjectCmd = &cobra.Command{
 
 func init() {
 	createProjectCmd.Flags().StringVarP(&project.Name, "name", "n", "", "[Required] set a name of new project")
-	createProjectCmd.Flags().IntVar(&project.AccessTokenLifeSpan, "accessExpires", 5*60, "access token life span [sec]")
-	createProjectCmd.Flags().IntVar(&project.RefreshTokenLifeSpan, "refreshExpires", 14*24*60*60, "refresh token life span [sec]")
+	createProjectCmd.Flags().UintVar(&project.AccessTokenLifeSpan, "accessExpires", 5*60, "access token life span [sec]")
+	createProjectCmd.Flags().UintVar(&project.RefreshTokenLifeSpan, "refreshExpires", 14*24*60*60, "refresh token life span [sec]")
 	createProjectCmd.MarkFlagRequired("name")
 }
