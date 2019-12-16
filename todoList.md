@@ -12,9 +12,6 @@
 
 ## server application enhancement
 
-- apiのvalidateionの追加
-  - project name: URL形式
-  - user nameなど
 - その他のDB Handlerの実装
   - mongodb driver
 - 各種APIの実装
@@ -23,6 +20,8 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
+- apiのvalidateionの追加
+  - user nameなど
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - audit log
