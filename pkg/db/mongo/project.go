@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 )
@@ -24,12 +25,21 @@ func NewProjectHandler(dbClient *mongo.Client) *ProjectInfoHandler {
 
 // Add ...
 func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
+	v := &projectInfo{
+		Name:      ent.Name,
+		CreatedAt: ent.CreatedAt,
+		TokenConfig: &tokenConfig{
+			AccessTokenLifeSpan:  ent.TokenConfig.AccessTokenLifeSpan,
+			RefreshTokenLifeSpan: ent.TokenConfig.RefreshTokenLifeSpan,
+		},
+	}
+
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	_, err := col.InsertOne(ctx, ent)
+	_, err := col.InsertOne(ctx, v)
 	if err != nil {
 		return errors.Wrap(err, "Failed to insert project to mongodb")
 	}
@@ -39,6 +49,18 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 
 // Delete ...
 func (h *ProjectInfoHandler) Delete(name string) error {
+	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
+	filter := bson.D{
+		{Key: "name", Value: name},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete project from mongodb")
+	}
 	return nil
 }
 
