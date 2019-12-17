@@ -5,6 +5,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const (
+	projectCollectionName = "project"
+)
+
 // ProjectInfoHandler implement db.ProjectInfoHandler
 type ProjectInfoHandler struct {
 	dbClient *mongo.Client
