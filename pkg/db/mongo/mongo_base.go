@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+const (
+	databaseName          = "jwtserver"
+	projectCollectionName = "project"
+
+	timeoutSecond = 5
+)
+
 // NewClient ...
 func NewClient(connStr string) (*mongo.Client, error) {
 	cli, err := mongo.NewClient(options.Client().ApplyURI(connStr))

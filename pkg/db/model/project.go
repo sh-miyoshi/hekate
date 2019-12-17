@@ -2,8 +2,8 @@ package model
 
 import (
 	"errors"
-	"time"
 	"regexp"
+	"time"
 )
 
 // TokenConfig ...

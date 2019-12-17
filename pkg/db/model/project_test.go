@@ -6,11 +6,11 @@ import (
 
 func TestValidate(t *testing.T) {
 	tt := []struct {
-		projectName string
+		projectName   string
 		expectSuccess bool
 	}{
-		{ "project-ok", true },
-		{ "project-ng-str-!", false },
+		{"project-ok", true},
+		{"project-ng-str-!", false},
 		// TODO(add more test case)
 	}
 
