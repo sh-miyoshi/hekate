@@ -112,7 +112,7 @@ func main() {
 	token.InitConfig(cfg.TokenIssuer, cfg.TokenSecretKey)
 
 	// Initalize Database
-	if err := initDB("memory", "", cfg.AdminName, cfg.AdminPassword); err != nil {
+	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
 		logger.Error("Failed to initialize database: %+v", err)
 		os.Exit(1)
 	}
