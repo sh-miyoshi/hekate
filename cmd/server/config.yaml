@@ -12,10 +12,10 @@ logfile: ''
 debug_mode: false
 
 db:
-  # type: "memory"
-  # connection_string: ""
-  type: "mongo"
-  connection_string: "mongodb://localhost:27017"
+  type: "memory"
+  connection_string: ""
+  # type: "mongo"
+  # connection_string: "mongodb://localhost:27017"
 
 # Name of Server Admin
 #   This parameter is overwritten by OS env JWT_SERVER_ADMIN_NAME
