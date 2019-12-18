@@ -66,7 +66,27 @@ func (h *ProjectInfoHandler) Delete(name string) error {
 
 // GetList ...
 func (h *ProjectInfoHandler) GetList() ([]string, error) {
-	return []string{}, nil
+	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	cursor, err := col.Find(ctx, bson.D{})
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to get project list from mongodb")
+	}
+
+	projects := []projectInfo{}
+	if err := cursor.All(ctx, &projects); err != nil {
+		return []string{}, errors.Wrap(err, "Failed to get project list from mongodb")
+	}
+
+	res := []string{}
+	for _, prj := range projects {
+		res = append(res, prj.Name)
+	}
+
+	return res, nil
 }
 
 // Get ...
