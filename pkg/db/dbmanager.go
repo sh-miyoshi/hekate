@@ -80,6 +80,14 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 
 // ProjectDelete ...
 func (m *Manager) ProjectDelete(name string) error {
+	if name == "" {
+		return errors.New("name of entry is empty")
+	}
+
+	if name == "master" {
+		return errors.New("master project can not delete")
+	}
+
 	return m.project.Delete(name)
 }
 

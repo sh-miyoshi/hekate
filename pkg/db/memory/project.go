@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
@@ -27,14 +26,6 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 
 // Delete ...
 func (h *ProjectInfoHandler) Delete(name string) error {
-	if name == "" {
-		return errors.Cause(fmt.Errorf("name of entry is empty"))
-	}
-
-	if name == "master" {
-		return errors.Cause(fmt.Errorf("master project can not delete"))
-	}
-
 	if _, exists := h.projectList[name]; exists {
 		delete(h.projectList, name)
 		return nil
