@@ -21,20 +21,6 @@ func NewProjectHandler() (*ProjectInfoHandler, error) {
 
 // Add ...
 func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
-	if ent.Name == "" {
-		return errors.Cause(fmt.Errorf("name of entry is empty"))
-	}
-
-	if _, exists := h.projectList[ent.Name]; exists {
-		return errors.Cause(model.ErrProjectAlreadyExists)
-	}
-
-	for _, project := range h.projectList {
-		if project.Name == ent.Name {
-			return errors.Cause(model.ErrProjectAlreadyExists)
-		}
-	}
-
 	h.projectList[ent.Name] = *ent
 	return nil
 }

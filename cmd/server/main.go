@@ -56,7 +56,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	}
 
 	// Set Master Project if not exsits
-	err := db.GetInst().Project.Add(&model.ProjectInfo{
+	err := db.GetInst().ProjectAdd(&model.ProjectInfo{
 		Name:      "master",
 		CreatedAt: time.Now(),
 		TokenConfig: &model.TokenConfig{
@@ -69,7 +69,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		return nil
 	}
 
-	err = db.GetInst().User.Add(&model.UserInfo{
+	err = db.GetInst().UserAdd(&model.UserInfo{
 		ID:           uuid.New().String(),
 		ProjectName:  "master",
 		Name:         adminName,

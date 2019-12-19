@@ -38,6 +38,22 @@ var (
 	ErrNoSuchRoleInUser = errors.New("User do not have such role")
 )
 
+// UserInfoHandler ...
+type UserInfoHandler interface {
+	Add(ent *UserInfo) error
+	Delete(projectName string, userID string) error
+	GetList(projectName string) ([]string, error)
+	Get(projectName string, userID string) (*UserInfo, error)
+	Update(ent *UserInfo) error
+	GetIDByName(projectName string, userName string) (string, error)
+	DeleteAll(projectName string) error
+
+	AddRole(projectName string, userID string, roleID string) error
+	DeleteRole(projectName string, userID string, roleID string) error
+	NewSession(projectName string, userID string, session Session) error
+	RevokeSession(projectName string, userID string, sessionID string) error
+}
+
 // Validate ...
 func (ui *UserInfo) Validate() error {
 	if ui.ID == "" {

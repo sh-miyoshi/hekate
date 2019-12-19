@@ -22,7 +22,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projectNames, err := db.GetInst().Project.GetList()
+	projectNames, err := db.GetInst().ProjectGetList()
 	if err != nil {
 		logger.Error("Failed to get project list: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -63,7 +63,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create New Project
-	if err := db.GetInst().Project.Add(&project); err != nil {
+	if err := db.GetInst().ProjectAdd(&project); err != nil {
 		if err == model.ErrProjectAlreadyExists {
 			logger.Info("Project %s is already exists", request.Name)
 			http.Error(w, "Project Already Exists", http.StatusConflict)
@@ -106,7 +106,7 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.GetInst().Project.Delete(projectName); err != nil {
+	if err := db.GetInst().ProjectDelete(projectName); err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -136,7 +136,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 
 	// Get Project
-	project, err := db.GetInst().Project.Get(projectName)
+	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
@@ -190,7 +190,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous Project Info
-	project, err := db.GetInst().Project.Get(projectName)
+	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
@@ -207,7 +207,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	project.TokenConfig.RefreshTokenLifeSpan = request.TokenConfig.RefreshTokenLifeSpan
 
 	// Update DB
-	if err := db.GetInst().Project.Update(project); err != nil {
+	if err := db.GetInst().ProjectUpdate(project); err != nil {
 		logger.Error("Failed to update project: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

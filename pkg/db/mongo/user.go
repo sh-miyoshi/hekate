@@ -50,18 +50,18 @@ func (h *UserInfoHandler) GetIDByName(projectName string, userName string) (stri
 	return "", nil
 }
 
-// DeleteProjectDefine ...
-func (h *UserInfoHandler) DeleteProjectDefine(projectName string) error {
+// DeleteAll ...
+func (h *UserInfoHandler) DeleteAll(projectName string) error {
 	return nil
 }
 
-// AppendRole ...
-func (h *UserInfoHandler) AppendRole(projectName string, userID string, roleID string) error {
+// AddRole ...
+func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID string) error {
 	return nil
 }
 
-// RemoveRole ...
-func (h *UserInfoHandler) RemoveRole(projectName string, userID string, roleID string) error {
+// DeleteRole ...
+func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
 	return nil
 }
 

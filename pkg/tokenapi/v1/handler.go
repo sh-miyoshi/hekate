@@ -22,7 +22,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO(Validate project ID)
 
 	// Get Project Info for Token Config
-	project, err := db.GetInst().Project.Get(projectName)
+	project, err := db.GetInst().ProjectGet(projectName)
 	if err == model.ErrNoSuchProject {
 		http.Error(w, "Project Not Found", http.StatusNotFound)
 		return
@@ -43,7 +43,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
-		userID, err = db.GetInst().User.GetIDByName(projectName, request.Name)
+		userID, err = db.GetInst().UserGetIDByName(projectName, request.Name)
 		if err != nil {
 			if err == model.ErrNoSuchUser {
 				http.Error(w, "User Not Found", http.StatusNotFound)
@@ -56,7 +56,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	logger.Debug("User ID: %s", userID)
 
-	user, err := db.GetInst().User.Get(projectName, userID)
+	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
 		if err == model.ErrNoSuchUser {
 			http.Error(w, "User Not Found", http.StatusNotFound)
@@ -92,7 +92,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Revoke previous session
-		if err := db.GetInst().User.RevokeSession(projectName, userID, claims.SessionID); err != nil {
+		if err := db.GetInst().RevokeSession(projectName, userID, claims.SessionID); err != nil {
 			// Not found the session
 			logger.Info("Token is already revoked")
 			http.Error(w, "Token Revoked", http.StatusUnauthorized)
@@ -143,7 +143,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		FromIP:    r.RemoteAddr,
 	}
 
-	if err := db.GetInst().User.NewSession(projectName, userID, session); err != nil {
+	if err := db.GetInst().NewSession(projectName, userID, session); err != nil {
 		logger.Error("Failed to register refresh token session token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

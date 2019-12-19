@@ -27,6 +27,15 @@ var (
 	ErrNoSuchProject = errors.New("No such project")
 )
 
+// ProjectInfoHandler ...
+type ProjectInfoHandler interface {
+	Add(ent *ProjectInfo) error
+	Delete(name string) error
+	GetList() ([]string, error)
+	Get(name string) (*ProjectInfo, error)
+	Update(ent *ProjectInfo) error
+}
+
 // Validate ...
 func (p *ProjectInfo) Validate() error {
 	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)

@@ -122,16 +122,16 @@ func (h *UserInfoHandler) GetIDByName(projectName string, userName string) (stri
 	return "", errors.Cause(model.ErrNoSuchUser)
 }
 
-// DeleteProjectDefine ...
-func (h *UserInfoHandler) DeleteProjectDefine(projectName string) error {
+// DeleteAll ...
+func (h *UserInfoHandler) DeleteAll(projectName string) error {
 	if _, exists := h.userList[projectName]; exists {
 		delete(h.userList, projectName)
 	}
 	return nil
 }
 
-// AppendRole ...
-func (h *UserInfoHandler) AppendRole(projectName string, userID string, roleID string) error {
+// AddRole ...
+func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID string) error {
 	if _, exists := h.userList[projectName]; !exists {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
@@ -153,8 +153,8 @@ func (h *UserInfoHandler) AppendRole(projectName string, userID string, roleID s
 	return nil
 }
 
-// RemoveRole ....
-func (h *UserInfoHandler) RemoveRole(projectName string, userID string, roleID string) error {
+// DeleteRole ....
+func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
 	if _, exists := h.userList[projectName]; !exists {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
