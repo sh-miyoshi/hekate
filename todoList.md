@@ -12,6 +12,8 @@
 
 ## server application enhancement
 
+- Bug Fix
+  - db entryに対するvalidationをどこで入れるか
 - その他のDB Handlerの実装
   - mongodb driver
 - 各種APIの実装
