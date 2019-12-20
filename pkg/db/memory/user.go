@@ -23,27 +23,9 @@ func NewUserHandler(projectHandler *ProjectInfoHandler) (*UserInfoHandler, error
 
 // Add ...
 func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
-	if err := ent.Validate(); err != nil {
-		return errors.Wrap(err, "Failed to validate entry")
-	}
-
-	if _, err := h.projectHandler.Get(ent.ProjectName); err != nil {
-		return errors.Wrap(err, "Failed to get project")
-	}
-
 	// If userList do not contains project info, create project info
 	if _, exists := h.userList[ent.ProjectName]; !exists {
 		h.userList[ent.ProjectName] = make(map[string]*model.UserInfo)
-	}
-
-	if _, exists := h.userList[ent.ProjectName][ent.ID]; exists {
-		return errors.Cause(model.ErrUserAlreadyExists)
-	}
-
-	for _, user := range h.userList[ent.ProjectName] {
-		if user.Name == ent.Name {
-			return errors.Cause(model.ErrUserAlreadyExists)
-		}
 	}
 
 	h.userList[ent.ProjectName][ent.ID] = ent

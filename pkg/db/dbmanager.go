@@ -71,6 +71,8 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 		return errors.New("name of entry is empty")
 	}
 
+	// TODO(lock, unlock)
+
 	if _, err := m.project.Get(ent.Name); err != model.ErrNoSuchProject {
 		return errors.Cause(model.ErrProjectAlreadyExists)
 	}
@@ -87,6 +89,8 @@ func (m *Manager) ProjectDelete(name string) error {
 	if name == "master" {
 		return errors.New("master project can not delete")
 	}
+
+	// TODO(lock, unlock)
 
 	return m.project.Delete(name)
 }
@@ -108,6 +112,35 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
 
 // UserAdd ...
 func (m *Manager) UserAdd(ent *model.UserInfo) error {
+	if err := ent.Validate(); err != nil {
+		return errors.Wrap(err, "Failed to validate entry")
+	}
+
+	// TODO(lock, unlock)
+
+	if _, err := m.project.Get(ent.ProjectName); err != nil {
+		return errors.Wrap(err, "Failed to get project")
+	}
+
+	_, err := m.user.Get(ent.ProjectName, ent.ID)
+	if err != model.ErrNoSuchUser {
+		if err == nil {
+			return errors.Cause(model.ErrUserAlreadyExists)
+		}
+		return errors.Wrap(err, "Failed to get user info")
+	}
+
+	// Check duplicate user by name
+	if id, err := m.user.GetIDByName(ent.ProjectName, ent.Name); err == nil {
+		_, err = m.user.Get(ent.ProjectName, id)
+		if err != model.ErrNoSuchUser {
+			if err == nil {
+				return errors.Cause(model.ErrUserAlreadyExists)
+			}
+			return errors.Wrap(err, "Failed to get user info by name")
+		}
+	}
+
 	return m.user.Add(ent)
 }
 
