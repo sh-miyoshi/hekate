@@ -87,7 +87,7 @@ func (m *Manager) ProjectDelete(name string) error {
 	}
 
 	if name == "master" {
-		return errors.New("master project can not delete")
+		return errors.Wrap(model.ErrDeleteBlockedProject, "master project can not delete")
 	}
 
 	// TODO(lock, unlock)
@@ -102,11 +102,17 @@ func (m *Manager) ProjectGetList() ([]string, error) {
 
 // ProjectGet ...
 func (m *Manager) ProjectGet(name string) (*model.ProjectInfo, error) {
+	if name == "" {
+		return nil, errors.New("name of entry is empty")
+	}
+
 	return m.project.Get(name)
 }
 
 // ProjectUpdate ...
 func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
+	// TODO(validate ent, projectExists)
+	// TODO(lock, unlock)
 	return m.project.Update(ent)
 }
 
@@ -117,10 +123,6 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	}
 
 	// TODO(lock, unlock)
-
-	if _, err := m.project.Get(ent.ProjectName); err != nil {
-		return errors.Wrap(err, "Failed to get project")
-	}
 
 	_, err := m.user.Get(ent.ProjectName, ent.ID)
 	if err != model.ErrNoSuchUser {
@@ -146,50 +148,67 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 
 // UserDelete ...
 func (m *Manager) UserDelete(projectName string, userID string) error {
+	// TODO(validate projectName, userID)
+	// TODO(lock, unlock)
 	return m.user.Delete(projectName, userID)
 }
 
 // UserGetList ...
 func (m *Manager) UserGetList(projectName string) ([]string, error) {
+	// TODO(validate projectName)
 	return m.user.GetList(projectName)
 }
 
 // UserGet ...
 func (m *Manager) UserGet(projectName string, userID string) (*model.UserInfo, error) {
+	// TODO(validate projectName, userID)
 	return m.user.Get(projectName, userID)
 }
 
 // UserUpdate ...
 func (m *Manager) UserUpdate(ent *model.UserInfo) error {
+	// TODO(validate ent)
+	// TODO(lock, unlock)
 	return m.user.Update(ent)
 }
 
 // UserGetIDByName ...
 func (m *Manager) UserGetIDByName(projectName string, userName string) (string, error) {
+	// TODO(validate projectName, userName)
 	return m.user.GetIDByName(projectName, userName)
 }
 
 // UserDeleteAll ...
 func (m *Manager) UserDeleteAll(projectName string) error {
+	// TODO(validate projectName)
+	// TODO(lock, unlock)
 	return m.user.DeleteAll(projectName)
 }
 
 // UserAddRole ...
 func (m *Manager) UserAddRole(projectName string, userID string, roleID string) error {
+	// TODO(validate projectName, userID, roleID)
+	// TODO(lock, unlock)
 	return m.user.AddRole(projectName, userID, roleID)
 }
 
 // UserDeleteRole ...
 func (m *Manager) UserDeleteRole(projectName string, userID string, roleID string) error {
+	// TODO(validate projectName, userID, roleID)
+	// TODO(lock, unlock)
 	return m.user.DeleteRole(projectName, userID, roleID)
 }
 
 // NewSession ...
 func (m *Manager) NewSession(projectName string, userID string, session model.Session) error {
+	// TODO(validate projectName, userID, session)
+	// TODO(lock, unlock)
 	return m.user.NewSession(projectName, userID, session)
 }
 
 // RevokeSession ...
 func (m *Manager) RevokeSession(projectName string, userID string, sessionID string) error {
+	// TODO(validate projectName, userID, sessionID)
+	// TODO(lock, unlock)
 	return m.user.RevokeSession(projectName, userID, sessionID)
 }

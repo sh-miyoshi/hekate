@@ -100,16 +100,13 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
-	if projectName == "master" {
-		logger.Info("Cannot delete master project")
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if err == model.ErrDeleteBlockedProject {
+			logger.Info("Failed to delete blocked project: %v", err)
+			http.Error(w, "Forbidden", http.StatusForbidden)
 		} else {
 			logger.Error("Failed to delete project: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

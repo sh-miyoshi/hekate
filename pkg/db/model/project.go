@@ -25,6 +25,9 @@ var (
 
 	// ErrNoSuchProject ...
 	ErrNoSuchProject = errors.New("No such project")
+
+	// ErrDeleteBlockedProject ...
+	ErrDeleteBlockedProject = errors.New("Projects cannot be deleted")
 )
 
 // ProjectInfoHandler ...
