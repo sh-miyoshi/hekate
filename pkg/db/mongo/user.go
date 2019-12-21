@@ -11,15 +11,13 @@ import (
 
 // UserInfoHandler implement db.UserInfoHandler
 type UserInfoHandler struct {
-	dbClient       *mongo.Client
-	projectHandler *ProjectInfoHandler
+	dbClient *mongo.Client
 }
 
 // NewUserHandler ...
-func NewUserHandler(dbClient *mongo.Client, projectHandler *ProjectInfoHandler) *UserInfoHandler {
+func NewUserHandler(dbClient *mongo.Client) *UserInfoHandler {
 	res := &UserInfoHandler{
-		projectHandler: projectHandler,
-		dbClient:       dbClient,
+		dbClient: dbClient,
 	}
 	return res
 }

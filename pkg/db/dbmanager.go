@@ -47,7 +47,7 @@ func InitDBManager(dbType string, connStr string) error {
 		}
 
 		prjHandler := mongo.NewProjectHandler(dbClient)
-		userHandler := mongo.NewUserHandler(dbClient, prjHandler)
+		userHandler := mongo.NewUserHandler(dbClient)
 
 		inst = &Manager{
 			project: prjHandler,
