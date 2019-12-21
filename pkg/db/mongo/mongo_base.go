@@ -22,11 +22,15 @@ func NewClient(connStr string) (*mongo.Client, error) {
 		return nil, errors.Cause(err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
 	if err := cli.Connect(ctx); err != nil {
 		return nil, errors.Cause(err)
+	}
+
+	if err := cli.Ping(ctx, nil); err != nil {
+		return nil, errors.Wrap(err, "Failed to connect to mongodb")
 	}
 
 	return cli, nil
