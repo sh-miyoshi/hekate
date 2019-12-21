@@ -44,8 +44,8 @@ type UserInfoHandler interface {
 	Delete(projectName string, userID string) error
 	GetList(projectName string) ([]string, error)
 	Get(projectName string, userID string) (*UserInfo, error)
+	GetByName(projectName string, userName string) (*UserInfo, error)
 	Update(ent *UserInfo) error
-	GetIDByName(projectName string, userName string) (string, error)
 	DeleteAll(projectName string) error
 
 	AddRole(projectName string, userID string, roleID string) error

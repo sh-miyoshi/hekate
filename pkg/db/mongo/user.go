@@ -66,9 +66,9 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	return nil
 }
 
-// GetIDByName ...
-func (h *UserInfoHandler) GetIDByName(projectName string, userName string) (string, error) {
-	return "", nil
+// GetByName ...
+func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model.UserInfo, error) {
+	return nil, nil
 }
 
 // DeleteAll ...

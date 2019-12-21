@@ -133,14 +133,12 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	}
 
 	// Check duplicate user by name
-	if id, err := m.user.GetIDByName(ent.ProjectName, ent.Name); err == nil {
-		_, err = m.user.Get(ent.ProjectName, id)
-		if err != model.ErrNoSuchUser {
-			if err == nil {
-				return errors.Cause(model.ErrUserAlreadyExists)
-			}
-			return errors.Wrap(err, "Failed to get user info by name")
+	_, err = m.user.GetByName(ent.ProjectName, ent.Name)
+	if err != model.ErrNoSuchUser {
+		if err == nil {
+			return errors.Cause(model.ErrUserAlreadyExists)
 		}
+		return errors.Wrap(err, "Failed to get user info by name")
 	}
 
 	return m.user.Add(ent)
@@ -172,10 +170,10 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 	return m.user.Update(ent)
 }
 
-// UserGetIDByName ...
-func (m *Manager) UserGetIDByName(projectName string, userName string) (string, error) {
+// UserGetByName ...
+func (m *Manager) UserGetByName(projectName string, userName string) (*model.UserInfo, error) {
 	// TODO(validate projectName, userName)
-	return m.user.GetIDByName(projectName, userName)
+	return m.user.GetByName(projectName, userName)
 }
 
 // UserDeleteAll ...

@@ -8,14 +8,14 @@ import (
 // UserInfoHandler implement db.UserInfoHandler
 type UserInfoHandler struct {
 	// userList[projectName][userID] = UserInfo
-	userList       map[string](map[string]*model.UserInfo)
+	userList       map[string]*model.UserInfo
 	projectHandler *ProjectInfoHandler
 }
 
 // NewUserHandler ...
 func NewUserHandler(projectHandler *ProjectInfoHandler) (*UserInfoHandler, error) {
 	res := &UserInfoHandler{
-		userList:       make(map[string](map[string]*model.UserInfo)),
+		userList:       make(map[string]*model.UserInfo),
 		projectHandler: projectHandler,
 	}
 	return res, nil
@@ -23,23 +23,18 @@ func NewUserHandler(projectHandler *ProjectInfoHandler) (*UserInfoHandler, error
 
 // Add ...
 func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
-	// If userList do not contains project info, create project info
-	if _, exists := h.userList[ent.ProjectName]; !exists {
-		h.userList[ent.ProjectName] = make(map[string]*model.UserInfo)
-	}
-
-	h.userList[ent.ProjectName][ent.ID] = ent
+	h.userList[ent.ID] = ent
 	return nil
 }
 
 // Delete ...
 func (h *UserInfoHandler) Delete(projectName string, userID string) error {
-	if _, exists := h.userList[projectName]; !exists {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
 
-	if _, exists := h.userList[projectName][userID]; exists {
-		delete(h.userList[projectName], userID)
+	if _, exists := h.userList[userID]; exists {
+		delete(h.userList, userID)
 		return nil
 	}
 	return errors.Cause(model.ErrNoSuchUser)
@@ -49,13 +44,15 @@ func (h *UserInfoHandler) Delete(projectName string, userID string) error {
 func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 	res := []string{}
 
-	if _, exists := h.userList[projectName]; !exists {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
 		// project is created in Add method, so maybe empty project
 		return res, nil
 	}
 
-	for _, user := range h.userList[projectName] {
-		res = append(res, user.ID)
+	for _, user := range h.userList {
+		if user.ProjectName == projectName {
+			res = append(res, user.ID)
+		}
 	}
 
 	return res, nil
@@ -63,11 +60,11 @@ func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 
 // Get ...
 func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, error) {
-	if _, exists := h.userList[projectName]; !exists {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
 		return nil, errors.Cause(model.ErrNoSuchProject)
 	}
 
-	res, exists := h.userList[projectName][userID]
+	res, exists := h.userList[userID]
 	if !exists {
 		return nil, errors.Cause(model.ErrNoSuchUser)
 	}
@@ -77,52 +74,54 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 
 // Update ...
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
-	if _, exists := h.userList[ent.ProjectName]; !exists {
+	if _, err := h.projectHandler.Get(ent.ProjectName); err != nil {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
 
-	if _, exists := h.userList[ent.ProjectName][ent.ID]; !exists {
+	if _, exists := h.userList[ent.ID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}
 
-	h.userList[ent.ProjectName][ent.ID] = ent
+	h.userList[ent.ID] = ent
 
 	return nil
 }
 
-// GetIDByName ...
-func (h *UserInfoHandler) GetIDByName(projectName string, userName string) (string, error) {
-	if _, exists := h.userList[projectName]; !exists {
-		return "", errors.Cause(model.ErrNoSuchProject)
+// GetByName ...
+func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model.UserInfo, error) {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
+		return nil, errors.Cause(model.ErrNoSuchProject)
 	}
 
-	for _, user := range h.userList[projectName] {
-		if user.Name == userName {
-			return user.ID, nil
+	for _, user := range h.userList {
+		if user.ProjectName == projectName && user.Name == userName {
+			return user, nil
 		}
 	}
-	return "", errors.Cause(model.ErrNoSuchUser)
+	return nil, errors.Cause(model.ErrNoSuchUser)
 }
 
 // DeleteAll ...
 func (h *UserInfoHandler) DeleteAll(projectName string) error {
-	if _, exists := h.userList[projectName]; exists {
-		delete(h.userList, projectName)
+	for _, user := range h.userList {
+		if user.ProjectName == projectName {
+			delete(h.userList, user.ID)
+		}
 	}
 	return nil
 }
 
 // AddRole ...
 func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID string) error {
-	if _, exists := h.userList[projectName]; !exists {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
 
-	if _, exists := h.userList[projectName][userID]; !exists {
+	if _, exists := h.userList[userID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}
 
-	roles := h.userList[projectName][userID].Roles
+	roles := h.userList[userID].Roles
 	for _, r := range roles {
 		if r == roleID {
 			return errors.Cause(model.ErrRoleAlreadyAppended)
@@ -130,24 +129,24 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID stri
 	}
 
 	roles = append(roles, roleID)
-	h.userList[projectName][userID].Roles = roles
+	h.userList[userID].Roles = roles
 
 	return nil
 }
 
 // DeleteRole ....
 func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
-	if _, exists := h.userList[projectName]; !exists {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
 
-	if _, exists := h.userList[projectName][userID]; !exists {
+	if _, exists := h.userList[userID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}
 
 	deleted := false
 	roles := []string{}
-	for _, r := range h.userList[projectName][userID].Roles {
+	for _, r := range h.userList[userID].Roles {
 		if r == roleID {
 			deleted = true
 		} else {
@@ -155,7 +154,7 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 		}
 	}
 
-	h.userList[projectName][userID].Roles = roles
+	h.userList[userID].Roles = roles
 
 	if !deleted {
 		return errors.Cause(model.ErrNoSuchRoleInUser)
@@ -166,15 +165,15 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 
 // NewSession ...
 func (h *UserInfoHandler) NewSession(projectName string, userID string, session model.Session) error {
-	if _, exists := h.userList[projectName]; !exists {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
 
-	if _, exists := h.userList[projectName][userID]; !exists {
+	if _, exists := h.userList[userID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}
 
-	sessions := h.userList[projectName][userID].Sessions
+	sessions := h.userList[userID].Sessions
 	for _, s := range sessions {
 		if s.SessionID == session.SessionID {
 			return errors.New("Session already exists")
@@ -182,24 +181,24 @@ func (h *UserInfoHandler) NewSession(projectName string, userID string, session 
 	}
 
 	sessions = append(sessions, session)
-	h.userList[projectName][userID].Sessions = sessions
+	h.userList[userID].Sessions = sessions
 
 	return nil
 }
 
 // RevokeSession ...
 func (h *UserInfoHandler) RevokeSession(projectName string, userID string, sessionID string) error {
-	if _, exists := h.userList[projectName]; !exists {
+	if _, err := h.projectHandler.Get(projectName); err != nil {
 		return errors.Cause(model.ErrNoSuchProject)
 	}
 
-	if _, exists := h.userList[projectName][userID]; !exists {
+	if _, exists := h.userList[userID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}
 
 	deleted := false
 	sessions := []model.Session{}
-	for _, s := range h.userList[projectName][userID].Sessions {
+	for _, s := range h.userList[userID].Sessions {
 		if s.SessionID == sessionID {
 			deleted = true
 		} else {
@@ -207,7 +206,7 @@ func (h *UserInfoHandler) RevokeSession(projectName string, userID string, sessi
 		}
 	}
 
-	h.userList[projectName][userID].Sessions = sessions
+	h.userList[userID].Sessions = sessions
 
 	if !deleted {
 		return errors.New("No such session")

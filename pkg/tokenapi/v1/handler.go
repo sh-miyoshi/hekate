@@ -36,32 +36,24 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := request.ID
-	if userID == "" {
+	user := &model.UserInfo{}
+
+	if request.ID == "" {
 		if request.Name == "" {
 			logger.Info("Name or ID must be specified")
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
-		userID, err = db.GetInst().UserGetIDByName(projectName, request.Name)
-		if err != nil {
-			if err == model.ErrNoSuchUser {
-				http.Error(w, "User Not Found", http.StatusNotFound)
-			} else {
-				logger.Error("Failed to get user id: %+v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			}
-			return
-		}
+		user, err = db.GetInst().UserGetByName(projectName, request.Name)
+	} else {
+		user, err = db.GetInst().UserGet(projectName, request.ID)
 	}
-	logger.Debug("User ID: %s", userID)
 
-	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
 		if err == model.ErrNoSuchUser {
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get user info: %+v", err)
+			logger.Error("Failed to get user id: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -85,14 +77,14 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		logger.Debug("%v", claims)
 
-		if claims.Audience != userID {
+		if claims.Audience != user.ID {
 			logger.Info("Invalid refresh token audience")
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		// Revoke previous session
-		if err := db.GetInst().RevokeSession(projectName, userID, claims.SessionID); err != nil {
+		if err := db.GetInst().RevokeSession(projectName, user.ID, claims.SessionID); err != nil {
 			// Not found the session
 			logger.Info("Token is already revoked")
 			http.Error(w, "Token Revoked", http.StatusUnauthorized)
@@ -143,7 +135,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		FromIP:    r.RemoteAddr,
 	}
 
-	if err := db.GetInst().NewSession(projectName, userID, session); err != nil {
+	if err := db.GetInst().NewSession(projectName, user.ID, session); err != nil {
 		logger.Error("Failed to register refresh token session token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
