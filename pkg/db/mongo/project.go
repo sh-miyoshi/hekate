@@ -91,7 +91,20 @@ func (h *ProjectInfoHandler) GetList() ([]string, error) {
 
 // Get ...
 func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
-	return nil, nil
+	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
+	filter := bson.D{
+		{Key: "name", Value: name},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	res := &model.ProjectInfo{}
+	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
+		return nil, errors.Wrap(err, "Failed to get project from mongodb")
+	}
+
+	return res, nil
 }
 
 // Update ...
