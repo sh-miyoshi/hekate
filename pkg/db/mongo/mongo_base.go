@@ -11,6 +11,7 @@ import (
 const (
 	databaseName          = "jwtserver"
 	projectCollectionName = "project"
+	userCollectionName    = "user"
 
 	timeoutSecond = 5
 )

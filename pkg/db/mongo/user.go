@@ -1,8 +1,12 @@
 package mongo
 
 import (
+	"context"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
@@ -37,7 +41,24 @@ func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 
 // Get ...
 func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, error) {
-	return nil, nil
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+		{Key: "id", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	res := &model.UserInfo{}
+	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.Cause(model.ErrNoSuchUser)
+		}
+		return nil, errors.Wrap(err, "Failed to get project from mongodb")
+	}
+
+	return res, nil
 }
 
 // Update ...
