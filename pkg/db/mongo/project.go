@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"time"
@@ -101,13 +102,40 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
 
 	res := &model.ProjectInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.Cause(model.ErrNoSuchProject)
+		}
 		return nil, errors.Wrap(err, "Failed to get project from mongodb")
 	}
+	logger.Debug("Get project %s data: %v", name, res)
 
 	return res, nil
 }
 
 // Update ...
 func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
+	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
+	filter := bson.D{
+		{Key: "name", Value: ent.Name},
+	}
+
+	v := &projectInfo{
+		Name:      ent.Name,
+		CreatedAt: ent.CreatedAt,
+		TokenConfig: &tokenConfig{
+			AccessTokenLifeSpan:  ent.TokenConfig.AccessTokenLifeSpan,
+			RefreshTokenLifeSpan: ent.TokenConfig.RefreshTokenLifeSpan,
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	// TODO(user FindOneAudUpdate?)
+
+	if _, err := col.UpdateOne(ctx, filter, v); err != nil {
+		return errors.Wrap(err, "Failed to update project in mongodb")
+	}
+
 	return nil
 }

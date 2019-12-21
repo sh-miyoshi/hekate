@@ -65,8 +65,11 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		},
 	})
 	if err != nil {
-		logger.Info("Master Project is already exists. So nothing to do.")
-		return nil
+		if err == model.ErrProjectAlreadyExists {
+			logger.Info("Master Project is already exists.")
+		} else {
+			return errors.Wrap(err, "Failed to create master project")
+		}
 	}
 
 	err = db.GetInst().UserAdd(&model.UserInfo{
@@ -79,7 +82,11 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "Failed to create admin user")
+		if err == model.ErrUserAlreadyExists {
+			logger.Info("Admin user is already exists.")
+		} else {
+			return errors.Wrap(err, "Failed to create admin user")
+		}
 	}
 
 	return nil
