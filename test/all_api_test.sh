@@ -107,7 +107,7 @@ if [ $? != 0 ]; then
 	exit 1
 fi
 echo "success"
-# userID=`echo $result | jq .id`
+userID=`echo $result | jq -r .id`
 
 # All User Get
 result=`test_api "$URL/project/master/user" GET $master_access_token`
@@ -117,18 +117,42 @@ if [ $result != "success" ]; then
 	exit 1
 fi
 
-
 # User Get
-# TODO
+result=`test_api "$URL/project/master/user/$userID" GET $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to get user"
+	exit 1
+fi
 
 # User Update
-# TODO
+result=`test_api "$URL/project/master/user/$userID" PUT $master_access_token 'user_update.json'`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to update user"
+	exit 1
+fi
+
+# Add User Role
+result=`test_api "$URL/project/master/user/$userID/role/project-read" POST $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to add role to user"
+	exit 1
+fi
+
+# Delete User Role
+result=`test_api "$URL/project/master/user/$userID/role/project-read" DELETE $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to delete role from user"
+	exit 1
+fi
 
 # User Delete
-# TODO
-
-# Append User Role
-# TODO
-
-# Remove User Role
-# TODO
+result=`test_api "$URL/project/master/user/$userID" DELETE $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to delete user"
+	exit 1
+fi
