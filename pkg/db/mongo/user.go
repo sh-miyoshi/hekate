@@ -24,6 +24,35 @@ func NewUserHandler(dbClient *mongo.Client) *UserInfoHandler {
 
 // Add ...
 func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
+	v := &userInfo{
+		ID:           ent.ID,
+		ProjectName:  ent.ProjectName,
+		Name:         ent.Name,
+		CreatedAt:    ent.CreatedAt,
+		PasswordHash: ent.PasswordHash,
+		Roles:        ent.Roles,
+		Sessions:     []session{},
+	}
+
+	for _, s := range ent.Sessions {
+		v.Sessions = append(v.Sessions, session{
+			SessionID: s.SessionID,
+			CreatedAt: s.CreatedAt,
+			ExpiresIn: s.ExpiresIn,
+			FromIP:    s.FromIP,
+		})
+	}
+
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.InsertOne(ctx, v)
+	if err != nil {
+		return errors.Wrap(err, "Failed to insert user to mongodb")
+	}
+
 	return nil
 }
 
