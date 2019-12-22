@@ -29,6 +29,31 @@ function test_api() {
 	fi
 }
 
+function test_api_return_json() {
+	url=$1
+	method=$2
+	token=$3
+
+	if [ $# = 4 ]; then
+		input=$4
+		result=`curl -s -X $method -d "@$input" \
+		  -H "Authorization: Bearer $token" $url \
+		  | jq .`
+		if [ $? != 0 ]; then
+			exit 1
+		fi
+		echo $result
+	else
+		result=`curl -s -X $method \
+		  -H "Authorization: Bearer $token" $url \
+		  | jq .`
+		if [ $? != 0 ]; then
+			exit 1
+		fi
+		echo $result
+	fi
+}
+
 # Get Master Token
 token_info=`curl -s -X POST -d '@token_request.json' $URL/project/master/token`
 master_access_token=`echo $token_info | jq -r .accessToken`
@@ -76,7 +101,13 @@ fi
 
 
 # User Create
-# TODO
+result=`test_api_return_json "$URL/project/master/user" POST $master_access_token 'user_create.json'`
+if [ $? != 0 ]; then
+	echo "Failed to create user"
+	exit 1
+fi
+echo "success"
+# userID=`echo $result | jq .id`
 
 # All User Get
 result=`test_api "$URL/project/master/user" GET $master_access_token`

@@ -99,9 +99,6 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
-
-	logger.Info("Not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }
 
 // UserDeleteHandler ...
