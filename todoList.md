@@ -12,10 +12,17 @@
 
 ## server application enhancement
 
-- Bug Fix
-  - db entryに対するvalidationをどこで入れるか
 - その他のDB Handlerの実装
   - mongodb driver
+    - ProjectUpdate
+    - UserDelete
+    - UserGetList
+    - UserUpdate
+    - UserDeleteAll
+    - UserAddRole
+    - UserDeleteRole
+    - UserNewSession
+    - UserRevokeSession
 - 各種APIの実装
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのすべてのsessionのrevoke
