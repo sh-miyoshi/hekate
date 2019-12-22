@@ -66,7 +66,24 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 
 // GetByName ...
 func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model.UserInfo, error) {
-	return nil, nil
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+		{Key: "name", Value: userName},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	res := &model.UserInfo{}
+	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.Cause(model.ErrNoSuchUser)
+		}
+		return nil, errors.Wrap(err, "Failed to get project by name from mongodb")
+	}
+
+	return res, nil
 }
 
 // DeleteAll ...
