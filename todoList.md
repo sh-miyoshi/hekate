@@ -12,13 +12,10 @@
 
 ## server application enhancement
 
+- session dbを外だしする
+  - update時に更新されないように
 - その他のDB Handlerの実装
   - mongodb driver
-    - ProjectUpdate
-    - UserDelete
-    - UserGetList
-    - UserUpdate
-    - UserDeleteAll
     - UserAddRole
     - UserDeleteRole
     - UserNewSession

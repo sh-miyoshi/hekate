@@ -92,6 +92,10 @@ func (m *Manager) ProjectDelete(name string) error {
 
 	// TODO(lock, unlock)
 
+	if err := m.user.DeleteAll(name); err != nil {
+		return errors.Wrap(err, "failed to delete user data")
+	}
+
 	return m.project.Delete(name)
 }
 
@@ -174,13 +178,6 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 func (m *Manager) UserGetByName(projectName string, userName string) (*model.UserInfo, error) {
 	// TODO(validate projectName, userName)
 	return m.user.GetByName(projectName, userName)
-}
-
-// UserDeleteAll ...
-func (m *Manager) UserDeleteAll(projectName string) error {
-	// TODO(validate projectName)
-	// TODO(lock, unlock)
-	return m.user.DeleteAll(projectName)
 }
 
 // UserAddRole ...

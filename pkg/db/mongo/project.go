@@ -58,7 +58,7 @@ func (h *ProjectInfoHandler) Delete(name string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	_, err := col.DeleteMany(ctx, filter)
+	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
 		return errors.Wrap(err, "Failed to delete project from mongodb")
 	}
@@ -130,8 +130,6 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
-
-	// TODO(user FindOneAudUpdate?)
 
 	if _, err := col.UpdateOne(ctx, filter, v); err != nil {
 		return errors.Wrap(err, "Failed to update project in mongodb")

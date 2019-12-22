@@ -58,12 +58,49 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 
 // Delete ...
 func (h *UserInfoHandler) Delete(projectName string, userID string) error {
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+		{Key: "id", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteOne(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete user from mongodb")
+	}
 	return nil
 }
 
 // GetList ...
 func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
-	return []string{}, nil
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to get user list from mongodb")
+	}
+
+	users := []userInfo{}
+	if err := cursor.All(ctx, &users); err != nil {
+		return []string{}, errors.Wrap(err, "Failed to get user list from mongodb")
+	}
+
+	res := []string{}
+	for _, user := range users {
+		res = append(res, user.ID)
+	}
+
+	return res, nil
 }
 
 // Get ...
@@ -90,6 +127,38 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 
 // Update ...
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
+	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: ent.ProjectName},
+		{Key: "id", Value: ent.ID},
+	}
+
+	v := &userInfo{
+		ID:           ent.ID,
+		ProjectName:  ent.ProjectName,
+		Name:         ent.Name,
+		CreatedAt:    ent.CreatedAt,
+		PasswordHash: ent.PasswordHash,
+		Roles:        ent.Roles,
+		Sessions:     []session{},
+	}
+
+	for _, s := range ent.Sessions {
+		v.Sessions = append(v.Sessions, session{
+			SessionID: s.SessionID,
+			CreatedAt: s.CreatedAt,
+			ExpiresIn: s.ExpiresIn,
+			FromIP:    s.FromIP,
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	if _, err := col.UpdateOne(ctx, filter, v); err != nil {
+		return errors.Wrap(err, "Failed to update project in mongodb")
+	}
+
 	return nil
 }
 
@@ -117,6 +186,18 @@ func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model
 
 // DeleteAll ...
 func (h *UserInfoHandler) DeleteAll(projectName string) error {
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete user from mongodb")
+	}
 	return nil
 }
 
