@@ -34,15 +34,6 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 		Sessions:     []session{},
 	}
 
-	for _, s := range ent.Sessions {
-		v.Sessions = append(v.Sessions, session{
-			SessionID: s.SessionID,
-			CreatedAt: s.CreatedAt,
-			ExpiresIn: s.ExpiresIn,
-			FromIP:    s.FromIP,
-		})
-	}
-
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -141,15 +132,6 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 		PasswordHash: ent.PasswordHash,
 		Roles:        ent.Roles,
 		Sessions:     []session{},
-	}
-
-	for _, s := range ent.Sessions {
-		v.Sessions = append(v.Sessions, session{
-			SessionID: s.SessionID,
-			CreatedAt: s.CreatedAt,
-			ExpiresIn: s.ExpiresIn,
-			FromIP:    s.FromIP,
-		})
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)

@@ -168,8 +168,15 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		Roles:        user.Roles,
 	}
 
-	for _, s := range user.Sessions {
-		res.Sessions = append(res.Sessions, s.SessionID)
+	sessions, err := db.GetInst().GetSessions(user.ID)
+	if err != nil {
+		logger.Error("Failed to get session list: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	for _, s := range sessions {
+		res.Sessions = append(res.Sessions, s)
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetHandler", &res)

@@ -84,7 +84,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Revoke previous session
-		if err := db.GetInst().RevokeSession(projectName, user.ID, claims.SessionID); err != nil {
+		if err := db.GetInst().RevokeSession(claims.SessionID); err != nil {
 			// Not found the session
 			logger.Info("Token is already revoked")
 			http.Error(w, "Token Revoked", http.StatusUnauthorized)
@@ -127,15 +127,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	now := time.Now()
-	session := model.Session{
-		SessionID: sessionID,
-		CreatedAt: now,
-		ExpiresIn: res.RefreshExpiresIn,
-		FromIP:    r.RemoteAddr,
-	}
-
-	if err := db.GetInst().NewSession(projectName, user.ID, session); err != nil {
+	if err := db.GetInst().NewSession(user.ID, sessionID, res.RefreshExpiresIn, r.RemoteAddr); err != nil {
 		logger.Error("Failed to register refresh token session token: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

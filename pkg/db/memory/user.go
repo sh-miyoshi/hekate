@@ -7,7 +7,7 @@ import (
 
 // UserInfoHandler implement db.UserInfoHandler
 type UserInfoHandler struct {
-	// userList[projectName][userID] = UserInfo
+	// userList[userID] = UserInfo
 	userList       map[string]*model.UserInfo
 	projectHandler *ProjectInfoHandler
 }
@@ -158,58 +158,6 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 
 	if !deleted {
 		return errors.Cause(model.ErrNoSuchRoleInUser)
-	}
-
-	return nil
-}
-
-// NewSession ...
-func (h *UserInfoHandler) NewSession(projectName string, userID string, session model.Session) error {
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return errors.Cause(model.ErrNoSuchProject)
-	}
-
-	if _, exists := h.userList[userID]; !exists {
-		return errors.Cause(model.ErrNoSuchUser)
-	}
-
-	sessions := h.userList[userID].Sessions
-	for _, s := range sessions {
-		if s.SessionID == session.SessionID {
-			return errors.New("Session already exists")
-		}
-	}
-
-	sessions = append(sessions, session)
-	h.userList[userID].Sessions = sessions
-
-	return nil
-}
-
-// RevokeSession ...
-func (h *UserInfoHandler) RevokeSession(projectName string, userID string, sessionID string) error {
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return errors.Cause(model.ErrNoSuchProject)
-	}
-
-	if _, exists := h.userList[userID]; !exists {
-		return errors.Cause(model.ErrNoSuchUser)
-	}
-
-	deleted := false
-	sessions := []model.Session{}
-	for _, s := range h.userList[userID].Sessions {
-		if s.SessionID == sessionID {
-			deleted = true
-		} else {
-			sessions = append(sessions, s)
-		}
-	}
-
-	h.userList[userID].Sessions = sessions
-
-	if !deleted {
-		return errors.New("No such session")
 	}
 
 	return nil

@@ -13,6 +13,7 @@ import (
 type Manager struct {
 	project model.ProjectInfoHandler
 	user    model.UserInfoHandler
+	session model.SessionHandler
 }
 
 var inst *Manager
@@ -34,10 +35,15 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create user handler")
 		}
+		sessionHander, err := memory.NewSessionHandler()
+		if err != nil {
+			return errors.Wrap(err, "Failed to create session handler")
+		}
 
 		inst = &Manager{
 			project: prjHandler,
 			user:    userHandler,
+			session: sessionHander,
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -48,6 +54,8 @@ func InitDBManager(dbType string, connStr string) error {
 
 		prjHandler := mongo.NewProjectHandler(dbClient)
 		userHandler := mongo.NewUserHandler(dbClient)
+
+		// TODO(sessionHandler)
 
 		inst = &Manager{
 			project: prjHandler,
@@ -195,15 +203,21 @@ func (m *Manager) UserDeleteRole(projectName string, userID string, roleID strin
 }
 
 // NewSession ...
-func (m *Manager) NewSession(projectName string, userID string, session model.Session) error {
-	// TODO(validate projectName, userID, session)
+func (m *Manager) NewSession(userID string, sessionID string, expiresIn uint, fromIP string) error {
+	// TODO(validate userID, sessionID, expiresIn?)
 	// TODO(lock, unlock)
-	return m.user.NewSession(projectName, userID, session)
+	return m.session.NewSession(userID, sessionID, expiresIn, fromIP)
 }
 
 // RevokeSession ...
-func (m *Manager) RevokeSession(projectName string, userID string, sessionID string) error {
-	// TODO(validate projectName, userID, sessionID)
+func (m *Manager) RevokeSession(sessionID string) error {
+	// TODO(validate sessionID)
 	// TODO(lock, unlock)
-	return m.user.RevokeSession(projectName, userID, sessionID)
+	return m.session.RevokeSession(sessionID)
+}
+
+// GetSessions ...
+func (m *Manager) GetSessions(userID string) ([]string, error) {
+	// TODO(validate userID)
+	return m.session.GetSessions(userID)
 }

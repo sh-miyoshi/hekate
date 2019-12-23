@@ -5,14 +5,6 @@ import (
 	"time"
 )
 
-// Session ...
-type Session struct {
-	SessionID string
-	CreatedAt time.Time
-	ExpiresIn uint
-	FromIP    string // Used to identify the user using this session
-}
-
 // UserInfo ...
 type UserInfo struct {
 	ID           string
@@ -21,7 +13,6 @@ type UserInfo struct {
 	CreatedAt    time.Time
 	PasswordHash string
 	Roles        []string
-	Sessions     []Session
 }
 
 var (
@@ -47,11 +38,8 @@ type UserInfoHandler interface {
 	GetByName(projectName string, userName string) (*UserInfo, error)
 	Update(ent *UserInfo) error
 	DeleteAll(projectName string) error
-
 	AddRole(projectName string, userID string, roleID string) error
 	DeleteRole(projectName string, userID string, roleID string) error
-	NewSession(projectName string, userID string, session Session) error
-	RevokeSession(projectName string, userID string, sessionID string) error
 }
 
 // Validate ...
