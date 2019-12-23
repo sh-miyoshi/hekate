@@ -31,7 +31,6 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 		CreatedAt:    ent.CreatedAt,
 		PasswordHash: ent.PasswordHash,
 		Roles:        ent.Roles,
-		Sessions:     []session{},
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
@@ -131,7 +130,6 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 		CreatedAt:    ent.CreatedAt,
 		PasswordHash: ent.PasswordHash,
 		Roles:        ent.Roles,
-		Sessions:     []session{},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -247,15 +245,5 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 		return errors.Wrap(err, "Failed to add role to user in mongodb")
 	}
 
-	return nil
-}
-
-// NewSession ...
-func (h *UserInfoHandler) NewSession(projectName string, userID string, session model.Session) error {
-	return nil
-}
-
-// RevokeSession ...
-func (h *UserInfoHandler) RevokeSession(projectName string, userID string, sessionID string) error {
 	return nil
 }
