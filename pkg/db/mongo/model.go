@@ -16,7 +16,7 @@ type projectInfo struct {
 }
 
 type session struct {
-	UserID string `bson:"userID"`
+	UserID    string    `bson:"userID"`
 	SessionID string    `bson:"sessionID"`
 	CreatedAt time.Time `bson:"createdAt"`
 	ExpiresIn uint      `bson:"expiresIn"`

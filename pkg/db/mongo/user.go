@@ -200,7 +200,7 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID stri
 		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: user.ID},
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
@@ -223,7 +223,7 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 	for _, role := range user.Roles {
 		if role == roleID {
 			deleted = true
-		}else{
+		} else {
 			roles = append(roles, role)
 		}
 	}
@@ -237,7 +237,7 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: user.ID},
 	}
-	
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 

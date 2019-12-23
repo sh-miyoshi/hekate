@@ -1,21 +1,21 @@
 package memory
 
 import (
-	"time"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"time"
 )
 
 // SessionHandler implement db.SessionHandler
 type SessionHandler struct {
 	// sessionList[sessionID] = Session
-	sessionList       map[string]*model.Session
+	sessionList map[string]*model.Session
 }
 
 // NewSessionHandler ...
 func NewSessionHandler() (*SessionHandler, error) {
 	res := &SessionHandler{
-		sessionList:       make(map[string]*model.Session),
+		sessionList: make(map[string]*model.Session),
 	}
 	return res, nil
 }
@@ -27,11 +27,11 @@ func (h *SessionHandler) NewSession(userID string, sessionID string, expiresIn u
 	}
 
 	h.sessionList[sessionID] = &model.Session{
-		UserID: userID, 
+		UserID:    userID,
 		SessionID: sessionID,
 		CreatedAt: time.Now(),
 		ExpiresIn: expiresIn,
-		FromIP: fromIP,
+		FromIP:    fromIP,
 	}
 
 	return nil
@@ -48,7 +48,7 @@ func (h *SessionHandler) RevokeSession(sessionID string) error {
 }
 
 // GetSessions ...
-func (h *SessionHandler) GetSessions(userID string) ([]string, error){
+func (h *SessionHandler) GetSessions(userID string) ([]string, error) {
 	res := []string{}
 
 	for id, s := range h.sessionList {

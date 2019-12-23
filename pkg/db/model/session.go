@@ -6,7 +6,7 @@ import (
 
 // Session ...
 type Session struct {
-	UserID string
+	UserID    string
 	SessionID string
 	CreatedAt time.Time
 	ExpiresIn uint
