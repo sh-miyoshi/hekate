@@ -119,7 +119,7 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.Cause(model.ErrNoSuchUser)
 		}
-		return nil, errors.Wrap(err, "Failed to get project from mongodb")
+		return nil, errors.Wrap(err, "Failed to get user from mongodb")
 	}
 
 	return res, nil
@@ -156,7 +156,7 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, v); err != nil {
-		return errors.Wrap(err, "Failed to update project in mongodb")
+		return errors.Wrap(err, "Failed to update user in mongodb")
 	}
 
 	return nil
@@ -178,7 +178,7 @@ func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.Cause(model.ErrNoSuchUser)
 		}
-		return nil, errors.Wrap(err, "Failed to get project by name from mongodb")
+		return nil, errors.Wrap(err, "Failed to get user by name from mongodb")
 	}
 
 	return res, nil
@@ -203,11 +203,68 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 
 // AddRole ...
 func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID string) error {
+	user, err := h.Get(projectName, userID)
+	if err != nil {
+		return errors.Wrap(err, "Failed to get user info in AddRole")
+	}
+
+	for _, role := range user.Roles {
+		if role == roleID {
+			return errors.Cause(model.ErrRoleAlreadyAppended)
+		}
+	}
+	user.Roles = append(user.Roles, roleID)
+
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+		{Key: "id", Value: user.ID},
+	}
+	
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	if _, err := col.UpdateOne(ctx, filter, user); err != nil {
+		return errors.Wrap(err, "Failed to add role to user in mongodb")
+	}
+
 	return nil
 }
 
 // DeleteRole ...
 func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
+	user, err := h.Get(projectName, userID)
+	if err != nil {
+		return errors.Wrap(err, "Failed to get user info in AddRole")
+	}
+
+	deleted := false
+	roles := []string{}
+	for _, role := range user.Roles {
+		if role == roleID {
+			deleted = true
+		}else{
+			roles = append(roles, role)
+		}
+	}
+	if !deleted {
+		return errors.Cause(model.ErrNoSuchRoleInUser)
+	}
+	user.Roles = roles
+
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+		{Key: "id", Value: user.ID},
+	}
+	
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	if _, err := col.UpdateOne(ctx, filter, user); err != nil {
+		return errors.Wrap(err, "Failed to add role to user in mongodb")
+	}
+
 	return nil
 }
 

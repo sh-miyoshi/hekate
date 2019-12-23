@@ -16,8 +16,6 @@
   - update時に更新されないように
 - その他のDB Handlerの実装
   - mongodb driver
-    - UserAddRole
-    - UserDeleteRole
     - UserNewSession
     - UserRevokeSession
 - access tokenの高機能化
