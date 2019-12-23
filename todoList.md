@@ -22,6 +22,7 @@
     - UserRevokeSession
 - access tokenの高機能化
   - redirect_url?
+  - audienceの見直し
 - 各種APIの実装
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのすべてのsessionのrevoke

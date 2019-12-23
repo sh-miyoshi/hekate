@@ -3,7 +3,10 @@
 ## Overview
 
 jwt-serverはJWT Tokenを取得するためのserverです。  
-現在絶賛リファクタリング中です。
+
+## Project Goal
+
+より速く、よりスケールするシンプルな認証・認可サーバ
 
 ## 開発環境
 
@@ -34,3 +37,7 @@ EOF
 
 curl -X POST -d '@token.json' http://localhost:8080/api/v1/project/master/token
 ```
+
+## All APIs
+
+[test/all_api_test.sh](test/all_api_test.sh)を参照してください。
