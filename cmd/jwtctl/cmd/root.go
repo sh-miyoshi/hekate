@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/sh-miyoshi/jwt-server/cmd/jwtctl/output"
-	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
-	"github.com/sh-miyoshi/jwt-server/pkg/cmd/create"
-	"github.com/sh-miyoshi/jwt-server/pkg/cmd/login"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/create"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/login"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/spf13/cobra"
 

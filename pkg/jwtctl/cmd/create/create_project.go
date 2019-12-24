@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/sh-miyoshi/jwt-server/pkg/cmd/config"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
