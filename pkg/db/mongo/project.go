@@ -7,6 +7,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -16,12 +17,26 @@ type ProjectInfoHandler struct {
 }
 
 // NewProjectHandler ...
-func NewProjectHandler(dbClient *mongo.Client) *ProjectInfoHandler {
+func NewProjectHandler(dbClient *mongo.Client) (*ProjectInfoHandler, error) {
 	res := &ProjectInfoHandler{
 		dbClient: dbClient,
 	}
 
-	return res
+	// Create Index to Project Name
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			"name": 1, // index in ascending order
+		},
+		Options: options.Index().SetUnique(true),
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	col := res.dbClient.Database(databaseName).Collection(projectCollectionName)
+	_, err := col.Indexes().CreateOne(ctx, mod)
+
+	return res, err
 }
 
 // Add ...

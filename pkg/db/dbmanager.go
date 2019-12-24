@@ -52,7 +52,10 @@ func InitDBManager(dbType string, connStr string) error {
 			return errors.Wrap(err, "Failed to create db client")
 		}
 
-		prjHandler := mongo.NewProjectHandler(dbClient)
+		prjHandler, err := mongo.NewProjectHandler(dbClient)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create project handler")
+		}
 		userHandler := mongo.NewUserHandler(dbClient)
 		sessionHandler := mongo.NewSessionHandler(dbClient)
 
