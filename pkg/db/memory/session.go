@@ -20,8 +20,8 @@ func NewSessionHandler() (*SessionHandler, error) {
 	return res, nil
 }
 
-// NewSession ...
-func (h *SessionHandler) NewSession(userID string, sessionID string, expiresIn uint, fromIP string) error {
+// New ...
+func (h *SessionHandler) New(userID string, sessionID string, expiresIn uint, fromIP string) error {
 	if _, exists := h.sessionList[sessionID]; exists {
 		return errors.New("Session already exists")
 	}
@@ -37,8 +37,8 @@ func (h *SessionHandler) NewSession(userID string, sessionID string, expiresIn u
 	return nil
 }
 
-// RevokeSession ...
-func (h *SessionHandler) RevokeSession(sessionID string) error {
+// Revoke ...
+func (h *SessionHandler) Revoke(sessionID string) error {
 	if _, exists := h.sessionList[sessionID]; exists {
 		delete(h.sessionList, sessionID)
 		return nil
@@ -47,8 +47,8 @@ func (h *SessionHandler) RevokeSession(sessionID string) error {
 	return nil
 }
 
-// GetSessions ...
-func (h *SessionHandler) GetSessions(userID string) ([]string, error) {
+// GetList ...
+func (h *SessionHandler) GetList(userID string) ([]string, error) {
 	res := []string{}
 
 	for id, s := range h.sessionList {

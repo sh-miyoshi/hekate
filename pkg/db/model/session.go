@@ -15,7 +15,7 @@ type Session struct {
 
 // SessionHandler ...
 type SessionHandler interface {
-	NewSession(userID string, sessionID string, expiresIn uint, fromIP string) error
-	RevokeSession(sessionID string) error
-	GetSessions(userID string) ([]string, error)
+	New(userID string, sessionID string, expiresIn uint, fromIP string) error
+	Revoke(sessionID string) error
+	GetList(userID string) ([]string, error)
 }

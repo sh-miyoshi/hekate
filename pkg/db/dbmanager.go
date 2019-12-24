@@ -206,18 +206,18 @@ func (m *Manager) UserDeleteRole(projectName string, userID string, roleID strin
 func (m *Manager) NewSession(userID string, sessionID string, expiresIn uint, fromIP string) error {
 	// TODO(validate userID, sessionID, expiresIn?)
 	// TODO(lock, unlock)
-	return m.session.NewSession(userID, sessionID, expiresIn, fromIP)
+	return m.session.New(userID, sessionID, expiresIn, fromIP)
 }
 
 // RevokeSession ...
 func (m *Manager) RevokeSession(sessionID string) error {
 	// TODO(validate sessionID)
 	// TODO(lock, unlock)
-	return m.session.RevokeSession(sessionID)
+	return m.session.Revoke(sessionID)
 }
 
 // GetSessions ...
 func (m *Manager) GetSessions(userID string) ([]string, error) {
 	// TODO(validate userID)
-	return m.session.GetSessions(userID)
+	return m.session.GetList(userID)
 }
