@@ -22,10 +22,6 @@ func NewSessionHandler() (*SessionHandler, error) {
 
 // New ...
 func (h *SessionHandler) New(userID string, sessionID string, expiresIn uint, fromIP string) error {
-	if _, exists := h.sessionList[sessionID]; exists {
-		return errors.New("Session already exists")
-	}
-
 	h.sessionList[sessionID] = &model.Session{
 		UserID:    userID,
 		SessionID: sessionID,
@@ -44,7 +40,15 @@ func (h *SessionHandler) Revoke(sessionID string) error {
 		return nil
 	}
 
-	return nil
+	return errors.Cause(model.ErrNoSuchSession)
+}
+
+// Get ...
+func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
+	if _, exists := h.sessionList[sessionID]; !exists {
+		return nil, errors.Cause(model.ErrNoSuchSession)
+	}
+	return h.sessionList[sessionID], nil
 }
 
 // GetList ...

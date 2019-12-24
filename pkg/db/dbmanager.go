@@ -57,7 +57,10 @@ func InitDBManager(dbType string, connStr string) error {
 			return errors.Wrap(err, "Failed to create project handler")
 		}
 		userHandler := mongo.NewUserHandler(dbClient)
-		sessionHandler := mongo.NewSessionHandler(dbClient)
+		sessionHandler, err := mongo.NewSessionHandler(dbClient)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create session handler")
+		}
 
 		inst = &Manager{
 			project: prjHandler,
@@ -209,6 +212,11 @@ func (m *Manager) UserDeleteRole(projectName string, userID string, roleID strin
 func (m *Manager) NewSession(userID string, sessionID string, expiresIn uint, fromIP string) error {
 	// TODO(validate userID, sessionID, expiresIn?)
 	// TODO(lock, unlock)
+
+	if _, err := m.session.Get(sessionID); err != model.ErrNoSuchSession {
+		return errors.Cause(model.ErrSessionAlreadyExists)
+	}
+
 	return m.session.New(userID, sessionID, expiresIn, fromIP)
 }
 
