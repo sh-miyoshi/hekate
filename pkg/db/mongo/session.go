@@ -40,11 +40,41 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
 
 // New ...
 func (h *SessionHandler) New(userID string, sessionID string, expiresIn uint, fromIP string) error {
+	v := &session{
+		UserID:    userID,
+		SessionID: sessionID,
+		CreatedAt: time.Now(),
+		ExpiresIn: expiresIn,
+		FromIP:    fromIP,
+	}
+
+	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.InsertOne(ctx, v)
+	if err != nil {
+		return errors.Wrap(err, "Failed to insert session to mongodb")
+	}
+
 	return nil
 }
 
 // Revoke ...
 func (h *SessionHandler) Revoke(sessionID string) error {
+	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
+	filter := bson.D{
+		{Key: "sessionID", Value: sessionID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteOne(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete session from mongodb")
+	}
 	return nil
 }
 
@@ -71,7 +101,29 @@ func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 
 // GetList ...
 func (h *SessionHandler) GetList(userID string) ([]string, error) {
+	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
+
+	filter := bson.D{
+		{Key: "userID", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	cursor, err := col.Find(ctx, filter)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to get session list from mongodb")
+	}
+
+	sessions := []session{}
+	if err := cursor.All(ctx, &sessions); err != nil {
+		return []string{}, errors.Wrap(err, "Failed to get session list from mongodb")
+	}
+
 	res := []string{}
+	for _, s := range sessions {
+		res = append(res, s.SessionID)
+	}
 
 	return res, nil
 }
