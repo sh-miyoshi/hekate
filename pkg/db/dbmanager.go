@@ -54,12 +54,12 @@ func InitDBManager(dbType string, connStr string) error {
 
 		prjHandler := mongo.NewProjectHandler(dbClient)
 		userHandler := mongo.NewUserHandler(dbClient)
-
-		// TODO(sessionHandler)
+		sessionHandler := mongo.NewSessionHandler(dbClient)
 
 		inst = &Manager{
 			project: prjHandler,
 			user:    userHandler,
+			session: sessionHandler,
 		}
 	default:
 		return errors.Cause(fmt.Errorf("Database Type %s is not implemented yet", dbType))
