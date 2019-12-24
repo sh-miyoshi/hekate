@@ -145,7 +145,7 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 
 	// TODO(lock, unlock)
 
-	_, err := m.user.Get(ent.ProjectName, ent.ID)
+	_, err := m.user.Get(ent.ID)
 	if err != model.ErrNoSuchUser {
 		if err == nil {
 			return errors.Cause(model.ErrUserAlreadyExists)
@@ -166,10 +166,10 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 }
 
 // UserDelete ...
-func (m *Manager) UserDelete(projectName string, userID string) error {
-	// TODO(validate projectName, userID)
+func (m *Manager) UserDelete(userID string) error {
+	// TODO(validate userID)
 	// TODO(lock, unlock)
-	return m.user.Delete(projectName, userID)
+	return m.user.Delete(userID)
 }
 
 // UserGetList ...
@@ -179,9 +179,9 @@ func (m *Manager) UserGetList(projectName string) ([]string, error) {
 }
 
 // UserGet ...
-func (m *Manager) UserGet(projectName string, userID string) (*model.UserInfo, error) {
-	// TODO(validate projectName, userID)
-	return m.user.Get(projectName, userID)
+func (m *Manager) UserGet(userID string) (*model.UserInfo, error) {
+	// TODO(validate userID)
+	return m.user.Get(userID)
 }
 
 // UserUpdate ...
@@ -198,17 +198,17 @@ func (m *Manager) UserGetByName(projectName string, userName string) (*model.Use
 }
 
 // UserAddRole ...
-func (m *Manager) UserAddRole(projectName string, userID string, roleID string) error {
-	// TODO(validate projectName, userID, roleID)
+func (m *Manager) UserAddRole(userID string, roleID string) error {
+	// TODO(validate userID, roleID)
 	// TODO(lock, unlock)
-	return m.user.AddRole(projectName, userID, roleID)
+	return m.user.AddRole(userID, roleID)
 }
 
 // UserDeleteRole ...
-func (m *Manager) UserDeleteRole(projectName string, userID string, roleID string) error {
-	// TODO(validate projectName, userID, roleID)
+func (m *Manager) UserDeleteRole(userID string, roleID string) error {
+	// TODO(validate userID, roleID)
 	// TODO(lock, unlock)
-	return m.user.DeleteRole(projectName, userID, roleID)
+	return m.user.DeleteRole(userID, roleID)
 }
 
 // NewSession ...

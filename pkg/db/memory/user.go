@@ -28,11 +28,7 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 }
 
 // Delete ...
-func (h *UserInfoHandler) Delete(projectName string, userID string) error {
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return errors.Cause(model.ErrNoSuchProject)
-	}
-
+func (h *UserInfoHandler) Delete(userID string) error {
 	if _, exists := h.userList[userID]; exists {
 		delete(h.userList, userID)
 		return nil
@@ -59,11 +55,7 @@ func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 }
 
 // Get ...
-func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, error) {
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return nil, errors.Cause(model.ErrNoSuchProject)
-	}
-
+func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 	res, exists := h.userList[userID]
 	if !exists {
 		return nil, errors.Cause(model.ErrNoSuchUser)
@@ -74,10 +66,6 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 
 // Update ...
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
-	if _, err := h.projectHandler.Get(ent.ProjectName); err != nil {
-		return errors.Cause(model.ErrNoSuchProject)
-	}
-
 	if _, exists := h.userList[ent.ID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}
@@ -112,11 +100,7 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 }
 
 // AddRole ...
-func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID string) error {
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return errors.Cause(model.ErrNoSuchProject)
-	}
-
+func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
 	if _, exists := h.userList[userID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}
@@ -135,11 +119,7 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID stri
 }
 
 // DeleteRole ....
-func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return errors.Cause(model.ErrNoSuchProject)
-	}
-
+func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 	if _, exists := h.userList[userID]; !exists {
 		return errors.Cause(model.ErrNoSuchUser)
 	}

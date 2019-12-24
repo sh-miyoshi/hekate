@@ -115,7 +115,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
-	if err := db.GetInst().UserDelete(projectName, userID); err != nil {
+	if err := db.GetInst().UserDelete(userID); err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -148,7 +148,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
-	user, err := db.GetInst().UserGet(projectName, userID)
+	user, err := db.GetInst().UserGet(userID)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
@@ -205,7 +205,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous User Info
-	user, err := db.GetInst().UserGet(projectName, userID)
+	user, err := db.GetInst().UserGet(userID)
 	if err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
@@ -253,7 +253,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := vars["roleID"]
 
 	// Get Previous User Info
-	if err := db.GetInst().UserAddRole(projectName, userID, roleID); err != nil {
+	if err := db.GetInst().UserAddRole(userID, roleID); err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -290,7 +290,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := vars["roleID"]
 
 	// Get Previous User Info
-	if err := db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
+	if err := db.GetInst().UserDeleteRole(userID, roleID); err != nil {
 		if err == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)

@@ -46,7 +46,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		user, err = db.GetInst().UserGetByName(projectName, request.Name)
 	} else {
-		user, err = db.GetInst().UserGet(projectName, request.ID)
+		user, err = db.GetInst().UserGet(request.ID)
 	}
 
 	if err != nil {

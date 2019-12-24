@@ -32,14 +32,14 @@ var (
 // UserInfoHandler ...
 type UserInfoHandler interface {
 	Add(ent *UserInfo) error
-	Delete(projectName string, userID string) error
+	Delete(userID string) error
 	GetList(projectName string) ([]string, error)
-	Get(projectName string, userID string) (*UserInfo, error)
+	Get(userID string) (*UserInfo, error)
 	GetByName(projectName string, userName string) (*UserInfo, error)
 	Update(ent *UserInfo) error
 	DeleteAll(projectName string) error
-	AddRole(projectName string, userID string, roleID string) error
-	DeleteRole(projectName string, userID string, roleID string) error
+	AddRole(userID string, roleID string) error
+	DeleteRole(userID string, roleID string) error
 }
 
 // Validate ...

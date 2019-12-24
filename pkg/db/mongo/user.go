@@ -63,10 +63,9 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 }
 
 // Delete ...
-func (h *UserInfoHandler) Delete(projectName string, userID string) error {
+func (h *UserInfoHandler) Delete(userID string) error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -110,10 +109,9 @@ func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 }
 
 // Get ...
-func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, error) {
+func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -135,7 +133,6 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: ent.ProjectName},
 		{Key: "id", Value: ent.ID},
 	}
 
@@ -202,8 +199,8 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 }
 
 // AddRole ...
-func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID string) error {
-	user, err := h.Get(projectName, userID)
+func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
+	user, err := h.Get(userID)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get user info in AddRole")
 	}
@@ -217,7 +214,6 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID stri
 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: user.ID},
 	}
 
@@ -236,8 +232,8 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID stri
 }
 
 // DeleteRole ...
-func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
-	user, err := h.Get(projectName, userID)
+func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
+	user, err := h.Get(userID)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get user info in AddRole")
 	}
@@ -258,7 +254,6 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: user.ID},
 	}
 
