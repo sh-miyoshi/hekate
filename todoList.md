@@ -12,12 +12,10 @@
 
 ## server application enhancement
 
-- session dbを外だしする
-  - update時に更新されないように
 - その他のDB Handlerの実装
   - mongodb driver
-    - UserNewSession
-    - UserRevokeSession
+    - NewSession
+    - RevokeSession
 - access tokenの高機能化
   - redirect_url?
   - audienceの見直し
