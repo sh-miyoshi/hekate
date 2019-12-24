@@ -12,13 +12,6 @@
 
 ## server application enhancement
 
-- その他のDB Handlerの実装
-  - mongodb driver
-    - NewSession
-    - RevokeSession
-- access tokenの高機能化
-  - redirect_url?
-  - audienceの見直し
 - 各種APIの実装
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのすべてのsessionのrevoke
@@ -43,7 +36,8 @@
 - (project/user) enabledの有効化
 - user federation
   - user情報を外部に保存し、それと連携する
-- open id connect連携
+- redirect_urlの設定
+- LDAP連携？
 
 ## operation enhancement
 
