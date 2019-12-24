@@ -143,10 +143,14 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 		},
 	}
 
+	updates := bson.D{
+		{Key: "$set", Value: v},
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	if _, err := col.UpdateOne(ctx, filter, v); err != nil {
+	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
 		return errors.Wrap(err, "Failed to update project in mongodb")
 	}
 

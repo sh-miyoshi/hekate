@@ -132,10 +132,14 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 		Roles:        ent.Roles,
 	}
 
+	updates := bson.D{
+		{Key: "$set", Value: v},
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	if _, err := col.UpdateOne(ctx, filter, v); err != nil {
+	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
 		return errors.Wrap(err, "Failed to update user in mongodb")
 	}
 
@@ -204,7 +208,11 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleID stri
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	if _, err := col.UpdateOne(ctx, filter, user); err != nil {
+	updates := bson.D{
+		{Key: "$set", Value: user},
+	}
+
+	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
 		return errors.Wrap(err, "Failed to add role to user in mongodb")
 	}
 
@@ -241,7 +249,11 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	if _, err := col.UpdateOne(ctx, filter, user); err != nil {
+	updates := bson.D{
+		{Key: "$set", Value: user},
+	}
+
+	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
 		return errors.Wrap(err, "Failed to add role to user in mongodb")
 	}
 
