@@ -20,10 +20,10 @@ func NewProjectInfoFormat(project *projectapi.ProjectGetResponse) *ProjectInfoFo
 
 // ToText ...
 func (f *ProjectInfoFormat) ToText() (string, error) {
-	res := ""
-	res += fmt.Sprintf("Name:                    %s", f.project.Name)
-	res += fmt.Sprintf("Created Time:            %s", f.project.CreatedAt.String())
-	res += fmt.Sprintf("Access Token Life Span:  %d [sec]", f.project.TokenConfig.AccessTokenLifeSpan)
+	res := fmt.Sprintf("Create Status:           Success\n")
+	res += fmt.Sprintf("Name:                    %s\n", f.project.Name)
+	res += fmt.Sprintf("Created Time:            %s\n", f.project.CreatedAt.String())
+	res += fmt.Sprintf("Access Token Life Span:  %d [sec]\n", f.project.TokenConfig.AccessTokenLifeSpan)
 	res += fmt.Sprintf("Refresh Token Life Span: %d [sec]", f.project.TokenConfig.RefreshTokenLifeSpan)
 	return res, nil
 }
