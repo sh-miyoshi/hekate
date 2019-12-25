@@ -1,6 +1,7 @@
 package login
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -8,10 +9,12 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"syscall"
 )
 
 var (
@@ -28,7 +31,24 @@ var loginCmd = &cobra.Command{
 		project := config.Get().ProjectName
 		logger.Debug("server address: %s", serverAddr)
 
-		// TODO(input password in STDIN)
+		if userName == "" {
+			// Set user name from STDIN
+			fmt.Printf("User Name: ")
+			stdin := bufio.NewScanner(os.Stdin)
+			stdin.Scan()
+			userName = stdin.Text()
+		}
+
+		if password == "" {
+			// input password in STDIN
+			fmt.Printf("Password: ")
+			var err error
+			password, err = readPasswordFromConsole()
+			if err != nil {
+				fmt.Printf("Failed to read password: %v\n", err)
+				os.Exit(1)
+			}
+		}
 
 		req := tokenapi.TokenRequest{
 			Name:     userName,
@@ -91,11 +111,20 @@ var loginCmd = &cobra.Command{
 
 func init() {
 	loginCmd.Flags().StringVarP(&userName, "name", "n", "", "Login User Name")
-	loginCmd.Flags().StringVar(&password, "password", "", "Login User Password")
-	loginCmd.MarkFlagRequired("name")
+	loginCmd.Flags().StringVarP(&password, "password", "p", "", "Login User Password")
 }
 
 // GetLoginCommand ...
 func GetLoginCommand() *cobra.Command {
 	return loginCmd
+}
+
+func readPasswordFromConsole() (string, error) {
+	passwordBytes, err := terminal.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		return "", err
+	}
+	fmt.Println()
+	password := string(passwordBytes)
+	return password, nil
 }
