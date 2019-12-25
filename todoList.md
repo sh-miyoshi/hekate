@@ -2,19 +2,18 @@
 
 ## new commands
 
-- CLI Tool(jwtctl)
-  - ServerのAPIをたたくためのコマンドラインツール
 - Gateway
   - Backendのユーザープログラムに対してアクセス制御するようなツール
   - keycloak-gatekeeperのようなものを想定
-  - tokenを認証するようなAPIを追加(To Server)
 - GUI画面(portal)
 
-## server application enhancement
+## jwt-server application enhancement
 
 - 各種APIの実装
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのすべてのsessionのrevoke
+  - tokenを認証するようなAPI
+- expireしないclientの登録
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
@@ -38,6 +37,23 @@
   - user情報を外部に保存し、それと連携する
 - redirect_urlの設定
 - LDAP連携？
+
+## CLI tool(jwtctl) enhancement
+
+- 各APIへの対応
+  - project get list
+  - project get
+  - project update
+  - project delete
+  - user create
+  - user get list
+  - user get
+  - user update
+  - user delete
+  - user role add
+  - user role delete
+- default config pathの修正
+- Production向け実行ファイルの作成
 
 ## operation enhancement
 
