@@ -1,15 +1,15 @@
 package login
 
 import (
-	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
-	"fmt"
-	"encoding/json"
-	"net/http"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
+	"net/http"
 )
 
 // Do ...
-func Do(serverAddr string, projectName string, req *tokenapi.TokenRequest) (*tokenapi.TokenResponse,error) {
+func Do(serverAddr string, projectName string, req *tokenapi.TokenRequest) (*tokenapi.TokenResponse, error) {
 	url := fmt.Sprintf("%s/api/v1/project/%s/token", serverAddr, projectName)
 	body, _ := json.Marshal(req)
 	httpReq, err := http.NewRequest("POST", url, bytes.NewReader(body))

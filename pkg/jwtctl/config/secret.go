@@ -1,34 +1,34 @@
 package config
 
 import (
-	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
+	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"time"
-	"os"
 )
 
 type secret struct {
-	UserName string `json:"userName"`
-	AccessToken string `json:"accessToken"`
-	AccessTokenExpiresTime time.Time `json:"accessTokenExpiresTime"`
-	RefreshToken string `json:"refreshToken"`
+	UserName                string    `json:"userName"`
+	AccessToken             string    `json:"accessToken"`
+	AccessTokenExpiresTime  time.Time `json:"accessTokenExpiresTime"`
+	RefreshToken            string    `json:"refreshToken"`
 	RefreshTokenExpiresTime time.Time `json:"refreshTokenExpiresTime"`
 }
 
 // SetSecret ...
-func SetSecret(userName string,token *tokenapi.TokenResponse) {
+func SetSecret(userName string, token *tokenapi.TokenResponse) {
 	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
 
 	v := secret{
-		UserName: userName,
-		AccessToken: token.AccessToken,
-		AccessTokenExpiresTime: time.Now().Add(time.Second*time.Duration(token.AccessExpiresIn)),
-		RefreshToken: token.RefreshToken,
-		RefreshTokenExpiresTime: time.Now().Add(time.Second*time.Duration(token.RefreshExpiresIn)),
+		UserName:                userName,
+		AccessToken:             token.AccessToken,
+		AccessTokenExpiresTime:  time.Now().Add(time.Second * time.Duration(token.AccessExpiresIn)),
+		RefreshToken:            token.RefreshToken,
+		RefreshTokenExpiresTime: time.Now().Add(time.Second * time.Duration(token.RefreshExpiresIn)),
 	}
 
 	bytes, _ := json.MarshalIndent(v, "", "  ")
@@ -59,7 +59,7 @@ func GetAccessToken() (string, error) {
 			AuthType: "refresh",
 		}
 
-		res,err := login.Do(sysConf.ServerAddr, sysConf.ProjectName, &req)
+		res, err := login.Do(sysConf.ServerAddr, sysConf.ProjectName, &req)
 		if err != nil {
 			return "", err
 		}

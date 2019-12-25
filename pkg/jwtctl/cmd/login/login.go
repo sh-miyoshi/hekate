@@ -47,7 +47,7 @@ var loginCmd = &cobra.Command{
 			AuthType: "password",
 		}
 
-		res,err := login.Do(config.Get().ServerAddr, config.Get().ProjectName, &req)
+		res, err := login.Do(config.Get().ServerAddr, config.Get().ProjectName, &req)
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
