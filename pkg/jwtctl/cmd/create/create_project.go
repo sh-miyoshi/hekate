@@ -8,12 +8,9 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
-	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"github.com/spf13/cobra"
-	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 )
 
 type projectInfo struct {
@@ -29,22 +26,11 @@ var createProjectCmd = &cobra.Command{
 	Short: "Create New Project",
 	Long:  "Create New Project",
 	Run: func(cmd *cobra.Command, args []string) {
-		// Get Secret Info
-		secretFile := filepath.Join(config.Get().ConfigDir, "secret")
-		buf, err := ioutil.ReadFile(secretFile)
+		secret, err := config.GetSecretToken()
 		if err != nil {
-			fmt.Printf("Failed to read secret file: %v\n", err)
-			fmt.Println("You need to `jwtctl login` at first")
+			fmt.Printf("%s\n", err.Error())
 			os.Exit(1)
 		}
-
-		var secret tokenapi.TokenResponse
-		if err = json.Unmarshal(buf, &secret); err != nil {
-			fmt.Printf("Failed to parse secret json: %v", err)
-			os.Exit(1)
-		}
-
-		// TODO(Validate secret)
 
 		serverAddr := config.Get().ServerAddr
 		req := projectapi.ProjectCreateRequest{
