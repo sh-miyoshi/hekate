@@ -2,15 +2,12 @@ package login
 
 import (
 	"bufio"
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
 	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
-	"net/http"
 	"os"
 	"syscall"
 )
@@ -25,10 +22,6 @@ var loginCmd = &cobra.Command{
 	Short: "Login to system",
 	Long:  `Login to system`,
 	Run: func(cmd *cobra.Command, args []string) {
-		serverAddr := config.Get().ServerAddr
-		project := config.Get().ProjectName
-		logger.Debug("server address: %s", serverAddr)
-
 		if userName == "" {
 			// Set user name from STDIN
 			fmt.Printf("User Name: ")
@@ -54,49 +47,14 @@ var loginCmd = &cobra.Command{
 			AuthType: "password",
 		}
 
-		url := fmt.Sprintf("%s/api/v1/project/%s/token", serverAddr, project)
-		body, err := json.Marshal(req)
+		res,err := login.Do(config.Get().ServerAddr, config.Get().ProjectName, &req)
 		if err != nil {
-			logger.Error("<Program Bug> Failed to marshal JSON: %v", err)
+			fmt.Println(err.Error())
 			os.Exit(1)
 		}
 
-		httpReq, err := http.NewRequest("POST", url, bytes.NewReader(body))
-		if err != nil {
-			logger.Error("<Program Bug> Failed to create http request: %v", err)
-			os.Exit(1)
-		}
-		httpReq.Header.Add("Content-Type", "application/json")
-		client := &http.Client{}
-		httpRes, err := client.Do(httpReq)
-		if err != nil {
-			fmt.Printf("Failed to request server: %v", err)
-			os.Exit(1)
-		}
-		defer httpRes.Body.Close()
-
-		switch httpRes.StatusCode {
-		case 200:
-			var res tokenapi.TokenResponse
-			if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
-				logger.Error("<Program Bug> Failed to parse http response: %v", err)
-				os.Exit(1)
-			}
-			// Output to secret file
-			config.SetSecret(&res)
-			fmt.Println("Successfully logged in")
-		case 401, 404:
-			fmt.Println("Failed to login to system")
-			fmt.Println("Please cheak user name or password (or project name)")
-			os.Exit(1)
-		case 500:
-			fmt.Println("Internal Server Error is occured")
-			fmt.Println("Please contact to your server administrator")
-			os.Exit(1)
-		default:
-			logger.Error("<Program Bug> Unexpected http response code: %d", httpRes.StatusCode)
-			os.Exit(1)
-		}
+		config.SetSecret(userName, res)
+		fmt.Println("Successfully logged in")
 	},
 }
 

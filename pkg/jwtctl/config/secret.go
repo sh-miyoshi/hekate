@@ -2,6 +2,7 @@ package config
 
 import (
 	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
 	"fmt"
 	"encoding/json"
 	"io/ioutil"
@@ -11,6 +12,7 @@ import (
 )
 
 type secret struct {
+	UserName string `json:"userName"`
 	AccessToken string `json:"accessToken"`
 	AccessTokenExpiresTime time.Time `json:"accessTokenExpiresTime"`
 	RefreshToken string `json:"refreshToken"`
@@ -18,10 +20,11 @@ type secret struct {
 }
 
 // SetSecret ...
-func SetSecret(token *tokenapi.TokenResponse) {
+func SetSecret(userName string,token *tokenapi.TokenResponse) {
 	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
 
 	v := secret{
+		UserName: userName,
 		AccessToken: token.AccessToken,
 		AccessTokenExpiresTime: time.Now().Add(time.Second*time.Duration(token.AccessExpiresIn)),
 		RefreshToken: token.RefreshToken,
@@ -44,8 +47,27 @@ func GetAccessToken() (string, error) {
 	var s secret
 	json.Unmarshal(buf, &s)
 
-	// TODO(Validate secret)
-	// TODO(Refresh token if required)
+	if time.Now().After(s.RefreshTokenExpiresTime) {
+		return "", fmt.Errorf("Token is expired\nPlease run `jwtctl login`")
+	}
+
+	if time.Now().After(s.AccessTokenExpiresTime) {
+		// Refresh token by using refresh-token
+
+		req := tokenapi.TokenRequest{
+			Name:     s.UserName,
+			Secret:   s.RefreshToken,
+			AuthType: "refresh",
+		}
+
+		res,err := login.Do(sysConf.ServerAddr, sysConf.ProjectName, &req)
+		if err != nil {
+			return "", err
+		}
+
+		fmt.Println(res)
+		// TODO(res)
+	}
 
 	return s.AccessToken, nil
 }
