@@ -114,8 +114,8 @@ func init() {
 	loginCmd.Flags().StringVarP(&password, "password", "p", "", "Login User Password")
 }
 
-// GetLoginCommand ...
-func GetLoginCommand() *cobra.Command {
+// GetCommand ...
+func GetCommand() *cobra.Command {
 	return loginCmd
 }
 

@@ -19,7 +19,7 @@ var createCmd = &cobra.Command{
 	},
 }
 
-// GetCreateCommand ...
-func GetCreateCommand() *cobra.Command {
+// GetCommand ...
+func GetCommand() *cobra.Command {
 	return createCmd
 }

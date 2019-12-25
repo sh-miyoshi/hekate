@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/create"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/login"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/delete"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
@@ -24,8 +25,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of jwtctl config")
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
 
-	rootCmd.AddCommand(create.GetCreateCommand())
-	rootCmd.AddCommand(login.GetLoginCommand())
+	rootCmd.AddCommand(login.GetCommand())
+	rootCmd.AddCommand(create.GetCommand())
+	rootCmd.AddCommand(delete.GetCommand())
 }
 
 func initOutput() {
