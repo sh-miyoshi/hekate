@@ -10,10 +10,8 @@ import (
 	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
-	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"syscall"
 )
 
@@ -85,14 +83,7 @@ var loginCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			// Output to secret file
-			secretFile := filepath.Join(config.Get().ConfigDir, "secret")
-			bytes, err := json.MarshalIndent(res, "", "  ")
-			if err != nil {
-				logger.Error("<Program Bug> Failed to marshal json: %v", err)
-				os.Exit(1)
-			}
-
-			ioutil.WriteFile(secretFile, bytes, os.ModePerm)
+			config.SetSecret(&res)
 			fmt.Println("Successfully logged in")
 		case 401, 404:
 			fmt.Println("Failed to login to system")

@@ -26,7 +26,7 @@ var createProjectCmd = &cobra.Command{
 	Short: "Create New Project",
 	Long:  "Create New Project",
 	Run: func(cmd *cobra.Command, args []string) {
-		secret, err := config.GetSecretToken()
+		token, err := config.GetAccessToken()
 		if err != nil {
 			fmt.Printf("%s\n", err.Error())
 			os.Exit(1)
@@ -54,7 +54,7 @@ var createProjectCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		httpReq.Header.Add("Content-Type", "application/json")
-		httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", secret.AccessToken))
+		httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", token))
 		client := &http.Client{}
 		httpRes, err := client.Do(httpReq)
 		if err != nil {

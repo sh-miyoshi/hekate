@@ -6,21 +6,46 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
+	"time"
+	"os"
 )
 
-// GetSecretToken ...
-func GetSecretToken() (*tokenapi.TokenResponse, error) {
+type secret struct {
+	AccessToken string `json:"accessToken"`
+	AccessTokenExpiresTime time.Time `json:"accessTokenExpiresTime"`
+	RefreshToken string `json:"refreshToken"`
+	RefreshTokenExpiresTime time.Time `json:"refreshTokenExpiresTime"`
+}
+
+// SetSecret ...
+func SetSecret(token *tokenapi.TokenResponse) {
+	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
+
+	v := secret{
+		AccessToken: token.AccessToken,
+		AccessTokenExpiresTime: time.Now().Add(time.Second*time.Duration(token.AccessExpiresIn)),
+		RefreshToken: token.RefreshToken,
+		RefreshTokenExpiresTime: time.Now().Add(time.Second*time.Duration(token.RefreshExpiresIn)),
+	}
+
+	bytes, _ := json.MarshalIndent(v, "", "  ")
+	ioutil.WriteFile(secretFile, bytes, os.ModePerm)
+}
+
+// GetAccessToken ...
+func GetAccessToken() (string, error) {
 	// Get Secret Info
 	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
 	buf, err := ioutil.ReadFile(secretFile)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to read secret file: %v\nYou need to `jwtctl login` at first", err)
+		return "", fmt.Errorf("Failed to read secret file: %v\nYou need to `jwtctl login` at first", err)
 	}
 
-	var secret tokenapi.TokenResponse
-	json.Unmarshal(buf, &secret)
+	var s secret
+	json.Unmarshal(buf, &s)
 
 	// TODO(Validate secret)
+	// TODO(Refresh token if required)
 
-	return &secret, nil
+	return s.AccessToken, nil
 }
