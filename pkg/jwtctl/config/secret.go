@@ -53,7 +53,6 @@ func GetAccessToken() (string, error) {
 
 	if time.Now().After(s.AccessTokenExpiresTime) {
 		// Refresh token by using refresh-token
-
 		req := tokenapi.TokenRequest{
 			Name:     s.UserName,
 			Secret:   s.RefreshToken,
@@ -65,8 +64,7 @@ func GetAccessToken() (string, error) {
 			return "", err
 		}
 
-		fmt.Println(res)
-		// TODO(res)
+		SetSecret(s.UserName, res)
 	}
 
 	return s.AccessToken, nil
