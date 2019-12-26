@@ -7,6 +7,23 @@ info:
     name: 'Apache 2.0'
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 paths:
+  '/api/v1/project/{projectName}/.well-known/openid-configuration':
+    get:
+      tags:
+        - openid-connect
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Get configuration'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenIDConfiguration'
   '/api/v1/project/{projectName}/token':
     post:
       tags:
@@ -434,3 +451,36 @@ components:
           type: string
         refreshExpiresIn:
           type: integer
+    OpenIDConfiguration:
+      type: object
+      properties:
+        issuer:
+          type: string
+        authorization_endpoint:
+          type: string
+        token_endpoint:
+          type: string
+        userinfo_endpoint:
+          type: string
+        jwks_uri:
+          type: string
+        scopes_supported:
+          type: array
+          items:
+            type: string
+        response_types_supported:
+          type: array
+          items:
+            type: string
+        subject_types_supported:
+          type: array
+          items:
+            type: string
+        id_token_signing_alg_values_supported:
+          type: array
+          items:
+            type: string
+        claims_supported:
+          type: array
+          items:
+            type: string
