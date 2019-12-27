@@ -10,14 +10,16 @@
 ## jwt-server application enhancement
 
 - 各種APIの実装
+  - client用API?
   - openid-connect用のAPI
     - /api/v1/project/{projectName}/.well-known/openid-configuration
-    - /api/v1/project/{projectName}/protocol/openid-connect/auth
-    - /api/v1/project/{projectName}/protocol/openid-connect/token
-    - /api/v1/project/{projectName}/protocol/openid-connect/userinfo
-    - /api/v1/project/{projectName}/protocol/openid-connect/certs
+    - /api/v1/project/{projectName}/openid-connect/token
+    - /api/v1/project/{projectName}/openid-connect/certs
+    - /api/v1/project/{projectName}/openid-connect/auth
+    - /api/v1/project/{projectName}/openid-connect/userinfo
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのログアウト(session全削除)
+- https対応
 - expireしないclientの登録
 - テストの追加
   - ロジック部分のunit test
