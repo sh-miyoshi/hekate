@@ -443,6 +443,8 @@ components:
     TokenResponse:
       type: object
       properties:
+        token_type:
+          type: string
         accessToken:
           type: string
         accessExpiresIn:

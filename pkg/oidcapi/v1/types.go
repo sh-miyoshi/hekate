@@ -13,3 +13,12 @@ type Config struct {
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 	ClaimsSupported                  []string `json:"claims_supported"`
 }
+
+// TokenResponse ...
+type TokenResponse struct {
+	TokenType        string `json:"token_type"`
+	AccessToken      string `json:"access_token"`
+	ExpiresIn        uint   `json:"expires_in"`
+	RefreshToken     string `json:"refresh_token"`
+	RefreshExpiresIn uint   `json:"refresh_expires_in"`
+}
