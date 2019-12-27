@@ -24,32 +24,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenIDConfiguration'
-  '/api/v1/project/{projectName}/token':
+  '/api/v1/project/{projectName}/openid-connect/token':
     post:
       tags:
-        - token
+        - openid-connect
       parameters:
         - name: projectName
           in: path
           required: true
           schema:
             type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TokenRequest'
+        - name: grant_type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: username
+          in: query
+          schema:
+            type: string
+        - name: password
+          in: query
+          schema:
+            type: string
+        - name: client_id
+          in: query
+          schema:
+            type: string
+        - name: client_secret
+          in: query
+          schema:
+            type: string
+        - name: scope
+          in: query
+          schema:
+            type: string
+        - name: refresh_token
+          in: query
+          schema:
+            type: string
+        - name: redirect_uri
+          in: query
+          schema:
+            type: string
+        - name: code
+          in: query
+          schema:
+            type: string
+        - name: code_verifier
+          in: query
+          schema:
+            type: string
       responses:
         '200':
-          description: 'Get token'
+          description: 'Get Token'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
-        '401':
-          description: 'Unauthorized'
-        '500':
-          description: 'Internal Server Error'
   '/api/v1/project':
     post:
       tags:
@@ -425,33 +457,18 @@ components:
           type: array
           items:
             type: string
-    TokenRequest:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        secret:
-          type: string
-        authType:
-          type: string
-          enum:
-            - password
-            - refreshToken
-            - clientSecret
     TokenResponse:
       type: object
       properties:
         token_type:
           type: string
-        accessToken:
+        access_token:
           type: string
-        accessExpiresIn:
+        expires_in:
           type: integer
-        refreshToken:
+        refresh_token:
           type: string
-        refreshExpiresIn:
+        refresh_expires_in:
           type: integer
     OpenIDConfiguration:
       type: object
@@ -486,3 +503,4 @@ components:
           type: array
           items:
             type: string
+
