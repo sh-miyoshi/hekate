@@ -11,6 +11,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	oidcapiv1 "github.com/sh-miyoshi/jwt-server/pkg/oidcapi/v1"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	defaultrole "github.com/sh-miyoshi/jwt-server/pkg/role"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
@@ -25,7 +26,11 @@ import (
 func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
 
+	// OpenID Connect API
+	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", oidcapiv1.ConfigGetHandler).Methods("GET")
+
 	// Token API
+	// TODO(depricated)
 	r.HandleFunc(basePath+"/project/{projectName}/token", tokenapiv1.TokenCreateHandler).Methods("POST")
 
 	// Project API
