@@ -20,15 +20,25 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Debug("Issuer: %s", issuer)
 
 	res := Config{
-		Issuer:                           issuer,
-		AuthorizationEndpoint:            issuer + "/openid-connect/auth",
-		TokenEndpoint:                    issuer + "/openid-connect/token",
-		UserinfoEndpoint:                 issuer + "/openid-connect/userinfo",
-		JwksURI:                          issuer + "/openid-connect/certs",
-		ScopesSupported:                  []string{"openid"},
-		ResponseTypesSupported:           []string{}, // TODO(set value)
-		SubjectTypesSupported:            []string{}, // TODO(set value)
-		IDTokenSigningAlgValuesSupported: []string{"HS256"},
+		Issuer:                 issuer,
+		AuthorizationEndpoint:  issuer + "/openid-connect/auth",
+		TokenEndpoint:          issuer + "/openid-connect/token",
+		UserinfoEndpoint:       issuer + "/openid-connect/userinfo",
+		JwksURI:                issuer + "/openid-connect/certs",
+		ScopesSupported:        []string{"openid"},
+		ResponseTypesSupported: []string{},         // TODO(set value)
+		SubjectTypesSupported:  []string{"public"}, // TODO(set value)
+		IDTokenSigningAlgValuesSupported: []string{
+			"HS256",
+			"HS384",
+			"HS512",
+			"RS256",
+			"RS384",
+			"RS512",
+			"ES256",
+			"ES384",
+			"ES512",
+		},
 		ClaimsSupported: []string{
 			"iss",
 			"aud",

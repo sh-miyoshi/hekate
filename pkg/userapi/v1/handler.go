@@ -131,7 +131,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return 204 (No content) for success
 	w.WriteHeader(http.StatusNoContent)
-	logger.Info("PUserDeleteHandler method successfully finished")
+	logger.Info("UserDeleteHandler method successfully finished")
 }
 
 // UserGetHandler ...
