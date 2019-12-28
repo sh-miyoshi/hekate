@@ -15,7 +15,6 @@ import (
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	defaultrole "github.com/sh-miyoshi/jwt-server/pkg/role"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
-	tokenapiv1 "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	userapiv1 "github.com/sh-miyoshi/jwt-server/pkg/userapi/v1"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
@@ -29,10 +28,6 @@ func setAPI(r *mux.Router) {
 	// OpenID Connect API
 	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", oidcapiv1.ConfigGetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/token", oidcapiv1.TokenHandler).Methods("POST")
-
-	// Token API
-	// TODO(depricated)
-	r.HandleFunc(basePath+"/project/{projectName}/token", tokenapiv1.TokenCreateHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
