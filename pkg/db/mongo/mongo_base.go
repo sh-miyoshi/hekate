@@ -12,6 +12,7 @@ const (
 	databaseName          = "jwtserver"
 	projectCollectionName = "project"
 	userCollectionName    = "user"
+	clientCollectionName  = "client"
 	sessionCollectionName = "session"
 
 	timeoutSecond = 5

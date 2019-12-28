@@ -31,3 +31,11 @@ type userInfo struct {
 	PasswordHash string    `bson:"passwordHash"`
 	Roles        []string  `bson:"roles"`
 }
+
+type clientInfo struct {
+	ID          string    `bson:"id"`
+	ProjectName string    `bson:"projectName"`
+	Secret      string    `bson:"secret"`
+	AccessType  string    `bson:"accessType"`
+	CreatedAt   time.Time `bson:"createdAt"`
+}
