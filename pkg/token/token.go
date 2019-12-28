@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
+	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"net/http"
 	"regexp"
 	"strings"
@@ -82,7 +83,7 @@ func GenerateRefreshToken(sessionID string, request Request) (string, error) {
 }
 
 // ValidateAccessToken ...
-func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, issuer string) error {
+func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIssuer string) error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.Cause(fmt.Errorf("Unexpected signing method: %v", token.Header["alg"]))
@@ -99,7 +100,10 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, issuer s
 		return errors.New("Invalid token is specifyed")
 	}
 
-	if claims.Issuer != issuer {
+	// Token Validate
+	ti := claims.Issuer[:len(expectIssuer)]
+	if ti != expectIssuer {
+		logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
 		return errors.New("Unexpected token issuer")
 	}
 
