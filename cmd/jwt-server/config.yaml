@@ -9,7 +9,7 @@ server_bind_address: "0.0.0.0"
 logfile: ''
 
 # If true, output debug level log
-debug_mode: false
+debug_mode: true
 
 db:
   type: "memory"
