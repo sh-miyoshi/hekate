@@ -122,7 +122,7 @@ func main() {
 	}
 
 	// Initialize Token Config
-	token.InitConfig(cfg.TokenIssuer, cfg.TokenSecretKey)
+	token.InitConfig(cfg.TokenSecretKey)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {

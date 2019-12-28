@@ -70,7 +70,7 @@ func TokenCreateHandler(w http.ResponseWriter, r *http.Request) {
 	case "refresh":
 		// Parse secret which is refresh token
 		claims := &token.RefreshTokenClaims{}
-		if err := token.ValidateRefreshToken(claims, request.Secret); err != nil {
+		if err := token.ValidateRefreshToken(claims, request.Secret, "TODO"); err != nil {
 			logger.Info("Failed to validate refresh token: %v", err)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return

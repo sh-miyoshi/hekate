@@ -15,6 +15,5 @@ type GlobalConfig struct {
 	DB             DBInfo `yaml:"db"`
 	AdminName      string `yaml:"admin_name"`
 	AdminPassword  string `yaml:"admin_password"`
-	TokenIssuer    string `yaml:"token_issuer"`
 	TokenSecretKey string `yaml:"token_secret_key"`
 }

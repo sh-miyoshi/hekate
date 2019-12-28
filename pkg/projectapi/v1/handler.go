@@ -16,7 +16,7 @@ import (
 //   require role: cluster-read
 func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r.Header, role.ResCluster, role.TypeRead); err != nil {
+	if err := jwthttp.AuthHeader(r, role.ResCluster, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -36,7 +36,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 //   require role: cluster-write
 func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r.Header, role.ResCluster, role.TypeWrite); err != nil {
+	if err := jwthttp.AuthHeader(r, role.ResCluster, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -91,7 +91,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 //   require role: cluster-write
 func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r.Header, role.ResCluster, role.TypeWrite); err != nil {
+	if err := jwthttp.AuthHeader(r, role.ResCluster, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -123,7 +123,7 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 //   require role: project-read
 func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r.Header, role.ResProject, role.TypeRead); err != nil {
+	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -169,7 +169,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 //   require role: project-write
 func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r.Header, role.ResProject, role.TypeWrite); err != nil {
+	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
