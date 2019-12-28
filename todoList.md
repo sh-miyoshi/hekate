@@ -38,6 +38,8 @@
   - パスワードポリシー
   - encrypt_type
 - custom roleの有効化
+- userのパスワード変更のrole見直し
+  - 本人のみが変更できるようにする
 - SAML対応
 - (project/user) enabledの有効化
 - user federation
