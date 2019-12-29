@@ -14,6 +14,7 @@ type Manager struct {
 	project model.ProjectInfoHandler
 	user    model.UserInfoHandler
 	session model.SessionHandler
+	client  model.ClientInfoHandler
 }
 
 var inst *Manager
@@ -39,11 +40,16 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create session handler")
 		}
+		clientHandler, err := memory.NewClientHandler(prjHandler)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create client handler")
+		}
 
 		inst = &Manager{
 			project: prjHandler,
 			user:    userHandler,
 			session: sessionHander,
+			client:  clientHandler,
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -64,11 +70,16 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create session handler")
 		}
+		clientHandler, err := mongo.NewClientHandler(dbClient)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create client handler")
+		}
 
 		inst = &Manager{
 			project: prjHandler,
 			user:    userHandler,
 			session: sessionHandler,
+			client:  clientHandler,
 		}
 	default:
 		return errors.Cause(fmt.Errorf("Database Type %s is not implemented yet", dbType))
@@ -234,4 +245,46 @@ func (m *Manager) RevokeSession(sessionID string) error {
 func (m *Manager) GetSessions(userID string) ([]string, error) {
 	// TODO(validate userID)
 	return m.session.GetList(userID)
+}
+
+// ClientAdd ...
+func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
+	// TODO(validation)
+	// TODO(lock, unlock)
+
+	_, err := m.client.Get(ent.ID)
+	if err != model.ErrNoSuchClient {
+		if err == nil {
+			return errors.Cause(model.ErrClientAlreadyExists)
+		}
+		return errors.Wrap(err, "Failed to get client info")
+	}
+
+	return m.client.Add(ent)
+}
+
+// ClientDelete ...
+func (m *Manager) ClientDelete(clientID string) error {
+	// TODO(validate clientID)
+	// TODO(lock, unlock)
+	return m.client.Delete(clientID)
+}
+
+// ClientGetList ...
+func (m *Manager) ClientGetList(projectName string) ([]string, error) {
+	// TODO(validate projectName)
+	return m.client.GetList(projectName)
+}
+
+// ClientGet ...
+func (m *Manager) ClientGet(clientID string) (*model.ClientInfo, error) {
+	// TODO(validate clientID)
+	return m.client.Get(clientID)
+}
+
+// ClientUpdate ...
+func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
+	// TODO(validate ent)
+	// TODO(lock, unlock)
+	return m.client.Update(ent)
 }
