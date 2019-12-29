@@ -1,9 +1,5 @@
 package clientapi
 
-import (
-	"time"
-)
-
 // ClientCreateRequest ...
 type ClientCreateRequest struct {
 	ID         string `json:"id"`
@@ -13,10 +9,10 @@ type ClientCreateRequest struct {
 
 // ClientGetResponse ...
 type ClientGetResponse struct {
-	ID         string    `json:"id"`
-	Secret     string    `json:"secret"`
-	AccessType string    `json:"access_type"`
-	CreatedAt  time.Time `json:"createdAt"`
+	ID         string `json:"id"`
+	Secret     string `json:"secret"`
+	AccessType string `json:"access_type"`
+	CreatedAt  string `json:"createdAt"`
 }
 
 // ClientPutRequest ...

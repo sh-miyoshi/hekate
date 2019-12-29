@@ -30,6 +30,8 @@ func InitHandler() error {
 	inst.createRole(ResRole, TypeWrite)
 	inst.createRole(ResUser, TypeRead)
 	inst.createRole(ResUser, TypeWrite)
+	inst.createRole(ResClient, TypeRead)
+	inst.createRole(ResClient, TypeWrite)
 
 	roles := []string{}
 	for _, role := range inst.roleList {
