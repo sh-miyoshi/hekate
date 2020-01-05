@@ -1,0 +1,9 @@
+client-id: gatekeeper
+client-secret: secret
+discovery-url: http://localhost:8080/api/v1/project/master
+enable-default-deny: true
+skip-openid-provider-tls-verify: true
+encryption_key: secret
+listen: 0.0.0.0:3000
+upstream-url: http://localhost:10000
+secure-cookie: false

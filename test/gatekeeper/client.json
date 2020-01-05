@@ -1,0 +1,5 @@
+{
+	"id": "gatekeeper",
+	"secret": "secret",
+	"access_type": "public"
+}

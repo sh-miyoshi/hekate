@@ -1,0 +1,7 @@
+# log files
+*.log
+
+# binary files
+keycloak-proxy-linux-amd64
+test-server
+test-server.exe
