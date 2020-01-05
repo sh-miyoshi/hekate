@@ -1,22 +1,27 @@
 package login
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
+	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/oidcapi/v1"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 // Do ...
-func Do(serverAddr string, projectName string, req *tokenapi.TokenRequest) (*tokenapi.TokenResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/token", serverAddr, projectName)
-	body, _ := json.Marshal(req)
-	httpReq, err := http.NewRequest("POST", url, bytes.NewReader(body))
+func Do(serverAddr string, projectName string, userName string, password string) (*oidcapi.TokenResponse, error) {
+	u := fmt.Sprintf("%s/api/v1/project/%s/token", serverAddr, projectName)
+
+	form := url.Values{}
+	form.Add("username", userName)
+	form.Add("password", password)
+	body := strings.NewReader(form.Encode())
+	httpReq, err := http.NewRequest("POST", u, body)
 	if err != nil {
 		return nil, fmt.Errorf("<Program Bug> Failed to create http request: %v", err)
 	}
-	httpReq.Header.Add("Content-Type", "application/json")
+	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	client := &http.Client{}
 	httpRes, err := client.Do(httpReq)
@@ -27,7 +32,7 @@ func Do(serverAddr string, projectName string, req *tokenapi.TokenRequest) (*tok
 
 	switch httpRes.StatusCode {
 	case 200:
-		var res tokenapi.TokenResponse
+		var res oidcapi.TokenResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, fmt.Errorf("<Program Bug> Failed to parse http response: %v", err)
 		}

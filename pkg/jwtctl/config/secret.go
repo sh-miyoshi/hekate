@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
-	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
+	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/oidcapi/v1"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -20,13 +20,13 @@ type secret struct {
 }
 
 // SetSecret ...
-func SetSecret(userName string, token *tokenapi.TokenResponse) {
+func SetSecret(userName string, token *oidcapi.TokenResponse) {
 	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
 
 	v := secret{
 		UserName:                userName,
 		AccessToken:             token.AccessToken,
-		AccessTokenExpiresTime:  time.Now().Add(time.Second * time.Duration(token.AccessExpiresIn)),
+		AccessTokenExpiresTime:  time.Now().Add(time.Second * time.Duration(token.ExpiresIn)),
 		RefreshToken:            token.RefreshToken,
 		RefreshTokenExpiresTime: time.Now().Add(time.Second * time.Duration(token.RefreshExpiresIn)),
 	}
@@ -53,13 +53,8 @@ func GetAccessToken() (string, error) {
 
 	if time.Now().After(s.AccessTokenExpiresTime) {
 		// Refresh token by using refresh-token
-		req := tokenapi.TokenRequest{
-			Name:     s.UserName,
-			Secret:   s.RefreshToken,
-			AuthType: "refresh",
-		}
-
-		res, err := login.Do(sysConf.ServerAddr, sysConf.ProjectName, &req)
+		// TODO(do not work this)
+		res, err := login.Do(sysConf.ServerAddr, sysConf.ProjectName, s.UserName, s.RefreshToken)
 		if err != nil {
 			return "", err
 		}

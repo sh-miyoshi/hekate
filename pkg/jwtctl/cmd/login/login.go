@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
-	tokenapi "github.com/sh-miyoshi/jwt-server/pkg/tokenapi/v1"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 	"os"
@@ -41,13 +40,7 @@ var loginCmd = &cobra.Command{
 			}
 		}
 
-		req := tokenapi.TokenRequest{
-			Name:     userName,
-			Secret:   password,
-			AuthType: "password",
-		}
-
-		res, err := login.Do(config.Get().ServerAddr, config.Get().ProjectName, &req)
+		res, err := login.Do(config.Get().ServerAddr, config.Get().ProjectName, userName, password)
 		if err != nil {
 			fmt.Println(err.Error())
 			os.Exit(1)
