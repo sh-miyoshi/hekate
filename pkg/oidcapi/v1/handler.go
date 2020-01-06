@@ -102,6 +102,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshExpiresIn: project.TokenConfig.RefreshTokenLifeSpan,
 		}
 
+		audiences := []string{user.ID}
+		clientID := r.Form.Get("client_id")
+		if clientID != "" {
+			audiences = append(audiences, clientID)
+		}
+
 		accessTokenReq := token.Request{
 			Issuer:      token.GetFullIssuer(r),
 			ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
@@ -109,7 +115,6 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			UserID:      user.ID,
 		}
 
-		audiences := []string{user.ID}
 		res.AccessToken, err = token.GenerateAccessToken(audiences, accessTokenReq)
 		if err != nil {
 			logger.Error("Failed to get JWT token: %+v", err)
@@ -139,6 +144,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		jwthttp.ResponseWrite(w, "TokenHandler", &res)
+		return
+	case "refresh_token":
+		logger.Error("Not Implemented yet")
+		writeTokenErrorResponse(w)
 		return
 	}
 
