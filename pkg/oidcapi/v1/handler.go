@@ -110,7 +110,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		audiences := []string{user.ID}
-		res.AccessToken, err = token.GenerateAccessToken(accessTokenReq, audiences)
+		res.AccessToken, err = token.GenerateAccessToken(audiences, accessTokenReq)
 		if err != nil {
 			logger.Error("Failed to get JWT token: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -125,7 +125,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		sessionID := uuid.New().String()
-		res.RefreshToken, err = token.GenerateRefreshToken(sessionID, refreshTokenReq)
+		res.RefreshToken, err = token.GenerateRefreshToken(sessionID, audiences, refreshTokenReq)
 		if err != nil {
 			logger.Error("Failed to get JWT token: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -25,7 +25,7 @@ func InitConfig(secretKey string) {
 }
 
 // GenerateAccessToken ...
-func GenerateAccessToken(request Request, audiences []string) (string, error) {
+func GenerateAccessToken(audiences []string, request Request) (string, error) {
 	if tokenSecretKey == "" {
 		return "", errors.New("Did not initialize config yet")
 	}
@@ -67,10 +67,18 @@ func GenerateAccessToken(request Request, audiences []string) (string, error) {
 }
 
 // GenerateRefreshToken ...
-func GenerateRefreshToken(sessionID string, request Request) (string, error) {
+func GenerateRefreshToken(sessionID string, audiences []string, request Request) (string, error) {
 	if tokenSecretKey == "" {
 		return "", errors.New("Did not initialize config yet")
 	}
+
+	// TODO(use []string after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
+	aud := "["
+	for _, a := range audiences {
+		aud += a + ","
+	}
+	aud = strings.TrimSuffix(aud, ",")
+	aud += "]"
 
 	now := time.Now()
 	claims := &RefreshTokenClaims{
@@ -79,7 +87,7 @@ func GenerateRefreshToken(sessionID string, request Request) (string, error) {
 			Issuer:    request.Issuer,
 			IssuedAt:  now.Unix(),
 			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
-			Audience:  request.UserID,
+			Audience:  aud,
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
