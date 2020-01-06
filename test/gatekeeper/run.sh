@@ -38,7 +38,7 @@ if [ $? != 0 ]; then
   wget https://github.com/keycloak/keycloak-gatekeeper/releases/download/v2.3.0/keycloak-proxy-linux-amd64
   chmod +x keycloak-proxy-linux-amd64
 fi
-./keycloak-proxy-linux-amd64 --config=config.yml > gatekeeper.log 2>&1 &
+./keycloak-proxy-linux-amd64 --config=config.yml --verbose > gatekeeper.log 2>&1 &
 
 # echo "access without gatekeeper"
 # curl http://localhost:10000/hello
