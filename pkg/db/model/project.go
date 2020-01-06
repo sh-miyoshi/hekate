@@ -10,6 +10,7 @@ import (
 type TokenConfig struct {
 	AccessTokenLifeSpan  uint
 	RefreshTokenLifeSpan uint
+	// TODO(token signing type HS256,RS256,... )
 }
 
 // ProjectInfo ...

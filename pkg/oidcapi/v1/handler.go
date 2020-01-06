@@ -146,6 +146,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		jwthttp.ResponseWrite(w, "TokenHandler", &res)
 		return
 	case "refresh_token":
+		// TODO(implement token get by refresh_token)
 		logger.Error("Not Implemented yet")
 		writeTokenErrorResponse(w)
 		return
@@ -157,6 +158,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 // CertsHandler ...
 func CertsHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO(get certs)
 	logger.Error("Not implemented yet")
 	http.Error(w, "Not implemented yet", http.StatusInternalServerError)
 }
