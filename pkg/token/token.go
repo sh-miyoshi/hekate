@@ -30,13 +30,7 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 		return "", errors.New("Did not initialize config yet")
 	}
 
-	// TODO(use []string after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
-	aud := "["
-	for _, a := range audiences {
-		aud += a + ","
-	}
-	aud = strings.TrimSuffix(aud, ",")
-	aud += "]"
+	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
 
 	now := time.Now()
 	claims := AccessTokenClaims{
@@ -45,11 +39,11 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 			Issuer:    request.Issuer,
 			IssuedAt:  now.Unix(),
 			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
-			Audience:  aud,
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
 		[]string{},
+		audiences,
 	}
 
 	// Set user roles
@@ -72,13 +66,7 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 		return "", errors.New("Did not initialize config yet")
 	}
 
-	// TODO(use []string after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
-	aud := "["
-	for _, a := range audiences {
-		aud += a + ","
-	}
-	aud = strings.TrimSuffix(aud, ",")
-	aud += "]"
+	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
 
 	now := time.Now()
 	claims := &RefreshTokenClaims{
@@ -87,11 +75,11 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 			Issuer:    request.Issuer,
 			IssuedAt:  now.Unix(),
 			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
-			Audience:  aud,
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
 		sessionID,
+		audiences,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

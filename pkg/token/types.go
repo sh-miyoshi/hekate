@@ -18,6 +18,7 @@ type AccessTokenClaims struct {
 	jwt.StandardClaims
 
 	Roles []string `json:"roles"`
+	Audience []string `json:"aud"`
 }
 
 // RefreshTokenClaims ...
@@ -25,4 +26,5 @@ type RefreshTokenClaims struct {
 	jwt.StandardClaims
 
 	SessionID string `json:"sessionID"`
+	Audience []string `json:"aud"`
 }
