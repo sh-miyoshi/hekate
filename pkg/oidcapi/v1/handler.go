@@ -155,6 +155,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	writeTokenErrorResponse(w)
 }
 
+// CertsHandler ...
+func CertsHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Error("Not implemented yet")
+	http.Error(w, "Not implemented yet", http.StatusInternalServerError)
+}
+
 func writeTokenErrorResponse(w http.ResponseWriter) {
 	res := TokenErrorResponse{
 		Error: "invalid_request",
