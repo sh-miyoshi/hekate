@@ -22,8 +22,10 @@ token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token 
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \
+  -d "client_id=gatekeeper" \
   -d 'grant_type=password'`
 master_access_token=`echo $token_info | jq -r .access_token`
+# echo $master_access_token
 
 # register client
 curl --insecure -s -X POST $URL/project/master/client \
@@ -31,7 +33,11 @@ curl --insecure -s -X POST $URL/project/master/client \
   -H "Content-Type: application/json" \
   -d "@client.json"
 
-# wget https://github.com/keycloak/keycloak-gatekeeper/releases/download/v2.3.0/keycloak-proxy-linux-amd64
+ls keycloak-proxy-linux-amd64 > /dev/null 2>&1
+if [ $? != 0 ]; then
+  wget https://github.com/keycloak/keycloak-gatekeeper/releases/download/v2.3.0/keycloak-proxy-linux-amd64
+  chmod +x keycloak-proxy-linux-amd64
+fi
 ./keycloak-proxy-linux-amd64 --config=config.yml > gatekeeper.log 2>&1 &
 
 # echo "access without gatekeeper"
