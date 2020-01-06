@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGetIssuer(t *testing.T) {
+func TestGetExpectIssuer(t *testing.T) {
 	// TODO(init config)
 	InitConfig("testsecret")
 
@@ -15,14 +15,14 @@ func TestGetIssuer(t *testing.T) {
 	}{
 		{
 			"http://localhost:8080/api/v1/project/master/.well-known/openid-configuration",
-			"http://localhost:8080/api/v1/project/master",
+			"http://localhost:8080",
 		},
 	}
 
 	for _, target := range tt {
 		req, _ := http.NewRequest("GET", target.url, nil)
 
-		res := GetIssuer(req)
+		res := GetExpectIssuer(req)
 		if res != target.expect {
 			t.Errorf("GetIssuer returns wrong string. got %s, want %s", res, target.expect)
 		}

@@ -16,7 +16,7 @@ import (
 
 // ConfigGetHandler method return a configuration of OpenID Connect
 func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
-	issuer := token.GetIssuer(r)
+	issuer := token.GetFullIssuer(r)
 	logger.Debug("Issuer: %s", issuer)
 
 	res := Config{
@@ -103,13 +103,14 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		accessTokenReq := token.Request{
-			Issuer:      token.GetIssuer(r),
+			Issuer:      token.GetFullIssuer(r),
 			ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
 			ProjectName: user.ProjectName,
 			UserID:      user.ID,
 		}
 
-		res.AccessToken, err = token.GenerateAccessToken(accessTokenReq)
+		audiences := []string{user.ID}
+		res.AccessToken, err = token.GenerateAccessToken(accessTokenReq, audiences)
 		if err != nil {
 			logger.Error("Failed to get JWT token: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -117,7 +118,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		refreshTokenReq := token.Request{
-			Issuer:      token.GetIssuer(r),
+			Issuer:      token.GetFullIssuer(r),
 			ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
 			ProjectName: user.ProjectName,
 			UserID:      user.ID,

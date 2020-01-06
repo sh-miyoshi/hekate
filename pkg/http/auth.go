@@ -31,7 +31,7 @@ func validateAPIRequest(req *http.Request) (*token.AccessTokenClaims, error) {
 		return nil, errors.New("Failed to get token from header")
 	}
 	claims := &token.AccessTokenClaims{}
-	issuer := token.GetIssuer(req)
+	issuer := token.GetExpectIssuer(req)
 	if err := token.ValidateAccessToken(claims, tokenString, issuer); err != nil {
 		return nil, errors.Wrap(err, "Failed to validate token")
 	}

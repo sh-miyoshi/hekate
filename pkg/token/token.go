@@ -25,10 +25,18 @@ func InitConfig(secretKey string) {
 }
 
 // GenerateAccessToken ...
-func GenerateAccessToken(request Request) (string, error) {
+func GenerateAccessToken(request Request, audiences []string) (string, error) {
 	if tokenSecretKey == "" {
 		return "", errors.New("Did not initialize config yet")
 	}
+
+	// TODO(use []string after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
+	aud := "["
+	for _, a := range audiences {
+		aud += a + ","
+	}
+	aud = strings.TrimSuffix(aud, ",")
+	aud += "]"
 
 	now := time.Now()
 	claims := AccessTokenClaims{
@@ -37,7 +45,7 @@ func GenerateAccessToken(request Request) (string, error) {
 			Issuer:    request.Issuer,
 			IssuedAt:  now.Unix(),
 			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
-			Audience:  request.UserID,
+			Audience:  aud,
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
@@ -97,7 +105,10 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 	}
 
 	// Token Validate
-	ti := claims.Issuer[:len(expectIssuer)]
+	ti := claims.Issuer
+	if len(claims.Issuer) > len(expectIssuer) {
+		ti = claims.Issuer[:len(expectIssuer)]
+	}
 	if ti != expectIssuer {
 		logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
 		return errors.New("Unexpected token issuer")
@@ -141,10 +152,15 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, issuer
 	return nil
 }
 
-// GetIssuer ...
-func GetIssuer(r *http.Request) string {
+// GetFullIssuer ...
+func GetFullIssuer(r *http.Request) string {
 	re := regexp.MustCompile(`/api/v1/project/[^/]+`)
 	url := re.FindString(r.URL.Path)
 	res := fmt.Sprintf("%s://%s%s", protoSchema, r.Host, url)
 	return strings.TrimSuffix(res, "/")
+}
+
+// GetExpectIssuer ...
+func GetExpectIssuer(r *http.Request) string {
+	return fmt.Sprintf("%s://%s", protoSchema, r.Host)
 }

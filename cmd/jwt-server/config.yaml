@@ -6,7 +6,7 @@ server_bind_address: "0.0.0.0"
 
 # File Name of Output Log
 #   If set empty, output log to stdout
-logfile: 'jwt-server.log'
+logfile: ''
 
 # If true, output debug level log
 debug_mode: true
