@@ -1,15 +1,15 @@
 package db
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/memory"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/mongo"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"crypto/rsa"
-	"crypto/rand"
-	"crypto/x509"
 )
 
 // Manager ...
@@ -106,7 +106,7 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 	// TODO(add other algorithm)
 	switch ent.TokenConfig.SigningAlgorithm {
 	case "RS256":
-		key, err := rsa.GenerateKey(rand.Reader,2048)// fixed key length is ok?
+		key, err := rsa.GenerateKey(rand.Reader, 2048) // fixed key length is ok?
 		if err != nil {
 			return errors.Wrap(err, "Failed to generate RSA private key")
 		}

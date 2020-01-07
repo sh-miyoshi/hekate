@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	protoSchema    string
+	protoSchema string
 )
 
 // InitConfig ...
