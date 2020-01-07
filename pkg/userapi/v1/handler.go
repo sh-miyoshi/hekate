@@ -309,7 +309,4 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserRoleDeleteHandler method successfully finished")
-
-	logger.Info("Not implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }

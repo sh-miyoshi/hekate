@@ -1,7 +1,7 @@
 package model
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 	"regexp"
 	"time"
 )
@@ -10,7 +10,7 @@ import (
 type TokenConfig struct {
 	AccessTokenLifeSpan  uint
 	RefreshTokenLifeSpan uint
-	// TODO(token signing type HS256,RS256,... )
+	SigningAlgorithm     string // HS256, RS256, ...
 }
 
 // ProjectInfo ...
@@ -29,6 +29,9 @@ var (
 
 	// ErrDeleteBlockedProject ...
 	ErrDeleteBlockedProject = errors.New("Projects cannot be deleted")
+
+	// ErrProjectValidationFailed ...
+	ErrProjectValidationFailed = errors.New("Project Validation Failed")
 )
 
 // ProjectInfoHandler ...
@@ -42,9 +45,27 @@ type ProjectInfoHandler interface {
 
 // Validate ...
 func (p *ProjectInfo) Validate() error {
+	// Check Project Name
 	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
 	if !prjNameRegExp.MatchString(p.Name) {
 		return errors.New("Invalid Project Name format")
 	}
+
+	// Check Token Signing Algorithm
+	validAlgs := []string{
+		"RS256",
+		// TODO(add more algorithm)
+	}
+	ok := false
+	for _, alg := range validAlgs {
+		if p.TokenConfig.SigningAlgorithm == alg {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return errors.New("Invalid Token Signing Algorithm")
+	}
+
 	return nil
 }

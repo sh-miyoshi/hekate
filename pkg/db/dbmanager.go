@@ -95,8 +95,9 @@ func GetInst() *Manager {
 
 // ProjectAdd ...
 func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
-	if ent.Name == "" {
-		return errors.New("name of entry is empty")
+	if err := ent.Validate(); err != nil {
+		logger.Info("Failed to validate project entry: %v", err)
+		return errors.Cause(model.ErrProjectValidationFailed)
 	}
 
 	// TODO(lock, unlock)
@@ -143,7 +144,12 @@ func (m *Manager) ProjectGet(name string) (*model.ProjectInfo, error) {
 
 // ProjectUpdate ...
 func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
-	// TODO(validate ent, projectExists)
+	if err := ent.Validate(); err != nil {
+		logger.Info("Failed to validate project entry: %v", err)
+		return errors.Cause(model.ErrProjectValidationFailed)
+	}
+
+	// TODO(projectExists)
 	// TODO(lock, unlock)
 	return m.project.Update(ent)
 }
@@ -197,7 +203,10 @@ func (m *Manager) UserGet(userID string) (*model.UserInfo, error) {
 
 // UserUpdate ...
 func (m *Manager) UserUpdate(ent *model.UserInfo) error {
-	// TODO(validate ent)
+	if err := ent.Validate(); err != nil {
+		return errors.Wrap(err, "Failed to validate entry")
+	}
+
 	// TODO(lock, unlock)
 	return m.user.Update(ent)
 }

@@ -59,6 +59,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		TokenConfig: &model.TokenConfig{
 			AccessTokenLifeSpan:  request.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: request.TokenConfig.RefreshTokenLifeSpan,
+			SigningAlgorithm:     request.TokenConfig.SigningAlgorithm,
 		},
 	}
 
@@ -67,6 +68,9 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		if err == model.ErrProjectAlreadyExists {
 			logger.Info("Project %s is already exists", request.Name)
 			http.Error(w, "Project Already Exists", http.StatusConflict)
+		} else if err == model.ErrProjectValidationFailed {
+			logger.Info("Invalid project entry is specified: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to create project: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -81,6 +85,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		TokenConfig: &TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
+			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
 		},
 	}
 
@@ -153,6 +158,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		TokenConfig: &TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
+			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
 		},
 	}
 
@@ -202,6 +208,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update Parameters
 	project.TokenConfig.AccessTokenLifeSpan = request.TokenConfig.AccessTokenLifeSpan
 	project.TokenConfig.RefreshTokenLifeSpan = request.TokenConfig.RefreshTokenLifeSpan
+	project.TokenConfig.SigningAlgorithm = request.TokenConfig.SigningAlgorithm
 
 	// Update DB
 	if err := db.GetInst().ProjectUpdate(project); err != nil {

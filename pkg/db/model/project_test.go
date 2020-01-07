@@ -6,17 +6,22 @@ import (
 
 func TestValidate(t *testing.T) {
 	tt := []struct {
-		projectName   string
-		expectSuccess bool
+		projectName     string
+		tokenSigningAlg string
+		expectSuccess   bool
 	}{
-		{"project-ok", true},
-		{"project-ng-str-!", false},
+		{"project-ok", "RS256", true},
+		{"project-ng-str-!", "RS256", false},
+		{"project-ok", "invalid", false},
 		// TODO(add more test case)
 	}
 
 	for _, target := range tt {
 		prjInfo := ProjectInfo{
 			Name: target.projectName,
+			TokenConfig: &TokenConfig{
+				SigningAlgorithm: target.tokenSigningAlg,
+			},
 		}
 		err := prjInfo.Validate()
 

@@ -1,6 +1,7 @@
 {
 	"tokenConfig": {
 		"accessTokenLifeSpan": 300,
-		"refreshTokenLifeSpan": 3600
+		"refreshTokenLifeSpan": 3600,
+		"signingAlgorithm": "RS256"
 	}
 }
