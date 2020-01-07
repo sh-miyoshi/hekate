@@ -28,6 +28,20 @@ func InitConfig(useHTTPS bool, secretKey string) {
 	}
 }
 
+func signToken(projectName string, claims jwt.Claims) (string, error) {
+	project, err := db.GetInst().ProjectGet(projectName)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to get project")
+	}
+	switch project.TokenConfig.SigningAlgorithm {
+	case "RS256":
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		return token.SignedString([]byte(tokenSecretKey))
+	default:
+		return "", errors.New("Unexpected Token Signing Algorithm")
+	}
+}
+
 // GenerateAccessToken ...
 func GenerateAccessToken(audiences []string, request Request) (string, error) {
 	if tokenSecretKey == "" {
@@ -59,9 +73,7 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 		claims.Roles = append(claims.Roles, role)
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	return token.SignedString([]byte(tokenSecretKey))
+	return signToken(request.ProjectName, claims)
 }
 
 // GenerateRefreshToken ...
@@ -86,8 +98,7 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 		audiences,
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(tokenSecretKey))
+	return signToken(request.ProjectName, claims)
 }
 
 // ValidateAccessToken ...

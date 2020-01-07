@@ -5,8 +5,11 @@ import (
 )
 
 type tokenConfig struct {
-	AccessTokenLifeSpan  uint `bson:"accessTokenLifeSpan"`
-	RefreshTokenLifeSpan uint `bson:"refreshTokenLifeSpan"`
+	AccessTokenLifeSpan  uint   `bson:"accessTokenLifeSpan"`
+	RefreshTokenLifeSpan uint   `bson:"refreshTokenLifeSpan"`
+	SigningAlgorithm     string `bson:"signingAlgorithm"`
+	SignPublicKey        []byte `bson:"signPublicKey"`
+	SignSecretKey        []byte `bson:"signSecretKey"`
 }
 
 type projectInfo struct {

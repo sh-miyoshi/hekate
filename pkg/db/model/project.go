@@ -11,6 +11,8 @@ type TokenConfig struct {
 	AccessTokenLifeSpan  uint
 	RefreshTokenLifeSpan uint
 	SigningAlgorithm     string // HS256, RS256, ...
+	SignPublicKey        []byte
+	SignSecretKey        []byte
 }
 
 // ProjectInfo ...

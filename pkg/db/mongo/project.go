@@ -47,6 +47,9 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 		TokenConfig: &tokenConfig{
 			AccessTokenLifeSpan:  ent.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: ent.TokenConfig.RefreshTokenLifeSpan,
+			SigningAlgorithm:     ent.TokenConfig.SigningAlgorithm,
+			SignPublicKey:        ent.TokenConfig.SignPublicKey,
+			SignSecretKey:        ent.TokenConfig.SignSecretKey,
 		},
 	}
 
@@ -140,6 +143,9 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 		TokenConfig: &tokenConfig{
 			AccessTokenLifeSpan:  ent.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: ent.TokenConfig.RefreshTokenLifeSpan,
+			SigningAlgorithm:     ent.TokenConfig.SigningAlgorithm,
+			SignPublicKey:        ent.TokenConfig.SignPublicKey,
+			SignSecretKey:        ent.TokenConfig.SignSecretKey,
 		},
 	}
 
