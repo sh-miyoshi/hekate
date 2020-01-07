@@ -17,7 +17,7 @@ type Request struct {
 type AccessTokenClaims struct {
 	jwt.StandardClaims
 
-	Roles []string `json:"roles"`
+	Roles    []string `json:"roles"`
 	Audience []string `json:"aud"`
 }
 
@@ -25,6 +25,6 @@ type AccessTokenClaims struct {
 type RefreshTokenClaims struct {
 	jwt.StandardClaims
 
-	SessionID string `json:"sessionID"`
-	Audience []string `json:"aud"`
+	SessionID string   `json:"sessionID"`
+	Audience  []string `json:"aud"`
 }

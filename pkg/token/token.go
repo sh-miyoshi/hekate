@@ -19,9 +19,13 @@ var (
 )
 
 // InitConfig ...
-func InitConfig(secretKey string) {
+func InitConfig(useHTTPS bool, secretKey string) {
 	tokenSecretKey = secretKey
-	protoSchema = "http" // TODO
+	if useHTTPS {
+		protoSchema = "https"
+	} else {
+		protoSchema = "http"
+	}
 }
 
 // GenerateAccessToken ...
