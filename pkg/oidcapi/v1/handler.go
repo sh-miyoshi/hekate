@@ -29,15 +29,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 		ResponseTypesSupported: []string{},         // TODO(set value)
 		SubjectTypesSupported:  []string{"public"}, // TODO(set value)
 		IDTokenSigningAlgValuesSupported: []string{
-			"HS256",
-			"HS384",
-			"HS512",
 			"RS256",
-			"RS384",
-			"RS512",
-			"ES256",
-			"ES384",
-			"ES512",
 		},
 		ClaimsSupported: []string{
 			"iss",
@@ -158,9 +150,30 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 // CertsHandler ...
 func CertsHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO(get certs)
-	logger.Error("Not implemented yet")
-	http.Error(w, "Not implemented yet", http.StatusInternalServerError)
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
+	project, err := db.GetInst().ProjectGet(projectName)
+	if err != nil {
+		if err == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectName)
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to get project: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	jwk := JWKInfo{
+		KeyID:     uuid.New().String(),
+		Algorithm: project.TokenConfig.SigningAlgorithm,
+		// TODO(set other vars)
+	}
+
+	res := JWKSet{}
+	res.Keys = append(res.Keys, jwk)
+	jwthttp.ResponseWrite(w, "CertsHandler", &res)
 }
 
 func writeTokenErrorResponse(w http.ResponseWriter) {
