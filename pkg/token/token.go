@@ -108,7 +108,11 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 
 		// TODO(add more validation claims[alg]==project.alg?, cast ok?, ...)
 
-		return project.TokenConfig.SignSecretKey, nil
+		key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
+		if err != nil {
+			return nil, err
+		}
+		return key, nil
 	})
 
 	if err != nil {
