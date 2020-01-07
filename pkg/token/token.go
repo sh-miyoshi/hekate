@@ -1,6 +1,7 @@
 package token
 
 import (
+	"crypto/x509"
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
@@ -33,15 +34,12 @@ func signToken(projectName string, claims jwt.Claims) (string, error) {
 	}
 	switch project.TokenConfig.SigningAlgorithm {
 	case "RS256":
-		// TODO(fix bug)
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		return token.SignedString(project.TokenConfig.SignSecretKey)
-		// token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-		// key, err := jwt.ParseRSAPrivateKeyFromPEM(project.TokenConfig.SignSecretKey)
-		// if err != nil {
-		// 	return "", err
-		// }
-		// return token.SignedString(key)
+		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+		key, err := x509.ParsePKCS1PrivateKey(project.TokenConfig.SignSecretKey)
+		if err != nil {
+			return "", err
+		}
+		return token.SignedString(key)
 	default:
 		return "", errors.New("Unexpected Token Signing Algorithm")
 	}
@@ -107,6 +105,8 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to get project")
 		}
+
+		// TODO(add more validation claims[alg]==project.alg?, cast ok?, ...)
 
 		return project.TokenConfig.SignSecretKey, nil
 	})
