@@ -14,13 +14,11 @@ import (
 )
 
 var (
-	tokenSecretKey string
 	protoSchema    string
 )
 
 // InitConfig ...
-func InitConfig(useHTTPS bool, secretKey string) {
-	tokenSecretKey = secretKey
+func InitConfig(useHTTPS bool) {
 	if useHTTPS {
 		protoSchema = "https"
 	} else {
@@ -35,8 +33,15 @@ func signToken(projectName string, claims jwt.Claims) (string, error) {
 	}
 	switch project.TokenConfig.SigningAlgorithm {
 	case "RS256":
+		// TODO(fix bug)
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		return token.SignedString([]byte(tokenSecretKey))
+		return token.SignedString(project.TokenConfig.SignSecretKey)
+		// token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+		// key, err := jwt.ParseRSAPrivateKeyFromPEM(project.TokenConfig.SignSecretKey)
+		// if err != nil {
+		// 	return "", err
+		// }
+		// return token.SignedString(key)
 	default:
 		return "", errors.New("Unexpected Token Signing Algorithm")
 	}
@@ -44,10 +49,6 @@ func signToken(projectName string, claims jwt.Claims) (string, error) {
 
 // GenerateAccessToken ...
 func GenerateAccessToken(audiences []string, request Request) (string, error) {
-	if tokenSecretKey == "" {
-		return "", errors.New("Did not initialize config yet")
-	}
-
 	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
 
 	now := time.Now()
@@ -60,6 +61,7 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
+		request.ProjectName,
 		[]string{},
 		audiences,
 	}
@@ -78,10 +80,6 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 
 // GenerateRefreshToken ...
 func GenerateRefreshToken(sessionID string, audiences []string, request Request) (string, error) {
-	if tokenSecretKey == "" {
-		return "", errors.New("Did not initialize config yet")
-	}
-
 	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
 
 	now := time.Now()
@@ -94,6 +92,7 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
+		request.ProjectName,
 		sessionID,
 		audiences,
 	}
@@ -104,7 +103,12 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 // ValidateAccessToken ...
 func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIssuer string) error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(tokenSecretKey), nil
+		project, err := db.GetInst().ProjectGet(claims.Project)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to get project")
+		}
+
+		return project.TokenConfig.SignSecretKey, nil
 	})
 
 	if err != nil {
@@ -134,13 +138,14 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 }
 
 // ValidateRefreshToken ...
-func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, issuer string) error {
+func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expectIssuer string) error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.Cause(fmt.Errorf("Unexpected signing method: %v", token.Header["alg"]))
+		project, err := db.GetInst().ProjectGet(claims.Project)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to get project")
 		}
 
-		return []byte(tokenSecretKey), nil
+		return project.TokenConfig.SignSecretKey, nil
 	})
 
 	if err != nil {
@@ -148,10 +153,16 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, issuer
 	}
 
 	if !token.Valid {
-		return errors.New("Invalid token is specifyed")
+		return errors.New("Invalid token is specified")
 	}
 
-	if claims.Issuer != issuer {
+	// Token Validate
+	ti := claims.Issuer
+	if len(claims.Issuer) > len(expectIssuer) {
+		ti = claims.Issuer[:len(expectIssuer)]
+	}
+	if ti != expectIssuer {
+		logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
 		return errors.New("Unexpected token issuer")
 	}
 

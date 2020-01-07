@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetExpectIssuer(t *testing.T) {
-	InitConfig(false, "testsecret")
+	InitConfig(false)
 
 	tt := []struct {
 		url    string

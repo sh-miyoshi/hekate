@@ -128,7 +128,7 @@ func main() {
 
 	// Initialize Token Config
 	// TODO(use https)
-	token.InitConfig(false, cfg.TokenSecretKey)
+	token.InitConfig(false)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {

@@ -17,6 +17,7 @@ type Request struct {
 type AccessTokenClaims struct {
 	jwt.StandardClaims
 
+	Project string `json:"project"`
 	Roles    []string `json:"roles"`
 	Audience []string `json:"aud"`
 }
@@ -25,6 +26,7 @@ type AccessTokenClaims struct {
 type RefreshTokenClaims struct {
 	jwt.StandardClaims
 
+	Project string `json:"project"`
 	SessionID string   `json:"sessionID"`
 	Audience  []string `json:"aud"`
 }
