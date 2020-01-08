@@ -10,17 +10,14 @@
 ## jwt-server application enhancement
 
 - 各種APIの実装
-  - client用API?
   - openid-connect用のAPI
-    - /api/v1/project/{projectName}/.well-known/openid-configuration
-    - /api/v1/project/{projectName}/openid-connect/token
-    - /api/v1/project/{projectName}/openid-connect/certs
     - /api/v1/project/{projectName}/openid-connect/auth
     - /api/v1/project/{projectName}/openid-connect/userinfo
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのログアウト(session全削除)
+  - keycloak gatekeeper用のroleを設定
+    - 参考: [gatekeeper](https://github.com/keycloak/keycloak-gatekeeper/blob/42b3e3cd1359285da766fd0f0f637411d744e9bf/user_context.go#L57)
 - https対応
-- expireしないclientの登録
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
