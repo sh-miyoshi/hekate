@@ -7,3 +7,9 @@ encryption_key: secret
 listen: 0.0.0.0:3000
 upstream-url: http://localhost:10000
 secure-cookie: false
+resources:
+  - uri: /hello
+    methods:
+    - GET
+    roles:
+      - user-read
