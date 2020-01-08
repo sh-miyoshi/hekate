@@ -12,6 +12,8 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"time"
+	"crypto/x509"
+	"encoding/base64"
 )
 
 // ConfigGetHandler method return a configuration of OpenID Connect
@@ -168,7 +170,20 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 	jwk := JWKInfo{
 		KeyID:     uuid.New().String(),
 		Algorithm: project.TokenConfig.SigningAlgorithm,
-		// TODO(set other vars)
+		PublicKeyUse: "sig",
+	}
+
+	switch jwk.Algorithm {
+	case "RS256":
+		jwk.KeyType = "RSA"
+		key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
+		if err != nil {
+			logger.Error("Failed to parse RSA public key: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		jwk.E = base64.StdEncoding.EncodeToString([]byte(string(key.E)))
+		jwk.N = base64.StdEncoding.EncodeToString([]byte(key.N.String()))
 	}
 
 	res := JWKSet{}
