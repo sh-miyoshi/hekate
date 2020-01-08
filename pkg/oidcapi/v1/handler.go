@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"time"
 	"crypto/x509"
-	"encoding/base64"
+	"github.com/dvsekhvalnov/jose2go/base64url"
 )
 
 // ConfigGetHandler method return a configuration of OpenID Connect
@@ -182,8 +182,9 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		jwk.E = base64.StdEncoding.EncodeToString([]byte(string(key.E)))
-		jwk.N = base64.StdEncoding.EncodeToString([]byte(key.N.String()))
+		e := util.Int2bytes(uint64(key.E))
+		jwk.E = base64url.Encode(e)
+		jwk.N = base64url.Encode(key.N.Bytes())
 	}
 
 	res := JWKSet{}

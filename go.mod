@@ -3,6 +3,7 @@ module github.com/sh-miyoshi/jwt-server
 require (
 	github.com/DataDog/zstd v1.4.4 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dvsekhvalnov/jose2go v0.0.0-20180829124132-7f401d37b68a
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect

@@ -34,8 +34,6 @@ type JWKInfo struct {
 	KeyID                    string   `json:"kid"`
 	Algorithm                string   `json:"alg"`
 	PublicKeyUse             string   `json:"use"`
-	X509CertChain            []string `json:"x5c"`
-	X509CertSHA256Thumbprint string   `json:"x5t#S256"`
 	N                        string   `json:"n,omitempty"` // Use in RSA
 	E                        string   `json:"e,omitempty"` // Use in RSA
 	X                        string   `json:"x,omitempty"` // Use in EC
