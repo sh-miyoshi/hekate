@@ -40,6 +40,9 @@ if [ $? != 0 ]; then
 fi
 ./keycloak-proxy-linux-amd64 --config=config.yml --verbose > gatekeeper.log 2>&1 &
 
+# wait gatekeeper up
+sleep 1
+
 # echo "access without gatekeeper"
 # curl http://localhost:10000/hello
 # echo ""
