@@ -1,7 +1,9 @@
 package oidc
 
 import (
+	"crypto/x509"
 	"encoding/json"
+	"github.com/dvsekhvalnov/jose2go/base64url"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
@@ -12,8 +14,6 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"time"
-	"crypto/x509"
-	"github.com/dvsekhvalnov/jose2go/base64url"
 )
 
 // ConfigGetHandler method return a configuration of OpenID Connect
@@ -168,8 +168,8 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jwk := JWKInfo{
-		KeyID:     uuid.New().String(),
-		Algorithm: project.TokenConfig.SigningAlgorithm,
+		KeyID:        uuid.New().String(),
+		Algorithm:    project.TokenConfig.SigningAlgorithm,
 		PublicKeyUse: "sig",
 	}
 

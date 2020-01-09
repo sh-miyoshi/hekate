@@ -30,14 +30,14 @@ type TokenErrorResponse struct {
 
 // JWKInfo is a struct for JSON Web Key(JWK) format defined in https://tools.ietf.org/html/rfc7517
 type JWKInfo struct {
-	KeyType                  string   `json:"kty"`
-	KeyID                    string   `json:"kid"`
-	Algorithm                string   `json:"alg"`
-	PublicKeyUse             string   `json:"use"`
-	N                        string   `json:"n,omitempty"` // Use in RSA
-	E                        string   `json:"e,omitempty"` // Use in RSA
-	X                        string   `json:"x,omitempty"` // Use in EC
-	Y                        string   `json:"y,omitempty"` // Use in EC
+	KeyType      string `json:"kty"`
+	KeyID        string `json:"kid"`
+	Algorithm    string `json:"alg"`
+	PublicKeyUse string `json:"use"`
+	N            string `json:"n,omitempty"` // Use in RSA
+	E            string `json:"e,omitempty"` // Use in RSA
+	X            string `json:"x,omitempty"` // Use in EC
+	Y            string `json:"y,omitempty"` // Use in EC
 }
 
 // JWKSet ...
