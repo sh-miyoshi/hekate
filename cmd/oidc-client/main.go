@@ -52,7 +52,7 @@ func setAPI(r *mux.Router) {
 			return
 		}
 		oidcConfig := &oidc.Config{
-			ClientID: "testapp",
+			ClientID: secret.ClientID,
 		}
 		verifier := provider.Verifier(oidcConfig)
 		idToken, err := verifier.Verify(context.Background(), rawIDToken)
