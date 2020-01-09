@@ -41,11 +41,12 @@ func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, error) {
 // Add ...
 func (h *ClientInfoHandler) Add(ent *model.ClientInfo) error {
 	v := &clientInfo{
-		ID:          ent.ID,
-		ProjectName: ent.ProjectName,
-		Secret:      ent.Secret,
-		AccessType:  ent.AccessType,
-		CreatedAt:   ent.CreatedAt,
+		ID:                  ent.ID,
+		ProjectName:         ent.ProjectName,
+		Secret:              ent.Secret,
+		AccessType:          ent.AccessType,
+		CreatedAt:           ent.CreatedAt,
+		AllowedCallbackURLs: ent.AllowedCallbackURLs,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
@@ -136,11 +137,12 @@ func (h *ClientInfoHandler) Update(ent *model.ClientInfo) error {
 	}
 
 	v := &clientInfo{
-		ID:          ent.ID,
-		ProjectName: ent.ProjectName,
-		Secret:      ent.Secret,
-		AccessType:  ent.AccessType,
-		CreatedAt:   ent.CreatedAt,
+		ID:                  ent.ID,
+		ProjectName:         ent.ProjectName,
+		Secret:              ent.Secret,
+		AccessType:          ent.AccessType,
+		CreatedAt:           ent.CreatedAt,
+		AllowedCallbackURLs: ent.AllowedCallbackURLs,
 	}
 
 	updates := bson.D{

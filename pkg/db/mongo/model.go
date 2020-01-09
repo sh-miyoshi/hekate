@@ -36,9 +36,10 @@ type userInfo struct {
 }
 
 type clientInfo struct {
-	ID          string    `bson:"id"`
-	ProjectName string    `bson:"projectName"`
-	Secret      string    `bson:"secret"`
-	AccessType  string    `bson:"accessType"`
-	CreatedAt   time.Time `bson:"createdAt"`
+	ID                  string    `bson:"id"`
+	ProjectName         string    `bson:"projectName"`
+	Secret              string    `bson:"secret"`
+	AccessType          string    `bson:"accessType"`
+	CreatedAt           time.Time `bson:"createdAt"`
+	AllowedCallbackURLs []string  `bson:"allowedCallbackURLs"`
 }

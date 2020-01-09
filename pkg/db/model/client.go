@@ -7,11 +7,12 @@ import (
 
 // ClientInfo ...
 type ClientInfo struct {
-	ID          string
-	ProjectName string
-	Secret      string
-	AccessType  string
-	CreatedAt   time.Time
+	ID                  string
+	ProjectName         string
+	Secret              string
+	AccessType          string
+	CreatedAt           time.Time
+	AllowedCallbackURLs []string
 }
 
 var (
