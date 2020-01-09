@@ -65,11 +65,12 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create Client Entry
 	client := model.ClientInfo{
-		ID:          request.ID,
-		ProjectName: projectName,
-		Secret:      request.Secret,
-		AccessType:  request.AccessType,
-		CreatedAt:   time.Now(),
+		ID:                  request.ID,
+		ProjectName:         projectName,
+		Secret:              request.Secret,
+		AccessType:          request.AccessType,
+		CreatedAt:           time.Now(),
+		AllowedCallbackURLs: request.AllowedCallbackURLs,
 	}
 
 	if err := db.GetInst().ClientAdd(&client); err != nil {
@@ -88,10 +89,11 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return Response
 	res := ClientGetResponse{
-		ID:         client.ID,
-		Secret:     client.Secret,
-		AccessType: client.AccessType,
-		CreatedAt:  client.CreatedAt.String(),
+		ID:                  client.ID,
+		Secret:              client.Secret,
+		AccessType:          client.AccessType,
+		CreatedAt:           client.CreatedAt.String(),
+		AllowedCallbackURLs: client.AllowedCallbackURLs,
 	}
 
 	jwthttp.ResponseWrite(w, "ClientGetAllClientGetHandlerHandler", &res)
@@ -157,10 +159,11 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res := ClientGetResponse{
-		ID:         client.ID,
-		Secret:     client.Secret,
-		AccessType: client.AccessType,
-		CreatedAt:  client.CreatedAt.String(),
+		ID:                  client.ID,
+		Secret:              client.Secret,
+		AccessType:          client.AccessType,
+		CreatedAt:           client.CreatedAt.String(),
+		AllowedCallbackURLs: client.AllowedCallbackURLs,
 	}
 
 	jwthttp.ResponseWrite(w, "ClientGetHandler", &res)
@@ -207,6 +210,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update Parameters
 	client.Secret = request.Secret
 	client.AccessType = request.AccessType
+	client.AllowedCallbackURLs = request.AllowedCallbackURLs
 
 	// Update DB
 	if err := db.GetInst().ClientUpdate(client); err != nil {

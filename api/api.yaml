@@ -601,6 +601,10 @@ components:
           type: string
         access_type:
           type: string
+        allowed_callback_urls:
+          type: array
+          items:
+            type: string
     ClientGetResponse:
       type: object
       properties:
@@ -610,9 +614,13 @@ components:
           type: string
         access_type:
           type: string
-        createdAt:
+        created_at:
           type: string
           format: date
+        allowed_callback_urls:
+          type: array
+          items:
+            type: string
     ClientPutRequest:
       type: object
       properties:
@@ -620,6 +628,10 @@ components:
           type: string
         access_type:
           type: string
+        allowed_callback_urls:
+          type: array
+          items:
+            type: string
     TokenResponse:
       type: object
       properties:
