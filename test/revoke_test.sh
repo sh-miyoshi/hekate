@@ -3,6 +3,9 @@
 URL="http://localhost:8080/api/v1"
 PROJECT_NAME="master"
 
+echo "refactoring now ..."
+exit 1
+
 token_info=`curl -s -X POST -d '@token_request.json' $URL/project/$PROJECT_NAME/token`
 master_token=`echo $token_info | jq -r .accessToken`
 refresh_token=`echo $token_info | jq -r .refreshToken`

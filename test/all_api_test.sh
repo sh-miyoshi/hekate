@@ -63,7 +63,7 @@ token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token 
 master_access_token=`echo $token_info | jq -r .access_token`
 
 # Project Create
-result=`test_api "$URL/project" POST $master_access_token 'project_create.json'`
+result=`test_api "$URL/project" POST $master_access_token 'inputs/project_create.json'`
 echo $result
 if [ $result != "success" ]; then
 	echo "Failed to create project"
@@ -87,7 +87,7 @@ if [ $result != "success" ]; then
 fi
 
 # Project Update
-result=`test_api "$URL/project/new-project" PUT $master_access_token "project_update.json"`
+result=`test_api "$URL/project/new-project" PUT $master_access_token "inputs/project_update.json"`
 echo $result
 if [ $result != "success" ]; then
 	echo "Failed to update project"
@@ -104,7 +104,7 @@ fi
 
 
 # User Create
-result=`test_api_return_json "$URL/project/master/user" POST $master_access_token 'user_create.json'`
+result=`test_api_return_json "$URL/project/master/user" POST $master_access_token 'inputs/user_create.json'`
 if [ $? != 0 ]; then
 	echo "Failed to create user"
 	exit 1
@@ -129,7 +129,7 @@ if [ $result != "success" ]; then
 fi
 
 # User Update
-result=`test_api "$URL/project/master/user/$userID" PUT $master_access_token 'user_update.json'`
+result=`test_api "$URL/project/master/user/$userID" PUT $master_access_token 'inputs/user_update.json'`
 echo $result
 if [ $result != "success" ]; then
 	echo "Failed to update user"

@@ -13,7 +13,11 @@ PROJECT_NAME="master"
 
 for i in `seq $LOOPS`; do
   for j in `seq $THREADS`; do
-    curl -s -X POST -d '@token_request.json' $URL/project/$PROJECT_NAME/token -o /dev/null &
+    curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/token -o /dev/null \
+      -H "Content-Type: application/x-www-form-urlencoded" \
+      -d "username=admin" \
+      -d "password=password" \
+      -d 'grant_type=password' &
   done
   wait
   echo "Done $i/$LOOPS"
