@@ -9,6 +9,7 @@
 
 ## jwt-server application enhancement
 
+- DBにlock/unlockの追加
 - 各種APIの実装
   - openid-connect用のAPI
     - /api/v1/project/{projectName}/openid-connect/auth
