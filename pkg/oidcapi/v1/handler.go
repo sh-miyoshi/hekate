@@ -53,11 +53,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 
 	if err := r.ParseForm(); err != nil {
-		// TODO internal server error?
+		logger.Info("Failed to parse form: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
-	logger.Info("Form: %v", r.Form)
+	logger.Debug("Form: %v", r.Form)
 	switch r.Form.Get("grant_type") {
 	case "password":
 		uname := r.Form.Get("username")
@@ -190,6 +191,44 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 	res := JWKSet{}
 	res.Keys = append(res.Keys, jwk)
 	jwthttp.ResponseWrite(w, "CertsHandler", &res)
+}
+
+// AuthGETHandler ...
+func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
+	// Get data form Query
+
+	// TODO Not Implemented yet
+	logger.Error("Not Implemented yet")
+	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+}
+
+// AuthPOSTHandler ...
+func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
+	// Get data form Form
+	if err := r.ParseForm(); err != nil {
+		logger.Info("Failed to parse form: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	logger.Debug("Form: %v", r.Form)
+
+	info := &authInfo{
+		Scope:        r.Form.Get("scope"),
+		ResponseType: r.Form.Get("response_type"),
+		ClientID:     r.Form.Get("client_id"),
+		RedirectURI:  r.Form.Get("redirect_uri"),
+		State:        r.Form.Get("state"),
+	}
+
+	if err := info.Validate(); err != nil {
+		logger.Info("Failed to validate request: %v", err)
+		// TODO(return bad request)
+	}
+
+	// TODO Not Implemented yet
+	logger.Error("Not Implemented yet")
+	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
 }
 
 func writeTokenErrorResponse(w http.ResponseWriter) {
