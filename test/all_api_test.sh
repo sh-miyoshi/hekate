@@ -159,3 +159,44 @@ if [ $result != "success" ]; then
 	echo "Failed to delete user"
 	exit 1
 fi
+
+# Client Create
+result=`test_api "$URL/project/master/client" POST $master_access_token 'inputs/client_create.json'`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to create client"
+	exit 1
+fi
+clientID="oidc-client"
+
+# All Client Get
+result=`test_api "$URL/project/master/client" GET $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to get client list"
+	exit 1
+fi
+
+# Client Get
+result=`test_api "$URL/project/master/client/$clientID" GET $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to get client"
+	exit 1
+fi
+
+# Client Update
+result=`test_api "$URL/project/master/client/$clientID" PUT $master_access_token 'inputs/client_update.json'`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to update client"
+	exit 1
+fi
+
+# Client Delete
+result=`test_api "$URL/project/master/client/$clientID" DELETE $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to delete client"
+	exit 1
+fi
