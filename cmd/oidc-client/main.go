@@ -44,6 +44,7 @@ func setAPI(r *mux.Router) {
 		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"))
 		if err != nil {
 			http.Error(w, "Can't get access token", http.StatusInternalServerError)
+			return
 		}
 
 		rawIDToken, ok := accessToken.Extra("id_token").(string)

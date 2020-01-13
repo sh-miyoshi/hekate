@@ -145,6 +145,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error("Not Implemented yet")
 		writeTokenErrorResponse(w)
 		return
+	case "authorization_code":
+		// TODO(implement token get by authorization_code)
+		logger.Info("Form: %v", r.Form)
+		logger.Error("Not Implemented yet")
+		writeTokenErrorResponse(w)
+		return
 	}
 
 	logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
@@ -213,6 +219,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(return code and state)
 	http.Redirect(w, r, info.RedirectURI, http.StatusFound)
 }
 
@@ -241,6 +248,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(return code and state)
 	http.Redirect(w, r, info.RedirectURI, http.StatusFound)
 }
 

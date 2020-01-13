@@ -21,5 +21,10 @@ type authInfo struct {
 
 // Validate ...
 func (ai *authInfo) Validate() error {
+	// TODO(add validation)
+	// refs.
+	//   https://qiita.com/itkr/items/9b4e8d8c6d574137443c
+	//   https://github.com/go-playground/validator
+	//   https://godoc.org/gopkg.in/go-playground/validator.v9
 	return nil
 }
