@@ -196,10 +196,24 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 // AuthGETHandler ...
 func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Query
+	queries := r.URL.Query()
+	logger.Debug("Query: %v", queries)
 
-	// TODO Not Implemented yet
-	logger.Error("Not Implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	info := &authInfo{
+		Scope:        queries.Get("scope"),
+		ResponseType: queries.Get("response_type"),
+		ClientID:     queries.Get("client_id"),
+		RedirectURI:  queries.Get("redirect_uri"),
+		State:        queries.Get("state"),
+	}
+
+	if err := info.Validate(); err != nil {
+		logger.Info("Failed to validate request: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, info.RedirectURI, http.StatusFound)
 }
 
 // AuthPOSTHandler ...
@@ -223,12 +237,11 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := info.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
-		// TODO(return bad request)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
 	}
 
-	// TODO Not Implemented yet
-	logger.Error("Not Implemented yet")
-	http.Error(w, "Not Implemented yet", http.StatusInternalServerError)
+	http.Redirect(w, r, info.RedirectURI, http.StatusFound)
 }
 
 func writeTokenErrorResponse(w http.ResponseWriter) {
