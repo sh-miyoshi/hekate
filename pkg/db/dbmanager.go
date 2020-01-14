@@ -14,10 +14,11 @@ import (
 
 // Manager ...
 type Manager struct {
-	project model.ProjectInfoHandler
-	user    model.UserInfoHandler
-	session model.SessionHandler
-	client  model.ClientInfoHandler
+	project  model.ProjectInfoHandler
+	user     model.UserInfoHandler
+	session  model.SessionHandler
+	client   model.ClientInfoHandler
+	authCode model.AuthCodeHandler
 }
 
 var inst *Manager
@@ -47,12 +48,17 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create client handler")
 		}
+		authCodeHandler, err := memory.NewAuthCodeHandler()
+		if err != nil {
+			return errors.Wrap(err, "Failed to create auth code handler")
+		}
 
 		inst = &Manager{
-			project: prjHandler,
-			user:    userHandler,
-			session: sessionHander,
-			client:  clientHandler,
+			project:  prjHandler,
+			user:     userHandler,
+			session:  sessionHander,
+			client:   clientHandler,
+			authCode: authCodeHandler,
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -77,12 +83,17 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create client handler")
 		}
+		authCodeHandler, err := mongo.NewAuthCodeHandler(dbClient)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create auth code handler")
+		}
 
 		inst = &Manager{
-			project: prjHandler,
-			user:    userHandler,
-			session: sessionHandler,
-			client:  clientHandler,
+			project:  prjHandler,
+			user:     userHandler,
+			session:  sessionHandler,
+			client:   clientHandler,
+			authCode: authCodeHandler,
 		}
 	default:
 		return errors.Cause(fmt.Errorf("Database Type %s is not implemented yet", dbType))
@@ -310,4 +321,24 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 	// TODO(validate ent)
 	// TODO(lock, unlock)
 	return m.client.Update(ent)
+}
+
+// NewAuthCode ...
+func (m *Manager) NewAuthCode(ent *model.AuthCode) error {
+	// TODO(validate ent)
+	// TODO(lock, unlock)
+	return m.authCode.New(ent)
+}
+
+// DeleteAuthCode ...
+func (m *Manager) DeleteAuthCode(codeID string) error {
+	// TODO(validate codeID)
+	// TODO(lock, unlock)
+	return m.authCode.Delete(codeID)
+}
+
+// GetAuthCode ...
+func (m *Manager) GetAuthCode(codeID string) (*model.AuthCode, error) {
+	// TODO(validate codeID)
+	return m.authCode.Get(codeID)
 }

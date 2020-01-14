@@ -93,7 +93,7 @@ func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.Cause(model.ErrNoSuchSession)
 		}
-		return nil, errors.Wrap(err, "Failed to get project from mongodb")
+		return nil, errors.Wrap(err, "Failed to get session from mongodb")
 	}
 
 	return res, nil

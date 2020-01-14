@@ -43,3 +43,10 @@ type clientInfo struct {
 	CreatedAt           time.Time `bson:"createdAt"`
 	AllowedCallbackURLs []string  `bson:"allowedCallbackURLs"`
 }
+
+type authCode struct {
+	ExpiresIn   time.Time `bson:"expiresIn"`
+	ClientID    string    `bson:"clientID"`
+	RedirectURL string    `bson:"redirectURL"`
+	CodeID      string    `bson:"codeID"`
+}

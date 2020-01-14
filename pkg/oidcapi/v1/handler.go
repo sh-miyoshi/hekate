@@ -223,7 +223,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO(return end user auth prompt)
 
 	// Debug(following code is temporary code)
-	code := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
+	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
 	values := url.Values{}
 	values.Set("code", code)
 	if authReq.State != "" {
@@ -263,7 +263,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO(return end user auth prompt)
 
 	// Debug(following code is temporary code)
-	code := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
+	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
 	values := url.Values{}
 	values.Set("code", code)
 	if authReq.State != "" {
