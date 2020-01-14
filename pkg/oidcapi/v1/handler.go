@@ -61,6 +61,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug("Form: %v", r.Form)
+
+	userID := ""
+
+	// Authetication
 	switch r.Form.Get("grant_type") {
 	case "password":
 		uname := r.Form.Get("username")
@@ -78,70 +82,14 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		userID = user.ID
+
 		hash := util.CreateHash(passwd)
 		if user.PasswordHash != hash {
 			logger.Info("password authentication failed")
 			writeTokenErrorResponse(w)
 			return
 		}
-
-		// Get Project Info for Token Config
-		project, err := db.GetInst().ProjectGet(projectName)
-		if err == model.ErrNoSuchProject {
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-			return
-		}
-
-		// Generate JWT Token
-		res := TokenResponse{
-			TokenType:        "Bearer",
-			ExpiresIn:        project.TokenConfig.AccessTokenLifeSpan,
-			RefreshExpiresIn: project.TokenConfig.RefreshTokenLifeSpan,
-		}
-
-		audiences := []string{user.ID}
-		clientID := r.Form.Get("client_id")
-		if clientID != "" {
-			audiences = append(audiences, clientID)
-		}
-
-		accessTokenReq := token.Request{
-			Issuer:      token.GetFullIssuer(r),
-			ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
-			ProjectName: user.ProjectName,
-			UserID:      user.ID,
-		}
-
-		res.AccessToken, err = token.GenerateAccessToken(audiences, accessTokenReq)
-		if err != nil {
-			logger.Error("Failed to get JWT token: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		refreshTokenReq := token.Request{
-			Issuer:      token.GetFullIssuer(r),
-			ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
-			ProjectName: user.ProjectName,
-			UserID:      user.ID,
-		}
-
-		sessionID := uuid.New().String()
-		res.RefreshToken, err = token.GenerateRefreshToken(sessionID, audiences, refreshTokenReq)
-		if err != nil {
-			logger.Error("Failed to get JWT token: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		if err := db.GetInst().NewSession(user.ID, sessionID, res.RefreshExpiresIn, r.RemoteAddr); err != nil {
-			logger.Error("Failed to register refresh token session token: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		jwthttp.ResponseWrite(w, "TokenHandler", &res)
-		return
 	case "refresh_token":
 		// TODO(implement token get by refresh_token)
 		logger.Error("Not Implemented yet")
@@ -153,10 +101,68 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error("Not Implemented yet")
 		writeTokenErrorResponse(w)
 		return
+	default:
+		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
+		writeTokenErrorResponse(w)
+		return
 	}
 
-	logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
-	writeTokenErrorResponse(w)
+	// Get Project Info for Token Config
+	project, err := db.GetInst().ProjectGet(projectName)
+	if err == model.ErrNoSuchProject {
+		http.Error(w, "Project Not Found", http.StatusNotFound)
+		return
+	}
+
+	// Generate JWT Token
+	res := TokenResponse{
+		TokenType:        "Bearer",
+		ExpiresIn:        project.TokenConfig.AccessTokenLifeSpan,
+		RefreshExpiresIn: project.TokenConfig.RefreshTokenLifeSpan,
+	}
+
+	audiences := []string{userID}
+	clientID := r.Form.Get("client_id")
+	if clientID != "" {
+		audiences = append(audiences, clientID)
+	}
+
+	accessTokenReq := token.Request{
+		Issuer:      token.GetFullIssuer(r),
+		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+		ProjectName: projectName,
+		UserID:      userID,
+	}
+
+	res.AccessToken, err = token.GenerateAccessToken(audiences, accessTokenReq)
+	if err != nil {
+		logger.Error("Failed to get JWT token: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	refreshTokenReq := token.Request{
+		Issuer:      token.GetFullIssuer(r),
+		ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
+		ProjectName: projectName,
+		UserID:      userID,
+	}
+
+	sessionID := uuid.New().String()
+	res.RefreshToken, err = token.GenerateRefreshToken(sessionID, audiences, refreshTokenReq)
+	if err != nil {
+		logger.Error("Failed to get JWT token: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	if err := db.GetInst().NewSession(userID, sessionID, res.RefreshExpiresIn, r.RemoteAddr); err != nil {
+		logger.Error("Failed to register refresh token session token: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	jwthttp.ResponseWrite(w, "TokenHandler", &res)
 }
 
 // CertsHandler ...
@@ -214,6 +220,9 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(return end user auth prompt)
+
+	// Debug(following code is temporary code)
 	code := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
 	values := url.Values{}
 	values.Set("code", code)
@@ -251,6 +260,9 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(return end user auth prompt)
+
+	// Debug(following code is temporary code)
 	code := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
 	values := url.Values{}
 	values.Set("code", code)
