@@ -14,6 +14,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -213,21 +214,23 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(return code)
+	code := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
+	values := url.Values{}
+	values.Set("code", code)
+	if authReq.State != "" {
+		values.Set("state", authReq.State)
+	}
+
 	req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
 	if err != nil {
 		logger.Error("Failed to create response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
-	req.URL.Query().Add("code", "TODO")
-	if authReq.State != "" {
-		req.URL.Query().Add("state", authReq.State)
-	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.URL.RawQuery = values.Encode()
 
-	http.Redirect(w, r, authReq.RedirectURI, http.StatusFound)
+	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
 // AuthPOSTHandler ...
@@ -248,8 +251,23 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(return code and state)
-	http.Redirect(w, r, authReq.RedirectURI, http.StatusFound)
+	code := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
+	values := url.Values{}
+	values.Set("code", code)
+	if authReq.State != "" {
+		values.Set("state", authReq.State)
+	}
+
+	req, err := http.NewRequest("POST", authReq.RedirectURI, nil)
+	if err != nil {
+		logger.Error("Failed to create response: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.URL.RawQuery = values.Encode()
+
+	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
 func writeTokenErrorResponse(w http.ResponseWriter) {
