@@ -219,7 +219,20 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(return code and state)
+	// TODO(return code)
+	req, err := http.NewRequest("GET", info.RedirectURI, nil)
+	if err != nil {
+		logger.Error("Failed to create response: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	req.URL.Query().Add("code", "TODO")
+	if info.State != "" {
+		req.URL.Query().Add("state", info.State)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
 	http.Redirect(w, r, info.RedirectURI, http.StatusFound)
 }
 
