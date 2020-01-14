@@ -17,12 +17,13 @@ func InitAuthCodeConfig(authCodeExpiresTimeSec uint64) {
 }
 
 // GenerateAuthCode ...
-func GenerateAuthCode(clientID string, redirectURL string) (string, error) {
+func GenerateAuthCode(clientID string, redirectURL string, userID string) (string, error) {
 	code := &model.AuthCode{
 		CodeID:      uuid.New().String(),
 		ClientID:    clientID,
 		RedirectURL: redirectURL,
 		ExpiresIn:   time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
+		UserID:      userID,
 	}
 
 	err := db.GetInst().NewAuthCode(code)

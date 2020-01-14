@@ -45,8 +45,9 @@ type clientInfo struct {
 }
 
 type authCode struct {
+	CodeID      string    `bson:"codeID"`
 	ExpiresIn   time.Time `bson:"expiresIn"`
 	ClientID    string    `bson:"clientID"`
 	RedirectURL string    `bson:"redirectURL"`
-	CodeID      string    `bson:"codeID"`
+	UserID      string    `bson:"userID"`
 }

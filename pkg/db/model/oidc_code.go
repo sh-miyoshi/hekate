@@ -7,10 +7,11 @@ import (
 
 // AuthCode ...
 type AuthCode struct {
+	CodeID      string
 	ExpiresIn   time.Time
 	ClientID    string
 	RedirectURL string
-	CodeID      string
+	UserID      string
 }
 
 // AuthCodeHandler ...

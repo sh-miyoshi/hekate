@@ -41,10 +41,11 @@ func NewAuthCodeHandler(dbClient *mongo.Client) (*AuthCodeHandler, error) {
 // New ...
 func (h *AuthCodeHandler) New(code *model.AuthCode) error {
 	v := &authCode{
+		CodeID:      code.CodeID,
 		ExpiresIn:   code.ExpiresIn,
 		ClientID:    code.ClientID,
 		RedirectURL: code.RedirectURL,
-		CodeID:      code.CodeID,
+		UserID:      code.UserID,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)

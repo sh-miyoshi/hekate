@@ -96,9 +96,22 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		writeTokenErrorResponse(w)
 		return
 	case "authorization_code":
+		// Validate code
+		codeID := r.Form.Get("code")
+		code, err := db.GetInst().GetAuthCode(codeID)
+		if err != nil {
+			if err == model.ErrNoSuchCode {
+				logger.Info("No such code %s", codeID)
+				http.Error(w, "No such code", http.StatusBadRequest)
+			} else {
+				logger.Error("Failed to get auth code: %+v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
+		logger.Debug("Code: %v", code)
+
 		// TODO(implement token get by authorization_code)
-		logger.Info("Form: %v", r.Form)
-		logger.Error("Not Implemented yet")
 		writeTokenErrorResponse(w)
 		return
 	default:
@@ -223,7 +236,9 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO(return end user auth prompt)
 
 	// Debug(following code is temporary code)
-	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
+	// TODO(set correct user id)
+	users, _ := db.GetInst().UserGetList("master")
+	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, users[0])
 	values := url.Values{}
 	values.Set("code", code)
 	if authReq.State != "" {
@@ -263,7 +278,9 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO(return end user auth prompt)
 
 	// Debug(following code is temporary code)
-	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI)
+	// TODO(set correct user id)
+	users, _ := db.GetInst().UserGetList("master")
+	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, users[0])
 	values := url.Values{}
 	values.Set("code", code)
 	if authReq.State != "" {
