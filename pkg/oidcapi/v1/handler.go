@@ -10,6 +10,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
@@ -205,22 +206,15 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	queries := r.URL.Query()
 	logger.Debug("Query: %v", queries)
 
-	info := &authInfo{
-		Scope:        queries.Get("scope"),
-		ResponseType: queries.Get("response_type"),
-		ClientID:     queries.Get("client_id"),
-		RedirectURI:  queries.Get("redirect_uri"),
-		State:        queries.Get("state"),
-	}
-
-	if err := info.Validate(); err != nil {
+	authReq := oidc.NewAuthRequest(queries)
+	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
 	// TODO(return code)
-	req, err := http.NewRequest("GET", info.RedirectURI, nil)
+	req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
 	if err != nil {
 		logger.Error("Failed to create response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -228,12 +222,12 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.URL.Query().Add("code", "TODO")
-	if info.State != "" {
-		req.URL.Query().Add("state", info.State)
+	if authReq.State != "" {
+		req.URL.Query().Add("state", authReq.State)
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	http.Redirect(w, r, info.RedirectURI, http.StatusFound)
+	http.Redirect(w, r, authReq.RedirectURI, http.StatusFound)
 }
 
 // AuthPOSTHandler ...
@@ -247,22 +241,15 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug("Form: %v", r.Form)
 
-	info := &authInfo{
-		Scope:        r.Form.Get("scope"),
-		ResponseType: r.Form.Get("response_type"),
-		ClientID:     r.Form.Get("client_id"),
-		RedirectURI:  r.Form.Get("redirect_uri"),
-		State:        r.Form.Get("state"),
-	}
-
-	if err := info.Validate(); err != nil {
+	authReq := oidc.NewAuthRequest(r.Form)
+	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
 	// TODO(return code and state)
-	http.Redirect(w, r, info.RedirectURI, http.StatusFound)
+	http.Redirect(w, r, authReq.RedirectURI, http.StatusFound)
 }
 
 func writeTokenErrorResponse(w http.ResponseWriter) {
