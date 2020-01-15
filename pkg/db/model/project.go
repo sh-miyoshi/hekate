@@ -22,6 +22,14 @@ type ProjectInfo struct {
 	TokenConfig *TokenConfig
 }
 
+const (
+	// DefaultAccessTokenExpiresTimeSec is default expires time for access token(5 minutes)
+	DefaultAccessTokenExpiresTimeSec = 5 * 60
+
+	// DefaultRefreshTokenExpiresTimeSec is default expires time for refresh token(14 days)
+	DefaultRefreshTokenExpiresTimeSec = 14 * 24 * 60 * 60
+)
+
 var (
 	// ErrProjectAlreadyExists ...
 	ErrProjectAlreadyExists = errors.New("Project Already Exists")

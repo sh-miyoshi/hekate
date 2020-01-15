@@ -82,8 +82,8 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		Name:      "master",
 		CreatedAt: time.Now(),
 		TokenConfig: &model.TokenConfig{
-			AccessTokenLifeSpan:  5 * 60,            // 5 minutes, TODO(use const variable)
-			RefreshTokenLifeSpan: 14 * 24 * 60 * 60, // 14 days, TODO(use const variable)
+			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresTimeSec,
+			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresTimeSec,
 			SigningAlgorithm:     "RS256",
 		},
 	})
