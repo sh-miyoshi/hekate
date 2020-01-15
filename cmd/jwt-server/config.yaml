@@ -1,3 +1,11 @@
+# Name of Server Admin
+#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_NAME
+admin_name: admin
+
+# Password of Server Admin
+#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_PASSWORD
+admin_password: password
+
 # Listen Port of Server
 server_port: 8080
 
@@ -17,10 +25,5 @@ db:
   # type: "mongo"
   # connection_string: "mongodb://localhost:27017"
 
-# Name of Server Admin
-#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_NAME
-admin_name: admin
-
-# Password of Server Admin
-#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_PASSWORD
-admin_password: password
+# Expires Time of Authorization code in OpenID Connect [sec]
+oidc_auth_code_expires_time: 300

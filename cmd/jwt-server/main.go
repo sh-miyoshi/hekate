@@ -12,6 +12,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
 	oidcapiv1 "github.com/sh-miyoshi/jwt-server/pkg/oidcapi/v1"
 	projectapiv1 "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
 	defaultrole "github.com/sh-miyoshi/jwt-server/pkg/role"
@@ -140,6 +141,9 @@ func main() {
 	// Initialize Token Config
 	// TODO(use https)
 	token.InitConfig(false)
+
+	// Initialize OIDC Auth Code Config
+	oidc.InitAuthCodeConfig(cfg.AuthCodeExpiresTime)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
