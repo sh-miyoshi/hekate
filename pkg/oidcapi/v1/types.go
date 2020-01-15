@@ -21,6 +21,7 @@ type TokenResponse struct {
 	ExpiresIn        uint   `json:"expires_in"`
 	RefreshToken     string `json:"refresh_token"`
 	RefreshExpiresIn uint   `json:"refresh_expires_in"`
+	IDToken          string `json:"id_token"`
 }
 
 // TokenErrorResponse ...

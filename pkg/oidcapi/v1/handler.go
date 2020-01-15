@@ -105,7 +105,15 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Info(message)
 		writeTokenErrorResponse(w)
 	case http.StatusOK:
-		jwthttp.ResponseWrite(w, "TokenHandler", token)
+		res := &TokenResponse{
+			TokenType:        token.TokenType,
+			AccessToken:      token.AccessToken,
+			ExpiresIn:        token.ExpiresIn,
+			RefreshToken:     token.RefreshToken,
+			RefreshExpiresIn: token.RefreshExpiresIn,
+			IDToken:          token.IDToken,
+		}
+		jwthttp.ResponseWrite(w, "TokenHandler", res)
 	default:
 		logger.Error("Program Bug: code %d is not implemented", statusCode)
 		http.Error(w, "Internal Server Error", statusCode)

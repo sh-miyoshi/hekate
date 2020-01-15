@@ -1,14 +1,14 @@
 package oidc
 
 import (
+	"fmt"
+	"github.com/google/uuid"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
-	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
-	"fmt"
+	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"time"
-	"github.com/google/uuid"
 )
 
 // TokenResponse ...
@@ -93,8 +93,8 @@ func AuthByCode(project *model.ProjectInfo, codeID string, r *http.Request) (*To
 	}
 
 	res := TokenResponse{
-		TokenType:        "Bearer",
-		ExpiresIn:        project.TokenConfig.AccessTokenLifeSpan,
+		TokenType: "Bearer",
+		ExpiresIn: project.TokenConfig.AccessTokenLifeSpan,
 	}
 
 	audiences := []string{

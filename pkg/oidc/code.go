@@ -4,9 +4,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"time"
-	"net/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"net/http"
+	"time"
 )
 
 var (
