@@ -113,6 +113,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshExpiresIn: token.RefreshExpiresIn,
 			IDToken:          token.IDToken,
 		}
+		// TODO(set header?)
 		jwthttp.ResponseWrite(w, "TokenHandler", res)
 	default:
 		logger.Error("Program Bug: code %d is not implemented", statusCode)
@@ -214,6 +215,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
+		// TODO(return correct error response)
 		return
 	}
 
