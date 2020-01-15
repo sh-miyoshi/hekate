@@ -42,7 +42,7 @@ func setAPI(r *mux.Router) {
 			return
 		}
 
-		fmt.Printf("Request: %v\n", r)
+		// fmt.Printf("Request: %v\n", r)
 
 		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"))
 		if err != nil {
@@ -50,7 +50,7 @@ func setAPI(r *mux.Router) {
 			return
 		}
 
-		fmt.Printf("Access Token: %v\n", accessToken)
+		// fmt.Printf("Access Token: %v\n", accessToken)
 
 		rawIDToken, ok := accessToken.Extra("id_token").(string)
 		if !ok {
