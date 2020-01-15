@@ -98,27 +98,25 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "authorization_code":
 		// Validate code
 		codeID := r.Form.Get("code")
-		code, err := db.GetInst().GetAuthCode(codeID)
-		if err != nil {
-			if err == model.ErrNoSuchCode {
-				logger.Info("No such code %s", codeID)
-				http.Error(w, "No such code", http.StatusBadRequest)
-			} else {
-				logger.Error("Failed to get auth code: %+v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			}
+		code, status, msg := oidc.ValidateAuthCode(codeID)
+		if status != http.StatusOK {
+			http.Error(w, msg, status)
 			return
 		}
-		logger.Debug("Code: %v", code)
 
-		// TODO(implement token get by authorization_code)
-		writeTokenErrorResponse(w)
-		return
+		if err := db.GetInst().DeleteAuthCode(codeID); err != nil {
+			logger.Error("Failed to delete auth code: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		userID = code.UserID
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
 		writeTokenErrorResponse(w)
 		return
 	}
+	logger.Debug("User ID: %s", userID)
 
 	// Get Project Info for Token Config
 	project, err := db.GetInst().ProjectGet(projectName)

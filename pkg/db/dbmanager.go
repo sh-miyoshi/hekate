@@ -325,7 +325,7 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 
 // NewAuthCode ...
 func (m *Manager) NewAuthCode(ent *model.AuthCode) error {
-	// TODO(validate ent)
+	// TODO(validate ent, identify by clientID and redirectURL)
 	// TODO(lock, unlock)
 	return m.authCode.New(ent)
 }
