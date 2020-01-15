@@ -16,6 +16,7 @@ type secretInfo struct {
 	Issuer       string `yaml:"issuer"`
 	ClientID     string `yaml:"client-id"`
 	ClientSecret string `yaml:"client-secret"`
+	RedirectURL  string `yaml:"redirect-url"`
 }
 
 var secret secretInfo
@@ -41,11 +42,15 @@ func setAPI(r *mux.Router) {
 			return
 		}
 
+		fmt.Printf("Request: %v\n", r)
+
 		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"))
 		if err != nil {
 			http.Error(w, "Can't get access token", http.StatusInternalServerError)
 			return
 		}
+
+		fmt.Printf("Access Token: %v\n", accessToken)
 
 		rawIDToken, ok := accessToken.Extra("id_token").(string)
 		if !ok {
@@ -102,7 +107,7 @@ func getOIDCConfig() (*oauth2.Config, *oidc.Provider) {
 		ClientSecret: secret.ClientSecret,
 		Endpoint:     provider.Endpoint(),
 		Scopes:       []string{oidc.ScopeOpenID},
-		RedirectURL:  "http://localhost:3000/callback",
+		RedirectURL:  fmt.Sprintf("http://%s:3000/callback", secret.RedirectURL),
 	}
 
 	return oauth2Config, provider
