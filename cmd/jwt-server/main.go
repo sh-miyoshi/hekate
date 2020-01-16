@@ -112,6 +112,21 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		}
 	}
 
+	err = db.GetInst().ClientAdd(&model.ClientInfo{
+		ID: "admin-cli",
+		ProjectName: "master",
+		AccessType: "public",
+		CreatedAt: time.Now(),
+	})
+
+	if err != nil {
+		if err == model.ErrClientAlreadyExists {
+			logger.Info("admin-cli client is already exists.")
+		} else {
+			return errors.Wrap(err, "Failed to create admin-cli client")
+		}
+	}
+
 	return nil
 }
 
