@@ -14,9 +14,6 @@
   - openid-connect用のAPI
     - /api/v1/project/{projectName}/openid-connect/auth
       - end-user authenticate APIの実装
-    - /api/v1/project/{projectName}/openid-connect/token
-      - grant_type: refresh_tokenの実装
-      - grant_type: authorization_codeの実装
     - /api/v1/project/{projectName}/openid-connect/userinfo
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのログアウト(session全削除)
