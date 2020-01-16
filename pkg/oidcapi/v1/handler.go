@@ -68,7 +68,17 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var token *oidc.TokenResponse
+	clientID := r.Form.Get("client_id")
+	clientSecret := r.Form.Get("client_secret")
+
+	if err := oidc.ClientAuth(clientID, clientSecret); err != nil {
+		// TODO(internal server error)
+		logger.Info("Failed to authenticate client: %s", clientID)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var tkn *oidc.TokenResponse
 	var statusCode int
 	var message string
 
@@ -77,37 +87,15 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "password":
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")
-		token, statusCode, message = oidc.AuthByPassword(project, uname, passwd, r)
+
+		tkn, statusCode, message = oidc.AuthByPassword(project, uname, passwd, r)
 	case "refresh_token":
-		// TODO(implement token get by refresh_token)
-		logger.Error("Not Implemented yet")
-		writeTokenErrorResponse(w)
-		return
+		refreshToken := r.Form.Get("refresh_token")
+		tkn, statusCode, message = oidc.AuthByRefreshToken(project, refreshToken, r)
 	case "authorization_code":
 		// Validate code
 		codeID := r.Form.Get("code")
-		clientID := r.Form.Get("client_id")
-		clientSecret := r.Form.Get("client_secret")
-
-		// Client authentication
-		client, err := db.GetInst().ClientGet(clientID)
-		if err != nil {
-			if err == model.ErrNoSuchClient {
-				logger.Info("Failed to authenticate client: %s", clientID)
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			} else {
-				logger.Error("Failed to get client: %+v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			}
-			return
-		}
-		if clientSecret != client.Secret {
-			logger.Info("Failed to authenticate client: %s", clientID)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		token, statusCode, message = oidc.AuthByCode(project, codeID, r)
+		tkn, statusCode, message = oidc.AuthByCode(project, codeID, r)
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
 		writeTokenErrorResponse(w)
@@ -123,12 +111,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		writeTokenErrorResponse(w)
 	case http.StatusOK:
 		res := &TokenResponse{
-			TokenType:        token.TokenType,
-			AccessToken:      token.AccessToken,
-			ExpiresIn:        token.ExpiresIn,
-			RefreshToken:     token.RefreshToken,
-			RefreshExpiresIn: token.RefreshExpiresIn,
-			IDToken:          token.IDToken,
+			TokenType:        tkn.TokenType,
+			AccessToken:      tkn.AccessToken,
+			ExpiresIn:        tkn.ExpiresIn,
+			RefreshToken:     tkn.RefreshToken,
+			RefreshExpiresIn: tkn.RefreshExpiresIn,
+			IDToken:          tkn.IDToken,
 		}
 
 		w.Header().Add("Cache-Control", "no-store")

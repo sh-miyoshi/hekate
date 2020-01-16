@@ -132,3 +132,72 @@ func AuthByCode(project *model.ProjectInfo, codeID string, r *http.Request) (*To
 
 	return &res, http.StatusOK, ""
 }
+
+// AuthByRefreshToken ...
+func AuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http.Request) (*TokenResponse, int, string) {
+	clientID := r.Form.Get("client_id")
+
+	claims := &token.RefreshTokenClaims{}
+	issuer := token.GetExpectIssuer(r)
+	if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
+		return nil, http.StatusBadRequest, fmt.Sprintf("Failed to validate token: %v", err)
+	}
+
+	ok := false
+	for _, aud := range claims.Audience {
+		if aud == clientID {
+			ok = true
+			break
+		}
+	}
+
+	if !ok {
+		return nil, http.StatusBadRequest, "refresh token is not for the client"
+	}
+
+	// Revoke previous token
+	if err := db.GetInst().RevokeSession(claims.SessionID); err != nil {
+		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to revoke previous token: %+v", err)
+	}
+
+	// Generate JWT Token
+	res := TokenResponse{
+		TokenType:        "Bearer",
+		ExpiresIn:        project.TokenConfig.AccessTokenLifeSpan,
+		RefreshExpiresIn: project.TokenConfig.RefreshTokenLifeSpan,
+	}
+
+	userID := claims.Subject
+
+	accessTokenReq := token.Request{
+		Issuer:      claims.Issuer,
+		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+		ProjectName: claims.Project,
+		UserID:      userID,
+	}
+
+	var err error
+	res.AccessToken, err = token.GenerateAccessToken(claims.Audience, accessTokenReq)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get JWT token: %+v", err)
+	}
+
+	refreshTokenReq := token.Request{
+		Issuer:      claims.Issuer,
+		ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
+		ProjectName: claims.Project,
+		UserID:      userID,
+	}
+
+	sessionID := uuid.New().String()
+	res.RefreshToken, err = token.GenerateRefreshToken(sessionID, claims.Audience, refreshTokenReq)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get JWT token: %+v", err)
+	}
+
+	if err := db.GetInst().NewSession(userID, sessionID, res.RefreshExpiresIn, r.RemoteAddr); err != nil {
+		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register refresh token session token: %+v", err)
+	}
+
+	return &res, http.StatusOK, ""
+}
