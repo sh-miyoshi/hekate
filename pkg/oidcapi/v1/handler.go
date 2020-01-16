@@ -29,7 +29,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 		UserinfoEndpoint:       issuer + "/openid-connect/userinfo",
 		JwksURI:                issuer + "/openid-connect/certs",
 		ScopesSupported:        []string{"openid"},
-		ResponseTypesSupported: []string{},         // TODO(set value)
+		ResponseTypesSupported: []string{"code"},
 		SubjectTypesSupported:  []string{"public"}, // TODO(set value)
 		IDTokenSigningAlgValuesSupported: []string{
 			"RS256",
@@ -77,7 +77,6 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "password":
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")
-
 		token, statusCode, message = oidc.AuthByPassword(project, uname, passwd, r)
 	case "refresh_token":
 		// TODO(implement token get by refresh_token)
@@ -87,8 +86,26 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "authorization_code":
 		// Validate code
 		codeID := r.Form.Get("code")
+		clientID := r.Form.Get("client_id")
+		clientSecret := r.Form.Get("client_secret")
 
-		// TODO(client validation)
+		// Client authentication
+		client, err := db.GetInst().ClientGet(clientID)
+		if err != nil {
+			if err == model.ErrNoSuchClient {
+				logger.Info("Failed to authenticate client: %s", clientID)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			} else {
+				logger.Error("Failed to get client: %+v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
+		if clientSecret != client.Secret {
+			logger.Info("Failed to authenticate client: %s", clientID)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
 		token, statusCode, message = oidc.AuthByCode(project, codeID, r)
 	default:
@@ -113,7 +130,9 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshExpiresIn: token.RefreshExpiresIn,
 			IDToken:          token.IDToken,
 		}
-		// TODO(set header?)
+
+		w.Header().Add("Cache-Control", "no-store")
+		w.Header().Add("Pragma", "no-cache")
 		jwthttp.ResponseWrite(w, "TokenHandler", res)
 	default:
 		logger.Error("Program Bug: code %d is not implemented", statusCode)
@@ -249,8 +268,6 @@ func writeTokenErrorResponse(w http.ResponseWriter) {
 	}
 
 	w.Header().Add("Content-Type", "application/json")
-	w.Header().Add("Cache-Control", "no-store")
-	w.Header().Add("Pragma", "no-cache")
 
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		logger.Error("Failed to encode a token error response: %+v", err)
