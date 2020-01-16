@@ -42,15 +42,16 @@ func setAPI(r *mux.Router) {
 			return
 		}
 
-		// fmt.Printf("Request: %v\n", r)
+		fmt.Printf("Request: %v\n", r)
 
 		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"))
 		if err != nil {
-			http.Error(w, "Can't get access token", http.StatusInternalServerError)
+			msg := fmt.Sprintf("Can't get access token: %v", err)
+			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 
-		// fmt.Printf("Access Token: %v\n", accessToken)
+		fmt.Printf("Access Token: %v\n", accessToken)
 
 		rawIDToken, ok := accessToken.Extra("id_token").(string)
 		if !ok {
