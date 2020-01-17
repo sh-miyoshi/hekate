@@ -2,7 +2,8 @@
 
 ## Overview
 
-jwt-serverはJWT Tokenを取得するためのserverです。  
+`jwt-server`はOpenID Connectに対応したシンプルな認証・認可サーバです。
+単一バイナリでユーザー管理と認証・認可処理を実装しており、シンプルさを維持しています。
 
 ## Project Goal
 
@@ -17,25 +18,22 @@ jwt-serverはJWT Tokenを取得するためのserverです。
 ### サーバの起動
 
 ```bash
-cd cmd/server
+cd cmd/jwt-server
 vi config.yaml
-  # 適当に修正
+  # 必要に応じて修正
 go build
-./server
+./jwt-server
 ```
 
 ### JWT Tokenの取得
 
 ```bash
-cat << EOF > token.json
-{
-    "name": "admin",
-    "secret": "password",
-    "authType": "password"
-}
-EOF
-
-curl -X POST -d '@token.json' http://localhost:8080/api/v1/project/master/token
+curl --insecure -s -X POST http://localhost:8080/api/v1/project/master/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin" \
+  -d "password=password" \
+  -d "client_id=admin-cli" \
+  -d 'grant_type=password'
 ```
 
 ## All APIs
