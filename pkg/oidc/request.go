@@ -2,15 +2,16 @@ package oidc
 
 import (
 	"net/url"
+	validator "github.com/go-playground/validator/v10"
 )
 
 // AuthRequest ...
 type AuthRequest struct {
-	Scope        string // scope(REQUIRED)
-	ResponseType string // response_type(REQUIRED)
-	ClientID     string // client_id(REQUIRED)
-	RedirectURI  string // redirect_uri(REQUIRED)
-	State        string // state(RECOMMENDED)
+	Scope        string `validate:"required"`
+	ResponseType string `validate:"required"`
+	ClientID     string `validate:"required"`
+	RedirectURI  string `validate:"required,url"`
+	State        string
 
 	// TODO(implement this)
 	// ResponseMode string // response_mode(OPTIONAL)
@@ -37,10 +38,11 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 
 // Validate ...
 func (r *AuthRequest) Validate() error {
-	// TODO(add validation)
-	// refs.
-	//   https://qiita.com/itkr/items/9b4e8d8c6d574137443c
-	//   https://github.com/go-playground/validator
-	//   https://godoc.org/gopkg.in/go-playground/validator.v9
+	if err := validator.New().Struct(r); err != nil {
+		return err
+	}
+
+	// TODO(add more validation)
+
 	return nil
 }
