@@ -113,10 +113,10 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	}
 
 	err = db.GetInst().ClientAdd(&model.ClientInfo{
-		ID: "admin-cli",
+		ID:          "admin-cli",
 		ProjectName: "master",
-		AccessType: "public",
-		CreatedAt: time.Now(),
+		AccessType:  "public",
+		CreatedAt:   time.Now(),
 	})
 
 	if err != nil {
@@ -158,7 +158,7 @@ func main() {
 	token.InitConfig(false)
 
 	// Initialize OIDC Auth Code Config
-	oidc.InitAuthCodeConfig(cfg.AuthCodeExpiresTime)
+	oidc.InitAuthCodeConfig(cfg.AuthCodeExpiresTime, cfg.AuthCodeUserLoginFile)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {

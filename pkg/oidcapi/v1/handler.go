@@ -184,27 +184,28 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO(return end user auth prompt)
+	oidc.WriteUserLoginPage(w)
 
-	// Debug(following code is temporary code)
-	// TODO(set correct user id)
-	users, _ := db.GetInst().UserGetList("master")
-	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, users[0])
-	values := url.Values{}
-	values.Set("code", code)
-	if authReq.State != "" {
-		values.Set("state", authReq.State)
-	}
+	// // Debug(following code is temporary code)
+	// // TODO(set correct user id)
+	// users, _ := db.GetInst().UserGetList("master")
+	// code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, users[0])
+	// values := url.Values{}
+	// values.Set("code", code)
+	// if authReq.State != "" {
+	// 	values.Set("state", authReq.State)
+	// }
 
-	req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
-	if err != nil {
-		logger.Error("Failed to create response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.URL.RawQuery = values.Encode()
+	// req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
+	// if err != nil {
+	// 	logger.Error("Failed to create response: %v", err)
+	// 	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	// 	return
+	// }
+	// req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	// req.URL.RawQuery = values.Encode()
 
-	http.Redirect(w, req, req.URL.String(), http.StatusFound)
+	// http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
 // AuthPOSTHandler ...

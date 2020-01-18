@@ -5,17 +5,20 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"html/template"
 	"net/http"
 	"time"
 )
 
 var (
 	expiresTimeSec = uint64(10 * 60) // default: 10 minutes
+	userLoginHTML  = ""
 )
 
 // InitAuthCodeConfig ...
-func InitAuthCodeConfig(authCodeExpiresTimeSec uint64) {
+func InitAuthCodeConfig(authCodeExpiresTimeSec uint64, authCodeUserLoginFile string) {
 	expiresTimeSec = authCodeExpiresTimeSec
+	userLoginHTML = authCodeUserLoginFile
 }
 
 // GenerateAuthCode ...
@@ -53,4 +56,16 @@ func ValidateAuthCode(codeID string) (*model.AuthCode, int, string) {
 	}
 
 	return code, http.StatusOK, "ok"
+}
+
+// WriteUserLoginPage ...
+func WriteUserLoginPage(w http.ResponseWriter) {
+	tpl := template.Must(template.ParseFiles(userLoginHTML))
+
+	d := map[string]string{
+		"Message": "test message",
+		"URL":     "http://localhost:8080",
+	}
+
+	tpl.Execute(w, d)
 }

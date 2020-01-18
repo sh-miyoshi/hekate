@@ -27,3 +27,5 @@ db:
 
 # Expires Time of Authorization code in OpenID Connect [sec]
 oidc_auth_code_expires_time: 300
+
+oidc_auth_code_user_login_html: "auth_code_user_login.html"
