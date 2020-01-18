@@ -183,7 +183,8 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(return end user auth prompt)
+	// return end user auth prompt
+	// TODO(set header)
 	oidc.WriteUserLoginPage(w)
 
 	// // Debug(following code is temporary code)

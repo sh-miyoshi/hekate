@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+type sessionInfo struct {
+	VerifyCode string
+	ExpiresIn  time.Time
+	// todo(client info)
+}
+
 var (
 	expiresTimeSec = uint64(10 * 60) // default: 10 minutes
 	userLoginHTML  = ""
@@ -63,9 +69,19 @@ func WriteUserLoginPage(w http.ResponseWriter) {
 	tpl := template.Must(template.ParseFiles(userLoginHTML))
 
 	d := map[string]string{
-		"Message": "test message",
-		"URL":     "http://localhost:8080",
+		"URL": "http://localhost:8080",
 	}
 
 	tpl.Execute(w, d)
+}
+
+// RegisterUserLoginSession ...
+func RegisterUserLoginSession() {
+	// TODO(register to session list)
+}
+
+// UserLoginVerify ...
+func UserLoginVerify(code string) error {
+	// TODO(check session list)
+	return nil
 }
