@@ -41,6 +41,11 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", oidcapiv1.AuthGETHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", oidcapiv1.AuthPOSTHandler).Methods("POST")
 
+	// TODO(not implemented)
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/login", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	}).Methods("POST")
+
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project", projectapiv1.ProjectCreateHandler).Methods("POST")

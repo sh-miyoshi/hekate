@@ -172,6 +172,9 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 
 // AuthGETHandler ...
 func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Get data form Query
 	queries := r.URL.Query()
 	logger.Debug("Query: %v", queries)
@@ -184,8 +187,8 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return end user auth prompt
-	// TODO(set header)
-	oidc.WriteUserLoginPage(w)
+	code := oidc.RegisterUserLoginSession(authReq)
+	oidc.WriteUserLoginPage(code, projectName, w)
 
 	// // Debug(following code is temporary code)
 	// // TODO(set correct user id)
