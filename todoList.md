@@ -23,7 +23,7 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
-- apiのvalidateionの追加
+- apiのvalidationの追加
   - user nameなど
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
@@ -36,6 +36,8 @@
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type
+- APIのRBACの見直し
+  - OIDCのフローを使うようにする
 - custom roleの有効化
 - userのパスワード変更のrole見直し
   - 本人のみが変更できるようにする
