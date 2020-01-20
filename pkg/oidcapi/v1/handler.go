@@ -189,31 +189,13 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	// return end user auth prompt
 	code := oidc.RegisterUserLoginSession(authReq)
 	oidc.WriteUserLoginPage(code, projectName, w)
-
-	// // Debug(following code is temporary code)
-	// // TODO(set correct user id)
-	// users, _ := db.GetInst().UserGetList("master")
-	// code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, users[0])
-	// values := url.Values{}
-	// values.Set("code", code)
-	// if authReq.State != "" {
-	// 	values.Set("state", authReq.State)
-	// }
-
-	// req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
-	// if err != nil {
-	// 	logger.Error("Failed to create response: %v", err)
-	// 	http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	// 	return
-	// }
-	// req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	// req.URL.RawQuery = values.Encode()
-
-	// http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
 // AuthPOSTHandler ...
 func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
@@ -231,19 +213,62 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(return end user auth prompt)
+	// return end user auth prompt
+	code := oidc.RegisterUserLoginSession(authReq)
+	oidc.WriteUserLoginPage(code, projectName, w)
+}
 
-	// Debug(following code is temporary code)
-	// TODO(set correct user id)
-	users, _ := db.GetInst().UserGetList("master")
-	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, users[0])
+// UserLoginHandler ...
+func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
+	// Get data form Form
+	if err := r.ParseForm(); err != nil {
+		logger.Info("Failed to parse form: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	logger.Debug("Form: %v", r.Form)
+
+	// Verify user login session code
+	authReq, err := oidc.UserLoginVerify(r.Form.Get("login_verify_code"))
+	if err != nil {
+		logger.Info("Failed to verify user login session: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// Verify user
+	uname := r.Form.Get("username")
+	user, err := db.GetInst().UserGetByName(projectName, uname)
+	if err != nil {
+		if err == model.ErrNoSuchUser {
+			logger.Info("No such user %s in project %s", uname, projectName)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		} else {
+			logger.Error("Failed to get user id: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	hash := util.CreateHash(r.Form.Get("password"))
+	if user.PasswordHash != hash {
+		logger.Info("password authentication failed")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, user.ID)
 	values := url.Values{}
 	values.Set("code", code)
 	if authReq.State != "" {
 		values.Set("state", authReq.State)
 	}
 
-	req, err := http.NewRequest("POST", authReq.RedirectURI, nil)
+	req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
 	if err != nil {
 		logger.Error("Failed to create response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
