@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
 	"path/filepath"
+	"runtime"
 )
 
 var (

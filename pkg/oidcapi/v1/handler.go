@@ -298,7 +298,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res := &UserInfo{
-		Subject: claims.Subject,
+		Subject:  claims.Subject,
 		UserName: user.Name,
 	}
 

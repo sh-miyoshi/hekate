@@ -48,6 +48,6 @@ type JWKSet struct {
 
 // UserInfo ...
 type UserInfo struct {
-	Subject string `json:"sub"`
+	Subject  string `json:"sub"`
 	UserName string `json:"preferred_username"`
 }

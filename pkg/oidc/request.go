@@ -1,8 +1,8 @@
 package oidc
 
 import (
-	"net/url"
 	validator "github.com/go-playground/validator/v10"
+	"net/url"
 )
 
 // AuthRequest ...
