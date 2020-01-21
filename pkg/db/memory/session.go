@@ -3,7 +3,6 @@ package memory
 import (
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"time"
 )
 
 // SessionHandler implement db.SessionHandler
@@ -21,15 +20,8 @@ func NewSessionHandler() (*SessionHandler, error) {
 }
 
 // New ...
-func (h *SessionHandler) New(userID string, sessionID string, expiresIn uint, fromIP string) error {
-	h.sessionList[sessionID] = &model.Session{
-		UserID:    userID,
-		SessionID: sessionID,
-		CreatedAt: time.Now(),
-		ExpiresIn: expiresIn,
-		FromIP:    fromIP,
-	}
-
+func (h *SessionHandler) New(session *model.Session) error {
+	h.sessionList[session.SessionID] = session
 	return nil
 }
 

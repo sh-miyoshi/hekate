@@ -39,13 +39,13 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
 }
 
 // New ...
-func (h *SessionHandler) New(userID string, sessionID string, expiresIn uint, fromIP string) error {
+func (h *SessionHandler) New(s *model.Session) error {
 	v := &session{
-		UserID:    userID,
-		SessionID: sessionID,
-		CreatedAt: time.Now(),
-		ExpiresIn: expiresIn,
-		FromIP:    fromIP,
+		UserID:    s.UserID,
+		SessionID: s.SessionID,
+		CreatedAt: s.CreatedAt,
+		ExpiresIn: s.ExpiresIn,
+		FromIP:    s.FromIP,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)

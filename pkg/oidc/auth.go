@@ -9,6 +9,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"time"
+	"net"
 )
 
 // TokenResponse ...
@@ -74,7 +75,19 @@ func AuthByPassword(project *model.ProjectInfo, userName string, password string
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get JWT token: %+v", err)
 	}
 
-	if err := db.GetInst().NewSession(user.ID, sessionID, res.RefreshExpiresIn, r.RemoteAddr); err != nil {
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get from IP: %v", err)
+	}
+	ent := &model.Session{
+		UserID: user.ID,
+		SessionID: sessionID,
+		CreatedAt: time.Now(),
+		ExpiresIn: res.RefreshExpiresIn,
+		FromIP: ip,
+	}
+
+	if err := db.GetInst().NewSession(ent); err != nil {
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register refresh token session token: %+v", err)
 	}
 
@@ -195,7 +208,18 @@ func AuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get JWT token: %+v", err)
 	}
 
-	if err := db.GetInst().NewSession(userID, sessionID, res.RefreshExpiresIn, r.RemoteAddr); err != nil {
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get from IP: %v", err)
+	}
+	ent := &model.Session{
+		UserID: userID,
+		SessionID: sessionID,
+		CreatedAt: time.Now(),
+		ExpiresIn: res.RefreshExpiresIn,
+		FromIP: ip,
+	}
+	if err := db.GetInst().NewSession(ent); err != nil {
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register refresh token session token: %+v", err)
 	}
 

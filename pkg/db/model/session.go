@@ -1,7 +1,8 @@
 package model
 
 import (
-	"errors"
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -16,7 +17,7 @@ type Session struct {
 
 // SessionHandler ...
 type SessionHandler interface {
-	New(userID string, sessionID string, expiresIn uint, fromIP string) error
+	New(ent *Session) error
 	Revoke(sessionID string) error
 	Get(sessionID string) (*Session, error)
 	GetList(userID string) ([]string, error)
@@ -29,3 +30,23 @@ var (
 	// ErrNoSuchSession ...
 	ErrNoSuchSession = errors.New("No Such Session")
 )
+
+// Validate ...
+func (s *Session) Validate() error {
+	// Check Session ID
+	if ok := govalidator.IsUUID(s.SessionID); !ok {
+		return errors.New("Invalid session ID format")
+	}
+
+	// Check User ID
+	if ok := govalidator.IsUUID(s.UserID); !ok {
+		return errors.New("Invalid user ID format")
+	}
+
+	// Check From IP
+	if ok := govalidator.IsIP(s.FromIP); !ok {
+		return errors.New("Invalid from IP")
+	}
+
+	return nil
+}

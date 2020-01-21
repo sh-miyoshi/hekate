@@ -256,15 +256,17 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 }
 
 // NewSession ...
-func (m *Manager) NewSession(userID string, sessionID string, expiresIn uint, fromIP string) error {
-	// TODO(validate userID, sessionID, expiresIn?)
+func (m *Manager) NewSession(ent *model.Session) error {
+	if err := ent.Validate(); err != nil {
+		return errors.Wrap(err, "Failed to validate entry")
+	}
 	// TODO(lock, unlock)
 
-	if _, err := m.session.Get(sessionID); err != model.ErrNoSuchSession {
+	if _, err := m.session.Get(ent.SessionID); err != model.ErrNoSuchSession {
 		return errors.Cause(model.ErrSessionAlreadyExists)
 	}
 
-	return m.session.New(userID, sessionID, expiresIn, fromIP)
+	return m.session.New(ent)
 }
 
 // RevokeSession ...
