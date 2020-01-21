@@ -174,7 +174,6 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
 		return errors.Cause(model.ErrProjectValidationFailed)
 	}
 
-	// TODO(projectExists)
 	// TODO(lock, unlock)
 	return m.project.Update(ent)
 }

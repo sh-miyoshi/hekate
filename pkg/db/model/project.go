@@ -50,6 +50,9 @@ type ProjectInfoHandler interface {
 	Delete(name string) error
 	GetList() ([]string, error)
 	Get(name string) (*ProjectInfo, error)
+
+	// Update method updates existing project
+	// It must return error if project is not found
 	Update(ent *ProjectInfo) error
 }
 

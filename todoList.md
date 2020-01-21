@@ -65,5 +65,6 @@
 
 - add kubernetes yaml file
 - write usage to README.md
-- create public docker image
-- configure CI
+- add release pipeline
+  - create public docker image
+  - create binary files
