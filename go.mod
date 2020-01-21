@@ -2,6 +2,7 @@ module github.com/sh-miyoshi/jwt-server
 
 require (
 	github.com/DataDog/zstd v1.4.4 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
 	github.com/coreos/go-oidc v2.1.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dvsekhvalnov/jose2go v0.0.0-20180829124132-7f401d37b68a
