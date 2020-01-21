@@ -280,6 +280,31 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
+// UserInfoHandler ...
+func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	claims, err := jwthttp.ValidateAPIRequest(r)
+	if err != nil {
+		logger.Info("Failed to validate header: %v", err)
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	user, err := db.GetInst().UserGet(claims.Subject)
+	if err != nil {
+		// If token validate accepted, user absolutely exists
+		logger.Error("Failed to get user: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	res := &UserInfo{
+		Subject: claims.Subject,
+		UserName: user.Name,
+	}
+
+	jwthttp.ResponseWrite(w, "UserInfoHandler", res)
+}
+
 func writeTokenErrorResponse(w http.ResponseWriter) {
 	res := TokenErrorResponse{
 		Error: "invalid_request",

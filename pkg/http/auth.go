@@ -21,7 +21,8 @@ func parseHTTPHeaderToken(tokenString string) (string, error) {
 	return reqToken, nil
 }
 
-func validateAPIRequest(req *http.Request) (*token.AccessTokenClaims, error) {
+// ValidateAPIRequest ...
+func ValidateAPIRequest(req *http.Request) (*token.AccessTokenClaims, error) {
 	auth, ok := req.Header["Authorization"]
 	if !ok || len(auth) != 1 {
 		return nil, errors.New("Failed to get Authorization header")
@@ -40,7 +41,7 @@ func validateAPIRequest(req *http.Request) (*token.AccessTokenClaims, error) {
 
 // AuthHeader ...
 func AuthHeader(req *http.Request, reqTrgRes role.Resource, reqRoleType role.Type) error {
-	claims, err := validateAPIRequest(req)
+	claims, err := ValidateAPIRequest(req)
 	if err != nil {
 		return errors.Wrap(err, "Failed to validate token")
 	}

@@ -45,3 +45,9 @@ type JWKInfo struct {
 type JWKSet struct {
 	Keys []JWKInfo `json:"keys"`
 }
+
+// UserInfo ...
+type UserInfo struct {
+	Subject string `json:"sub"`
+	UserName string `json:"preferred_username"`
+}
