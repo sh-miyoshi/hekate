@@ -125,7 +125,10 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 		ent.TokenConfig.SignPublicKey = x509.MarshalPKCS1PublicKey(&key.PublicKey)
 	}
 
-	// TODO(lock, unlock)
+	if err := m.project.Lock(); err != nil {
+		return errors.Cause(err)
+	}
+	defer m.project.Unlock()
 
 	if _, err := m.project.Get(ent.Name); err != model.ErrNoSuchProject {
 		return errors.Cause(model.ErrProjectAlreadyExists)

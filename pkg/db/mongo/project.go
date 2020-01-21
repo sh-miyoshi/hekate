@@ -13,6 +13,7 @@ import (
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
 type ProjectInfoHandler struct {
+	session  mongo.Session
 	dbClient *mongo.Client
 }
 
@@ -161,4 +162,26 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 	}
 
 	return nil
+}
+
+// Lock ...
+func (h *ProjectInfoHandler) Lock() error {
+	var err error
+	h.session, err = h.dbClient.StartSession()
+	if err != nil {
+		return err
+	}
+	err = h.session.StartTransaction()
+	if err != nil {
+		h.Unlock()
+		return err
+	}
+	return nil
+}
+
+// Unlock ...
+func (h *ProjectInfoHandler) Unlock() {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+	h.session.EndSession(ctx)
 }

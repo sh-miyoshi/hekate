@@ -54,6 +54,9 @@ type ProjectInfoHandler interface {
 	// Update method updates existing project
 	// It must return error if project is not found
 	Update(ent *ProjectInfo) error
+
+	Lock() error
+	Unlock()
 }
 
 // Validate ...
