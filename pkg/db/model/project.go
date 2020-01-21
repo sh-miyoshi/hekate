@@ -80,5 +80,13 @@ func (p *ProjectInfo) Validate() error {
 		return errors.New("Invalid Token Signing Algorithm")
 	}
 
+	if p.TokenConfig.AccessTokenLifeSpan < 1 {
+		return errors.New("Access Token Life Span must >= 1")
+	}
+
+	if p.TokenConfig.RefreshTokenLifeSpan < 1 {
+		return errors.New("Refresh Token Life Span must >= 1")
+	}
+
 	return nil
 }
