@@ -20,9 +20,9 @@ func TestValidate(t *testing.T) {
 		prjInfo := ProjectInfo{
 			Name: target.projectName,
 			TokenConfig: &TokenConfig{
-				AccessTokenLifeSpan: 1,
+				AccessTokenLifeSpan:  1,
 				RefreshTokenLifeSpan: 1,
-				SigningAlgorithm: target.tokenSigningAlg,
+				SigningAlgorithm:     target.tokenSigningAlg,
 			},
 		}
 		err := prjInfo.Validate()
