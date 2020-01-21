@@ -56,6 +56,16 @@ func (h *Handler) GetList() []string {
 	return res
 }
 
+// IsValid return true if role is registered
+func (h *Handler) IsValid(role string) bool {
+	for _, r := range h.roleList {
+		if r.ID == role {
+			return true
+		}
+	}
+	return false
+}
+
 // Authorize ...
 func (h *Handler) Authorize(roles []string, targetResource Resource, roleType Type) bool {
 	name := fmt.Sprintf("%s-%s", roleType.String(), targetResource.String())

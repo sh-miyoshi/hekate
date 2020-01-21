@@ -282,7 +282,9 @@ func (m *Manager) GetSessions(userID string) ([]string, error) {
 
 // ClientAdd ...
 func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
-	// TODO(validation)
+	if err := ent.Validate(); err != nil {
+		return errors.Wrap(err, "Failed to validate entry")
+	}
 	// TODO(lock, unlock)
 
 	_, err := m.client.Get(ent.ID)
@@ -317,7 +319,9 @@ func (m *Manager) ClientGet(clientID string) (*model.ClientInfo, error) {
 
 // ClientUpdate ...
 func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
-	// TODO(validate ent)
+	if err := ent.Validate(); err != nil {
+		return errors.Wrap(err, "Failed to validate entry")
+	}
 	// TODO(lock, unlock)
 	return m.client.Update(ent)
 }

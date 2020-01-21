@@ -1,7 +1,10 @@
 package model
 
 import (
-	"errors"
+	"github.com/asaskevich/govalidator"
+	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/jwt-server/pkg/role"
+	"regexp"
 	"time"
 )
 
@@ -44,16 +47,27 @@ type UserInfoHandler interface {
 
 // Validate ...
 func (ui *UserInfo) Validate() error {
-	if ui.ID == "" {
-		return errors.New("User ID is empty")
+	// Check User ID
+	if ok := govalidator.IsUUID(ui.ID); !ok {
+		return errors.New("Invalid user ID format")
 	}
 
-	if ui.ProjectName == "" {
-		return errors.New("Project Name is empty")
+	// Check Project Name
+	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
+	if !prjNameRegExp.MatchString(ui.ProjectName) {
+		return errors.New("Invalid project Name format")
 	}
 
-	if ui.Name == "" {
-		return errors.New("User Name is empty")
+	// Check User Name
+	if !(3 <= len(ui.Name) && len(ui.Name) < 64) {
+		return errors.New("Invalid user name format")
+	}
+
+	// Check Roles
+	for _, r := range ui.Roles {
+		if !role.GetInst().IsValid(r) {
+			return errors.New("Invalid role")
+		}
 	}
 
 	return nil
