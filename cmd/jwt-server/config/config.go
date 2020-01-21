@@ -9,7 +9,7 @@ import (
 func setEnvVar(key string, target *string) {
 	val := os.Getenv(key)
 	if len(val) > 0 {
-		target = &val
+		*target = val
 	}
 }
 
@@ -24,7 +24,7 @@ func InitConfig(filePath string) (*GlobalConfig, error) {
 	defer fp.Close()
 
 	if err := yaml.NewDecoder(fp).Decode(res); err != nil {
-		return nil, errors.Wrap(err, "Failed to delete config yaml")
+		return nil, errors.Wrap(err, "Failed to decode config yaml")
 	}
 
 	setEnvVar("JWT_SERVER_ADMIN_NAME", &res.AdminName)

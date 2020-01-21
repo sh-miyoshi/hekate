@@ -26,7 +26,7 @@ import (
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Debug("%s: %s called", r.Method, r.URL.String())
+		logger.Info("%s: %s called", r.Method, r.URL.String())
 		next.ServeHTTP(w, r)
 	})
 }
