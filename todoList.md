@@ -11,8 +11,6 @@
 
 - DBにlock/unlockの追加
 - 各種APIの実装
-  - openid-connect用のAPI
-    - /api/v1/project/{projectName}/openid-connect/userinfo
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 特定ユーザのログアウト(session全削除)
   - keycloak gatekeeper用のroleを設定
