@@ -28,10 +28,15 @@
   - resource type (or url path and method)
   - client
   - success or failed
+- DBGCの追加
+  - Expiredしたsessionなどを一定期間ごとに削除する
 - projectのimport/export
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type
+- OpenID Connectのエンハンス
+  - subject_types_supportedにpairwiseをサポート
+  - RS256以外のSigining Algorithmのサポート
 - APIのRBACの見直し
   - OIDCのフローを使うようにする
 - custom roleの有効化
@@ -42,9 +47,6 @@
 - user federation
   - user情報を外部に保存し、それと連携する
 - redirect_urlの設定
-- OIDCのエンハンス
-  - subject_types_supportedにpairwiseをサポート
-  - RS256以外のSigining Algorithmのサポート
 - LDAP連携？
 
 ## CLI tool(jwtctl) enhancement
