@@ -114,7 +114,6 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 		return errors.Cause(model.ErrProjectValidationFailed)
 	}
 
-	// TODO(add other algorithm)
 	switch ent.TokenConfig.SigningAlgorithm {
 	case "RS256":
 		key, err := rsa.GenerateKey(rand.Reader, 2048) // fixed key length is ok?

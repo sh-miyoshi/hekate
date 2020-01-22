@@ -72,9 +72,13 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	clientSecret := r.Form.Get("client_secret")
 
 	if err := oidc.ClientAuth(clientID, clientSecret); err != nil {
-		// TODO(internal server error)
-		logger.Info("Failed to authenticate client: %s", clientID)
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		if err == oidc.ErrAuthFailed {
+			logger.Info("Failed to authenticate client: %s", clientID)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		} else {
+			logger.Error("Failed to authenticate client: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 

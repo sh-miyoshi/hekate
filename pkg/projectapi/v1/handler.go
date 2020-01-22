@@ -50,8 +50,6 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(Validate Request)
-
 	// Create Project Entry
 	project := model.ProjectInfo{
 		Name:      request.Name,
