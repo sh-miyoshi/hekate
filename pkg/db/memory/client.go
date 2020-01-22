@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"sync"
 )
@@ -35,7 +34,7 @@ func (h *ClientInfoHandler) Delete(clientID string) error {
 		delete(h.clientList, clientID)
 		return nil
 	}
-	return errors.Cause(model.ErrNoSuchClient)
+	return model.ErrNoSuchClient
 }
 
 // GetList ...
@@ -60,7 +59,7 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]string, error) {
 func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
 	res, exists := h.clientList[clientID]
 	if !exists {
-		return nil, errors.Cause(model.ErrNoSuchClient)
+		return nil, model.ErrNoSuchClient
 	}
 
 	return res, nil
@@ -69,7 +68,7 @@ func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
 // Update ...
 func (h *ClientInfoHandler) Update(ent *model.ClientInfo) error {
 	if _, exists := h.clientList[ent.ID]; !exists {
-		return errors.Cause(model.ErrNoSuchClient)
+		return model.ErrNoSuchClient
 	}
 
 	h.clientList[ent.ID] = ent

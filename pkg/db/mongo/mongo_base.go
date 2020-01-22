@@ -23,18 +23,18 @@ const (
 func NewClient(connStr string) (*mongo.Client, error) {
 	cli, err := mongo.NewClient(options.Client().ApplyURI(connStr))
 	if err != nil {
-		return nil, errors.Cause(err)
+		return nil, errors.Wrap(err, "Mongo NewClient failed")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
 	if err := cli.Connect(ctx); err != nil {
-		return nil, errors.Cause(err)
+		return nil, errors.Wrap(err, "Mongo Connect failed")
 	}
 
 	if err := cli.Ping(ctx, nil); err != nil {
-		return nil, errors.Wrap(err, "Failed to connect to mongodb")
+		return nil, errors.Wrap(err, "Mongo Ping failed")
 	}
 
 	return cli, nil

@@ -16,7 +16,7 @@ var inst *Handler
 // InitHandler ...
 func InitHandler() error {
 	if inst != nil {
-		return errors.Cause(fmt.Errorf("Default Role Handler is already initialized"))
+		return errors.New("Default Role Handler is already initialized")
 	}
 
 	inst = &Handler{}

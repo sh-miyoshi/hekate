@@ -26,7 +26,7 @@ var inst *Manager
 // InitDBManager ...
 func InitDBManager(dbType string, connStr string) error {
 	if inst != nil {
-		return errors.Cause(fmt.Errorf("DBManager is already initialized"))
+		return errors.New(fmt.Sprintf("DBManager is already initialized"))
 	}
 
 	switch dbType {
@@ -96,7 +96,7 @@ func InitDBManager(dbType string, connStr string) error {
 			authCode: authCodeHandler,
 		}
 	default:
-		return errors.Cause(fmt.Errorf("Database Type %s is not implemented yet", dbType))
+		return errors.New(fmt.Sprintf("Database Type %s is not implemented yet", dbType))
 	}
 
 	return nil
@@ -111,7 +111,7 @@ func GetInst() *Manager {
 func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 	if err := ent.Validate(); err != nil {
 		logger.Info("Failed to validate project entry: %v", err)
-		return errors.Cause(model.ErrProjectValidationFailed)
+		return errors.Wrap(err, "Validate failed")
 	}
 
 	switch ent.TokenConfig.SigningAlgorithm {
@@ -125,17 +125,17 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 	}
 
 	if err := m.project.BeginTx(); err != nil {
-		return errors.Cause(err)
+		return errors.Wrap(err, "BeginTx failed")
 	}
 
 	if _, err := m.project.Get(ent.Name); err != model.ErrNoSuchProject {
 		m.project.AbortTx()
-		return errors.Cause(model.ErrProjectAlreadyExists)
+		return model.ErrProjectAlreadyExists
 	}
 
 	if err := m.project.Add(ent); err != nil {
 		m.project.AbortTx()
-		return err
+		return errors.Wrap(err, "Failed to add project")
 	}
 	m.project.CommitTx()
 	return nil
@@ -152,17 +152,17 @@ func (m *Manager) ProjectDelete(name string) error {
 	}
 
 	if err := m.project.BeginTx(); err != nil {
-		return errors.Cause(err)
+		return errors.Wrap(err, "BeginTx failed")
 	}
 
 	if err := m.user.DeleteAll(name); err != nil {
 		m.project.AbortTx()
-		return errors.Wrap(err, "failed to delete user data")
+		return errors.Wrap(err, "Failed to delete user data")
 	}
 
 	if err := m.project.Delete(name); err != nil {
 		m.project.AbortTx()
-		return err
+		return errors.Wrap(err, "Failed to delete project")
 	}
 	m.project.CommitTx()
 	return nil
@@ -186,16 +186,16 @@ func (m *Manager) ProjectGet(name string) (*model.ProjectInfo, error) {
 func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
 	if err := ent.Validate(); err != nil {
 		logger.Info("Failed to validate project entry: %v", err)
-		return errors.Cause(model.ErrProjectValidationFailed)
+		return errors.Wrap(err, "Failed to validate")
 	}
 
 	if err := m.project.BeginTx(); err != nil {
-		return errors.Cause(err)
+		return errors.Wrap(err, "BeginTx failed")
 	}
 
 	if err := m.project.Update(ent); err != nil {
 		m.project.AbortTx()
-		return err
+		return errors.Wrap(err, "Failed to update project")
 	}
 	m.project.CommitTx()
 	return nil
@@ -212,7 +212,7 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	_, err := m.user.Get(ent.ID)
 	if err != model.ErrNoSuchUser {
 		if err == nil {
-			return errors.Cause(model.ErrUserAlreadyExists)
+			return model.ErrUserAlreadyExists
 		}
 		return errors.Wrap(err, "Failed to get user info")
 	}
@@ -221,7 +221,7 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	_, err = m.user.GetByName(ent.ProjectName, ent.Name)
 	if err != model.ErrNoSuchUser {
 		if err == nil {
-			return errors.Cause(model.ErrUserAlreadyExists)
+			return model.ErrUserAlreadyExists
 		}
 		return errors.Wrap(err, "Failed to get user info by name")
 	}
@@ -286,7 +286,7 @@ func (m *Manager) SessionAdd(ent *model.Session) error {
 	// TODO(lock, unlock)
 
 	if _, err := m.session.Get(ent.SessionID); err != model.ErrNoSuchSession {
-		return errors.Cause(model.ErrSessionAlreadyExists)
+		return model.ErrSessionAlreadyExists
 	}
 
 	return m.session.New(ent)
@@ -312,21 +312,21 @@ func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
 	}
 
 	if err := m.client.BeginTx(); err != nil {
-		return errors.Cause(err)
+		return errors.Wrap(err, "BeginTx failed")
 	}
 
 	_, err := m.client.Get(ent.ID)
 	if err != model.ErrNoSuchClient {
 		m.client.AbortTx()
 		if err == nil {
-			return errors.Cause(model.ErrClientAlreadyExists)
+			return model.ErrClientAlreadyExists
 		}
 		return errors.Wrap(err, "Failed to get client info")
 	}
 
 	if err := m.client.Add(ent); err != nil {
 		m.client.AbortTx()
-		return err
+		return errors.Wrap(err, "Failed to add client")
 	}
 	m.client.CommitTx()
 	return nil
@@ -337,12 +337,12 @@ func (m *Manager) ClientDelete(clientID string) error {
 	// TODO(validate clientID)
 
 	if err := m.client.BeginTx(); err != nil {
-		return errors.Cause(err)
+		return errors.Wrap(err, "BeginTx failed")
 	}
 
 	if err := m.client.Delete(clientID); err != nil {
 		m.client.AbortTx()
-		return err
+		return errors.Wrap(err, "Failed to delete client")
 	}
 	m.client.CommitTx()
 	return nil
@@ -367,12 +367,12 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 	}
 
 	if err := m.client.BeginTx(); err != nil {
-		return errors.Cause(err)
+		return errors.Wrap(err, "BeginTx failed")
 	}
 
 	if err := m.client.Update(ent); err != nil {
 		m.client.AbortTx()
-		return err
+		return errors.Wrap(err, "Failed to update client")
 	}
 	m.client.CommitTx()
 	return nil

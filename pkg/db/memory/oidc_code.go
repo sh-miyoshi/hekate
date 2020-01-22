@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
 
@@ -27,7 +26,7 @@ func (h *AuthCodeHandler) New(code *model.AuthCode) error {
 // Get ...
 func (h *AuthCodeHandler) Get(codeID string) (*model.AuthCode, error) {
 	if _, exists := h.authCodeList[codeID]; !exists {
-		return nil, errors.Cause(model.ErrNoSuchCode)
+		return nil, model.ErrNoSuchCode
 	}
 	return h.authCodeList[codeID], nil
 }
@@ -39,5 +38,5 @@ func (h *AuthCodeHandler) Delete(codeID string) error {
 		return nil
 	}
 
-	return errors.Cause(model.ErrNoSuchCode)
+	return model.ErrNoSuchCode
 }

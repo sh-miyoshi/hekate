@@ -91,7 +91,7 @@ func (h *AuthCodeHandler) Get(codeID string) (*model.AuthCode, error) {
 	res := &model.AuthCode{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.Cause(model.ErrNoSuchCode)
+			return nil, model.ErrNoSuchCode
 		}
 		return nil, errors.Wrap(err, "Failed to get auth code from mongodb")
 	}

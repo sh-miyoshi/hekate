@@ -1,7 +1,7 @@
 package model
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -27,4 +27,7 @@ var (
 
 	// ErrNoSuchCode ...
 	ErrNoSuchCode = errors.New("No Such Code")
+
+	// ErrCodeValidateFailed ...
+	ErrCodeValidateFailed = errors.New("Code validation failed")
 )

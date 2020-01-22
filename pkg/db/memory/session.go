@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
 
@@ -32,13 +31,13 @@ func (h *SessionHandler) Revoke(sessionID string) error {
 		return nil
 	}
 
-	return errors.Cause(model.ErrNoSuchSession)
+	return model.ErrNoSuchSession
 }
 
 // Get ...
 func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 	if _, exists := h.sessionList[sessionID]; !exists {
-		return nil, errors.Cause(model.ErrNoSuchSession)
+		return nil, model.ErrNoSuchSession
 	}
 	return h.sessionList[sessionID], nil
 }

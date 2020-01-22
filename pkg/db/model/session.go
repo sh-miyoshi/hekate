@@ -29,23 +29,26 @@ var (
 
 	// ErrNoSuchSession ...
 	ErrNoSuchSession = errors.New("No Such Session")
+
+	// ErrSessionValidateFailed ...
+	ErrSessionValidateFailed = errors.New("Session validation failed")
 )
 
 // Validate ...
 func (s *Session) Validate() error {
 	// Check Session ID
 	if ok := govalidator.IsUUID(s.SessionID); !ok {
-		return errors.New("Invalid session ID format")
+		return errors.Wrap(ErrSessionValidateFailed, "Invalid session ID format")
 	}
 
 	// Check User ID
 	if ok := govalidator.IsUUID(s.UserID); !ok {
-		return errors.New("Invalid user ID format")
+		return errors.Wrap(ErrSessionValidateFailed, "Invalid user ID format")
 	}
 
 	// Check From IP
 	if ok := govalidator.IsIP(s.FromIP); !ok {
-		return errors.New("Invalid from IP")
+		return errors.Wrap(ErrSessionValidateFailed, "Invalid from IP")
 	}
 
 	return nil

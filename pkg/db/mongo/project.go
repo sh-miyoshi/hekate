@@ -122,7 +122,7 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
 	res := &model.ProjectInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.Cause(model.ErrNoSuchProject)
+			return nil, model.ErrNoSuchProject
 		}
 		return nil, errors.Wrap(err, "Failed to get project from mongodb")
 	}

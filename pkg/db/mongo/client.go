@@ -122,7 +122,7 @@ func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
 	res := &model.ClientInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.Cause(model.ErrNoSuchClient)
+			return nil, model.ErrNoSuchClient
 		}
 		return nil, errors.Wrap(err, "Failed to get client from mongodb")
 	}

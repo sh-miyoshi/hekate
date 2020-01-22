@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
 
@@ -33,7 +32,7 @@ func (h *UserInfoHandler) Delete(userID string) error {
 		delete(h.userList, userID)
 		return nil
 	}
-	return errors.Cause(model.ErrNoSuchUser)
+	return model.ErrNoSuchUser
 }
 
 // GetList ...
@@ -58,7 +57,7 @@ func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 	res, exists := h.userList[userID]
 	if !exists {
-		return nil, errors.Cause(model.ErrNoSuchUser)
+		return nil,model.ErrNoSuchUser
 	}
 
 	return res, nil
@@ -67,7 +66,7 @@ func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 // Update ...
 func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	if _, exists := h.userList[ent.ID]; !exists {
-		return errors.Cause(model.ErrNoSuchUser)
+		return model.ErrNoSuchUser
 	}
 
 	h.userList[ent.ID] = ent
@@ -78,7 +77,7 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 // GetByName ...
 func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model.UserInfo, error) {
 	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return nil, errors.Cause(model.ErrNoSuchProject)
+		return nil, model.ErrNoSuchProject
 	}
 
 	for _, user := range h.userList {
@@ -86,7 +85,7 @@ func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model
 			return user, nil
 		}
 	}
-	return nil, errors.Cause(model.ErrNoSuchUser)
+	return nil, model.ErrNoSuchUser
 }
 
 // DeleteAll ...
@@ -102,13 +101,13 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 // AddRole ...
 func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
 	if _, exists := h.userList[userID]; !exists {
-		return errors.Cause(model.ErrNoSuchUser)
+		return model.ErrNoSuchUser
 	}
 
 	roles := h.userList[userID].Roles
 	for _, r := range roles {
 		if r == roleID {
-			return errors.Cause(model.ErrRoleAlreadyAppended)
+			return model.ErrRoleAlreadyAppended
 		}
 	}
 
@@ -121,7 +120,7 @@ func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
 // DeleteRole ....
 func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 	if _, exists := h.userList[userID]; !exists {
-		return errors.Cause(model.ErrNoSuchUser)
+		return model.ErrNoSuchUser
 	}
 
 	deleted := false
@@ -137,7 +136,7 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 	h.userList[userID].Roles = roles
 
 	if !deleted {
-		return errors.Cause(model.ErrNoSuchRoleInUser)
+		return model.ErrNoSuchRoleInUser
 	}
 
 	return nil

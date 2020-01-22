@@ -40,8 +40,8 @@ var (
 	// ErrDeleteBlockedProject ...
 	ErrDeleteBlockedProject = errors.New("Projects cannot be deleted")
 
-	// ErrProjectValidationFailed ...
-	ErrProjectValidationFailed = errors.New("Project Validation Failed")
+	// ErrProjectValidateFailed ...
+	ErrProjectValidateFailed = errors.New("Project Validation Failed")
 )
 
 // ProjectInfoHandler ...
@@ -70,7 +70,7 @@ func (p *ProjectInfo) Validate() error {
 	// Check Project Name
 	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
 	if !prjNameRegExp.MatchString(p.Name) {
-		return errors.New("Invalid Project Name format")
+		return errors.Wrap(ErrProjectValidateFailed, "Invalid Project Name format")
 	}
 
 	// Check Token Signing Algorithm
@@ -85,15 +85,15 @@ func (p *ProjectInfo) Validate() error {
 		}
 	}
 	if !ok {
-		return errors.New("Invalid Token Signing Algorithm")
+		return errors.Wrap(ErrProjectValidateFailed, "Invalid Token Signing Algorithm")
 	}
 
 	if p.TokenConfig.AccessTokenLifeSpan < 1 {
-		return errors.New("Access Token Life Span must >= 1")
+		return errors.Wrap(ErrProjectValidateFailed, "Access Token Life Span must >= 1")
 	}
 
 	if p.TokenConfig.RefreshTokenLifeSpan < 1 {
-		return errors.New("Refresh Token Life Span must >= 1")
+		return errors.Wrap(ErrProjectValidateFailed, "Refresh Token Life Span must >= 1")
 	}
 
 	return nil

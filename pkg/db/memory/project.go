@@ -1,7 +1,6 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"sync"
 )
@@ -32,7 +31,7 @@ func (h *ProjectInfoHandler) Delete(name string) error {
 		delete(h.projectList, name)
 		return nil
 	}
-	return errors.Cause(model.ErrNoSuchProject)
+	return model.ErrNoSuchProject
 }
 
 // GetList ...
@@ -50,7 +49,7 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
 	if ok {
 		return &res, nil
 	}
-	return nil, errors.Cause(model.ErrNoSuchProject)
+	return nil, model.ErrNoSuchProject
 }
 
 // Update ...
@@ -59,7 +58,7 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 		h.projectList[ent.Name] = *ent
 		return nil
 	}
-	return errors.Cause(model.ErrNoSuchProject)
+	return model.ErrNoSuchProject
 }
 
 // BeginTx ...

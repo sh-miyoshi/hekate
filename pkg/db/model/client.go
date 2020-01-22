@@ -23,6 +23,9 @@ var (
 
 	// ErrNoSuchClient ...
 	ErrNoSuchClient = errors.New("No Such Client")
+
+	// ErrClientValidateFailed ...
+	ErrClientValidateFailed = errors.New("Client validation failed")
 )
 
 // ClientInfoHandler ...
@@ -48,28 +51,28 @@ type ClientInfoHandler interface {
 func (c *ClientInfo) Validate() error {
 	// Check ID
 	if !(2 <= len(c.ID) && len(c.ID) < 128) {
-		return errors.New("Invalid Client ID format")
+		return errors.Wrap(ErrClientValidateFailed, "Invalid Client ID format")
 	}
 
 	// Check Project Name
 	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
 	if !prjNameRegExp.MatchString(c.ProjectName) {
-		return errors.New("Invalid Project Name format")
+		return errors.Wrap(ErrClientValidateFailed, "Invalid Project Name format")
 	}
 
 	// Check Secret
 	if !(8 <= len(c.ID) && len(c.ID) < 256) {
-		return errors.New("Invalid Client Secret format")
+		return errors.Wrap(ErrClientValidateFailed, "Invalid Client Secret format")
 	}
 
 	// Check Access Type
 	if c.AccessType != "public" && c.AccessType != "confidential" {
-		return errors.New("Invalid access type")
+		return errors.Wrap(ErrClientValidateFailed, "Invalid access type")
 	}
 
 	for _, u := range c.AllowedCallbackURLs {
 		if ok := govalidator.IsRequestURL(u); !ok {
-			return errors.New("Invalid callback URL")
+			return errors.Wrap(ErrClientValidateFailed, "Invalid callback URL")
 		}
 	}
 

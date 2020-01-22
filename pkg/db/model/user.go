@@ -30,6 +30,9 @@ var (
 
 	// ErrNoSuchRoleInUser ...
 	ErrNoSuchRoleInUser = errors.New("User do not have such role")
+
+	// ErrUserValidateFailed ...
+	ErrUserValidateFailed = errors.New("User validation failed")
 )
 
 // UserInfoHandler ...
@@ -49,24 +52,24 @@ type UserInfoHandler interface {
 func (ui *UserInfo) Validate() error {
 	// Check User ID
 	if ok := govalidator.IsUUID(ui.ID); !ok {
-		return errors.New("Invalid user ID format")
+		return errors.Wrap(ErrUserValidateFailed, "Invalid user ID format")
 	}
 
 	// Check Project Name
 	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
 	if !prjNameRegExp.MatchString(ui.ProjectName) {
-		return errors.New("Invalid project Name format")
+		return errors.Wrap(ErrUserValidateFailed, "Invalid project Name format")
 	}
 
 	// Check User Name
 	if !(3 <= len(ui.Name) && len(ui.Name) < 64) {
-		return errors.New("Invalid user name format")
+		return errors.Wrap(ErrUserValidateFailed, "Invalid user name format")
 	}
 
 	// Check Roles
 	for _, r := range ui.Roles {
 		if !role.GetInst().IsValid(r) {
-			return errors.New("Invalid role")
+			return errors.Wrap(ErrUserValidateFailed, "Invalid role")
 		}
 	}
 

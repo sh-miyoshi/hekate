@@ -10,6 +10,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/role"
 	"net/http"
 	"time"
+	"github.com/pkg/errors"
 )
 
 // AllProjectGetHandler ...
@@ -66,7 +67,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		if err == model.ErrProjectAlreadyExists {
 			logger.Info("Project %s is already exists", request.Name)
 			http.Error(w, "Project Already Exists", http.StatusConflict)
-		} else if err == model.ErrProjectValidationFailed {
+		} else if errors.Cause(err) == model.ErrProjectValidateFailed {
 			logger.Info("Invalid project entry is specified: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {

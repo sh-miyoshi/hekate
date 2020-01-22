@@ -121,7 +121,7 @@ func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 	res := &model.UserInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.Cause(model.ErrNoSuchUser)
+			return nil, model.ErrNoSuchUser
 		}
 		return nil, errors.Wrap(err, "Failed to get user from mongodb")
 	}
@@ -173,7 +173,7 @@ func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model
 	res := &model.UserInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, errors.Cause(model.ErrNoSuchUser)
+			return nil, model.ErrNoSuchUser
 		}
 		return nil, errors.Wrap(err, "Failed to get user by name from mongodb")
 	}
@@ -207,7 +207,7 @@ func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
 
 	for _, role := range user.Roles {
 		if role == roleID {
-			return errors.Cause(model.ErrRoleAlreadyAppended)
+			return model.ErrRoleAlreadyAppended
 		}
 	}
 	user.Roles = append(user.Roles, roleID)
@@ -248,7 +248,7 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 		}
 	}
 	if !deleted {
-		return errors.Cause(model.ErrNoSuchRoleInUser)
+		return model.ErrNoSuchRoleInUser
 	}
 	user.Roles = roles
 
