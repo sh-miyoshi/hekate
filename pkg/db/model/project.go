@@ -10,7 +10,7 @@ import (
 type TokenConfig struct {
 	AccessTokenLifeSpan  uint
 	RefreshTokenLifeSpan uint
-	SigningAlgorithm     string // HS256, RS256, ...
+	SigningAlgorithm     string
 	SignPublicKey        []byte
 	SignSecretKey        []byte
 }
@@ -76,7 +76,6 @@ func (p *ProjectInfo) Validate() error {
 	// Check Token Signing Algorithm
 	validAlgs := []string{
 		"RS256",
-		// TODO(add more algorithm)
 	}
 	ok := false
 	for _, alg := range validAlgs {

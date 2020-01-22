@@ -30,7 +30,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 		JwksURI:                issuer + "/openid-connect/certs",
 		ScopesSupported:        []string{"openid"},
 		ResponseTypesSupported: []string{"code"},
-		SubjectTypesSupported:  []string{"public"}, // TODO(set value)
+		SubjectTypesSupported:  []string{"public"},
 		IDTokenSigningAlgValuesSupported: []string{
 			"RS256",
 		},
