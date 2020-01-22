@@ -381,15 +381,31 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 // AuthCodeAdd ...
 func (m *Manager) AuthCodeAdd(ent *model.AuthCode) error {
 	// TODO(validate ent, identify by clientID and redirectURL)
-	// TODO(lock, unlock)
-	return m.authCode.New(ent)
+	if err := m.authCode.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	if err := m.authCode.New(ent); err != nil {
+		m.project.AbortTx()
+		return errors.Wrap(err, "Failed to add auth code")
+	}
+	m.authCode.CommitTx()
+	return nil
 }
 
 // AuthCodeDelete ...
 func (m *Manager) AuthCodeDelete(codeID string) error {
 	// TODO(validate codeID)
-	// TODO(lock, unlock)
-	return m.authCode.Delete(codeID)
+	if err := m.authCode.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	if err := m.authCode.Delete(codeID); err != nil {
+		m.project.AbortTx()
+		return errors.Wrap(err, "Failed to add auth code")
+	}
+	m.authCode.CommitTx()
+	return nil
 }
 
 // AuthCodeGet ...

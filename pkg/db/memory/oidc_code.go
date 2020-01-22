@@ -2,11 +2,13 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"sync"
 )
 
 // AuthCodeHandler implement db.AuthCodeHandler
 type AuthCodeHandler struct {
 	authCodeList map[string]*model.AuthCode
+	mu           sync.Mutex
 }
 
 // NewAuthCodeHandler ...
@@ -39,4 +41,22 @@ func (h *AuthCodeHandler) Delete(codeID string) error {
 	}
 
 	return model.ErrNoSuchCode
+}
+
+// BeginTx ...
+func (h *AuthCodeHandler) BeginTx() error {
+	h.mu.Lock()
+	return nil
+}
+
+// CommitTx ...
+func (h *AuthCodeHandler) CommitTx() error {
+	h.mu.Unlock()
+	return nil
+}
+
+// AbortTx ...
+func (h *AuthCodeHandler) AbortTx() error {
+	h.mu.Unlock()
+	return nil
 }
