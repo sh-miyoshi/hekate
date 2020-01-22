@@ -152,13 +152,21 @@ func (m *Manager) ProjectDelete(name string) error {
 		return errors.Wrap(model.ErrDeleteBlockedProject, "master project can not delete")
 	}
 
-	// TODO(lock, unlock)
+	if err := m.project.BeginTx(); err != nil {
+		return errors.Cause(err)
+	}
 
 	if err := m.user.DeleteAll(name); err != nil {
+		m.project.AbortTx()
 		return errors.Wrap(err, "failed to delete user data")
 	}
 
-	return m.project.Delete(name)
+	if err := m.project.Delete(name); err != nil {
+		m.project.AbortTx()
+		return err
+	}
+	m.project.CommitTx()
+	return nil
 }
 
 // ProjectGetList ...
@@ -182,8 +190,16 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
 		return errors.Cause(model.ErrProjectValidationFailed)
 	}
 
-	// TODO(lock, unlock)
-	return m.project.Update(ent)
+	if err := m.project.BeginTx(); err != nil {
+		return errors.Cause(err)
+	}
+
+	if err := m.project.Update(ent); err != nil {
+		m.project.AbortTx()
+		return err
+	}
+	m.project.CommitTx()
+	return nil
 }
 
 // UserAdd ...
