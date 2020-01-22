@@ -10,10 +10,10 @@ import (
 
 func parseHTTPHeaderToken(tokenString string) (string, error) {
 	var splitToken []string
-	if strings.Contains(tokenString, "bearer") {
-		splitToken = strings.Split(tokenString, "bearer")
-	} else if strings.Contains(tokenString, "Bearer") {
-		splitToken = strings.Split(tokenString, "Bearer")
+	if strings.Contains(tokenString, "bearer ") {
+		splitToken = strings.Split(tokenString, "bearer ")
+	} else if strings.Contains(tokenString, "Bearer ") {
+		splitToken = strings.Split(tokenString, "Bearer ")
 	} else {
 		return "", errors.New("token format is missing")
 	}
