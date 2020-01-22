@@ -168,7 +168,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		Roles:        user.Roles,
 	}
 
-	sessions, err := db.GetInst().GetSessions(user.ID)
+	sessions, err := db.GetInst().SessionGetList(user.ID)
 	if err != nil {
 		logger.Error("Failed to get session list: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

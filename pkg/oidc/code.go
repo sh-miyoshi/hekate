@@ -40,14 +40,14 @@ func GenerateAuthCode(clientID string, redirectURL string, userID string) (strin
 		UserID:      userID,
 	}
 
-	err := db.GetInst().NewAuthCode(code)
+	err := db.GetInst().AuthCodeAdd(code)
 
 	return code.CodeID, err
 }
 
 // ValidateAuthCode ...
 func ValidateAuthCode(codeID string) (*model.AuthCode, int, string) {
-	code, err := db.GetInst().GetAuthCode(codeID)
+	code, err := db.GetInst().AuthCodeGet(codeID)
 	if err != nil {
 		if err == model.ErrNoSuchCode {
 			// TODO(revoke all token in code.UserID) <- SHOULD

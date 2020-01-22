@@ -279,8 +279,8 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 	return m.user.DeleteRole(userID, roleID)
 }
 
-// NewSession ...
-func (m *Manager) NewSession(ent *model.Session) error {
+// SessionAdd ...
+func (m *Manager) SessionAdd(ent *model.Session) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
@@ -293,15 +293,15 @@ func (m *Manager) NewSession(ent *model.Session) error {
 	return m.session.New(ent)
 }
 
-// RevokeSession ...
-func (m *Manager) RevokeSession(sessionID string) error {
+// SessionDelete ...
+func (m *Manager) SessionDelete(sessionID string) error {
 	// TODO(validate sessionID)
 	// TODO(lock, unlock)
 	return m.session.Revoke(sessionID)
 }
 
-// GetSessions ...
-func (m *Manager) GetSessions(userID string) ([]string, error) {
+// SessionGetList ...
+func (m *Manager) SessionGetList(userID string) ([]string, error) {
 	// TODO(validate userID)
 	return m.session.GetList(userID)
 }
@@ -379,22 +379,22 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 	return nil
 }
 
-// NewAuthCode ...
-func (m *Manager) NewAuthCode(ent *model.AuthCode) error {
+// AuthCodeAdd ...
+func (m *Manager) AuthCodeAdd(ent *model.AuthCode) error {
 	// TODO(validate ent, identify by clientID and redirectURL)
 	// TODO(lock, unlock)
 	return m.authCode.New(ent)
 }
 
-// DeleteAuthCode ...
-func (m *Manager) DeleteAuthCode(codeID string) error {
+// AuthCodeDelete ...
+func (m *Manager) AuthCodeDelete(codeID string) error {
 	// TODO(validate codeID)
 	// TODO(lock, unlock)
 	return m.authCode.Delete(codeID)
 }
 
-// GetAuthCode ...
-func (m *Manager) GetAuthCode(codeID string) (*model.AuthCode, error) {
+// AuthCodeGet ...
+func (m *Manager) AuthCodeGet(codeID string) (*model.AuthCode, error) {
 	// TODO(validate codeID)
 	return m.authCode.Get(codeID)
 }

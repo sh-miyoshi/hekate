@@ -87,7 +87,7 @@ func AuthByPassword(project *model.ProjectInfo, userName string, password string
 		FromIP:    ip,
 	}
 
-	if err := db.GetInst().NewSession(ent); err != nil {
+	if err := db.GetInst().SessionAdd(ent); err != nil {
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register refresh token session token: %+v", err)
 	}
 
@@ -101,7 +101,7 @@ func AuthByCode(project *model.ProjectInfo, codeID string, r *http.Request) (*To
 		return nil, status, msg
 	}
 
-	if err := db.GetInst().DeleteAuthCode(codeID); err != nil {
+	if err := db.GetInst().AuthCodeDelete(codeID); err != nil {
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to delete auth code: %+v", err)
 	}
 
@@ -169,7 +169,7 @@ func AuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http
 	}
 
 	// Revoke previous token
-	if err := db.GetInst().RevokeSession(claims.SessionID); err != nil {
+	if err := db.GetInst().SessionDelete(claims.SessionID); err != nil {
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to revoke previous token: %+v", err)
 	}
 
@@ -219,7 +219,7 @@ func AuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http
 		ExpiresIn: res.RefreshExpiresIn,
 		FromIP:    ip,
 	}
-	if err := db.GetInst().NewSession(ent); err != nil {
+	if err := db.GetInst().SessionAdd(ent); err != nil {
 		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register refresh token session token: %+v", err)
 	}
 
