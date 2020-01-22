@@ -24,7 +24,7 @@ db:
   type: "memory"
   connection_string: ""
   # type: "mongo"
-  # connection_string: "mongodb://localhost:27017"
+  # connection_string: "mongodb://root:example@localhost:27017"
 
 # Expires Time of Authorization code in OpenID Connect [sec]
 oidc_auth_code_expires_time: 300

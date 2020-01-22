@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"sync"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
@@ -10,6 +11,7 @@ type ClientInfoHandler struct {
 	// clientList[clientID] = ClientInfo
 	clientList     map[string]*model.ClientInfo
 	projectHandler *ProjectInfoHandler
+	mu sync.Mutex
 }
 
 // NewClientHandler ...
@@ -82,5 +84,23 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) error {
 			delete(h.clientList, client.ID)
 		}
 	}
+	return nil
+}
+
+// BeginTx ...
+func (h *ClientInfoHandler) BeginTx() error {
+	h.mu.Lock()
+	return nil
+}
+
+// CommitTx ...
+func (h *ClientInfoHandler) CommitTx() error {
+	h.mu.Unlock()
+	return nil
+}
+
+// AbortTx ...
+func (h *ClientInfoHandler) AbortTx() error {
+	h.mu.Unlock()
 	return nil
 }
