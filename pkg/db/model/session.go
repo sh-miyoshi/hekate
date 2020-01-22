@@ -21,6 +21,15 @@ type SessionHandler interface {
 	Revoke(sessionID string) error
 	Get(sessionID string) (*Session, error)
 	GetList(userID string) ([]string, error)
+
+	// BeginTx method starts a transaction
+	BeginTx() error
+
+	// CommitTx method commits the transaction
+	CommitTx() error
+
+	// AbortTx method abort and rollback the transaction
+	AbortTx() error
 }
 
 var (

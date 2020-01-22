@@ -283,20 +283,37 @@ func (m *Manager) SessionAdd(ent *model.Session) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
-	// TODO(lock, unlock)
+
+	if err := m.session.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
 
 	if _, err := m.session.Get(ent.SessionID); err != model.ErrNoSuchSession {
+		m.session.AbortTx()
 		return model.ErrSessionAlreadyExists
 	}
 
-	return m.session.New(ent)
+	if err := m.session.New(ent); err != nil {
+		m.session.AbortTx()
+		return errors.Wrap(err, "Failed to add session")
+	}
+	m.session.CommitTx()
+	return nil
 }
 
 // SessionDelete ...
 func (m *Manager) SessionDelete(sessionID string) error {
 	// TODO(validate sessionID)
-	// TODO(lock, unlock)
-	return m.session.Revoke(sessionID)
+	if err := m.session.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	if err := m.session.Revoke(sessionID); err != nil {
+		m.session.AbortTx()
+		return errors.Wrap(err, "Failed to revoke session")
+	}
+	m.session.CommitTx()
+	return nil
 }
 
 // SessionGetList ...
