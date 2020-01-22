@@ -42,6 +42,9 @@
 - user federation
   - user情報を外部に保存し、それと連携する
 - redirect_urlの設定
+- OIDCのエンハンス
+  - subject_types_supportedにpairwiseをサポート
+  - RS256以外のSigining Algorithmのサポート
 - LDAP連携？
 
 ## CLI tool(jwtctl) enhancement
