@@ -128,7 +128,7 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 	if err := m.project.BeginTx(); err != nil {
 		return errors.Cause(err)
 	}
-	
+
 	if _, err := m.project.Get(ent.Name); err != model.ErrNoSuchProject {
 		m.project.AbortTx()
 		return errors.Cause(model.ErrProjectAlreadyExists)
@@ -366,7 +366,7 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
-	
+
 	if err := m.client.BeginTx(); err != nil {
 		return errors.Cause(err)
 	}

@@ -1,15 +1,15 @@
 package config
 
 import (
-	"testing"
 	"io/ioutil"
 	"os"
+	"testing"
 )
 
 func TestInitConfig(t *testing.T) {
-	tmpFile, _ := ioutil.TempFile("","testconf")
+	tmpFile, _ := ioutil.TempFile("", "testconf")
 	defer os.Remove(tmpFile.Name())
-	
+
 	tmpFile.WriteString(`admin_name: admin
 admin_password: password
 server_port: 8080

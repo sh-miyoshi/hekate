@@ -1,9 +1,9 @@
 package memory
 
 import (
-	"sync"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"sync"
 )
 
 // ClientInfoHandler implement db.ClientInfoHandler
@@ -11,7 +11,7 @@ type ClientInfoHandler struct {
 	// clientList[clientID] = ClientInfo
 	clientList     map[string]*model.ClientInfo
 	projectHandler *ProjectInfoHandler
-	mu sync.Mutex
+	mu             sync.Mutex
 }
 
 // NewClientHandler ...
