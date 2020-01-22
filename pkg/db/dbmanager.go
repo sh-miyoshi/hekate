@@ -311,24 +311,42 @@ func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
-	// TODO(lock, unlock)
+
+	if err := m.client.BeginTx(); err != nil {
+		return errors.Cause(err)
+	}
 
 	_, err := m.client.Get(ent.ID)
 	if err != model.ErrNoSuchClient {
+		m.client.AbortTx()
 		if err == nil {
 			return errors.Cause(model.ErrClientAlreadyExists)
 		}
 		return errors.Wrap(err, "Failed to get client info")
 	}
 
-	return m.client.Add(ent)
+	if err := m.client.Add(ent); err != nil {
+		m.client.AbortTx()
+		return err
+	}
+	m.client.CommitTx()
+	return nil
 }
 
 // ClientDelete ...
 func (m *Manager) ClientDelete(clientID string) error {
 	// TODO(validate clientID)
-	// TODO(lock, unlock)
-	return m.client.Delete(clientID)
+
+	if err := m.client.BeginTx(); err != nil {
+		return errors.Cause(err)
+	}
+
+	if err := m.client.Delete(clientID); err != nil {
+		m.client.AbortTx()
+		return err
+	}
+	m.client.CommitTx()
+	return nil
 }
 
 // ClientGetList ...
@@ -348,8 +366,17 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
-	// TODO(lock, unlock)
-	return m.client.Update(ent)
+	
+	if err := m.client.BeginTx(); err != nil {
+		return errors.Cause(err)
+	}
+
+	if err := m.client.Update(ent); err != nil {
+		m.client.AbortTx()
+		return err
+	}
+	m.client.CommitTx()
+	return nil
 }
 
 // NewAuthCode ...
