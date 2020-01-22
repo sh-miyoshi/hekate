@@ -125,16 +125,21 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 		ent.TokenConfig.SignPublicKey = x509.MarshalPKCS1PublicKey(&key.PublicKey)
 	}
 
-	if err := m.project.Lock(); err != nil {
+	if err := m.project.BeginTx(); err != nil {
 		return errors.Cause(err)
 	}
-	defer m.project.Unlock()
-
+	
 	if _, err := m.project.Get(ent.Name); err != model.ErrNoSuchProject {
+		m.project.AbortTx()
 		return errors.Cause(model.ErrProjectAlreadyExists)
 	}
 
-	return m.project.Add(ent)
+	if err := m.project.Add(ent); err != nil {
+		m.project.AbortTx()
+		return err
+	}
+	m.project.CommitTx()
+	return nil
 }
 
 // ProjectDelete ...

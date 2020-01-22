@@ -55,8 +55,9 @@ type ProjectInfoHandler interface {
 	// It must return error if project is not found
 	Update(ent *ProjectInfo) error
 
-	Lock() error
-	Unlock()
+	BeginTx() error
+	CommitTx() error
+	AbortTx() error
 }
 
 // Validate ...

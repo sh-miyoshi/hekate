@@ -62,13 +62,20 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 	return errors.Cause(model.ErrNoSuchProject)
 }
 
-// Lock ...
-func (h *ProjectInfoHandler) Lock() error {
+// BeginTx ...
+func (h *ProjectInfoHandler) BeginTx() error {
 	h.mu.Lock()
 	return nil
 }
 
-// Unlock ...
-func (h *ProjectInfoHandler) Unlock() {
+// CommitTx ...
+func (h *ProjectInfoHandler) CommitTx() error {
 	h.mu.Unlock()
+	return nil
+}
+
+// AbortTx ...
+func (h *ProjectInfoHandler) AbortTx() error {
+	h.mu.Unlock()
+	return nil
 }
