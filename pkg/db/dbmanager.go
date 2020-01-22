@@ -207,10 +207,13 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
-	// TODO(lock, unlock)
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
 
 	_, err := m.user.Get(ent.ID)
 	if err != model.ErrNoSuchUser {
+		m.user.AbortTx()
 		if err == nil {
 			return model.ErrUserAlreadyExists
 		}
@@ -220,20 +223,33 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	// Check duplicate user by name
 	_, err = m.user.GetByName(ent.ProjectName, ent.Name)
 	if err != model.ErrNoSuchUser {
+		m.user.AbortTx()
 		if err == nil {
 			return model.ErrUserAlreadyExists
 		}
 		return errors.Wrap(err, "Failed to get user info by name")
 	}
 
-	return m.user.Add(ent)
+	if err := m.user.Add(ent); err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to add user")
+	}
+	m.user.CommitTx()
+	return nil
 }
 
 // UserDelete ...
 func (m *Manager) UserDelete(userID string) error {
 	// TODO(validate userID)
-	// TODO(lock, unlock)
-	return m.user.Delete(userID)
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+	if err := m.user.Delete(userID); err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to delete user")
+	}
+	m.user.CommitTx()
+	return nil
 }
 
 // UserGetList ...
@@ -254,8 +270,15 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
-	// TODO(lock, unlock)
-	return m.user.Update(ent)
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+	if err := m.user.Update(ent); err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to update user")
+	}
+	m.user.CommitTx()
+	return nil
 }
 
 // UserGetByName ...
@@ -267,15 +290,30 @@ func (m *Manager) UserGetByName(projectName string, userName string) (*model.Use
 // UserAddRole ...
 func (m *Manager) UserAddRole(userID string, roleID string) error {
 	// TODO(validate userID, roleID)
-	// TODO(lock, unlock)
-	return m.user.AddRole(userID, roleID)
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+	if err := m.user.AddRole(userID, roleID); err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to add role to user")
+	}
+	m.user.CommitTx()
+	return nil
 }
 
 // UserDeleteRole ...
 func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 	// TODO(validate userID, roleID)
 	// TODO(lock, unlock)
-	return m.user.DeleteRole(userID, roleID)
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+	if err := m.user.DeleteRole(userID, roleID); err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to delete role from user")
+	}
+	m.user.CommitTx()
+	return nil
 }
 
 // SessionAdd ...
@@ -403,7 +441,7 @@ func (m *Manager) AuthCodeAdd(ent *model.AuthCode) error {
 	}
 
 	if err := m.authCode.New(ent); err != nil {
-		m.project.AbortTx()
+		m.authCode.AbortTx()
 		return errors.Wrap(err, "Failed to add auth code")
 	}
 	m.authCode.CommitTx()
@@ -418,8 +456,8 @@ func (m *Manager) AuthCodeDelete(codeID string) error {
 	}
 
 	if err := m.authCode.Delete(codeID); err != nil {
-		m.project.AbortTx()
-		return errors.Wrap(err, "Failed to add auth code")
+		m.authCode.AbortTx()
+		return errors.Wrap(err, "Failed to delete auth code")
 	}
 	m.authCode.CommitTx()
 	return nil

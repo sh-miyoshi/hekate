@@ -46,6 +46,15 @@ type UserInfoHandler interface {
 	DeleteAll(projectName string) error
 	AddRole(userID string, roleID string) error
 	DeleteRole(userID string, roleID string) error
+
+	// BeginTx method starts a transaction
+	BeginTx() error
+
+	// CommitTx method commits the transaction
+	CommitTx() error
+
+	// AbortTx method abort and rollback the transaction
+	AbortTx() error
 }
 
 // Validate ...

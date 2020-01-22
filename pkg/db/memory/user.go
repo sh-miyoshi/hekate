@@ -2,6 +2,7 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"sync"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
@@ -9,6 +10,7 @@ type UserInfoHandler struct {
 	// userList[userID] = UserInfo
 	userList       map[string]*model.UserInfo
 	projectHandler *ProjectInfoHandler
+	mu             sync.Mutex
 }
 
 // NewUserHandler ...
@@ -57,7 +59,7 @@ func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 	res, exists := h.userList[userID]
 	if !exists {
-		return nil,model.ErrNoSuchUser
+		return nil, model.ErrNoSuchUser
 	}
 
 	return res, nil
@@ -139,5 +141,23 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 		return model.ErrNoSuchRoleInUser
 	}
 
+	return nil
+}
+
+// BeginTx ...
+func (h *UserInfoHandler) BeginTx() error {
+	h.mu.Lock()
+	return nil
+}
+
+// CommitTx ...
+func (h *UserInfoHandler) CommitTx() error {
+	h.mu.Unlock()
+	return nil
+}
+
+// AbortTx ...
+func (h *UserInfoHandler) AbortTx() error {
+	h.mu.Unlock()
 	return nil
 }
