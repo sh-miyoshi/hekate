@@ -149,7 +149,11 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 			return nil, errors.Wrap(err, "Failed to get project")
 		}
 
-		return project.TokenConfig.SignSecretKey, nil
+		key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
+		if err != nil {
+			return nil, err
+		}
+		return key, nil
 	})
 
 	if err != nil {
