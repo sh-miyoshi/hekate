@@ -46,12 +46,12 @@ var (
 // Validate ...
 func (s *Session) Validate() error {
 	// Check Session ID
-	if ok := govalidator.IsUUID(s.SessionID); !ok {
+	if validateSessionID(s.SessionID) {
 		return errors.Wrap(ErrSessionValidateFailed, "Invalid session ID format")
 	}
 
 	// Check User ID
-	if ok := govalidator.IsUUID(s.UserID); !ok {
+	if validateUserID(s.UserID) {
 		return errors.Wrap(ErrSessionValidateFailed, "Invalid user ID format")
 	}
 

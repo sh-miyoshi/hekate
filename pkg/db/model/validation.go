@@ -2,6 +2,7 @@ package model
 
 import (
 	"regexp"
+	"github.com/asaskevich/govalidator"
 )
 
 func validateProjectName(name string) bool {
@@ -58,4 +59,12 @@ func validateUserName(name string) bool {
 		return false
 	}
 	return true
+}
+
+func validateUserID(id string) bool {
+	return govalidator.IsUUID(id)
+}
+
+func validateSessionID(id string) bool {
+	return govalidator.IsUUID(id)
 }

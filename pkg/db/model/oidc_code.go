@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/pkg/errors"
 	"time"
+	"github.com/asaskevich/govalidator"
 )
 
 // AuthCode ...
@@ -40,3 +41,24 @@ var (
 	// ErrCodeValidateFailed ...
 	ErrCodeValidateFailed = errors.New("Code validation failed")
 )
+
+// Validate ...
+func (ac *AuthCode) Validate() error {
+	if !govalidator.IsUUID(ac.CodeID) {
+		return errors.Wrap(ErrCodeValidateFailed, "Invalid code ID format")
+	}
+
+	if !validateClientID(ac.ClientID) {
+		return errors.Wrap(ErrCodeValidateFailed, "Invalid client ID format")
+	}
+
+	if !validateUserID(ac.UserID) {
+		return errors.Wrap(ErrCodeValidateFailed, "Invalid user ID format")
+	}
+
+	if !govalidator.IsURL(ac.RedirectURL) {
+		return errors.Wrap(ErrCodeValidateFailed, "Invalid redirect url format")
+	}
+
+	return nil
+}

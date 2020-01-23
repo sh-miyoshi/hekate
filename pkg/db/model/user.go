@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/role"
 	"time"
@@ -59,7 +58,7 @@ type UserInfoHandler interface {
 // Validate ...
 func (ui *UserInfo) Validate() error {
 	// Check User ID
-	if ok := govalidator.IsUUID(ui.ID); !ok {
+	if !validateUserID(ui.ID) {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid user ID format")
 	}
 
