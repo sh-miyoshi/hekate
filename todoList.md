@@ -9,8 +9,6 @@
 
 ## jwt-server application enhancement
 
-- apiのvalidationの追加
-  - user nameなど
 - リファクタリング
   - API関連をまとめる
   - ロジック部の整理
