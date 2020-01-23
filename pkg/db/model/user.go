@@ -4,7 +4,6 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/role"
-	"regexp"
 	"time"
 )
 
@@ -64,14 +63,12 @@ func (ui *UserInfo) Validate() error {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid user ID format")
 	}
 
-	// Check Project Name
-	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
-	if !prjNameRegExp.MatchString(ui.ProjectName) {
+	if !validateProjectName(ui.ProjectName) {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid project Name format")
 	}
 
 	// Check User Name
-	if !(3 <= len(ui.Name) && len(ui.Name) < 64) {
+	if !validateUserName(ui.Name) {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid user name format")
 	}
 

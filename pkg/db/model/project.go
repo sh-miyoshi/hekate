@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/pkg/errors"
-	"regexp"
 	"time"
 )
 
@@ -67,32 +66,19 @@ type ProjectInfoHandler interface {
 
 // Validate ...
 func (p *ProjectInfo) Validate() error {
-	// Check Project Name
-	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
-	if !prjNameRegExp.MatchString(p.Name) {
+	if !validateProjectName(p.Name) {
 		return errors.Wrap(ErrProjectValidateFailed, "Invalid Project Name format")
 	}
 
-	// Check Token Signing Algorithm
-	validAlgs := []string{
-		"RS256",
-	}
-	ok := false
-	for _, alg := range validAlgs {
-		if p.TokenConfig.SigningAlgorithm == alg {
-			ok = true
-			break
-		}
-	}
-	if !ok {
+	if !validateTokenSigningAlgorithm(p.TokenConfig.SigningAlgorithm) {
 		return errors.Wrap(ErrProjectValidateFailed, "Invalid Token Signing Algorithm")
 	}
 
-	if p.TokenConfig.AccessTokenLifeSpan < 1 {
+	if !validateLifeSpan(p.TokenConfig.AccessTokenLifeSpan) {
 		return errors.Wrap(ErrProjectValidateFailed, "Access Token Life Span must >= 1")
 	}
 
-	if p.TokenConfig.RefreshTokenLifeSpan < 1 {
+	if !validateLifeSpan(p.TokenConfig.RefreshTokenLifeSpan) {
 		return errors.Wrap(ErrProjectValidateFailed, "Refresh Token Life Span must >= 1")
 	}
 

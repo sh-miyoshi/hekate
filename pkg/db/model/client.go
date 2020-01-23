@@ -3,7 +3,6 @@ package model
 import (
 	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
-	"regexp"
 	"time"
 )
 
@@ -49,29 +48,24 @@ type ClientInfoHandler interface {
 
 // Validate ...
 func (c *ClientInfo) Validate() error {
-	// Check ID
-	if !(2 <= len(c.ID) && len(c.ID) < 128) {
+	if !validateClientID(c.ID) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid Client ID format")
 	}
 
-	// Check Project Name
-	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
-	if !prjNameRegExp.MatchString(c.ProjectName) {
+	if !validateProjectName(c.ProjectName) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid Project Name format")
 	}
 
-	// Check Secret
-	if !(8 <= len(c.ID) && len(c.ID) < 256) {
+	if !validateClientSecret(c.Secret) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid Client Secret format")
 	}
 
-	// Check Access Type
-	if c.AccessType != "public" && c.AccessType != "confidential" {
+	if !validateClientAccessType(c.AccessType) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid access type")
 	}
 
 	for _, u := range c.AllowedCallbackURLs {
-		if ok := govalidator.IsRequestURL(u); !ok {
+		if !govalidator.IsRequestURL(u) {
 			return errors.Wrap(ErrClientValidateFailed, "Invalid callback URL")
 		}
 	}
