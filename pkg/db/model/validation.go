@@ -7,7 +7,7 @@ import (
 
 func validateProjectName(name string) bool {
 	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
-	return !prjNameRegExp.MatchString(name)
+	return prjNameRegExp.MatchString(name)
 }
 
 func validateTokenSigningAlgorithm(signAlg string) bool {
