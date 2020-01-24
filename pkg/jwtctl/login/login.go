@@ -3,7 +3,7 @@ package login
 import (
 	"encoding/json"
 	"fmt"
-	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/oidcapi/v1"
+	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
 	"net/http"
 	"net/url"
 	"strings"

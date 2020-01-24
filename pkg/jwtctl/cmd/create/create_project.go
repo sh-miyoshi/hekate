@@ -7,7 +7,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
+	projectapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/project"
 	"github.com/spf13/cobra"
 	"net/http"
 	"os"

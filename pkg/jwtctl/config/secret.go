@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
-	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/oidcapi/v1"
+	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
 	"io/ioutil"
 	"os"
 	"path/filepath"

@@ -3,7 +3,7 @@ package output
 import (
 	"encoding/json"
 	"fmt"
-	projectapi "github.com/sh-miyoshi/jwt-server/pkg/projectapi/v1"
+	projectapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/project"
 )
 
 // ProjectInfoFormat ...
