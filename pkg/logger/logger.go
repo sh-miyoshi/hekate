@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"runtime"
 )
 
@@ -17,7 +16,7 @@ func writeLog(level string, format string, a ...interface{}) {
 	msg := fmt.Sprintf(format, a...)
 	_, fname, line, _ := runtime.Caller(2)
 
-	logger.Printf("%s:%d [%s] %s\n", filepath.Base(fname), line, level, msg)
+	logger.Printf("%s:%d [%s] %s\n", fname, line, level, msg)
 }
 
 // InitLogger initialize variables for logger
