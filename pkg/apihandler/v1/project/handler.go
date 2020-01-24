@@ -150,7 +150,6 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return Response
-	w.Header().Add("Content-Type", "application/json")
 	res := ProjectGetResponse{
 		Name:      project.Name,
 		CreatedAt: project.CreatedAt,
@@ -161,13 +160,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if err := json.NewEncoder(w).Encode(&res); err != nil {
-		logger.Error("Failed to encode a response for project get: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	logger.Info("ProjectGetHandler method successfully finished")
+	jwthttp.ResponseWrite(w, "ProjectGetHandler", &res)
 }
 
 // ProjectUpdateHandler ...

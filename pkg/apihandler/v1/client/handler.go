@@ -61,8 +61,6 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(Validate Request)
-
 	// Create Client Entry
 	client := model.ClientInfo{
 		ID:                  request.ID,

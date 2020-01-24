@@ -10,7 +10,7 @@
 ## jwt-server application enhancement
 
 - リファクタリング
-  - API関連をまとめる
+  - OIDC API Handlerの整理
   - ロジック部の整理
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)

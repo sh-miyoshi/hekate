@@ -63,8 +63,6 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(Validate Request)
-
 	// Create User Entry
 	user := model.UserInfo{
 		ID:           uuid.New().String(),
