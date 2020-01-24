@@ -56,12 +56,12 @@ func (c *ClientInfo) Validate() error {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid Project Name format")
 	}
 
-	if !validateClientSecret(c.Secret) {
-		return errors.Wrap(ErrClientValidateFailed, "Invalid Client Secret format")
-	}
-
 	if !validateClientAccessType(c.AccessType) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid access type")
+	}
+
+	if !validateClientSecret(c.Secret, c.AccessType) {
+		return errors.Wrap(ErrClientValidateFailed, "Invalid Client Secret format")
 	}
 
 	for _, u := range c.AllowedCallbackURLs {

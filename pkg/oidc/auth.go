@@ -88,7 +88,7 @@ func AuthByPassword(project *model.ProjectInfo, userName string, password string
 	}
 
 	if err := db.GetInst().SessionAdd(ent); err != nil {
-		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register refresh token session token: %+v", err)
+		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register session: %+v", err)
 	}
 
 	return &res, http.StatusOK, ""
