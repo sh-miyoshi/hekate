@@ -6,11 +6,11 @@ import (
 
 func TestValidate(t *testing.T) {
 	tt := []struct {
-		projectName     string
-		tokenSigningAlg string
-		accessTokenLifeSpan uint
+		projectName          string
+		tokenSigningAlg      string
+		accessTokenLifeSpan  uint
 		refreshTokenLifeSpan uint
-		expectSuccess   bool
+		expectSuccess        bool
 	}{
 		{"project-ok", "RS256", 1, 1, true},
 		{"project-ng-str-!", "RS256", 1, 1, false},

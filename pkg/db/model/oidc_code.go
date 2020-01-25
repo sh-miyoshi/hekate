@@ -1,9 +1,9 @@
 package model
 
 import (
+	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"time"
-	"github.com/asaskevich/govalidator"
 )
 
 // AuthCode ...

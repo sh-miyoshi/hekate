@@ -3,8 +3,8 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
 	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
 	"io/ioutil"
 	"os"
 	"path/filepath"

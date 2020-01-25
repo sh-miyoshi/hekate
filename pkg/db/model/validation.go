@@ -1,8 +1,8 @@
 package model
 
 import (
-	"regexp"
 	"github.com/asaskevich/govalidator"
+	"regexp"
 )
 
 func validateProjectName(name string) bool {
@@ -38,7 +38,7 @@ func validateClientSecret(secret string, accessType string) bool {
 	if accessType != "confidential" {
 		return true
 	}
-	
+
 	if !(8 <= len(secret) && len(secret) < 256) {
 		return false
 	}

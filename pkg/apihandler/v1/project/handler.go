@@ -3,6 +3,7 @@ package projectapi
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
@@ -10,7 +11,6 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/role"
 	"net/http"
 	"time"
-	"github.com/pkg/errors"
 )
 
 // AllProjectGetHandler ...

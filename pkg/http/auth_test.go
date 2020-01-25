@@ -7,24 +7,24 @@ import (
 func TestParseHTTPHeaderToken(t *testing.T) {
 	token := "testtokenstring"
 	tt := []struct {
-		tokenString string
+		tokenString   string
 		expectSuccess bool
 	}{
 		{
 			"bearer " + token,
- 			true,
+			true,
 		},
 		{
 			"Bearer " + token,
- 			true,
+			true,
 		},
 		{
 			"" + token,
- 			false,
+			false,
 		},
 		{
 			"bearerdummy " + token,
- 			false,
+			false,
 		},
 	}
 
