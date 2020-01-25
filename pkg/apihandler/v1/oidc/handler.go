@@ -6,12 +6,14 @@ import (
 	"github.com/dvsekhvalnov/jose2go/base64url"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
+	"github.com/sh-miyoshi/jwt-server/pkg/user"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"net/url"
@@ -246,26 +248,20 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Verify user
 	uname := r.Form.Get("username")
-	user, err := db.GetInst().UserGetByName(projectName, uname)
+	passwd := r.Form.Get("password")
+	usr, err := user.Verify(projectName, uname, passwd)
 	if err != nil {
-		if err == model.ErrNoSuchUser {
-			logger.Info("No such user %s in project %s", uname, projectName)
+		if errors.Cause(err) == user.ErrAuthFailed {
+			logger.Info("Failed to authenticate user %s: %v", uname, err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to get user id: %+v", err)
+			logger.Error("Failed to verify user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
 	}
 
-	hash := util.CreateHash(r.Form.Get("password"))
-	if user.PasswordHash != hash {
-		logger.Info("password authentication failed")
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		return
-	}
-
-	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, user.ID)
+	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, usr.ID)
 	values := url.Values{}
 	values.Set("code", code)
 	if authReq.State != "" {
