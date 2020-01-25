@@ -106,13 +106,15 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 			return nil, errors.Wrap(err, "Failed to get project")
 		}
 
-		// TODO(add more validation claims[alg]==project.alg?, cast ok?, ...)
-
-		key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
-		if err != nil {
-			return nil, err
+		switch token.Method {
+		case jwt.SigningMethodRS256:
+			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
+			if err != nil {
+				return nil, err
+			}
+			return key, nil
 		}
-		return key, nil
+		return nil, errors.New("unknown token sigining method")
 	})
 
 	if err != nil {
@@ -149,11 +151,15 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 			return nil, errors.Wrap(err, "Failed to get project")
 		}
 
-		key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
-		if err != nil {
-			return nil, err
+		switch token.Method {
+		case jwt.SigningMethodRS256:
+			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
+			if err != nil {
+				return nil, err
+			}
+			return key, nil
 		}
-		return key, nil
+		return nil, errors.New("unknown token sigining method")
 	})
 
 	if err != nil {
