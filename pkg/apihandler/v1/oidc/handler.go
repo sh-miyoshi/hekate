@@ -1,10 +1,7 @@
 package oidc
 
 import (
-	"crypto/x509"
 	"encoding/json"
-	"github.com/dvsekhvalnov/jose2go/base64url"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
@@ -14,7 +11,6 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/user"
-	"github.com/sh-miyoshi/jwt-server/pkg/util"
 	"net/http"
 	"net/url"
 )
@@ -151,29 +147,14 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwk := JWKInfo{
-		KeyID:        uuid.New().String(),
-		Algorithm:    project.TokenConfig.SigningAlgorithm,
-		PublicKeyUse: "sig",
+	res, err := oidc.GenerateJWKSet(project.TokenConfig.SigningAlgorithm, project.TokenConfig.SignPublicKey)
+	if err != nil {
+		logger.Error("Failed to generate JWT set: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
 	}
 
-	switch jwk.Algorithm {
-	case "RS256":
-		jwk.KeyType = "RSA"
-		key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
-		if err != nil {
-			logger.Error("Failed to parse RSA public key: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		e := util.Int2bytes(uint64(key.E))
-		jwk.E = base64url.Encode(e)
-		jwk.N = base64url.Encode(key.N.Bytes())
-	}
-
-	res := JWKSet{}
-	res.Keys = append(res.Keys, jwk)
-	jwthttp.ResponseWrite(w, "CertsHandler", &res)
+	jwthttp.ResponseWrite(w, "CertsHandler", res)
 }
 
 // AuthGETHandler ...
