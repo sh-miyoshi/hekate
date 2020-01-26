@@ -70,7 +70,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	clientSecret := r.Form.Get("client_secret")
 
 	if err := oidc.ClientAuth(clientID, clientSecret); err != nil {
-		if err == oidc.ErrAuthFailed {
+		if errors.Cause(err) == oidc.ErrClientAuthFailed {
 			logger.Info("Failed to authenticate client: %s", clientID)
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		} else {

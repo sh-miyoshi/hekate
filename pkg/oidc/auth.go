@@ -12,16 +12,6 @@ import (
 	"time"
 )
 
-// TokenResponse ...
-type TokenResponse struct {
-	TokenType        string
-	AccessToken      string
-	ExpiresIn        uint
-	RefreshToken     string
-	RefreshExpiresIn uint
-	IDToken          string
-}
-
 // AuthByPassword ...
 func AuthByPassword(project *model.ProjectInfo, userName string, password string, r *http.Request) (*TokenResponse, int, string) {
 	user, err := db.GetInst().UserGetByName(project.Name, userName)

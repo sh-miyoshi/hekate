@@ -8,23 +8,6 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
 )
 
-// JWKInfo is a struct for JSON Web Key(JWK) format defined in https://tools.ietf.org/html/rfc7517
-type JWKInfo struct {
-	KeyType      string `json:"kty"`
-	KeyID        string `json:"kid"`
-	Algorithm    string `json:"alg"`
-	PublicKeyUse string `json:"use"`
-	N            string `json:"n,omitempty"` // Use in RSA
-	E            string `json:"e,omitempty"` // Use in RSA
-	X            string `json:"x,omitempty"` // Use in EC
-	Y            string `json:"y,omitempty"` // Use in EC
-}
-
-// JWKSet ...
-type JWKSet struct {
-	Keys []JWKInfo `json:"keys"`
-}
-
 // GenerateJWKSet ...
 func GenerateJWKSet(signAlg string, publicKey []byte) (*JWKSet, error) {
 	jwk := JWKInfo{
