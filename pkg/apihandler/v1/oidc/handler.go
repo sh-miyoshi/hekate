@@ -61,7 +61,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Project Info for Token Config
 	project, err := db.GetInst().ProjectGet(projectName)
-	if err == model.ErrNoSuchProject {
+	if errors.Cause(err) == model.ErrNoSuchProject {
 		http.Error(w, "Project Not Found", http.StatusNotFound)
 		return
 	}
@@ -132,7 +132,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {

@@ -64,7 +64,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create New Project
 	if err := db.GetInst().ProjectAdd(&project); err != nil {
-		if err == model.ErrProjectAlreadyExists {
+		if errors.Cause(err) == model.ErrProjectAlreadyExists {
 			logger.Info("Project %s is already exists", request.Name)
 			http.Error(w, "Project Already Exists", http.StatusConflict)
 		} else if errors.Cause(err) == model.ErrProjectValidateFailed {
@@ -105,10 +105,10 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrDeleteBlockedProject {
+		} else if errors.Cause(err) == model.ErrDeleteBlockedProject {
 			logger.Info("Failed to delete blocked project: %v", err)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 		} else {
@@ -139,7 +139,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Project
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -187,7 +187,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Project Info
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
@@ -29,7 +30,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	users, err := db.GetInst().UserGetList(projectName)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -74,10 +75,10 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().UserAdd(&user); err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrUserAlreadyExists {
+		} else if errors.Cause(err) == model.ErrUserAlreadyExists {
 			logger.Info("User %s is already exists", user.Name)
 			http.Error(w, "User already exists", http.StatusConflict)
 		} else {
@@ -114,10 +115,10 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	userID := vars["userID"]
 
 	if err := db.GetInst().UserDelete(userID); err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrNoSuchUser {
+		} else if errors.Cause(err) == model.ErrNoSuchUser {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
@@ -148,7 +149,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.GetInst().UserGet(userID)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -205,10 +206,10 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous User Info
 	user, err := db.GetInst().UserGet(userID)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrNoSuchUser {
+		} else if errors.Cause(err) == model.ErrNoSuchUser {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
@@ -252,13 +253,13 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Previous User Info
 	if err := db.GetInst().UserAddRole(userID, roleID); err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrNoSuchUser {
+		} else if errors.Cause(err) == model.ErrNoSuchUser {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if err == model.ErrRoleAlreadyAppended {
+		} else if errors.Cause(err) == model.ErrRoleAlreadyAppended {
 			logger.Info("Role %s is already appended", roleID)
 			http.Error(w, "Role Already Appended", http.StatusConflict)
 		} else {
@@ -289,13 +290,13 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Previous User Info
 	if err := db.GetInst().UserDeleteRole(userID, roleID); err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrNoSuchUser {
+		} else if errors.Cause(err) == model.ErrNoSuchUser {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if err == model.ErrNoSuchRoleInUser {
+		} else if errors.Cause(err) == model.ErrNoSuchRoleInUser {
 			logger.Info("User %s do not have Role %s", userID, roleID)
 			http.Error(w, "No Such Role in User", http.StatusNotFound)
 		} else {

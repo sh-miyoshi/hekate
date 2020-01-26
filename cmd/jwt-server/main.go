@@ -90,7 +90,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		},
 	})
 	if err != nil {
-		if err == model.ErrProjectAlreadyExists {
+		if errors.Cause(err) == model.ErrProjectAlreadyExists {
 			logger.Info("Master Project is already exists.")
 		} else {
 			return errors.Wrap(err, "Failed to create master project")
@@ -107,7 +107,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	})
 
 	if err != nil {
-		if err == model.ErrUserAlreadyExists {
+		if errors.Cause(err) == model.ErrUserAlreadyExists {
 			logger.Info("Admin user is already exists.")
 		} else {
 			return errors.Wrap(err, "Failed to create admin user")
@@ -122,7 +122,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	})
 
 	if err != nil {
-		if err == model.ErrClientAlreadyExists {
+		if errors.Cause(err) == model.ErrClientAlreadyExists {
 			logger.Info("admin-cli client is already exists.")
 		} else {
 			return errors.Wrap(err, "Failed to create admin-cli client")

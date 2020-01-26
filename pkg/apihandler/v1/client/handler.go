@@ -3,6 +3,7 @@ package clientapi
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
@@ -27,7 +28,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	clients, err := db.GetInst().ClientGetList(projectName)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -72,10 +73,10 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().ClientAdd(&client); err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrClientAlreadyExists {
+		} else if errors.Cause(err) == model.ErrClientAlreadyExists {
 			logger.Info("Client %s is already exists", client.ID)
 			http.Error(w, "Client already exists", http.StatusConflict)
 		} else {
@@ -112,10 +113,10 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	clientID := vars["clientID"]
 
 	if err := db.GetInst().ClientDelete(clientID); err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrNoSuchClient {
+		} else if errors.Cause(err) == model.ErrNoSuchClient {
 			logger.Info("No such client: %s", clientID)
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
@@ -146,7 +147,7 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	client, err := db.GetInst().ClientGet(clientID)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -192,10 +193,10 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Client Info
 	client, err := db.GetInst().ClientGet(clientID)
 	if err != nil {
-		if err == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if err == model.ErrNoSuchClient {
+		} else if errors.Cause(err) == model.ErrNoSuchClient {
 			logger.Info("No such client: %s", clientID)
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
