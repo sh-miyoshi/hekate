@@ -9,9 +9,6 @@
 
 ## jwt-server application enhancement
 
-- リファクタリング
-  - OIDC API Handlerの整理
-  - ロジック部の整理
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - OIDCのエラーフォーマットに沿う
@@ -20,10 +17,13 @@
   - keycloak gatekeeper用のroleを設定
     - 参考: [gatekeeper](https://github.com/keycloak/keycloak-gatekeeper/blob/42b3e3cd1359285da766fd0f0f637411d744e9bf/user_context.go#L57)
   - sessionの詳細取得(引数: project, useID, sessionID)
-  - 各リソースのGetListメソッドの修正(何を返すべきか)
+  - 各リソースのGet APIの見直し
+    - 全体検索のみ？queryで検索できるようにする？
+- user login session情報をDBに保存する
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
+- client idをuser login pageで表示
 - https対応
 - audit log
   - time
