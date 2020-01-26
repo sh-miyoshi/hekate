@@ -39,8 +39,8 @@
 - OpenID Connect部分のエンハンス
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
+  - preferred_usernameの追加
 - APIのRBACの見直し
-  - OIDCのフローを使うようにする
 - custom roleの有効化
 - userのパスワード変更のrole見直し
   - 本人のみが変更できるようにする
