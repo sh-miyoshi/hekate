@@ -101,15 +101,26 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case "refresh_token":
-		//		refreshToken := r.Form.Get("refresh_token")
-		//		tkn, statusCode, message = oidc.AuthByRefreshToken(project, refreshToken, r)
+		refreshToken := r.Form.Get("refresh_token")
+		var err error
+		tkn, err = oidc.ReqAuthByRefreshToken(project, refreshToken, r)
+		if err != nil {
+			if errors.Cause(err) == oidc.ErrRequestVerifyFailed {
+				logger.Info("Failed to verify token: %v", err)
+				writeTokenErrorResponse(w)
+			} else {
+				logger.Error("Failed to verify token: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
 	case "authorization_code":
 		// Validate code
 		codeID := r.Form.Get("code")
 		var err error
 		tkn, err = oidc.ReqAuthByCode(project, codeID, r)
 		if err != nil {
-			if errors.Cause(err) == oidc.ErrAuthCodeVerifyFailed {
+			if errors.Cause(err) == oidc.ErrRequestVerifyFailed {
 				logger.Info("Failed to verify auth code: %v", err)
 				writeTokenErrorResponse(w)
 			} else {

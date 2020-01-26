@@ -25,8 +25,8 @@ var (
 	userLoginHTML  string
 	loginSessions  map[string]*sessionInfo // key: verifyCode
 
-	// ErrAuthCodeVerifyFailed ...
-	ErrAuthCodeVerifyFailed = errors.New("failed to verify code")
+	// ErrRequestVerifyFailed ...
+	ErrRequestVerifyFailed = errors.New("failed to verify request")
 )
 
 func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, r *http.Request, genRefresh, genIDToken bool) (*TokenResponse, error) {
@@ -103,14 +103,14 @@ func verifyAuthCode(codeID string) (*model.AuthCode, error) {
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchCode {
 			// TODO(revoke all token in code.UserID) <- SHOULD
-			return nil, errors.Wrap(ErrAuthCodeVerifyFailed, "no such code")
+			return nil, errors.Wrap(ErrRequestVerifyFailed, "no such code")
 		}
 		return nil, err
 	}
 	logger.Debug("Code: %v", code)
 
 	if time.Now().Unix() >= code.ExpiresIn.Unix() {
-		return nil, errors.Wrap(ErrAuthCodeVerifyFailed, "code is already expired")
+		return nil, errors.Wrap(ErrRequestVerifyFailed, "code is already expired")
 	}
 
 	return code, nil
@@ -159,14 +159,14 @@ func ReqAuthByCode(project *model.ProjectInfo, codeID string, r *http.Request) (
 	return genTokenRes(audiences, code.UserID, project, r, false, true)
 }
 
-// AuthByRefreshToken ...
-func AuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http.Request) (*TokenResponse, int, string) {
+// ReqAuthByRefreshToken ...
+func ReqAuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http.Request) (*TokenResponse, error) {
 	clientID := r.Form.Get("client_id")
 
 	claims := &token.RefreshTokenClaims{}
 	issuer := token.GetExpectIssuer(r)
 	if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
-		return nil, http.StatusBadRequest, fmt.Sprintf("Failed to validate token: %v", err)
+		return nil, errors.Wrap(ErrRequestVerifyFailed, fmt.Sprintf("Failed to verify token: %v", err))
 	}
 
 	ok := false
@@ -178,65 +178,16 @@ func AuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http
 	}
 
 	if !ok {
-		return nil, http.StatusBadRequest, "refresh token is not for the client"
+		return nil, errors.Wrap(ErrRequestVerifyFailed, "refresh token is not for the client")
 	}
 
 	// Revoke previous token
 	if err := db.GetInst().SessionDelete(claims.SessionID); err != nil {
-		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to revoke previous token: %+v", err)
-	}
-
-	// Generate JWT Token
-	res := TokenResponse{
-		TokenType:        "Bearer",
-		ExpiresIn:        project.TokenConfig.AccessTokenLifeSpan,
-		RefreshExpiresIn: project.TokenConfig.RefreshTokenLifeSpan,
+		return nil, errors.Wrap(err, "Failed to revoke previous token")
 	}
 
 	userID := claims.Subject
-
-	accessTokenReq := token.Request{
-		Issuer:      claims.Issuer,
-		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
-		ProjectName: claims.Project,
-		UserID:      userID,
-	}
-
-	var err error
-	res.AccessToken, err = token.GenerateAccessToken(claims.Audience, accessTokenReq)
-	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get JWT token: %+v", err)
-	}
-
-	refreshTokenReq := token.Request{
-		Issuer:      claims.Issuer,
-		ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
-		ProjectName: claims.Project,
-		UserID:      userID,
-	}
-
-	sessionID := uuid.New().String()
-	res.RefreshToken, err = token.GenerateRefreshToken(sessionID, claims.Audience, refreshTokenReq)
-	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get JWT token: %+v", err)
-	}
-
-	ip, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to get from IP: %v", err)
-	}
-	ent := &model.Session{
-		UserID:    userID,
-		SessionID: sessionID,
-		CreatedAt: time.Now(),
-		ExpiresIn: res.RefreshExpiresIn,
-		FromIP:    ip,
-	}
-	if err := db.GetInst().SessionAdd(ent); err != nil {
-		return nil, http.StatusInternalServerError, fmt.Sprintf("Failed to register refresh token session token: %+v", err)
-	}
-
-	return &res, http.StatusOK, ""
+	return genTokenRes(claims.Audience, userID, project, r, true, false)
 }
 
 // GenerateAuthCode ...
