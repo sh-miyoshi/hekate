@@ -87,51 +87,27 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "password":
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")
-
-		var err error
 		tkn, err = oidc.ReqAuthByPassword(project, uname, passwd, r)
-		if err != nil {
-			if errors.Cause(err) == user.ErrAuthFailed {
-				logger.Info("Failed to auth user: %v", err)
-				writeTokenErrorResponse(w)
-			} else {
-				logger.Error("Failed to auth user: %v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			}
-			return
-		}
 	case "refresh_token":
 		refreshToken := r.Form.Get("refresh_token")
-		var err error
 		tkn, err = oidc.ReqAuthByRefreshToken(project, refreshToken, r)
-		if err != nil {
-			if errors.Cause(err) == oidc.ErrRequestVerifyFailed {
-				logger.Info("Failed to verify token: %v", err)
-				writeTokenErrorResponse(w)
-			} else {
-				logger.Error("Failed to verify token: %v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			}
-			return
-		}
 	case "authorization_code":
-		// Validate code
 		codeID := r.Form.Get("code")
-		var err error
 		tkn, err = oidc.ReqAuthByCode(project, codeID, r)
-		if err != nil {
-			if errors.Cause(err) == oidc.ErrRequestVerifyFailed {
-				logger.Info("Failed to verify auth code: %v", err)
-				writeTokenErrorResponse(w)
-			} else {
-				logger.Error("Failed to verify auth code: %v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			}
-			return
-		}
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
 		writeTokenErrorResponse(w)
+		return
+	}
+
+	if err != nil {
+		if errors.Cause(err) == oidc.ErrRequestVerifyFailed {
+			logger.Info("Failed to verify request: %v", err)
+			writeTokenErrorResponse(w)
+		} else {
+			logger.Error("Failed to verify request: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 

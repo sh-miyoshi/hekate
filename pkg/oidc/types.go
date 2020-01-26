@@ -66,4 +66,7 @@ type TokenResponse struct {
 var (
 	// ErrClientAuthFailed ...
 	ErrClientAuthFailed = errors.New("client authentication failed")
+
+	// ErrRequestVerifyFailed ...
+	ErrRequestVerifyFailed = errors.New("failed to verify request")
 )

@@ -8,6 +8,17 @@ import (
 	"time"
 )
 
+type sessionInfo struct {
+	VerifyCode  string
+	ExpiresIn   time.Time
+	BaseRequest *AuthRequest
+}
+
+var (
+	// TODO(use database for scale)
+	loginSessions = make(map[string]*sessionInfo) // key: verifyCode
+)
+
 // WriteUserLoginPage ...
 func WriteUserLoginPage(code string, projectName string, w http.ResponseWriter) {
 	tpl := template.Must(template.ParseFiles(userLoginHTML))

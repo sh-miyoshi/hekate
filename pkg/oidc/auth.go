@@ -6,27 +6,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/user"
 	"net"
 	"net/http"
 	"time"
-)
-
-type sessionInfo struct {
-	VerifyCode  string
-	ExpiresIn   time.Time
-	BaseRequest *AuthRequest
-}
-
-var (
-	expiresTimeSec uint64
-	userLoginHTML  string
-	loginSessions  map[string]*sessionInfo // key: verifyCode
-
-	// ErrRequestVerifyFailed ...
-	ErrRequestVerifyFailed = errors.New("failed to verify request")
 )
 
 func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, r *http.Request, genRefresh, genIDToken bool) (*TokenResponse, error) {
@@ -98,35 +82,13 @@ func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, 
 	return &res, nil
 }
 
-func verifyAuthCode(codeID string) (*model.AuthCode, error) {
-	code, err := db.GetInst().AuthCodeGet(codeID)
-	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchCode {
-			// TODO(revoke all token in code.UserID) <- SHOULD
-			return nil, errors.Wrap(ErrRequestVerifyFailed, "no such code")
-		}
-		return nil, err
-	}
-	logger.Debug("Code: %v", code)
-
-	if time.Now().Unix() >= code.ExpiresIn.Unix() {
-		return nil, errors.Wrap(ErrRequestVerifyFailed, "code is already expired")
-	}
-
-	return code, nil
-}
-
-// InitAuthCodeConfig ...
-func InitAuthCodeConfig(authCodeExpiresTimeSec uint64, authCodeUserLoginFile string) {
-	expiresTimeSec = authCodeExpiresTimeSec
-	userLoginHTML = authCodeUserLoginFile
-	loginSessions = make(map[string]*sessionInfo)
-}
-
 // ReqAuthByPassword ...
 func ReqAuthByPassword(project *model.ProjectInfo, userName string, password string, r *http.Request) (*TokenResponse, error) {
 	usr, err := user.Verify(project.Name, userName, password)
 	if err != nil {
+		if errors.Cause(err) == user.ErrAuthFailed {
+			return nil, ErrRequestVerifyFailed
+		}
 		return nil, err
 	}
 
@@ -188,19 +150,4 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *h
 
 	userID := claims.Subject
 	return genTokenRes(claims.Audience, userID, project, r, true, false)
-}
-
-// GenerateAuthCode ...
-func GenerateAuthCode(clientID string, redirectURL string, userID string) (string, error) {
-	code := &model.AuthCode{
-		CodeID:      uuid.New().String(),
-		ClientID:    clientID,
-		RedirectURL: redirectURL,
-		ExpiresIn:   time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
-		UserID:      userID,
-	}
-
-	err := db.GetInst().AuthCodeAdd(code)
-
-	return code.CodeID, err
 }
