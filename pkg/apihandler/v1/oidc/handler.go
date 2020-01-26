@@ -81,8 +81,6 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var tkn *oidc.TokenResponse
-	var statusCode int
-	var message string
 
 	// Authetication
 	switch r.Form.Get("grant_type") {
@@ -90,44 +88,54 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")
 
-		tkn, statusCode, message = oidc.AuthByPassword(project, uname, passwd, r)
+		var err error
+		tkn, err = oidc.ReqAuthByPassword(project, uname, passwd, r)
+		if err != nil {
+			if errors.Cause(err) == user.ErrAuthFailed {
+				logger.Info("Failed to auth user: %v", err)
+				writeTokenErrorResponse(w)
+			} else {
+				logger.Error("Failed to auth user: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
 	case "refresh_token":
-		refreshToken := r.Form.Get("refresh_token")
-		tkn, statusCode, message = oidc.AuthByRefreshToken(project, refreshToken, r)
+		//		refreshToken := r.Form.Get("refresh_token")
+		//		tkn, statusCode, message = oidc.AuthByRefreshToken(project, refreshToken, r)
 	case "authorization_code":
 		// Validate code
 		codeID := r.Form.Get("code")
-		tkn, statusCode, message = oidc.AuthByCode(project, codeID, r)
+		var err error
+		tkn, err = oidc.ReqAuthByCode(project, codeID, r)
+		if err != nil {
+			if errors.Cause(err) == oidc.ErrAuthCodeVerifyFailed {
+				logger.Info("Failed to verify auth code: %v", err)
+				writeTokenErrorResponse(w)
+			} else {
+				logger.Error("Failed to verify auth code: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
 		writeTokenErrorResponse(w)
 		return
 	}
 
-	switch statusCode {
-	case http.StatusInternalServerError:
-		logger.Error(message)
-		http.Error(w, "Internal Server Error", statusCode)
-	case http.StatusBadRequest:
-		logger.Info(message)
-		writeTokenErrorResponse(w)
-	case http.StatusOK:
-		res := &TokenResponse{
-			TokenType:        tkn.TokenType,
-			AccessToken:      tkn.AccessToken,
-			ExpiresIn:        tkn.ExpiresIn,
-			RefreshToken:     tkn.RefreshToken,
-			RefreshExpiresIn: tkn.RefreshExpiresIn,
-			IDToken:          tkn.IDToken,
-		}
-
-		w.Header().Add("Cache-Control", "no-store")
-		w.Header().Add("Pragma", "no-cache")
-		jwthttp.ResponseWrite(w, "TokenHandler", res)
-	default:
-		logger.Error("Program Bug: code %d is not implemented", statusCode)
-		http.Error(w, "Internal Server Error", statusCode)
+	res := &TokenResponse{
+		TokenType:        tkn.TokenType,
+		AccessToken:      tkn.AccessToken,
+		ExpiresIn:        tkn.ExpiresIn,
+		RefreshToken:     tkn.RefreshToken,
+		RefreshExpiresIn: tkn.RefreshExpiresIn,
+		IDToken:          tkn.IDToken,
 	}
+
+	w.Header().Add("Cache-Control", "no-store")
+	w.Header().Add("Pragma", "no-cache")
+	jwthttp.ResponseWrite(w, "TokenHandler", res)
 }
 
 // CertsHandler ...
