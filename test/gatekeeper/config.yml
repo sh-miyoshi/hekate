@@ -12,4 +12,4 @@ resources:
     methods:
     - GET
     roles:
-      - user-read
+      - system_management:read-user

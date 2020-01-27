@@ -22,7 +22,7 @@ token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token 
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \
-  -d "client_id=gatekeeper" \
+  -d "client_id=admin-cli" \
   -d 'grant_type=password'`
 master_access_token=`echo $token_info | jq -r .access_token`
 # echo $master_access_token
@@ -47,9 +47,17 @@ sleep 1
 # curl http://localhost:10000/hello
 # echo ""
 
+token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin" \
+  -d "password=password" \
+  -d "client_id=gatekeeper" \
+  -d 'grant_type=password'`
+access_token=`echo $token_info | jq -r .access_token`
+
 echo "access with gatekeeper"
 curl http://localhost:3000/hello \
-  -H "Authorization: Bearer $master_access_token"
+  -H "Authorization: Bearer $access_token"
 echo ""
 
 # wait
