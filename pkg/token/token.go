@@ -60,17 +60,21 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 			Subject:   request.UserID,
 		},
 		request.ProjectName,
-		[]string{},
 		audiences,
+		RoleSet{
+			SystemManagement: RoleValue{
+				Roles: []string{},
+			},
+		},
 	}
 
-	// Set user roles
+	// TODO(Set user roles)
 	user, err := db.GetInst().UserGet(request.UserID)
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to get user")
 	}
 	for _, role := range user.Roles {
-		claims.Roles = append(claims.Roles, role)
+		claims.ResourceAccess.SystemManagement.Roles = append(claims.ResourceAccess.SystemManagement.Roles, role)
 	}
 
 	return signToken(request.ProjectName, claims)

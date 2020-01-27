@@ -29,10 +29,8 @@ type AccessTokenClaims struct {
 	jwt.StandardClaims
 
 	Project  string   `json:"project"`
-	Roles    []string `json:"roles"`
 	Audience []string `json:"aud"`
-
-	// TODO: ResourceAccess RoleSet `json:"resource_access"`
+	ResourceAccess RoleSet `json:"resource_access"`
 }
 
 // RefreshTokenClaims ...
