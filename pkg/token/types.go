@@ -11,6 +11,17 @@ type Request struct {
 	ExpiredTime time.Duration
 	ProjectName string
 	UserID      string
+	// TODO(add user name)
+}
+
+// RoleValue ...
+type RoleValue struct {
+	Roles []string `json:"roles"`
+}
+
+// RoleSet ...
+type RoleSet struct {
+	SystemManagement RoleValue `json:"system_management"`
 }
 
 // AccessTokenClaims ...
@@ -20,6 +31,8 @@ type AccessTokenClaims struct {
 	Project  string   `json:"project"`
 	Roles    []string `json:"roles"`
 	Audience []string `json:"aud"`
+
+	// TODO: ResourceAccess RoleSet `json:"resource_access"`
 }
 
 // RefreshTokenClaims ...
