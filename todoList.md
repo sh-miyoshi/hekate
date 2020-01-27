@@ -13,9 +13,14 @@
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - OIDCのエラーフォーマットに沿う
 - 各種APIの実装
+  - user role API
+    - add, delete, get, update
+    - userに紐付ける
+    - token情報に含める
+  - openid connect API
+    - implicit flow
+    - hybrid flow
   - 特定ユーザのログアウト(session全削除)
-  - keycloak gatekeeper用のroleを設定
-    - 参考: [gatekeeper](https://github.com/keycloak/keycloak-gatekeeper/blob/42b3e3cd1359285da766fd0f0f637411d744e9bf/user_context.go#L57)
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 各リソースのGet APIの見直し
     - 全体検索のみ？queryで検索できるようにする？
@@ -23,7 +28,6 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
-- client idをuser login pageで表示
 - https対応
 - audit log
   - time
@@ -50,7 +54,8 @@
   - user情報を外部に保存し、それと連携する
 - redirect_urlの設定
 - User Authentication HTMLの拡充
-  - Client IDを表示する
+  - Client IDを表示(optional)
+  - Project名を表示
 - LDAP連携？
 - http headerの追加
 
