@@ -97,14 +97,14 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		tkn, err = oidc.ReqAuthByCode(project, clientID, codeID, r)
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
-		writeTokenErrorResponse(w)
+		writeTokenErrorResponse(w, errCodeInvalidReq, "", r.Form.Get("state"))
 		return
 	}
 
 	if err != nil {
 		if errors.Cause(err) == oidc.ErrRequestVerifyFailed {
 			logger.Info("Failed to verify request: %v", err)
-			writeTokenErrorResponse(w)
+			writeTokenErrorResponse(w, errCodeInvalidReq, "", r.Form.Get("state"))
 		} else {
 			logger.Error("Failed to verify request: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

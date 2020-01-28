@@ -6,9 +6,11 @@ import (
 	"net/http"
 )
 
-func writeTokenErrorResponse(w http.ResponseWriter) {
+func writeTokenErrorResponse(w http.ResponseWriter, code, description, state string) {
 	res := ErrorResponse{
-		ErrorCode: "invalid_request",
+		ErrorCode:   code,
+		Description: description,
+		State:       state,
 	}
 
 	w.Header().Add("Content-Type", "application/json")

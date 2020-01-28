@@ -24,6 +24,12 @@ type TokenResponse struct {
 	IDToken          string `json:"id_token"`
 }
 
+// UserInfo ...
+type UserInfo struct {
+	Subject  string `json:"sub"`
+	UserName string `json:"preferred_username"`
+}
+
 // ErrorResponse ...
 type ErrorResponse struct {
 	ErrorCode   string `json:"error"`
@@ -32,8 +38,6 @@ type ErrorResponse struct {
 	State       string `json:"state"`
 }
 
-// UserInfo ...
-type UserInfo struct {
-	Subject  string `json:"sub"`
-	UserName string `json:"preferred_username"`
-}
+const (
+	errCodeInvalidReq = "invalid_request"
+)
