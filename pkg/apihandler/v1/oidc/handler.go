@@ -81,6 +81,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	var tkn *oidc.TokenResponse
 
+	// TODO(consider redirect_uri)
+
 	// Authetication
 	switch r.Form.Get("grant_type") {
 	case "password":
@@ -89,10 +91,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		tkn, err = oidc.ReqAuthByPassword(project, uname, passwd, r)
 	case "refresh_token":
 		refreshToken := r.Form.Get("refresh_token")
-		tkn, err = oidc.ReqAuthByRefreshToken(project, refreshToken, r)
+		tkn, err = oidc.ReqAuthByRefreshToken(project, clientID, refreshToken, r)
 	case "authorization_code":
 		codeID := r.Form.Get("code")
-		tkn, err = oidc.ReqAuthByCode(project, codeID, r)
+		tkn, err = oidc.ReqAuthByCode(project, clientID, codeID, r)
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
 		writeTokenErrorResponse(w)

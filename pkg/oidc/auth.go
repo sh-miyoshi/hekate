@@ -102,10 +102,14 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 }
 
 // ReqAuthByCode ...
-func ReqAuthByCode(project *model.ProjectInfo, codeID string, r *http.Request) (*TokenResponse, error) {
+func ReqAuthByCode(project *model.ProjectInfo, clientID string, codeID string, r *http.Request) (*TokenResponse, error) {
 	code, err := verifyAuthCode(codeID)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to verify code")
+	}
+
+	if code.ClientID != clientID {
+		return nil, errors.Wrap(ErrRequestVerifyFailed, "missing client id")
 	}
 
 	// Remove Authorized code
@@ -122,9 +126,7 @@ func ReqAuthByCode(project *model.ProjectInfo, codeID string, r *http.Request) (
 }
 
 // ReqAuthByRefreshToken ...
-func ReqAuthByRefreshToken(project *model.ProjectInfo, refreshToken string, r *http.Request) (*TokenResponse, error) {
-	clientID := r.Form.Get("client_id")
-
+func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshToken string, r *http.Request) (*TokenResponse, error) {
 	claims := &token.RefreshTokenClaims{}
 	issuer := token.GetExpectIssuer(r)
 	if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
