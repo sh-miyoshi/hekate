@@ -24,9 +24,12 @@ type TokenResponse struct {
 	IDToken          string `json:"id_token"`
 }
 
-// TokenErrorResponse ...
-type TokenErrorResponse struct {
-	Error string `json:"error"`
+// ErrorResponse ...
+type ErrorResponse struct {
+	ErrorCode   string `json:"error"`
+	Description string `json:"error_description"`
+	URI         string `json:"error_uri"`
+	State       string `json:"state"`
 }
 
 // UserInfo ...

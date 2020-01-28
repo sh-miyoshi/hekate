@@ -13,8 +13,8 @@ func TestAuthorize(t *testing.T) {
 
 	tt := []struct {
 		targetResource Resource
-		roleType Type
-		expectSuccess bool
+		roleType       Type
+		expectSuccess  bool
 	}{
 		{
 			Resource{"test1"},

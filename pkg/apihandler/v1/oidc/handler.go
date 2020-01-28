@@ -1,7 +1,6 @@
 package oidc
 
 import (
-	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
@@ -168,6 +167,8 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(switch by request)
+
 	// return end user auth prompt
 	code := oidc.RegisterUserLoginSession(authReq)
 	oidc.WriteUserLoginPage(code, projectName, w)
@@ -194,6 +195,8 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 		// TODO(return correct error response)
 		return
 	}
+
+	// TODO(switch by request)
 
 	// return end user auth prompt
 	code := oidc.RegisterUserLoginSession(authReq)
@@ -279,20 +282,4 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jwthttp.ResponseWrite(w, "UserInfoHandler", res)
-}
-
-func writeTokenErrorResponse(w http.ResponseWriter) {
-	res := TokenErrorResponse{
-		Error: "invalid_request",
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-
-	if err := json.NewEncoder(w).Encode(res); err != nil {
-		logger.Error("Failed to encode a token error response: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusBadRequest)
 }
