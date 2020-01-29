@@ -2,7 +2,6 @@ package oidc
 
 import (
 	validator "github.com/go-playground/validator/v10"
-	"github.com/pkg/errors"
 )
 
 // AuthRequest ...
@@ -76,11 +75,3 @@ func (e *Error) Error() string {
 }
 
 // *) error definition is in errors.go
-
-var (
-	// ErrClientAuthFailed ...
-	ErrClientAuthFailed = errors.New("client authentication failed")
-
-	// ErrRequestVerifyFailed ...
-	ErrRequestVerifyFailed = errors.New("failed to verify request")
-)

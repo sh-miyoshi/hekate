@@ -87,7 +87,7 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 	usr, err := user.Verify(project.Name, userName, password)
 	if err != nil {
 		if errors.Cause(err) == user.ErrAuthFailed {
-			return nil, ErrRequestVerifyFailed
+			return nil, ErrInvalidRequest
 		}
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, codeID string, r
 	}
 
 	if code.ClientID != clientID {
-		return nil, errors.Wrap(ErrRequestVerifyFailed, "missing client id")
+		return nil, errors.Wrap(ErrInvalidRequest, "missing client id")
 	}
 
 	// Remove Authorized code
@@ -130,7 +130,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	claims := &token.RefreshTokenClaims{}
 	issuer := token.GetExpectIssuer(r)
 	if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
-		return nil, errors.Wrap(ErrRequestVerifyFailed, fmt.Sprintf("Failed to verify token: %v", err))
+		return nil, errors.Wrap(ErrInvalidRequest, fmt.Sprintf("Failed to verify token: %v", err))
 	}
 
 	ok := false
@@ -142,7 +142,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	}
 
 	if !ok {
-		return nil, errors.Wrap(ErrRequestVerifyFailed, "refresh token is not for the client")
+		return nil, errors.Wrap(ErrInvalidRequest, "refresh token is not for the client")
 	}
 
 	// Revoke previous token

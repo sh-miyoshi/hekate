@@ -69,9 +69,9 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	clientSecret := r.Form.Get("client_secret")
 
 	if err := oidc.ClientAuth(clientID, clientSecret); err != nil {
-		if errors.Cause(err) == oidc.ErrClientAuthFailed {
+		if errors.Cause(err) == oidc.ErrInvalidClient {
 			logger.Info("Failed to authenticate client: %s", clientID)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			writeTokenErrorResponse(w, oidc.ErrInvalidClient, r.Form.Get("state"))
 		} else {
 			logger.Error("Failed to authenticate client: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -97,14 +97,14 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		tkn, err = oidc.ReqAuthByCode(project, clientID, codeID, r)
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
-		writeTokenErrorResponse(w, errCodeInvalidReq, "", r.Form.Get("state"))
+		writeTokenErrorResponse(w, oidc.ErrInvalidGrant, r.Form.Get("state"))
 		return
 	}
 
 	if err != nil {
-		if errors.Cause(err) == oidc.ErrRequestVerifyFailed {
+		if errors.Cause(err) == oidc.ErrInvalidRequest {
 			logger.Info("Failed to verify request: %v", err)
-			writeTokenErrorResponse(w, errCodeInvalidReq, "", r.Form.Get("state"))
+			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, r.Form.Get("state"))
 		} else {
 			logger.Error("Failed to verify request: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

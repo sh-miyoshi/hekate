@@ -36,7 +36,3 @@ type ErrorResponse struct {
 	Description string `json:"error_description"`
 	State       string `json:"state"`
 }
-
-const (
-	errCodeInvalidReq = "invalid_request"
-)

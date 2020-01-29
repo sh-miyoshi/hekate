@@ -52,14 +52,14 @@ func verifyAuthCode(codeID string) (*model.AuthCode, error) {
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchCode {
 			// TODO(revoke all token in code.UserID) <- SHOULD
-			return nil, errors.Wrap(ErrRequestVerifyFailed, "no such code")
+			return nil, errors.Wrap(ErrInvalidRequest, "no such code")
 		}
 		return nil, err
 	}
 	logger.Debug("Code: %v", code)
 
 	if time.Now().Unix() >= code.ExpiresIn.Unix() {
-		return nil, errors.Wrap(ErrRequestVerifyFailed, "code is already expired")
+		return nil, errors.Wrap(ErrInvalidRequest, "code is already expired")
 	}
 
 	return code, nil

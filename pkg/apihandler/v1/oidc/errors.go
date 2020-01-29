@@ -3,13 +3,14 @@ package oidc
 import (
 	"encoding/json"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
 	"net/http"
 )
 
-func writeTokenErrorResponse(w http.ResponseWriter, code, description, state string) {
+func writeTokenErrorResponse(w http.ResponseWriter, err *oidc.Error, state string) {
 	res := ErrorResponse{
-		ErrorCode:   code,
-		Description: description,
+		ErrorCode:   err.Name,
+		Description: err.Description,
 		State:       state,
 	}
 
@@ -21,5 +22,5 @@ func writeTokenErrorResponse(w http.ResponseWriter, code, description, state str
 		return
 	}
 
-	w.WriteHeader(http.StatusBadRequest)
+	w.WriteHeader(err.Code)
 }

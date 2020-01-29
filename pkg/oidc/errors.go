@@ -74,6 +74,7 @@ var (
 	// ErrInvalidClient ...
 	ErrInvalidClient = &Error{
 		Name: "invalid_client",
+		Description: "Client authentication failed.",
 		Code: http.StatusUnauthorized,
 	}
 	
