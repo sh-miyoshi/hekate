@@ -49,10 +49,11 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
+	state := r.Form.Get("state")
 
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, state)
 		return
 	}
 
@@ -71,10 +72,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if err := oidc.ClientAuth(clientID, clientSecret); err != nil {
 		if errors.Cause(err) == oidc.ErrInvalidClient {
 			logger.Info("Failed to authenticate client: %s", clientID)
-			writeTokenErrorResponse(w, oidc.ErrInvalidClient, r.Form.Get("state"))
+			writeTokenErrorResponse(w, oidc.ErrInvalidClient, state)
 		} else {
 			logger.Error("Failed to authenticate client: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			writeTokenErrorResponse(w, oidc.ErrServerError, state)
 		}
 		return
 	}
@@ -97,17 +98,17 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		tkn, err = oidc.ReqAuthByCode(project, clientID, codeID, r)
 	default:
 		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
-		writeTokenErrorResponse(w, oidc.ErrInvalidGrant, r.Form.Get("state"))
+		writeTokenErrorResponse(w, oidc.ErrInvalidGrant, state)
 		return
 	}
 
 	if err != nil {
 		if errors.Cause(err) == oidc.ErrInvalidRequest {
 			logger.Info("Failed to verify request: %v", err)
-			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, r.Form.Get("state"))
+			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, state)
 		} else {
 			logger.Error("Failed to verify request: %v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			writeTokenErrorResponse(w, oidc.ErrServerError, state)
 		}
 		return
 	}
@@ -138,7 +139,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			writeTokenErrorResponse(w, oidc.ErrServerError, "")
 		}
 		return
 	}
@@ -146,7 +147,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := oidc.GenerateJWKSet(project.TokenConfig.SigningAlgorithm, project.TokenConfig.SignPublicKey)
 	if err != nil {
 		logger.Error("Failed to generate JWT set: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		writeTokenErrorResponse(w, oidc.ErrServerError, "")
 		return
 	}
 
