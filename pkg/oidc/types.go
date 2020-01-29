@@ -63,6 +63,20 @@ type TokenResponse struct {
 	IDToken          string
 }
 
+// Error ...
+type Error struct {
+	Name        string `json:"error"`
+	Description string `json:"error_description"`
+	Code        int    `json:"status_code"`
+}
+
+// Error ...
+func (e *Error) Error() string {
+	return e.Name
+}
+
+// *) error definition is in errors.go
+
 var (
 	// ErrClientAuthFailed ...
 	ErrClientAuthFailed = errors.New("client authentication failed")
