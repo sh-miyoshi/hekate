@@ -479,3 +479,78 @@ func (m *Manager) AuthCodeGet(codeID string) (*model.AuthCode, error) {
 	// TODO(validate codeID)
 	return m.authCode.Get(codeID)
 }
+
+// CustomRoleAdd ...
+func (m *Manager) CustomRoleAdd(ent *model.CustomRole) error {
+	// TODO(add validation)
+	// if err := ent.Validate(); err != nil {
+	// 	return errors.Wrap(err, "Failed to validate entry")
+	// }
+
+	if err := m.customRole.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	_, err := m.customRole.Get(ent.ID)
+	if err != model.ErrNoSuchCustomRole {
+		m.customRole.AbortTx()
+		if err == nil {
+			return model.ErrCustomRoleAlreadyExists
+		}
+		return errors.Wrap(err, "Failed to get customRole info")
+	}
+
+	if err := m.customRole.Add(ent); err != nil {
+		m.customRole.AbortTx()
+		return errors.Wrap(err, "Failed to add customRole")
+	}
+	m.customRole.CommitTx()
+	return nil
+}
+
+// CustomRoleDelete ...
+func (m *Manager) CustomRoleDelete(customRoleID string) error {
+	// TODO(validate customRoleID)
+
+	if err := m.customRole.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	if err := m.customRole.Delete(customRoleID); err != nil {
+		m.customRole.AbortTx()
+		return errors.Wrap(err, "Failed to delete customRole")
+	}
+	m.customRole.CommitTx()
+	return nil
+}
+
+// CustomRoleGetList ...
+func (m *Manager) CustomRoleGetList(projectName string) ([]string, error) {
+	// TODO(validate projectName)
+	return m.customRole.GetList(projectName)
+}
+
+// CustomRoleGet ...
+func (m *Manager) CustomRoleGet(customRoleID string) (*model.CustomRole, error) {
+	// TODO(validate customRoleID)
+	return m.customRole.Get(customRoleID)
+}
+
+// CustomRoleUpdate ...
+func (m *Manager) CustomRoleUpdate(ent *model.CustomRole) error {
+	// TODO(add validation)
+	// if err := ent.Validate(); err != nil {
+	// 	return errors.Wrap(err, "Failed to validate entry")
+	// }
+
+	if err := m.customRole.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	if err := m.customRole.Update(ent); err != nil {
+		m.customRole.AbortTx()
+		return errors.Wrap(err, "Failed to update client")
+	}
+	m.customRole.CommitTx()
+	return nil
+}

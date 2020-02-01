@@ -16,6 +16,9 @@ type CustomRole struct {
 var (
 	// ErrNoSuchCustomRole ...
 	ErrNoSuchCustomRole = errors.New("No Such Custom Role")
+
+	// ErrCustomRoleAlreadyExists ...
+	ErrCustomRoleAlreadyExists = errors.New("Custom Role Already Exists")
 )
 
 // CustomRoleHandler ...
@@ -23,6 +26,7 @@ type CustomRoleHandler interface {
 	Add(ent *CustomRole) error
 	Delete(roleID string) error
 	Get(roleID string) (*CustomRole, error)
+	GetList(projectName string) ([]string, error)
 	Update(ent *CustomRole) error
 	DeleteAll(projectName string) error
 
