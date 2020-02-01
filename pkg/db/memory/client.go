@@ -8,16 +8,14 @@ import (
 // ClientInfoHandler implement db.ClientInfoHandler
 type ClientInfoHandler struct {
 	// clientList[clientID] = ClientInfo
-	clientList     map[string]*model.ClientInfo
-	projectHandler *ProjectInfoHandler
-	mu             sync.Mutex
+	clientList map[string]*model.ClientInfo
+	mu         sync.Mutex
 }
 
 // NewClientHandler ...
-func NewClientHandler(projectHandler *ProjectInfoHandler) (*ClientInfoHandler, error) {
+func NewClientHandler() (*ClientInfoHandler, error) {
 	res := &ClientInfoHandler{
-		clientList:     make(map[string]*model.ClientInfo),
-		projectHandler: projectHandler,
+		clientList: make(map[string]*model.ClientInfo),
 	}
 	return res, nil
 }
@@ -40,11 +38,6 @@ func (h *ClientInfoHandler) Delete(clientID string) error {
 // GetList ...
 func (h *ClientInfoHandler) GetList(projectName string) ([]string, error) {
 	res := []string{}
-
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		// project is created in Add method, so maybe empty project
-		return res, nil
-	}
 
 	for _, client := range h.clientList {
 		if client.ProjectName == projectName {

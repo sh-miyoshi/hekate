@@ -41,11 +41,6 @@ func (h *UserInfoHandler) Delete(userID string) error {
 func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 	res := []string{}
 
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		// project is created in Add method, so maybe empty project
-		return res, nil
-	}
-
 	for _, user := range h.userList {
 		if user.ProjectName == projectName {
 			res = append(res, user.ID)

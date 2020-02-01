@@ -45,7 +45,7 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create session handler")
 		}
-		clientHandler, err := memory.NewClientHandler(prjHandler)
+		clientHandler, err := memory.NewClientHandler()
 		if err != nil {
 			return errors.Wrap(err, "Failed to create client handler")
 		}
