@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -11,6 +12,11 @@ type CustomRole struct {
 	CreatedAt   time.Time
 	ProjectName string
 }
+
+var (
+	// ErrNoSuchCustomRole ...
+	ErrNoSuchCustomRole = errors.New("No Such Custom Role")
+)
 
 // CustomRoleHandler ...
 type CustomRoleHandler interface {

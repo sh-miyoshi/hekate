@@ -51,3 +51,10 @@ type authCode struct {
 	RedirectURL string    `bson:"redirectURL"`
 	UserID      string    `bson:"userID"`
 }
+
+type customRole struct {
+	ID          string    `bson:"id"`
+	Name        string    `bson:"name"`
+	CreatedAt   time.Time `bson:"createdAt"`
+	ProjectName string    `bson:"projectName"`
+}

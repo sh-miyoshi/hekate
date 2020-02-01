@@ -14,11 +14,12 @@ import (
 
 // Manager ...
 type Manager struct {
-	project  model.ProjectInfoHandler
-	user     model.UserInfoHandler
-	session  model.SessionHandler
-	client   model.ClientInfoHandler
-	authCode model.AuthCodeHandler
+	project    model.ProjectInfoHandler
+	user       model.UserInfoHandler
+	session    model.SessionHandler
+	client     model.ClientInfoHandler
+	authCode   model.AuthCodeHandler
+	customRole model.CustomRoleHandler
 }
 
 var inst *Manager
@@ -52,13 +53,18 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create auth code handler")
 		}
+		customRoleHandler, err := memory.NewCustomRoleHandler()
+		if err != nil {
+			return errors.Wrap(err, "Failed to create custom role handler")
+		}
 
 		inst = &Manager{
-			project:  prjHandler,
-			user:     userHandler,
-			session:  sessionHander,
-			client:   clientHandler,
-			authCode: authCodeHandler,
+			project:    prjHandler,
+			user:       userHandler,
+			session:    sessionHander,
+			client:     clientHandler,
+			authCode:   authCodeHandler,
+			customRole: customRoleHandler,
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -87,13 +93,18 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create auth code handler")
 		}
+		customRoleHandler, err := mongo.NewCustomRoleHandler(dbClient)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create custom role handler")
+		}
 
 		inst = &Manager{
-			project:  prjHandler,
-			user:     userHandler,
-			session:  sessionHandler,
-			client:   clientHandler,
-			authCode: authCodeHandler,
+			project:    prjHandler,
+			user:       userHandler,
+			session:    sessionHandler,
+			client:     clientHandler,
+			authCode:   authCodeHandler,
+			customRole: customRoleHandler,
 		}
 	default:
 		return errors.New(fmt.Sprintf("Database Type %s is not implemented yet", dbType))

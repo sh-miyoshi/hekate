@@ -15,6 +15,7 @@ const (
 	clientCollectionName   = "client"
 	sessionCollectionName  = "session"
 	authCodeCollectionName = "code"
+	roleCollectionName     = "customrole"
 
 	timeoutSecond = 5
 )
