@@ -71,7 +71,8 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		Name:         request.Name,
 		CreatedAt:    time.Now(),
 		PasswordHash: util.CreateHash(request.Password),
-		Roles:        request.Roles,
+		SystemRoles:  request.SystemRoles,
+		CustomRoles:  request.CustomRoles,
 	}
 
 	if err := db.GetInst().UserAdd(&user); err != nil {
@@ -94,7 +95,8 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		Name:         user.Name,
 		PasswordHash: user.PasswordHash,
 		CreatedAt:    user.CreatedAt.String(),
-		Roles:        user.Roles,
+		SystemRoles:  user.SystemRoles,
+		CustomRoles:  user.CustomRoles,
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
@@ -164,7 +166,8 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		Name:         user.Name,
 		PasswordHash: user.PasswordHash,
 		CreatedAt:    user.CreatedAt.String(),
-		Roles:        user.Roles,
+		SystemRoles:  user.SystemRoles,
+		CustomRoles:  user.CustomRoles,
 	}
 
 	sessions, err := db.GetInst().SessionGetList(user.ID)
@@ -223,7 +226,8 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// name, password, roles
 	user.Name = request.Name
 	user.PasswordHash = util.CreateHash(request.Password)
-	user.Roles = request.Roles
+	user.SystemRoles = request.SystemRoles
+	user.CustomRoles = request.CustomRoles
 
 	// Update DB
 	if err := db.GetInst().UserUpdate(user); err != nil {
@@ -251,8 +255,13 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	userID := vars["userID"]
 	roleID := vars["roleID"]
 
+	roleType := model.RoleCustom
+	if ok := role.GetInst().IsValid(roleID); ok {
+		roleType = model.RoleSystem
+	}
+
 	// Get Previous User Info
-	if err := db.GetInst().UserAddRole(userID, roleID); err != nil {
+	if err := db.GetInst().UserAddRole(userID, roleType, roleID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)

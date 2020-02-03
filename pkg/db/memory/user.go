@@ -96,12 +96,16 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 }
 
 // AddRole ...
-func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
+func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID string) error {
 	if _, exists := h.userList[userID]; !exists {
 		return model.ErrNoSuchUser
 	}
 
-	roles := h.userList[userID].Roles
+	roles := h.userList[userID].SystemRoles
+	if roleType == model.RoleCustom {
+		roles = h.userList[userID].CustomRoles
+	}
+
 	for _, r := range roles {
 		if r == roleID {
 			return model.ErrRoleAlreadyAppended
@@ -109,7 +113,11 @@ func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
 	}
 
 	roles = append(roles, roleID)
-	h.userList[userID].Roles = roles
+	if roleType == model.RoleCustom {
+		h.userList[userID].CustomRoles = roles
+	} else if roleType == model.RoleSystem {
+		h.userList[userID].SystemRoles = roles
+	}
 
 	return nil
 }
@@ -122,7 +130,7 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 
 	deleted := false
 	roles := []string{}
-	for _, r := range h.userList[userID].Roles {
+	for _, r := range h.userList[userID].SystemRoles {
 		if r == roleID {
 			deleted = true
 		} else {
@@ -130,13 +138,27 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 		}
 	}
 
-	h.userList[userID].Roles = roles
-
-	if !deleted {
-		return model.ErrNoSuchRoleInUser
+	if deleted {
+		h.userList[userID].SystemRoles = roles
+		return nil
 	}
 
-	return nil
+	deleted = false
+	roles = []string{}
+	for _, r := range h.userList[userID].CustomRoles {
+		if r == roleID {
+			deleted = true
+		} else {
+			roles = append(roles, r)
+		}
+	}
+
+	if deleted {
+		h.userList[userID].CustomRoles = roles
+		return nil
+	}
+
+	return model.ErrNoSuchRoleInUser
 }
 
 // BeginTx ...

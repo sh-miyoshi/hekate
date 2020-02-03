@@ -2,7 +2,6 @@ package model
 
 import (
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/role"
 	"time"
 )
 
@@ -13,7 +12,18 @@ type UserInfo struct {
 	Name         string
 	CreatedAt    time.Time
 	PasswordHash string
-	Roles        []string
+	SystemRoles  []string
+	CustomRoles  []string
+}
+
+// RoleType ...
+type RoleType struct {
+	value string
+}
+
+// String method returns a name of role type
+func (t RoleType) String() string {
+	return t.value
 }
 
 var (
@@ -31,6 +41,12 @@ var (
 
 	// ErrUserValidateFailed ...
 	ErrUserValidateFailed = errors.New("User validation failed")
+
+	// RoleSystem ...
+	RoleSystem = RoleType{"system_management"}
+
+	// RoleCustom ...
+	RoleCustom = RoleType{"custom_role"}
 )
 
 // UserInfoHandler ...
@@ -42,7 +58,7 @@ type UserInfoHandler interface {
 	GetByName(projectName string, userName string) (*UserInfo, error)
 	Update(ent *UserInfo) error
 	DeleteAll(projectName string) error
-	AddRole(userID string, roleID string) error
+	AddRole(userID string, roleType RoleType, roleID string) error
 	DeleteRole(userID string, roleID string) error
 
 	// BeginTx method starts a transaction
@@ -69,13 +85,6 @@ func (ui *UserInfo) Validate() error {
 	// Check User Name
 	if !validateUserName(ui.Name) {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid user name format")
-	}
-
-	// Check Roles
-	for _, r := range ui.Roles {
-		if !role.GetInst().IsValid(r) {
-			return errors.Wrap(ErrUserValidateFailed, "Invalid role")
-		}
 	}
 
 	return nil

@@ -22,6 +22,7 @@ type RoleValue struct {
 // RoleSet ...
 type RoleSet struct {
 	SystemManagement RoleValue `json:"system_management"`
+	User             RoleValue `json:"user"`
 }
 
 // AccessTokenClaims ...

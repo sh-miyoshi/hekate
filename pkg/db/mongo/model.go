@@ -32,7 +32,8 @@ type userInfo struct {
 	Name         string    `bson:"name"`
 	CreatedAt    time.Time `bson:"createdAt"`
 	PasswordHash string    `bson:"passwordHash"`
-	Roles        []string  `bson:"roles"`
+	SystemRoles  []string  `bson:"system_roles"`
+	CustomRoles  []string  `bson:"custom_roles"`
 }
 
 type clientInfo struct {

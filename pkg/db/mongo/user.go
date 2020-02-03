@@ -47,7 +47,8 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 		Name:         ent.Name,
 		CreatedAt:    ent.CreatedAt,
 		PasswordHash: ent.PasswordHash,
-		Roles:        ent.Roles,
+		SystemRoles:  ent.SystemRoles,
+		CustomRoles:  ent.CustomRoles,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
@@ -143,7 +144,8 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 		Name:         ent.Name,
 		CreatedAt:    ent.CreatedAt,
 		PasswordHash: ent.PasswordHash,
-		Roles:        ent.Roles,
+		SystemRoles:  ent.SystemRoles,
+		CustomRoles:  ent.CustomRoles,
 	}
 
 	updates := bson.D{
@@ -200,18 +202,27 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 }
 
 // AddRole ...
-func (h *UserInfoHandler) AddRole(userID string, roleID string) error {
+func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID string) error {
 	user, err := h.Get(userID)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get user info in AddRole")
 	}
 
-	for _, role := range user.Roles {
-		if role == roleID {
-			return model.ErrRoleAlreadyAppended
+	if roleType == model.RoleSystem {
+		for _, role := range user.SystemRoles {
+			if role == roleID {
+				return model.ErrRoleAlreadyAppended
+			}
 		}
+		user.SystemRoles = append(user.SystemRoles, roleID)
+	} else if roleType == model.RoleCustom {
+		for _, role := range user.CustomRoles {
+			if role == roleID {
+				return model.ErrRoleAlreadyAppended
+			}
+		}
+		user.CustomRoles = append(user.CustomRoles, roleID)
 	}
-	user.Roles = append(user.Roles, roleID)
 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
@@ -241,17 +252,31 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 
 	deleted := false
 	roles := []string{}
-	for _, role := range user.Roles {
+	for _, role := range user.SystemRoles {
 		if role == roleID {
 			deleted = true
 		} else {
 			roles = append(roles, role)
 		}
 	}
-	if !deleted {
-		return model.ErrNoSuchRoleInUser
+
+	if deleted {
+		user.SystemRoles = roles
+	} else {
+		deleted = false
+		roles = []string{}
+		for _, role := range user.CustomRoles {
+			if role == roleID {
+				deleted = true
+			} else {
+				roles = append(roles, role)
+			}
+		}
+		if !deleted {
+			return model.ErrNoSuchRoleInUser
+		}
+		user.CustomRoles = roles
 	}
-	user.Roles = roles
 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{

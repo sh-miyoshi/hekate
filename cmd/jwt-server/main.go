@@ -111,7 +111,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		Name:         adminName,
 		CreatedAt:    time.Now(),
 		PasswordHash: util.CreateHash(adminPassword),
-		Roles:        defaultrole.GetInst().GetList(), // set all roles
+		SystemRoles:  defaultrole.GetInst().GetList(), // set all roles
 	})
 
 	if err != nil {

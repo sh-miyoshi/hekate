@@ -10,6 +10,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/mongo"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/role"
 )
 
 // Manager ...
@@ -218,6 +219,13 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
+	for _, r := range ent.SystemRoles {
+		if !role.GetInst().IsValid(r) {
+			return errors.Wrap(model.ErrUserValidateFailed, "Invalid role")
+		}
+	}
+	// TODO(validate custom role)
+
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
@@ -281,6 +289,13 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
+	for _, r := range ent.SystemRoles {
+		if !role.GetInst().IsValid(r) {
+			return errors.Wrap(model.ErrUserValidateFailed, "Invalid role")
+		}
+	}
+	// TODO(validate custom role)
+
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
@@ -299,12 +314,12 @@ func (m *Manager) UserGetByName(projectName string, userName string) (*model.Use
 }
 
 // UserAddRole ...
-func (m *Manager) UserAddRole(userID string, roleID string) error {
+func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID string) error {
 	// TODO(validate userID, roleID)
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
-	if err := m.user.AddRole(userID, roleID); err != nil {
+	if err := m.user.AddRole(userID, roleType, roleID); err != nil {
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to add role to user")
 	}
