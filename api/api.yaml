@@ -512,7 +512,142 @@ paths:
         '204':
           description: 'Deleted'
         '404':
-          description: 'User Not Found'
+          description: 'Client Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/role':
+    post:
+      tags:
+        - role
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomRoleCreateRequest'
+      responses:
+        '200':
+          description: 'Created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomRoleGetResponse'
+        '400':
+          description: 'Bad Request'
+        '409':
+          description: 'Role Already Exists'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    get:
+      tags:
+        - role
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Get All Custom Role IDs'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: 'Project Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/role/{roleID}':
+    get:
+      tags:
+        - role
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully get custom role info'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomRoleGetResponse'
+        '404':
+          description: 'Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    put:
+      tags:
+        - role
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomRolePutRequest'
+      responses:
+        '204':
+          description: 'Updated'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'Role Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    delete:
+      tags:
+        - role
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Deleted'
+        '404':
+          description: 'Role Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -632,6 +767,26 @@ components:
           type: array
           items:
             type: string
+    CustomRoleCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    CustomRoleGetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date
+    CustomRolePutRequest:
+      type: object
+      properties:
+        name:
+          type: string
     TokenResponse:
       type: object
       properties:
@@ -678,4 +833,3 @@ components:
           type: array
           items:
             type: string
-
