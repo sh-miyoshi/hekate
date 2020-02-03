@@ -14,10 +14,10 @@
   - OIDCのエラーフォーマットに沿う
 - 各種APIの実装
   - user role API
-    - add, delete, get, update
     - userに紐付ける
     - token情報に含める
   - openid connect API
+    - token revocation
     - implicit flow
     - hybrid flow
   - 特定ユーザのログアウト(session全削除)
@@ -45,7 +45,6 @@
   - RS256以外のSigining Algorithmのサポート
   - preferred_usernameの追加
 - APIのRBACの見直し
-- custom roleの有効化
 - userのパスワード変更のrole見直し
   - 本人のみが変更できるようにする
 - SAML対応
