@@ -7,9 +7,10 @@ type CustomRoleCreateRequest struct {
 
 // CustomRoleGetResponse ...
 type CustomRoleGetResponse struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"createdAt"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	ProjectName string `json:"projectName"`
+	CreatedAt   string `json:"createdAt"`
 }
 
 // CustomRolePutRequest ...
