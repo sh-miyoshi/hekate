@@ -201,3 +201,44 @@ if [ $result != "success" ]; then
 	echo "Failed to delete client"
 	exit 1
 fi
+
+# Custom Role Create
+result=`test_api_return_json "$URL/project/master/role" POST $master_access_token 'inputs/role_create.json'`
+if [ $? != 0 ]; then
+	echo "Failed to create custom role"
+	exit 1
+fi
+echo "success"
+roleID=`echo $result | jq -r .id`
+
+# All Custom Role Get
+result=`test_api "$URL/project/master/role" GET $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to get custom role list"
+	exit 1
+fi
+
+# Custom Role Get
+result=`test_api "$URL/project/master/role/$roleID" GET $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to get custom role"
+	exit 1
+fi
+
+# Custom Role Update
+result=`test_api "$URL/project/master/role/$roleID" PUT $master_access_token 'inputs/role_update.json'`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to update custom role"
+	exit 1
+fi
+
+# Custom Role Delete
+result=`test_api "$URL/project/master/role/$roleID" DELETE $master_access_token`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to delete custom role"
+	exit 1
+fi
