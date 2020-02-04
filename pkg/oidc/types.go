@@ -2,6 +2,8 @@ package oidc
 
 import (
 	validator "github.com/go-playground/validator/v10"
+	"strings"
+	"github.com/pkg/errors"
 )
 
 // AuthRequest ...
@@ -28,6 +30,21 @@ type AuthRequest struct {
 func (r *AuthRequest) Validate() error {
 	if err := validator.New().Struct(r); err != nil {
 		return err
+	}
+
+	// Check Response Type
+	ok := false
+FOR_LABEL:
+	for _, typ := range strings.Split(r.ResponseType, " ") {
+		for _, support := range GetSupportedResponseType() {
+			if typ == support {
+				ok = true
+				break FOR_LABEL
+			}
+		}
+	}
+	if !ok {
+		return errors.New("Unsupported response type specified")
 	}
 
 	// TODO(add more validation)
