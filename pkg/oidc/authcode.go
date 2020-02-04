@@ -10,17 +10,6 @@ import (
 	"time"
 )
 
-var (
-	expiresTimeSec uint64
-	userLoginHTML  string
-)
-
-// InitAuthCodeConfig ...
-func InitAuthCodeConfig(authCodeExpiresTimeSec uint64, authCodeUserLoginFile string) {
-	expiresTimeSec = authCodeExpiresTimeSec
-	userLoginHTML = authCodeUserLoginFile
-}
-
 // NewAuthRequest ...
 func NewAuthRequest(values url.Values) *AuthRequest {
 	return &AuthRequest{

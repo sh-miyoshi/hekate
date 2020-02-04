@@ -167,8 +167,8 @@ func main() {
 	// TODO(use https)
 	token.InitConfig(false)
 
-	// Initialize OIDC Auth Code Config
-	oidc.InitAuthCodeConfig(cfg.AuthCodeExpiresTime, cfg.AuthCodeUserLoginFile)
+	// Initialize OIDC Config
+	oidc.InitConfig(cfg.AuthCodeExpiresTime, cfg.AuthCodeUserLoginFile)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
