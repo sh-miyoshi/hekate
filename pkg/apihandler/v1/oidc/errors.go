@@ -16,11 +16,11 @@ func writeTokenErrorResponse(w http.ResponseWriter, err *oidc.Error, state strin
 
 	w.Header().Add("Content-Type", "application/json")
 
+	w.WriteHeader(err.Code)
+
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		logger.Error("Failed to encode a token error response: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(err.Code)
 }
