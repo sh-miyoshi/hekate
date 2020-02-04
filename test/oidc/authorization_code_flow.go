@@ -87,6 +87,21 @@ func main() {
 
 	fmt.Printf("login res: %v\n", res)
 
-	// TODO(check status code: 302 -> ok)
+	if res.StatusCode != http.StatusFound {
+		fmt.Printf("Unexpected login result: want status %d, got %d\n", http.StatusFound, res.StatusCode)
+		os.Exit(1)
+	}
+
 	// TODO(exchange code to token)
+	url = res.Header.Get("Location")
+	u, _ = neturl.Parse(url)
+	code = u.Query().Get("code")
+	fmt.Printf("auth code: %s\n", code)
+	accessToken, err := config.Exchange(context.Background(), code)
+	if err != nil {
+		fmt.Printf("Failed to get access token: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("access token: %v\n", accessToken)
 }
