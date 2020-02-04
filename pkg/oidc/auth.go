@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+// TODO(consider response type when generating token)
+
 func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, r *http.Request, genRefresh, genIDToken bool) (*TokenResponse, error) {
 	// Generate JWT Token
 	res := TokenResponse{

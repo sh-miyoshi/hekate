@@ -166,11 +166,15 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	authReq := oidc.NewAuthRequest(queries)
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		e, ok := err.(*oidc.Error)
+		if ok {
+			writeTokenErrorResponse(w, e, authReq.State)
+		} else {
+			logger.Error("Failed to cast to *oidc.Error, this is critical program bug: %+v", err)
+			writeTokenErrorResponse(w, oidc.ErrServerError, "")
+		}
 		return
 	}
-
-	// TODO(switch by request)
 
 	// return end user auth prompt
 	code := oidc.RegisterUserLoginSession(authReq)
@@ -185,7 +189,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
 		return
 	}
 
@@ -194,12 +198,15 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	authReq := oidc.NewAuthRequest(r.Form)
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
-		// TODO(return correct error response)
+		e, ok := err.(*oidc.Error)
+		if ok {
+			writeTokenErrorResponse(w, e, authReq.State)
+		} else {
+			logger.Error("Failed to cast to *oidc.Error, this is critical program bug: %+v", err)
+			writeTokenErrorResponse(w, oidc.ErrServerError, "")
+		}
 		return
 	}
-
-	// TODO(switch by request)
 
 	// return end user auth prompt
 	code := oidc.RegisterUserLoginSession(authReq)
@@ -214,7 +221,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
 		return
 	}
 
@@ -224,7 +231,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	authReq, err := oidc.UserLoginVerify(r.Form.Get("login_verify_code"))
 	if err != nil {
 		logger.Info("Failed to verify user login session: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, r.Form.Get("state"))
 		return
 	}
 
@@ -235,10 +242,10 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Cause(err) == user.ErrAuthFailed {
 			logger.Info("Failed to authenticate user %s: %v", uname, err)
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, authReq.State)
 		} else {
 			logger.Error("Failed to verify user: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
 		}
 		return
 	}
@@ -253,7 +260,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
 	if err != nil {
 		logger.Error("Failed to create response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
 		return
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -267,7 +274,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	claims, err := jwthttp.ValidateAPIRequest(r)
 	if err != nil {
 		logger.Info("Failed to validate header: %v", err)
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, "")
 		return
 	}
 
@@ -275,7 +282,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If token validate accepted, user absolutely exists
 		logger.Error("Failed to get user: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		writeTokenErrorResponse(w, oidc.ErrServerError, "")
 		return
 	}
 

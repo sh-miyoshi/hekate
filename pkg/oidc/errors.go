@@ -38,6 +38,7 @@ var (
 	// ErrUnsupportedResponseType ...
 	ErrUnsupportedResponseType = &Error{
 		Name: "unsupported_response_type",
+		Description: "Given type is unsupported",
 		Code: http.StatusBadRequest,
 	}
 
