@@ -27,7 +27,13 @@ jobs:
         cd cmd/jwt-server
         go build -o jwt-server
         ./jwt-server &
+
     - name: API Test
       run: |
         cd test
         ./all_api_test.sh
+
+    - name: OIDC Test
+      run: |
+        cd test/oidc
+        go run authorization_code_flow.go

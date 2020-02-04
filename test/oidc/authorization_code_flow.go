@@ -5,12 +5,12 @@ import (
 	"fmt"
 	oidc "github.com/coreos/go-oidc"
 	"golang.org/x/oauth2"
-	"os"
-	"net/http"
-	"regexp"
 	"io/ioutil"
-	"strings"
+	"net/http"
 	neturl "net/url"
+	"os"
+	"regexp"
+	"strings"
 )
 
 func main() {
@@ -64,15 +64,15 @@ func main() {
 	code := u.Query().Get("login_verify_code")
 	fmt.Printf("code: %s\n", code)
 
-	req,_ := http.NewRequest("POST", url, nil)
+	req, _ := http.NewRequest("POST", url, nil)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	values := neturl.Values{
-		"username": []string{"admin"},
-		"password": []string{"password"},
+		"username":          []string{"admin"},
+		"password":          []string{"password"},
 		"login_verify_code": []string{code},
 	}
 	req.URL.RawQuery = values.Encode()
-	
+
 	client := &http.Client{}
 	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
@@ -92,16 +92,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	// TODO(exchange code to token)
 	url = res.Header.Get("Location")
 	u, _ = neturl.Parse(url)
 	code = u.Query().Get("code")
 	fmt.Printf("auth code: %s\n", code)
-	accessToken, err := config.Exchange(context.Background(), code)
+	tkn, err := config.Exchange(context.Background(), code)
 	if err != nil {
 		fmt.Printf("Failed to get access token: %v\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("access token: %v\n", accessToken)
+	fmt.Printf("access token: %v\n", tkn.AccessToken)
 }
