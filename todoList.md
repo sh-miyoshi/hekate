@@ -13,10 +13,9 @@
 - 各種APIの実装
   - openid connect API
     - token revocation
+      - Test
     - implicit flow
     - hybrid flow
-  - 特定ユーザのログアウト(session全削除)
-    - API docの修正
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 各リソースのGet APIの見直し
     - 全体検索のみ？queryで検索できるようにする？
