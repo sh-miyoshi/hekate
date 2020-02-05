@@ -2,8 +2,8 @@
 
 ## Overview
 
-`jwt-server`はOpenID Connectに対応したシンプルな認証・認可サーバです。
-単一バイナリでユーザー管理と認証・認可処理を実装しており、シンプルさを維持しています。
+`jwt-server`はGo言語で記述されたOpenID Connectに対応したシンプルな認証・認可サーバです。  
+単一バイナリでユーザー管理と認証・認可処理を実装しています。  
 
 ## Project Goal
 
@@ -38,4 +38,8 @@ curl --insecure -s -X POST http://localhost:8080/api/v1/project/master/openid-co
 
 ## All APIs
 
-[test/all_api_test.sh](test/all_api_test.sh)を参照してください。
+[api/api.html](api/api.html)、もしくは[test/all_api_test.sh](test/all_api_test.sh)を参照してください。
+
+## Road Map
+
+[TODO List](./todoList.md)を参照してください。

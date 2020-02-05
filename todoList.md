@@ -9,13 +9,8 @@
 
 ## jwt-server application enhancement
 
-- http errorの充実
-  - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
-  - OIDCのエラーフォーマットに沿う
+- user login session情報をDBに保存する
 - 各種APIの実装
-  - user role API
-    - userに紐付ける
-    - token情報に含める
   - openid connect API
     - token revocation
     - implicit flow
@@ -24,7 +19,6 @@
   - sessionの詳細取得(引数: project, useID, sessionID)
   - 各リソースのGet APIの見直し
     - 全体検索のみ？queryで検索できるようにする？
-- user login session情報をDBに保存する
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
@@ -34,12 +28,14 @@
   - resource type (or url path and method)
   - client
   - success or failed
-- DBGCの追加
-  - Expiredしたsessionなどを一定期間ごとに削除する
-- projectのimport/export
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type
+- DBGCの追加
+  - Expiredしたsessionなどを一定期間ごとに削除する
+- http errorの充実
+  - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
+- projectのimport/export
 - OpenID Connect部分のエンハンス
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
