@@ -306,6 +306,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	tokenType := r.Form.Get("token_type_hint")
 	switch tokenType {
 	case "access_token":
+		// TODO(implement revoketion of access token)
 		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
 	case "refresh_token":
 		refreshToken := r.Form.Get("token")
@@ -316,7 +317,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		if err := db.GetInst().SessionDelete(claims.SessionID); err != nil {
 			e := errors.Cause(err)
 			if e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
