@@ -5,6 +5,10 @@ import (
 )
 
 var (
+	//-------------------------------------
+	// Define in RFC6749
+	//-------------------------------------
+
 	// ErrUnknownRequest ...
 	ErrUnknownRequest = &Error{
 		Name: "unknown_error",
@@ -196,6 +200,17 @@ var (
 	// ErrInvalidRequestObject ...
 	ErrInvalidRequestObject = &Error{
 		Name: "invalid_request_object",
+		Code: http.StatusBadRequest,
+	}
+
+
+	//-------------------------------------
+	// Define in OAuth 2.0 Token Revocation
+	//-------------------------------------
+
+	// ErrUnsupportedTokenType ...
+	ErrUnsupportedTokenType = &Error{
+		Name: "unsupported_token_type",
 		Code: http.StatusBadRequest,
 	}
 )

@@ -293,3 +293,43 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	jwthttp.ResponseWrite(w, "UserInfoHandler", res)
 }
+
+// RevokeHandler ...
+func RevokeHandler(w http.ResponseWriter, r *http.Request) {
+	// Get data form Form
+	if err := r.ParseForm(); err != nil {
+		logger.Info("Failed to parse form: %v", err)
+		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
+		return
+	}
+
+	tokenType := r.Form.Get("token_type_hint")
+	switch tokenType {
+	case "access_token":
+		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
+	case "refresh_token":
+		refreshToken := r.Form.Get("token")
+		claims := &token.RefreshTokenClaims{}
+		issuer := token.GetExpectIssuer(r)
+		if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
+			logger.Info("Failed to validate refresh token: %v", err)
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		
+		if err := db.GetInst().SessionDelete(claims.SessionID); err != nil {
+			e := errors.Cause(err)
+			if e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
+				logger.Info("Failed to revoke session: %v", err)
+				w.WriteHeader(http.StatusOK)
+			} else {
+				logger.Error("Failed to revoke session: %+v", err)
+				writeTokenErrorResponse(w, oidc.ErrServerError, r.Form.Get("state"))
+			}
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	default:
+		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
+	}
+}

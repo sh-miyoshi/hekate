@@ -68,7 +68,6 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 		},
 	}
 
-	// TODO(Set user roles)
 	user, err := db.GetInst().UserGet(request.UserID)
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to get user")
