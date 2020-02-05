@@ -76,8 +76,12 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 	for _, role := range user.SystemRoles {
 		claims.ResourceAccess.SystemManagement.Roles = append(claims.ResourceAccess.SystemManagement.Roles, role)
 	}
-	for _, role := range user.CustomRoles {
-		claims.ResourceAccess.User.Roles = append(claims.ResourceAccess.User.Roles, role)
+	for _, rid := range user.CustomRoles {
+		role, err := db.GetInst().CustomRoleGet(rid)
+		if err != nil {
+			return "", errors.Wrap(err, "Failed to get custom role name")
+		}
+		claims.ResourceAccess.User.Roles = append(claims.ResourceAccess.User.Roles, role.Name)
 	}
 
 	return signToken(request.ProjectName, claims)

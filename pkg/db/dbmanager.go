@@ -501,6 +501,7 @@ func (m *Manager) CustomRoleAdd(ent *model.CustomRole) error {
 	// if err := ent.Validate(); err != nil {
 	// 	return errors.Wrap(err, "Failed to validate entry")
 	// }
+	// TODO(validate name uniquness in project)
 
 	if err := m.customRole.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
@@ -557,6 +558,7 @@ func (m *Manager) CustomRoleUpdate(ent *model.CustomRole) error {
 	// if err := ent.Validate(); err != nil {
 	// 	return errors.Wrap(err, "Failed to validate entry")
 	// }
+	// TODO(validate name uniquness in project)
 
 	if err := m.customRole.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
