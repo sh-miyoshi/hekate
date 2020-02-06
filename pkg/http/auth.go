@@ -1,11 +1,12 @@
 package http
 
 import (
-	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/role"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"net/http"
 	"strings"
+
+	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/jwt-server/pkg/oidc/token"
+	"github.com/sh-miyoshi/jwt-server/pkg/role"
 )
 
 func parseHTTPHeaderToken(tokenString string) (string, error) {

@@ -1,6 +1,9 @@
 package oidc
 
 import (
+	"net/http"
+	"net/url"
+
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
@@ -8,10 +11,8 @@ import (
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
+	"github.com/sh-miyoshi/jwt-server/pkg/oidc/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/user"
-	"net/http"
-	"net/url"
 )
 
 // ConfigGetHandler method return a configuration of OpenID Connect

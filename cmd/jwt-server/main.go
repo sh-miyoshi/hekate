@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -17,12 +21,9 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
+	"github.com/sh-miyoshi/jwt-server/pkg/oidc/token"
 	defaultrole "github.com/sh-miyoshi/jwt-server/pkg/role"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
-	"net/http"
-	"os"
-	"time"
 )
 
 func loggingMiddleware(next http.Handler) http.Handler {

@@ -2,15 +2,16 @@ package oidc
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"github.com/sh-miyoshi/jwt-server/pkg/token"
+	"github.com/sh-miyoshi/jwt-server/pkg/oidc/token"
 	"github.com/sh-miyoshi/jwt-server/pkg/user"
-	"net"
-	"net/http"
-	"time"
 )
 
 // TODO(consider response type when generating token)
