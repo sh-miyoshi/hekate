@@ -219,10 +219,20 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 
 // AddRole ...
 func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID string) error {
-	// TODO(fix bug use userInfo struct, not model.UserInfo)
-	user, err := h.Get(userID)
-	if err != nil {
-		return errors.Wrap(err, "Failed to get user info in AddRole")
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "id", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	user := &userInfo{}
+	if err := col.FindOne(ctx, filter).Decode(user); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.ErrNoSuchUser
+		}
+		return errors.Wrap(err, "Failed to get user from mongodb")
 	}
 
 	if roleType == model.RoleSystem {
@@ -241,14 +251,6 @@ func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID
 		user.CustomRoles = append(user.CustomRoles, roleID)
 	}
 
-	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
-	filter := bson.D{
-		{Key: "id", Value: user.ID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
 	updates := bson.D{
 		{Key: "$set", Value: user},
 	}
@@ -262,10 +264,20 @@ func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID
 
 // DeleteRole ...
 func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
-	// TODO(fix bug use userInfo struct, not model.UserInfo)
-	user, err := h.Get(userID)
-	if err != nil {
-		return errors.Wrap(err, "Failed to get user info in AddRole")
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "id", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	user := &userInfo{}
+	if err := col.FindOne(ctx, filter).Decode(user); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.ErrNoSuchUser
+		}
+		return errors.Wrap(err, "Failed to get user from mongodb")
 	}
 
 	deleted := false
@@ -295,14 +307,6 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 		}
 		user.CustomRoles = roles
 	}
-
-	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
-	filter := bson.D{
-		{Key: "id", Value: user.ID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
 
 	updates := bson.D{
 		{Key: "$set", Value: user},
