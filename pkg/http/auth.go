@@ -47,7 +47,7 @@ func AuthHeader(req *http.Request, reqTrgRes role.Resource, reqRoleType role.Typ
 	}
 
 	// Authorize API Request
-	if !role.GetInst().Authorize(claims.ResourceAccess.SystemManagement.Roles, role.ResCluster, role.TypeRead) {
+	if !role.GetInst().Authorize(claims.ResourceAccess.SystemManagement.Roles, reqTrgRes, reqRoleType) {
 		return errors.New("Do not have authority")
 	}
 

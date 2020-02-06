@@ -120,7 +120,7 @@ func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &model.UserInfo{}
+	res := &userInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchUser
@@ -128,7 +128,15 @@ func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 		return nil, errors.Wrap(err, "Failed to get user from mongodb")
 	}
 
-	return res, nil
+	return &model.UserInfo{
+		ID:           res.ID,
+		ProjectName:  res.ProjectName,
+		Name:         res.Name,
+		CreatedAt:    res.CreatedAt,
+		PasswordHash: res.PasswordHash,
+		SystemRoles:  res.SystemRoles,
+		CustomRoles:  res.CustomRoles,
+	}, nil
 }
 
 // Update ...
@@ -173,7 +181,7 @@ func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &model.UserInfo{}
+	res := &userInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchUser
@@ -181,7 +189,15 @@ func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model
 		return nil, errors.Wrap(err, "Failed to get user by name from mongodb")
 	}
 
-	return res, nil
+	return &model.UserInfo{
+		ID:           res.ID,
+		ProjectName:  res.ProjectName,
+		Name:         res.Name,
+		CreatedAt:    res.CreatedAt,
+		PasswordHash: res.PasswordHash,
+		SystemRoles:  res.SystemRoles,
+		CustomRoles:  res.CustomRoles,
+	}, nil
 }
 
 // DeleteAll ...
@@ -203,6 +219,7 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 
 // AddRole ...
 func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID string) error {
+	// TODO(fix bug use userInfo struct, not model.UserInfo)
 	user, err := h.Get(userID)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get user info in AddRole")
@@ -245,6 +262,7 @@ func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID
 
 // DeleteRole ...
 func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
+	// TODO(fix bug use userInfo struct, not model.UserInfo)
 	user, err := h.Get(userID)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get user info in AddRole")
