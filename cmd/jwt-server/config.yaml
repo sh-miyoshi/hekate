@@ -13,12 +13,12 @@ server_port: 8080
 server_bind_address: "0.0.0.0"
 
 # https must be true, but may be false in the following cases
-#   - SSL termination by proxy
+#   - SSL termination by Reverse Proxy
 #   - development environment
 https:
   enabled: false
-  cert-file: ""
-  key-file: ""
+  cert-file: "_data/testcerts/tls.crt"
+  key-file: "_data/testcerts/tls.key"
 
 # File Name of Output Log
 #   If set empty, output log to stdout
@@ -37,4 +37,4 @@ db:
 # Expires Time of Authorization code in OpenID Connect [sec]
 oidc_auth_code_expires_time: 300
 
-oidc_auth_code_user_login_html: "auth_code_user_login.html"
+oidc_auth_code_user_login_html: "_data/auth_code_user_login.html"

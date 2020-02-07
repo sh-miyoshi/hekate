@@ -9,7 +9,7 @@ function test_api() {
 
 	if [ $# = 4 ]; then
 		input=$4
-		result=`curl -s -X $method -d "@$input" \
+		result=`curl --insecure -s -X $method -d "@$input" \
 		  -H "Authorization: Bearer $token" $url \
 		  -o /dev/null -w '%{http_code}'`
 		if [ $result -lt 300 ]; then
@@ -18,7 +18,7 @@ function test_api() {
 			echo "failed"
 		fi
 	else
-		result=`curl -s -X $method \
+		result=`curl --insecure -s -X $method \
 		  -H "Authorization: Bearer $token" $url \
 		  -o /dev/null -w '%{http_code}'`
 		if [ $result -lt 300 ]; then
@@ -36,7 +36,7 @@ function test_api_return_json() {
 
 	if [ $# = 4 ]; then
 		input=$4
-		result=`curl -s -X $method -d "@$input" \
+		result=`curl --insecure -s -X $method -d "@$input" \
 		  -H "Authorization: Bearer $token" $url \
 		  | jq .`
 		if [ $? != 0 ]; then
@@ -44,7 +44,7 @@ function test_api_return_json() {
 		fi
 		echo $result
 	else
-		result=`curl -s -X $method \
+		result=`curl --insecure -s -X $method \
 		  -H "Authorization: Bearer $token" $url \
 		  | jq .`
 		if [ $? != 0 ]; then
