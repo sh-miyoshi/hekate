@@ -42,8 +42,31 @@ if [ "$new_refresh_token" = "null" ]; then
 fi
 echo "successfully get new token"
 
-# TODO(Get token by previous refresh token(Expect failed))
+# Get token by previous refresh token(Expect failed)
+status=`curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "refresh_token=$refresh_token" \
+  -d "client_id=admin-cli" \
+  -d 'grant_type=refresh_token' \
+  -o /dev/null -w '%{http_code}'`
+if [ $status -lt 300 ]; then
+  echo "Get token by using old refresh token expect failed, but got $status"
+  exit 1
+fi
+echo "successfully denied access"
 
-# TODO(revoke refresh token, get access token by revoked refresh token)
-
-# TODO(revoke all refresh token in a project)
+# revoke refresh token, get access token by revoked refresh token
+curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/revoke \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "token=$new_refresh_token"
+status=`curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "refresh_token=$new_refresh_token" \
+  -d "client_id=admin-cli" \
+  -d 'grant_type=refresh_token' \
+  -o /dev/null -w '%{http_code}'`
+if [ $status -lt 300 ]; then
+  echo "Get token by using revoked refresh token expect failed, but got $status"
+  exit 1
+fi
+echo "successfully revoke refresh token"

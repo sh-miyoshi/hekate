@@ -94,6 +94,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	case "refresh_token":
 		refreshToken := r.Form.Get("refresh_token")
 		tkn, err = oidc.ReqAuthByRefreshToken(project, clientID, refreshToken, r)
+
+		if err != nil && errors.Cause(err) == model.ErrNoSuchSession {
+			logger.Info("Refresh token is already revoked")
+			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, state)
+			return
+		}
 	case "authorization_code":
 		codeID := r.Form.Get("code")
 		tkn, err = oidc.ReqAuthByCode(project, clientID, codeID, r)
@@ -108,7 +114,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Failed to verify request: %v", err)
 			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, state)
 		} else {
-			logger.Error("Failed to verify request: %v", err)
+			logger.Error("Failed to verify request: %+v", err)
 			writeTokenErrorResponse(w, oidc.ErrServerError, state)
 		}
 		return
@@ -305,9 +311,13 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tokenType := r.Form.Get("token_type_hint")
+	if tokenType == "" {
+		tokenType = "refresh_token" // default is refresh token
+	}
+
 	switch tokenType {
 	case "access_token":
-		// TODO(implement revoketion of access token)
+		// TODO(implement revocation of access token)
 		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
 	case "refresh_token":
 		refreshToken := r.Form.Get("token")
