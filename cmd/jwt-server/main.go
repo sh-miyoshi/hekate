@@ -166,8 +166,7 @@ func main() {
 	}
 
 	// Initialize Token Config
-	// TODO(use https)
-	token.InitConfig(false)
+	token.InitConfig(cfg.HTTPSConfig.Enabled)
 
 	// Initialize OIDC Config
 	oidc.InitConfig(cfg.AuthCodeExpiresTime, cfg.AuthCodeUserLoginFile)
@@ -186,8 +185,16 @@ func main() {
 	corsObj := handlers.AllowedOrigins([]string{"*"})
 	addr := fmt.Sprintf("%s:%d", cfg.BindAddr, cfg.Port)
 	logger.Info("start server with %s", addr)
-	if err := http.ListenAndServe(addr, handlers.CORS(corsObj)(r)); err != nil {
-		logger.Error("Failed to run server: %+v", err)
-		os.Exit(1)
+
+	if cfg.HTTPSConfig.Enabled {
+		if err := http.ListenAndServeTLS(addr, cfg.HTTPSConfig.CertFile, cfg.HTTPSConfig.KeyFile, handlers.CORS(corsObj)(r)); err != nil {
+			logger.Error("Failed to run server: %+v", err)
+			os.Exit(1)
+		}
+	} else {
+		if err := http.ListenAndServe(addr, handlers.CORS(corsObj)(r)); err != nil {
+			logger.Error("Failed to run server: %+v", err)
+			os.Exit(1)
+		}
 	}
 }

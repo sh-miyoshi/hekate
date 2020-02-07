@@ -12,6 +12,14 @@ server_port: 8080
 # Binding Address to Server
 server_bind_address: "0.0.0.0"
 
+# https must be true, but may be false in the following cases
+#   - SSL termination by proxy
+#   - development environment
+https:
+  enabled: false
+  cert-file: ""
+  key-file: ""
+
 # File Name of Output Log
 #   If set empty, output log to stdout
 logfile: ''

@@ -6,15 +6,23 @@ type DBInfo struct {
 	ConnectionString string `yaml:"connection_string"`
 }
 
+// HTTPSConfig ...
+type HTTPSConfig struct {
+	Enabled  bool   `yaml:"enabled"`
+	CertFile string `yaml:"cert-file"`
+	KeyFile  string `yaml:"key-file"`
+}
+
 // GlobalConfig ...
 type GlobalConfig struct {
-	Port                  int    `yaml:"server_port"`
-	BindAddr              string `yaml:"server_bind_address"`
-	LogFile               string `yaml:"logfile"`
-	ModeDebug             bool   `yaml:"debug_mode"`
-	DB                    DBInfo `yaml:"db"`
-	AdminName             string `yaml:"admin_name"`
-	AdminPassword         string `yaml:"admin_password"`
-	AuthCodeExpiresTime   uint64 `yaml:"oidc_auth_code_expires_time"`
-	AuthCodeUserLoginFile string `yaml:"oidc_auth_code_user_login_html"`
+	Port                  int         `yaml:"server_port"`
+	BindAddr              string      `yaml:"server_bind_address"`
+	LogFile               string      `yaml:"logfile"`
+	ModeDebug             bool        `yaml:"debug_mode"`
+	DB                    DBInfo      `yaml:"db"`
+	AdminName             string      `yaml:"admin_name"`
+	AdminPassword         string      `yaml:"admin_password"`
+	AuthCodeExpiresTime   uint64      `yaml:"oidc_auth_code_expires_time"`
+	AuthCodeUserLoginFile string      `yaml:"oidc_auth_code_user_login_html"`
+	HTTPSConfig           HTTPSConfig `yaml:"https"`
 }
