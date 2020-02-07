@@ -12,8 +12,6 @@
 - user login session情報をDBに保存する
 - 各種APIの実装
   - openid connect API
-    - token revocation
-      - Test
     - implicit flow
     - hybrid flow
   - sessionの詳細取得(引数: project, useID, sessionID)
