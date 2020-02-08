@@ -74,16 +74,16 @@ type UserInfoHandler interface {
 // Validate ...
 func (ui *UserInfo) Validate() error {
 	// Check User ID
-	if !validateUserID(ui.ID) {
+	if !ValidateUserID(ui.ID) {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid user ID format")
 	}
 
-	if !validateProjectName(ui.ProjectName) {
+	if !ValidateProjectName(ui.ProjectName) {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid project Name format")
 	}
 
 	// Check User Name
-	if !validateUserName(ui.Name) {
+	if !ValidateUserName(ui.Name) {
 		return errors.Wrap(ErrUserValidateFailed, "Invalid user name format")
 	}
 

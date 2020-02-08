@@ -48,11 +48,11 @@ func (ac *AuthCode) Validate() error {
 		return errors.Wrap(ErrCodeValidateFailed, "Invalid code ID format")
 	}
 
-	if !validateClientID(ac.ClientID) {
+	if !ValidateClientID(ac.ClientID) {
 		return errors.Wrap(ErrCodeValidateFailed, "Invalid client ID format")
 	}
 
-	if !validateUserID(ac.UserID) {
+	if !ValidateUserID(ac.UserID) {
 		return errors.Wrap(ErrCodeValidateFailed, "Invalid user ID format")
 	}
 

@@ -48,19 +48,19 @@ type ClientInfoHandler interface {
 
 // Validate ...
 func (c *ClientInfo) Validate() error {
-	if !validateClientID(c.ID) {
+	if !ValidateClientID(c.ID) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid Client ID format")
 	}
 
-	if !validateProjectName(c.ProjectName) {
+	if !ValidateProjectName(c.ProjectName) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid Project Name format")
 	}
 
-	if !validateClientAccessType(c.AccessType) {
+	if !ValidateClientAccessType(c.AccessType) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid access type")
 	}
 
-	if !validateClientSecret(c.Secret, c.AccessType) {
+	if !ValidateClientSecret(c.Secret, c.AccessType) {
 		return errors.Wrap(ErrClientValidateFailed, "Invalid Client Secret format")
 	}
 

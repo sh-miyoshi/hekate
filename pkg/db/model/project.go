@@ -66,19 +66,19 @@ type ProjectInfoHandler interface {
 
 // Validate ...
 func (p *ProjectInfo) Validate() error {
-	if !validateProjectName(p.Name) {
+	if !ValidateProjectName(p.Name) {
 		return errors.Wrap(ErrProjectValidateFailed, "Invalid Project Name format")
 	}
 
-	if !validateTokenSigningAlgorithm(p.TokenConfig.SigningAlgorithm) {
+	if !ValidateTokenSigningAlgorithm(p.TokenConfig.SigningAlgorithm) {
 		return errors.Wrap(ErrProjectValidateFailed, "Invalid Token Signing Algorithm")
 	}
 
-	if !validateLifeSpan(p.TokenConfig.AccessTokenLifeSpan) {
+	if !ValidateLifeSpan(p.TokenConfig.AccessTokenLifeSpan) {
 		return errors.Wrap(ErrProjectValidateFailed, "Access Token Life Span must >= 1")
 	}
 
-	if !validateLifeSpan(p.TokenConfig.RefreshTokenLifeSpan) {
+	if !ValidateLifeSpan(p.TokenConfig.RefreshTokenLifeSpan) {
 		return errors.Wrap(ErrProjectValidateFailed, "Refresh Token Life Span must >= 1")
 	}
 

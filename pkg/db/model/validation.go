@@ -5,12 +5,14 @@ import (
 	"regexp"
 )
 
-func validateProjectName(name string) bool {
+// ValidateProjectName ...
+func ValidateProjectName(name string) bool {
 	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
 	return prjNameRegExp.MatchString(name)
 }
 
-func validateTokenSigningAlgorithm(signAlg string) bool {
+// ValidateTokenSigningAlgorithm ...
+func ValidateTokenSigningAlgorithm(signAlg string) bool {
 	validAlgs := []string{
 		"RS256",
 	}
@@ -23,18 +25,21 @@ func validateTokenSigningAlgorithm(signAlg string) bool {
 	return false
 }
 
-func validateLifeSpan(span uint) bool {
+// ValidateLifeSpan ...
+func ValidateLifeSpan(span uint) bool {
 	return span >= 1
 }
 
-func validateClientID(clientID string) bool {
+// ValidateClientID ...
+func ValidateClientID(clientID string) bool {
 	if !(2 <= len(clientID) && len(clientID) < 128) {
 		return false
 	}
 	return true
 }
 
-func validateClientSecret(secret string, accessType string) bool {
+// ValidateClientSecret ...
+func ValidateClientSecret(secret string, accessType string) bool {
 	if accessType != "confidential" {
 		return true
 	}
@@ -45,7 +50,8 @@ func validateClientSecret(secret string, accessType string) bool {
 	return true
 }
 
-func validateClientAccessType(typ string) bool {
+// ValidateClientAccessType ...
+func ValidateClientAccessType(typ string) bool {
 	allowedTypes := []string{
 		"public",
 		"confidential",
@@ -58,17 +64,20 @@ func validateClientAccessType(typ string) bool {
 	return false
 }
 
-func validateUserName(name string) bool {
+// ValidateUserName ...
+func ValidateUserName(name string) bool {
 	if !(3 <= len(name) && len(name) < 64) {
 		return false
 	}
 	return true
 }
 
-func validateUserID(id string) bool {
+// ValidateUserID ...
+func ValidateUserID(id string) bool {
 	return govalidator.IsUUID(id)
 }
 
-func validateSessionID(id string) bool {
+// ValidateSessionID ...
+func ValidateSessionID(id string) bool {
 	return govalidator.IsUUID(id)
 }
