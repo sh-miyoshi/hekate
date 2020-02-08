@@ -20,7 +20,6 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
-- https対応
 - audit log
   - time
   - resource type (or url path and method)

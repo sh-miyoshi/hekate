@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
+	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/memory"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
@@ -259,6 +260,10 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 
 // UserDelete ...
 func (m *Manager) UserDelete(userID string) error {
+	if !govalidator.IsUUID(userID) {
+		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
 	// TODO(validate userID)
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
@@ -279,7 +284,10 @@ func (m *Manager) UserGetList(projectName string) ([]string, error) {
 
 // UserGet ...
 func (m *Manager) UserGet(userID string) (*model.UserInfo, error) {
-	// TODO(validate userID)
+	if !govalidator.IsUUID(userID) {
+		return nil, errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
 	return m.user.Get(userID)
 }
 
@@ -315,7 +323,11 @@ func (m *Manager) UserGetByName(projectName string, userName string) (*model.Use
 
 // UserAddRole ...
 func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID string) error {
-	// TODO(validate userID, roleID)
+	if !govalidator.IsUUID(userID) {
+		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
+	// TODO(validate roleID)
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
@@ -329,8 +341,11 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 
 // UserDeleteRole ...
 func (m *Manager) UserDeleteRole(userID string, roleID string) error {
-	// TODO(validate userID, roleID)
-	// TODO(lock, unlock)
+	if !govalidator.IsUUID(userID) {
+		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
+	// TODO(validate roleID)
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
@@ -367,7 +382,10 @@ func (m *Manager) SessionAdd(ent *model.Session) error {
 
 // SessionDelete ...
 func (m *Manager) SessionDelete(sessionID string) error {
-	// TODO(validate sessionID)
+	if !govalidator.IsUUID(sessionID) {
+		return errors.Wrap(model.ErrSessionValidateFailed, "invalid session id format")
+	}
+
 	if err := m.session.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
@@ -382,7 +400,10 @@ func (m *Manager) SessionDelete(sessionID string) error {
 
 // SessionGetList ...
 func (m *Manager) SessionGetList(userID string) ([]string, error) {
-	// TODO(validate userID)
+	if !govalidator.IsUUID(userID) {
+		return []string{}, errors.Wrap(model.ErrSessionValidateFailed, "invalid user id format")
+	}
+
 	return m.session.GetList(userID)
 }
 
@@ -415,7 +436,9 @@ func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
 
 // ClientDelete ...
 func (m *Manager) ClientDelete(clientID string) error {
-	// TODO(validate clientID)
+	if !govalidator.IsUUID(clientID) {
+		return errors.Wrap(model.ErrClientValidateFailed, "invalid client id format")
+	}
 
 	if err := m.client.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
@@ -437,7 +460,10 @@ func (m *Manager) ClientGetList(projectName string) ([]string, error) {
 
 // ClientGet ...
 func (m *Manager) ClientGet(clientID string) (*model.ClientInfo, error) {
-	// TODO(validate clientID)
+	if !govalidator.IsUUID(clientID) {
+		return nil, errors.Wrap(model.ErrClientValidateFailed, "invalid client id format")
+	}
+
 	return m.client.Get(clientID)
 }
 
