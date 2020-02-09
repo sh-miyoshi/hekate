@@ -1,17 +1,25 @@
 <html>
 
 <head>
-	<meta charset="UTF-8">
-	<title>Login</title>
+  <meta charset="UTF-8">
+  <title>Login</title>
+
+  <link href="resources/css/bootstrap.min.css" rel="stylesheet">
+  <link href="resources/css/style.css" rel="stylesheet">
+  <link href="resources/css/style-responsive.css" rel="stylesheet">
 </head>
 
 <body>
-	<h1>Login to jwt-server</h1>
-	<form method="POST" action="{{.URL}}">
-		<label>User Name: </label><input type="text" name="username" placeholder="e.g. admin" /><br />
-		<label>Password: </label><input type="password" name="password" placeholder="password" /><br />
-		<button type="submit">Login</button>
-	</form>
+  <div class="container">
+    <form class="form-login" method="POST" action="{{.URL}}">
+      <h2 class="form-login-heading">Login to jwt-server</h2>
+      <div class="login-wrap">
+        <input type="text" class="form-control" name="username" placeholder="user name(e.g. admin)" autofocus /><br />
+        <input type="password" class="form-control" name="password" placeholder="password" /><br />
+        <button type="submit" class="btn btn-theme btn-block">Login</button>
+      </div>
+    </form>
+  </div>
 </body>
 
 </html>
