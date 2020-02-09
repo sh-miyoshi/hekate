@@ -33,7 +33,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func setAPI(r *mux.Router) {
+func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	const basePath = "/api/v1"
 
 	// OpenID Connect API
@@ -43,8 +43,9 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", oidcapiv1.AuthGETHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", oidcapiv1.AuthPOSTHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/userinfo", oidcapiv1.UserInfoHandler).Methods("GET", "POST")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/login", oidcapiv1.UserLoginHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", oidcapiv1.RevokeHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/login", oidcapiv1.UserLoginHandler).Methods("POST")
+	r.Handle(basePath+"/project/{projectName}/openid-connect/login", http.FileServer(http.Dir(cfg.UserLoginResourceDir)))
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
@@ -169,7 +170,7 @@ func main() {
 	token.InitConfig(cfg.HTTPSConfig.Enabled)
 
 	// Initialize OIDC Config
-	oidc.InitConfig(cfg.AuthCodeExpiresTime, cfg.AuthCodeUserLoginFile)
+	oidc.InitConfig(cfg.AuthCodeExpiresTime, cfg.UserLoginPage)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
@@ -179,7 +180,7 @@ func main() {
 
 	// Setup API
 	r := mux.NewRouter()
-	setAPI(r)
+	setAPI(r, cfg)
 
 	// Run Server
 	corsObj := handlers.AllowedOrigins([]string{"*"})
