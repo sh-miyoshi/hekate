@@ -1,11 +1,13 @@
 package oidc
 
 import (
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"html/template"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 )
 
 type sessionInfo struct {
@@ -21,7 +23,13 @@ var (
 
 // WriteUserLoginPage ...
 func WriteUserLoginPage(code string, projectName string, w http.ResponseWriter) {
-	tpl := template.Must(template.ParseFiles(userLoginHTML))
+	tpl, err := template.ParseFiles(userLoginHTML)
+	if err != nil {
+		logger.Error("Failed to parse template: %v", err)
+		http.Error(w, "User Login Page maybe broken", http.StatusInternalServerError)
+		return
+	}
+
 	url := "/api/v1/project/" + projectName + "/openid-connect/login?login_verify_code=" + code
 
 	d := map[string]string{
