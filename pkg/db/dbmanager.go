@@ -356,6 +356,40 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 	return nil
 }
 
+// UserLoginSessionAdd ...
+func (m *Manager) UserLoginSessionAdd(userID string, info *model.LoginSessionInfo) error {
+	if !model.ValidateUserID(userID) {
+		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+	if err := m.user.AddLoginSession(userID, info); err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to add user login session to user")
+	}
+	m.user.CommitTx()
+	return nil
+}
+
+// UserLoginSessionDelete ...
+func (m *Manager) UserLoginSessionDelete(userID string, code string) error {
+	if !model.ValidateUserID(userID) {
+		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+	if err := m.user.DeleteLoginSession(userID, code); err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to delete user login session from user")
+	}
+	m.user.CommitTx()
+	return nil
+}
+
 // SessionAdd ...
 func (m *Manager) SessionAdd(ent *model.Session) error {
 	if err := ent.Validate(); err != nil {

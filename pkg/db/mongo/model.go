@@ -26,14 +26,22 @@ type session struct {
 	FromIP    string    `bson:"fromIP"`
 }
 
+type loginSessionInfo struct {
+	VerifyCode  string    `bson:"verifyCode"`
+	ExpiresIn   time.Time `bson:"expiresIn"`
+	ClientID    string    `bson:"clientID"`
+	RedirectURI string    `bson:"redirectURI"`
+}
+
 type userInfo struct {
-	ID           string    `bson:"id"`
-	ProjectName  string    `bson:"projectName"`
-	Name         string    `bson:"name"`
-	CreatedAt    time.Time `bson:"createdAt"`
-	PasswordHash string    `bson:"passwordHash"`
-	SystemRoles  []string  `bson:"system_roles"`
-	CustomRoles  []string  `bson:"custom_roles"`
+	ID            string              `bson:"id"`
+	ProjectName   string              `bson:"projectName"`
+	Name          string              `bson:"name"`
+	CreatedAt     time.Time           `bson:"createdAt"`
+	PasswordHash  string              `bson:"passwordHash"`
+	SystemRoles   []string            `bson:"systemRoles"`
+	CustomRoles   []string            `bson:"customRoles"`
+	LoginSessions []*loginSessionInfo `bson:"loginSessions"`
 }
 
 type clientInfo struct {

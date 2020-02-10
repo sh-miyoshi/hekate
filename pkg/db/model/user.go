@@ -5,15 +5,24 @@ import (
 	"time"
 )
 
+// LoginSessionInfo ...
+type LoginSessionInfo struct {
+	VerifyCode  string
+	ExpiresIn   time.Time
+	ClientID    string
+	RedirectURI string
+}
+
 // UserInfo ...
 type UserInfo struct {
-	ID           string
-	ProjectName  string
-	Name         string
-	CreatedAt    time.Time
-	PasswordHash string
-	SystemRoles  []string
-	CustomRoles  []string
+	ID            string
+	ProjectName   string
+	Name          string
+	CreatedAt     time.Time
+	PasswordHash  string
+	SystemRoles   []string
+	CustomRoles   []string
+	LoginSessions []*LoginSessionInfo
 }
 
 // RoleType ...
@@ -28,23 +37,22 @@ func (t RoleType) String() string {
 
 var (
 	// ErrUserAlreadyExists ...
-	ErrUserAlreadyExists = errors.New("User Already Exists")
-
+	ErrUserAlreadyExists = errors.New("User already exists")
 	// ErrNoSuchUser ...
-	ErrNoSuchUser = errors.New("No Such User")
-
+	ErrNoSuchUser = errors.New("No such user")
 	// ErrRoleAlreadyAppended ...
 	ErrRoleAlreadyAppended = errors.New("Role already appended")
-
 	// ErrNoSuchRoleInUser ...
 	ErrNoSuchRoleInUser = errors.New("User do not have such role")
-
 	// ErrUserValidateFailed ...
 	ErrUserValidateFailed = errors.New("User validation failed")
+	// ErrLoginSessionAlreadyExists ...
+	ErrLoginSessionAlreadyExists = errors.New("Login session already exists")
+	// ErrNoSuchLoginSession ...
+	ErrNoSuchLoginSession = errors.New("No such login session")
 
 	// RoleSystem ...
 	RoleSystem = RoleType{"system_management"}
-
 	// RoleCustom ...
 	RoleCustom = RoleType{"custom_role"}
 )
@@ -60,6 +68,8 @@ type UserInfoHandler interface {
 	DeleteAll(projectName string) error
 	AddRole(userID string, roleType RoleType, roleID string) error
 	DeleteRole(userID string, roleID string) error
+	AddLoginSession(userID string, info *LoginSessionInfo) error
+	DeleteLoginSession(userID string, code string) error
 
 	// BeginTx method starts a transaction
 	BeginTx() error

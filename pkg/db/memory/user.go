@@ -161,6 +161,47 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 	return model.ErrNoSuchRoleInUser
 }
 
+// AddLoginSession ...
+func (h *UserInfoHandler) AddLoginSession(userID string, info *model.LoginSessionInfo) error {
+	if _, exists := h.userList[userID]; !exists {
+		return model.ErrNoSuchUser
+	}
+
+	for _, s := range h.userList[userID].LoginSessions {
+		if s.VerifyCode == info.VerifyCode {
+			return model.ErrLoginSessionAlreadyExists
+		}
+	}
+
+	h.userList[userID].LoginSessions = append(h.userList[userID].LoginSessions, info)
+
+	return nil
+}
+
+// DeleteLoginSession ...
+func (h *UserInfoHandler) DeleteLoginSession(userID string, code string) error {
+	if _, exists := h.userList[userID]; !exists {
+		return model.ErrNoSuchUser
+	}
+
+	found := false
+	sessions := []*model.LoginSessionInfo{}
+	for _, s := range h.userList[userID].LoginSessions {
+		if s.VerifyCode == code {
+			found = true
+		} else {
+			sessions = append(sessions, s)
+		}
+	}
+
+	if !found {
+		return model.ErrNoSuchLoginSession
+	}
+
+	h.userList[userID].LoginSessions = sessions
+	return nil
+}
+
 // BeginTx ...
 func (h *UserInfoHandler) BeginTx() error {
 	h.mu.Lock()

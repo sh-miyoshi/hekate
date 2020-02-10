@@ -41,14 +41,25 @@ func NewUserHandler(dbClient *mongo.Client) (*UserInfoHandler, error) {
 
 // Add ...
 func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
+	loginSessions := []*loginSessionInfo{}
+	for _, s := range ent.LoginSessions {
+		loginSessions = append(loginSessions, &loginSessionInfo{
+			VerifyCode:  s.VerifyCode,
+			ExpiresIn:   s.ExpiresIn,
+			ClientID:    s.ClientID,
+			RedirectURI: s.RedirectURI,
+		})
+	}
+
 	v := &userInfo{
-		ID:           ent.ID,
-		ProjectName:  ent.ProjectName,
-		Name:         ent.Name,
-		CreatedAt:    ent.CreatedAt,
-		PasswordHash: ent.PasswordHash,
-		SystemRoles:  ent.SystemRoles,
-		CustomRoles:  ent.CustomRoles,
+		ID:            ent.ID,
+		ProjectName:   ent.ProjectName,
+		Name:          ent.Name,
+		CreatedAt:     ent.CreatedAt,
+		PasswordHash:  ent.PasswordHash,
+		SystemRoles:   ent.SystemRoles,
+		CustomRoles:   ent.CustomRoles,
+		LoginSessions: loginSessions,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
@@ -128,14 +139,25 @@ func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 		return nil, errors.Wrap(err, "Failed to get user from mongodb")
 	}
 
+	loginSessions := []*model.LoginSessionInfo{}
+	for _, s := range res.LoginSessions {
+		loginSessions = append(loginSessions, &model.LoginSessionInfo{
+			VerifyCode:  s.VerifyCode,
+			ExpiresIn:   s.ExpiresIn,
+			ClientID:    s.ClientID,
+			RedirectURI: s.RedirectURI,
+		})
+	}
+
 	return &model.UserInfo{
-		ID:           res.ID,
-		ProjectName:  res.ProjectName,
-		Name:         res.Name,
-		CreatedAt:    res.CreatedAt,
-		PasswordHash: res.PasswordHash,
-		SystemRoles:  res.SystemRoles,
-		CustomRoles:  res.CustomRoles,
+		ID:            res.ID,
+		ProjectName:   res.ProjectName,
+		Name:          res.Name,
+		CreatedAt:     res.CreatedAt,
+		PasswordHash:  res.PasswordHash,
+		SystemRoles:   res.SystemRoles,
+		CustomRoles:   res.CustomRoles,
+		LoginSessions: loginSessions,
 	}, nil
 }
 
@@ -146,14 +168,25 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 		{Key: "id", Value: ent.ID},
 	}
 
+	loginSessions := []*loginSessionInfo{}
+	for _, s := range ent.LoginSessions {
+		loginSessions = append(loginSessions, &loginSessionInfo{
+			VerifyCode:  s.VerifyCode,
+			ExpiresIn:   s.ExpiresIn,
+			ClientID:    s.ClientID,
+			RedirectURI: s.RedirectURI,
+		})
+	}
+
 	v := &userInfo{
-		ID:           ent.ID,
-		ProjectName:  ent.ProjectName,
-		Name:         ent.Name,
-		CreatedAt:    ent.CreatedAt,
-		PasswordHash: ent.PasswordHash,
-		SystemRoles:  ent.SystemRoles,
-		CustomRoles:  ent.CustomRoles,
+		ID:            ent.ID,
+		ProjectName:   ent.ProjectName,
+		Name:          ent.Name,
+		CreatedAt:     ent.CreatedAt,
+		PasswordHash:  ent.PasswordHash,
+		SystemRoles:   ent.SystemRoles,
+		CustomRoles:   ent.CustomRoles,
+		LoginSessions: loginSessions,
 	}
 
 	updates := bson.D{
@@ -189,14 +222,25 @@ func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model
 		return nil, errors.Wrap(err, "Failed to get user by name from mongodb")
 	}
 
+	loginSessions := []*model.LoginSessionInfo{}
+	for _, s := range res.LoginSessions {
+		loginSessions = append(loginSessions, &model.LoginSessionInfo{
+			VerifyCode:  s.VerifyCode,
+			ExpiresIn:   s.ExpiresIn,
+			ClientID:    s.ClientID,
+			RedirectURI: s.RedirectURI,
+		})
+	}
+
 	return &model.UserInfo{
-		ID:           res.ID,
-		ProjectName:  res.ProjectName,
-		Name:         res.Name,
-		CreatedAt:    res.CreatedAt,
-		PasswordHash: res.PasswordHash,
-		SystemRoles:  res.SystemRoles,
-		CustomRoles:  res.CustomRoles,
+		ID:            res.ID,
+		ProjectName:   res.ProjectName,
+		Name:          res.Name,
+		CreatedAt:     res.CreatedAt,
+		PasswordHash:  res.PasswordHash,
+		SystemRoles:   res.SystemRoles,
+		CustomRoles:   res.CustomRoles,
+		LoginSessions: loginSessions,
 	}, nil
 }
 
@@ -316,6 +360,92 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 		return errors.Wrap(err, "Failed to add role to user in mongodb")
 	}
 
+	return nil
+}
+
+// AddLoginSession ...
+func (h *UserInfoHandler) AddLoginSession(userID string, info *model.LoginSessionInfo) error {
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "id", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	user := &userInfo{}
+	if err := col.FindOne(ctx, filter).Decode(user); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.ErrNoSuchUser
+		}
+		return errors.Wrap(err, "Failed to get user from mongodb")
+	}
+
+	for _, s := range user.LoginSessions {
+		if s.VerifyCode == info.VerifyCode {
+			return model.ErrLoginSessionAlreadyExists
+		}
+	}
+
+	user.LoginSessions = append(user.LoginSessions, &loginSessionInfo{
+		VerifyCode:  info.VerifyCode,
+		ExpiresIn:   info.ExpiresIn,
+		ClientID:    info.ClientID,
+		RedirectURI: info.RedirectURI,
+	})
+
+	updates := bson.D{
+		{Key: "$set", Value: user},
+	}
+
+	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
+		return errors.Wrap(err, "Failed to add login session to user in mongodb")
+	}
+
+	return nil
+}
+
+// DeleteLoginSession ...
+func (h *UserInfoHandler) DeleteLoginSession(userID string, code string) error {
+	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
+	filter := bson.D{
+		{Key: "id", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	user := &userInfo{}
+	if err := col.FindOne(ctx, filter).Decode(user); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.ErrNoSuchUser
+		}
+		return errors.Wrap(err, "Failed to get user from mongodb")
+	}
+
+	found := false
+	sessions := []*loginSessionInfo{}
+	for _, s := range user.LoginSessions {
+		if s.VerifyCode == code {
+			found = true
+		} else {
+			sessions = append(sessions, s)
+		}
+	}
+
+	if !found {
+		return model.ErrNoSuchLoginSession
+	}
+
+	user.LoginSessions = sessions
+
+	updates := bson.D{
+		{Key: "$set", Value: user},
+	}
+
+	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
+		return errors.Wrap(err, "Failed to delete session from user in mongodb")
+	}
 	return nil
 }
 
