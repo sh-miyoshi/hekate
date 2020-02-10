@@ -33,7 +33,8 @@ func WriteUserLoginPage(code string, projectName string, w http.ResponseWriter) 
 	url := "/api/v1/project/" + projectName + "/openid-connect/login?login_verify_code=" + code
 
 	d := map[string]string{
-		"URL": url,
+		"URL":          url,
+		"ResourcePath": userLoginResPath,
 	}
 
 	tpl.Execute(w, d)

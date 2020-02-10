@@ -4,9 +4,17 @@
   <meta charset="UTF-8">
   <title>Login</title>
 
-  <link href="resources/css/bootstrap.min.css" rel="stylesheet">
-  <link href="resources/css/style.css" rel="stylesheet">
-  <link href="resources/css/style-responsive.css" rel="stylesheet">
+  <!-- for debug -->
+  <!--
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/style-responsive.css" rel="stylesheet">
+  -->
+
+  <!-- for production -->
+  <link href="{{.ResourcePath}}/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{.ResourcePath}}/css/style.css" rel="stylesheet">
+  <link href="{{.ResourcePath}}/css/style-responsive.css" rel="stylesheet">
 </head>
 
 <body>

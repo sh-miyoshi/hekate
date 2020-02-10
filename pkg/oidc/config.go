@@ -1,14 +1,16 @@
 package oidc
 
 var (
-	expiresTimeSec uint64
-	userLoginHTML  string
+	expiresTimeSec   uint64
+	userLoginHTML    string
+	userLoginResPath string
 )
 
 // InitConfig ...
-func InitConfig(authCodeExpiresTimeSec uint64, authCodeUserLoginFile string) {
+func InitConfig(authCodeExpiresTimeSec uint64, authCodeUserLoginFile string, authCodeUserLoginResPath string) {
 	expiresTimeSec = authCodeExpiresTimeSec
 	userLoginHTML = authCodeUserLoginFile
+	userLoginResPath = authCodeUserLoginResPath
 }
 
 // GetSupportedResponseType ...
