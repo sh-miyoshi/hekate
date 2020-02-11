@@ -1,6 +1,8 @@
 package oidc
 
 import (
+	"github.com/sh-miyoshi/jwt-server/pkg/db"
+	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"html/template"
 	"net/http"
 	"time"
@@ -8,17 +10,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-)
-
-type sessionInfo struct {
-	VerifyCode  string
-	ExpiresIn   time.Time
-	BaseRequest *AuthRequest
-}
-
-var (
-	// TODO(use database for scale)
-	loginSessions = make(map[string]*sessionInfo) // key: verifyCode
 )
 
 // WriteUserLoginPage ...
@@ -41,27 +32,39 @@ func WriteUserLoginPage(code string, projectName string, w http.ResponseWriter) 
 }
 
 // RegisterUserLoginSession ...
-func RegisterUserLoginSession(req *AuthRequest) string {
+func RegisterUserLoginSession(req *AuthRequest) (string, error) {
 	code := uuid.New().String()
-	loginSessions[code] = &sessionInfo{
+
+	s := &model.LoginSessionInfo{
 		VerifyCode:  code,
 		ExpiresIn:   time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
-		BaseRequest: req,
+		ClientID:    req.ClientID,
+		RedirectURI: req.RedirectURI,
 	}
-	return code
+
+	if err := db.GetInst().LoginSessionAdd(s); err != nil {
+		return "", errors.Wrap(err, "add user login session failed")
+	}
+	return code, nil
 }
 
 // UserLoginVerify ...
-func UserLoginVerify(code string) (*AuthRequest, error) {
-	if s, ok := loginSessions[code]; ok {
-		// Get is only allowed once
-		delete(loginSessions, code)
-
-		now := time.Now().Unix()
-		if now > s.ExpiresIn.Unix() {
-			return nil, errors.New("Session already expired")
-		}
-		return s.BaseRequest, nil
+func UserLoginVerify(code string) (*UserLoginInfo, error) {
+	s, err := db.GetInst().LoginSessionGet(code)
+	if err != nil {
+		return nil, errors.Wrap(err, "user login session get failed")
 	}
-	return nil, errors.New("No such session")
+
+	if err := db.GetInst().LoginSessionDelete(code); err != nil {
+		return nil, errors.Wrap(err, "user login sessiond delete failed")
+	}
+
+	now := time.Now().Unix()
+	if now > s.ExpiresIn.Unix() {
+		return nil, errors.New("Session already expired")
+	}
+	return &UserLoginInfo{
+		ClientID:    s.ClientID,
+		RedirectURI: s.RedirectURI,
+	}, nil
 }

@@ -15,12 +15,13 @@ import (
 
 // Manager ...
 type Manager struct {
-	project    model.ProjectInfoHandler
-	user       model.UserInfoHandler
-	session    model.SessionHandler
-	client     model.ClientInfoHandler
-	authCode   model.AuthCodeHandler
-	customRole model.CustomRoleHandler
+	project      model.ProjectInfoHandler
+	user         model.UserInfoHandler
+	session      model.SessionHandler
+	client       model.ClientInfoHandler
+	authCode     model.AuthCodeHandler
+	customRole   model.CustomRoleHandler
+	loginSession model.LoginSessionHandler
 }
 
 var inst *Manager
@@ -58,14 +59,19 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create custom role handler")
 		}
+		loginSessionHandler, err := memory.NewLoginSessionHandler()
+		if err != nil {
+			return errors.Wrap(err, "Failed to create login session handler")
+		}
 
 		inst = &Manager{
-			project:    prjHandler,
-			user:       userHandler,
-			session:    sessionHander,
-			client:     clientHandler,
-			authCode:   authCodeHandler,
-			customRole: customRoleHandler,
+			project:      prjHandler,
+			user:         userHandler,
+			session:      sessionHander,
+			client:       clientHandler,
+			authCode:     authCodeHandler,
+			customRole:   customRoleHandler,
+			loginSession: loginSessionHandler,
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -98,14 +104,19 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create custom role handler")
 		}
+		loginSessionHandler, err := mongo.NewLoginSessionHandler(dbClient)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create login session handler")
+		}
 
 		inst = &Manager{
-			project:    prjHandler,
-			user:       userHandler,
-			session:    sessionHandler,
-			client:     clientHandler,
-			authCode:   authCodeHandler,
-			customRole: customRoleHandler,
+			project:      prjHandler,
+			user:         userHandler,
+			session:      sessionHandler,
+			client:       clientHandler,
+			authCode:     authCodeHandler,
+			customRole:   customRoleHandler,
+			loginSession: loginSessionHandler,
 		}
 	default:
 		return errors.New(fmt.Sprintf("Database Type %s is not implemented yet", dbType))
@@ -356,38 +367,50 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 	return nil
 }
 
-// UserLoginSessionAdd ...
-func (m *Manager) UserLoginSessionAdd(userID string, info *model.LoginSessionInfo) error {
-	if !model.ValidateUserID(userID) {
-		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
-	}
+// LoginSessionAdd ...
+func (m *Manager) LoginSessionAdd(info *model.LoginSessionInfo) error {
+	// TODO(add validation)
 
-	if err := m.user.BeginTx(); err != nil {
+	if err := m.loginSession.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
-	if err := m.user.AddLoginSession(userID, info); err != nil {
-		m.user.AbortTx()
-		return errors.Wrap(err, "Failed to add user login session to user")
+	if err := m.loginSession.Add(info); err != nil {
+		m.loginSession.AbortTx()
+		return errors.Wrap(err, "Failed to add login session")
 	}
-	m.user.CommitTx()
+	m.loginSession.CommitTx()
 	return nil
 }
 
-// UserLoginSessionDelete ...
-func (m *Manager) UserLoginSessionDelete(userID string, code string) error {
-	if !model.ValidateUserID(userID) {
-		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
-	}
-
-	if err := m.user.BeginTx(); err != nil {
+// LoginSessionDelete ...
+func (m *Manager) LoginSessionDelete(code string) error {
+	if err := m.loginSession.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
-	if err := m.user.DeleteLoginSession(userID, code); err != nil {
-		m.user.AbortTx()
-		return errors.Wrap(err, "Failed to delete user login session from user")
+
+	if err := m.loginSession.Delete(code); err != nil {
+		m.loginSession.AbortTx()
+		return errors.Wrap(err, "Failed to delete login session")
 	}
-	m.user.CommitTx()
+
+	m.loginSession.CommitTx()
 	return nil
+}
+
+// LoginSessionGet ...
+func (m *Manager) LoginSessionGet(code string) (*model.LoginSessionInfo, error) {
+	if err := m.loginSession.BeginTx(); err != nil {
+		return nil, errors.Wrap(err, "BeginTx failed")
+	}
+
+	res, err := m.loginSession.Get(code)
+	if err != nil {
+		m.loginSession.AbortTx()
+		return nil, errors.Wrap(err, "Failed to delete login session")
+	}
+
+	m.loginSession.CommitTx()
+	return res, nil
 }
 
 // SessionAdd ...

@@ -9,13 +9,14 @@ import (
 )
 
 const (
-	databaseName           = "jwtserver"
-	projectCollectionName  = "project"
-	userCollectionName     = "user"
-	clientCollectionName   = "client"
-	sessionCollectionName  = "session"
-	authCodeCollectionName = "code"
-	roleCollectionName     = "customrole"
+	databaseName               = "jwtserver"
+	projectCollectionName      = "project"
+	userCollectionName         = "user"
+	clientCollectionName       = "client"
+	sessionCollectionName      = "session"
+	authCodeCollectionName     = "code"
+	roleCollectionName         = "customrole"
+	loginSessionCollectionName = "loginsession"
 
 	timeoutSecond = 5
 )

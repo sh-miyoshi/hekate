@@ -25,6 +25,12 @@ type AuthRequest struct {
 	// ACRValues string // acr_values(OPTIONAL)
 }
 
+// UserLoginInfo ...
+type UserLoginInfo struct {
+	ClientID    string
+	RedirectURI string
+}
+
 // Validate ...
 func (r *AuthRequest) Validate() error {
 	if err := validator.New().Struct(r); err != nil {

@@ -184,7 +184,13 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return end user auth prompt
-	code := oidc.RegisterUserLoginSession(authReq)
+	code, err := oidc.RegisterUserLoginSession(authReq)
+	if err != nil {
+		logger.Error("Failed to register login session %+v", err)
+		writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+		return
+	}
+
 	oidc.WriteUserLoginPage(code, projectName, w)
 }
 
@@ -210,13 +216,19 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 			writeTokenErrorResponse(w, e, authReq.State)
 		} else {
 			logger.Error("Failed to cast to *oidc.Error, this is critical program bug: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, "")
+			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
 		}
 		return
 	}
 
 	// return end user auth prompt
-	code := oidc.RegisterUserLoginSession(authReq)
+	code, err := oidc.RegisterUserLoginSession(authReq)
+	if err != nil {
+		logger.Error("Failed to register login session %+v", err)
+		writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+		return
+	}
+
 	oidc.WriteUserLoginPage(code, projectName, w)
 }
 
@@ -233,12 +245,13 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug("Form: %v", r.Form)
+	state := r.Form.Get("state")
 
 	// Verify user login session code
-	authReq, err := oidc.UserLoginVerify(r.Form.Get("login_verify_code"))
+	info, err := oidc.UserLoginVerify(r.Form.Get("login_verify_code"))
 	if err != nil {
 		logger.Info("Failed to verify user login session: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, r.Form.Get("state"))
+		writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, state)
 		return
 	}
 
@@ -249,25 +262,25 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Cause(err) == user.ErrAuthFailed {
 			logger.Info("Failed to authenticate user %s: %v", uname, err)
-			writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, authReq.State)
+			writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, state)
 		} else {
 			logger.Error("Failed to verify user: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+			writeTokenErrorResponse(w, oidc.ErrServerError, state)
 		}
 		return
 	}
 
-	code, _ := oidc.GenerateAuthCode(authReq.ClientID, authReq.RedirectURI, usr.ID)
+	code, _ := oidc.GenerateAuthCode(info.ClientID, info.RedirectURI, usr.ID)
 	values := url.Values{}
 	values.Set("code", code)
-	if authReq.State != "" {
-		values.Set("state", authReq.State)
+	if state != "" {
+		values.Set("state", state)
 	}
 
-	req, err := http.NewRequest("GET", authReq.RedirectURI, nil)
+	req, err := http.NewRequest("GET", info.RedirectURI, nil)
 	if err != nil {
 		logger.Error("Failed to create response: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+		writeTokenErrorResponse(w, oidc.ErrServerError, state)
 		return
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")

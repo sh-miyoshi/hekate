@@ -5,24 +5,15 @@ import (
 	"time"
 )
 
-// LoginSessionInfo ...
-type LoginSessionInfo struct {
-	VerifyCode  string
-	ExpiresIn   time.Time
-	ClientID    string
-	RedirectURI string
-}
-
 // UserInfo ...
 type UserInfo struct {
-	ID            string
-	ProjectName   string
-	Name          string
-	CreatedAt     time.Time
-	PasswordHash  string
-	SystemRoles   []string
-	CustomRoles   []string
-	LoginSessions []*LoginSessionInfo
+	ID           string
+	ProjectName  string
+	Name         string
+	CreatedAt    time.Time
+	PasswordHash string
+	SystemRoles  []string
+	CustomRoles  []string
 }
 
 // RoleType ...
@@ -46,10 +37,6 @@ var (
 	ErrNoSuchRoleInUser = errors.New("User do not have such role")
 	// ErrUserValidateFailed ...
 	ErrUserValidateFailed = errors.New("User validation failed")
-	// ErrLoginSessionAlreadyExists ...
-	ErrLoginSessionAlreadyExists = errors.New("Login session already exists")
-	// ErrNoSuchLoginSession ...
-	ErrNoSuchLoginSession = errors.New("No such login session")
 
 	// RoleSystem ...
 	RoleSystem = RoleType{"system_management"}
@@ -68,8 +55,6 @@ type UserInfoHandler interface {
 	DeleteAll(projectName string) error
 	AddRole(userID string, roleType RoleType, roleID string) error
 	DeleteRole(userID string, roleID string) error
-	AddLoginSession(userID string, info *LoginSessionInfo) error
-	DeleteLoginSession(userID string, code string) error
 
 	// BeginTx method starts a transaction
 	BeginTx() error

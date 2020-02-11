@@ -34,14 +34,13 @@ type loginSessionInfo struct {
 }
 
 type userInfo struct {
-	ID            string              `bson:"id"`
-	ProjectName   string              `bson:"projectName"`
-	Name          string              `bson:"name"`
-	CreatedAt     time.Time           `bson:"createdAt"`
-	PasswordHash  string              `bson:"passwordHash"`
-	SystemRoles   []string            `bson:"systemRoles"`
-	CustomRoles   []string            `bson:"customRoles"`
-	LoginSessions []*loginSessionInfo `bson:"loginSessions"`
+	ID           string    `bson:"id"`
+	ProjectName  string    `bson:"projectName"`
+	Name         string    `bson:"name"`
+	CreatedAt    time.Time `bson:"createdAt"`
+	PasswordHash string    `bson:"passwordHash"`
+	SystemRoles  []string  `bson:"systemRoles"`
+	CustomRoles  []string  `bson:"customRoles"`
 }
 
 type clientInfo struct {
