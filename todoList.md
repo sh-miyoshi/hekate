@@ -9,7 +9,6 @@
 
 ## jwt-server application enhancement
 
-- user login session情報をDBに保存する
 - 各種APIの実装
   - openid connect API
     - implicit flow
