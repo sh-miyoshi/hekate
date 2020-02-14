@@ -10,7 +10,8 @@ import (
 func ClientAuth(clientID string, clientSecret string) error {
 	client, err := db.GetInst().ClientGet(clientID)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchClient {
+		e := errors.Cause(err)
+		if e == model.ErrNoSuchClient || e == model.ErrClientValidateFailed {
 			return ErrInvalidClient
 		}
 		return errors.Wrap(err, "Failed to get client")
