@@ -3,12 +3,13 @@ package login
 import (
 	"bufio"
 	"fmt"
+	"os"
+	"syscall"
+
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
-	"os"
-	"syscall"
 )
 
 var (
@@ -21,6 +22,8 @@ var loginCmd = &cobra.Command{
 	Short: "Login to system",
 	Long:  `Login to system`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// TODO(support authorization code flow)
+
 		if userName == "" {
 			// Set user name from STDIN
 			fmt.Printf("User Name: ")

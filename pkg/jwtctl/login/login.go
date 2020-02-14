@@ -3,19 +3,22 @@ package login
 import (
 	"encoding/json"
 	"fmt"
-	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
 	"net/http"
 	"net/url"
 	"strings"
+
+	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
 )
 
 // Do ...
 func Do(serverAddr string, projectName string, userName string, password string) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/token", serverAddr, projectName)
+	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, projectName)
 
 	form := url.Values{}
 	form.Add("username", userName)
 	form.Add("password", password)
+	form.Add("grant_type", "password")
+	form.Add("client_id", "admin-cli")
 	body := strings.NewReader(form.Encode())
 	httpReq, err := http.NewRequest("POST", u, body)
 	if err != nil {
