@@ -203,7 +203,6 @@ var (
 		Code: http.StatusBadRequest,
 	}
 
-
 	//-------------------------------------
 	// Define in OAuth 2.0 Token Revocation
 	//-------------------------------------
