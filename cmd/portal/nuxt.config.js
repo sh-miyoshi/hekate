@@ -23,7 +23,7 @@ export default {
   /*
    ** Global CSS
    */
-  css: [],
+  css: ['@/assets/css/bootstrap.min.css', '@/assets/css/style.css'],
   /*
    ** Plugins to load before mounting the App
    */
@@ -39,6 +39,7 @@ export default {
    ** Nuxt.js modules
    */
   modules: [
+    '@nuxtjs/auth',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     // Doc: https://github.com/nuxt-community/dotenv-module
@@ -77,5 +78,33 @@ export default {
     port: '3000'
   },
 
-  env: {}
+  env: {
+    serverAddr: 'http://localhost:8080'
+  },
+
+  auth: {
+    redirect: {
+      login: '/',
+      logout: '/',
+      callback: '/callback',
+      home: '/home',
+    },
+    strategies: {
+      jwtserver: {
+        _scheme: 'oauth2',
+        authorization_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/auth',
+        userinfo_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/userinfo',
+        scope: ['openid'],
+        access_token_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/token',
+        response_type: 'code',
+        token_type: 'Bearer',
+        redirect_uri: "http://localhost:3000/callback",
+        client_id: 'admin-cli',
+      },
+      github: {
+        client_id: "",
+        client_secret: ""
+      }
+    },
+  }
 }

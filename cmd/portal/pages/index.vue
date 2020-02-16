@@ -1,22 +1,20 @@
 <template>
   <div class="container">
-    <h1>hello world</h1>
+    <h2>Welcom to JWT-Server</h2>
+    <button @click="login">Login</button>
+    <button @click="login_github">Github Login</button>
   </div>
 </template>
 
 <script>
 export default {
-  components: {}
+  methods: {
+    login() {
+      this.$auth.loginWith('jwtserver')
+    },
+    login_github() {
+      this.$auth.loginWith('github')
+    }
+  }
 }
 </script>
-
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-</style>
