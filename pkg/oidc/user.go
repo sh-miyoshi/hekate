@@ -13,7 +13,7 @@ import (
 )
 
 // WriteUserLoginPage ...
-func WriteUserLoginPage(code string, projectName string, w http.ResponseWriter) {
+func WriteUserLoginPage(code string, state string, projectName string, w http.ResponseWriter) {
 	tpl, err := template.ParseFiles(userLoginHTML)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
@@ -22,6 +22,9 @@ func WriteUserLoginPage(code string, projectName string, w http.ResponseWriter) 
 	}
 
 	url := "/api/v1/project/" + projectName + "/openid-connect/login?login_verify_code=" + code
+	if state != "" {
+		url += "&state=" + state
+	}
 
 	d := map[string]string{
 		"URL":          url,

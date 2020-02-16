@@ -191,7 +191,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oidc.WriteUserLoginPage(code, projectName, w)
+	oidc.WriteUserLoginPage(code, authReq.State, projectName, w)
 }
 
 // AuthPOSTHandler ...
@@ -229,7 +229,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oidc.WriteUserLoginPage(code, projectName, w)
+	oidc.WriteUserLoginPage(code, authReq.State, projectName, w)
 }
 
 // UserLoginHandler ...
