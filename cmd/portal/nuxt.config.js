@@ -100,6 +100,7 @@ export default {
         token_type: 'Bearer',
         redirect_uri: "http://localhost:3000/callback",
         client_id: 'admin-cli',
+        grant_type: "authorization_code"
       },
       github: {
         client_id: "",
