@@ -23,7 +23,11 @@ export default {
   /*
    ** Global CSS
    */
-  css: ['@/assets/css/bootstrap.min.css', '@/assets/css/style.css'],
+  css: [
+    '@/assets/css/bootstrap.min.css',
+    '@/assets/css/style.css',
+    '@/assets/css/dashio.css'
+  ],
   /*
    ** Plugins to load before mounting the App
    */
@@ -79,7 +83,7 @@ export default {
   },
 
   env: {
-    serverAddr: 'http://localhost:8080'
+    SERVER_ADDR: 'http://localhost:8080'
   },
 
   auth: {
@@ -93,18 +97,14 @@ export default {
       jwtserver: {
         _scheme: 'oauth2',
         authorization_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/auth',
-        userinfo_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/userinfo',
+        userinfo_endpoint: undefined,
         scope: ['openid'],
         access_token_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/token',
         response_type: 'code',
         token_type: 'Bearer',
-        redirect_uri: "http://localhost:3000/callback",
+        redirect_uri: "http://localhost:3000/callback", // TODO(set correct value)
         client_id: 'admin-cli',
         grant_type: "authorization_code"
-      },
-      github: {
-        client_id: "",
-        client_secret: ""
       }
     },
   }
