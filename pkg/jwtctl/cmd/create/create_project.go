@@ -52,7 +52,7 @@ var createProjectCmd = &cobra.Command{
 }
 
 func init() {
-	createProjectCmd.Flags().StringVarP(&project.Name, "name", "n", "", "[Required] set a name of new project")
+	createProjectCmd.Flags().StringVarP(&project.Name, "name", "n", "", "[Required] name of new project")
 	createProjectCmd.Flags().UintVar(&project.AccessTokenLifeSpan, "accessExpires", 5*60, "access token life span [sec]")
 	createProjectCmd.Flags().UintVar(&project.RefreshTokenLifeSpan, "refreshExpires", 14*24*60*60, "refresh token life span [sec]")
 	createProjectCmd.MarkFlagRequired("name")

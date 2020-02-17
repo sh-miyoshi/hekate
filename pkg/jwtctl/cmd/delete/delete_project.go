@@ -33,6 +33,6 @@ var deleteProjectCmd = &cobra.Command{
 }
 
 func init() {
-	deleteProjectCmd.Flags().StringVarP(&projectName, "name", "n", "", "[Required] set a name of delete project")
+	deleteProjectCmd.Flags().StringVarP(&projectName, "name", "n", "", "[Required] name of delete project")
 	deleteProjectCmd.MarkFlagRequired("name")
 }
