@@ -5,17 +5,12 @@
     <button class="btn btn-compose" @click="login">
       Login to admin console
     </button>
-    {{ path }}
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      path: `${process.env.OIDC_PATH}`
-    }
-  },
+  layout: 'index',
   methods: {
     login() {
       this.$auth.loginWith('jwtserver')
