@@ -5,7 +5,6 @@
 - Gateway
   - Backendのユーザープログラムに対してアクセス制御するようなツール
   - keycloak-gatekeeperのようなものを想定
-- GUI画面(portal)
 
 ## jwt-server application enhancement
 
@@ -19,6 +18,11 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
+- roleの割り当てのvalidation
+  - write権限のみはだめ(同リソースのreadは必須)
+    - 作成・削除時にvalidationをかける
+  - masterプロジェクトユーザはcluster-read必須？
+  - その他はcluster系は付けられないようにする？
 - audit log
   - time
   - resource type (or url path and method)
@@ -50,8 +54,21 @@
 - LDAP連携？
 - http headerの追加
 
+## Portal(Admin Console) enhancement
+
+- middleware処理
+  - accessTokenがない or 有効期限が切れている
+    - ログイン処理
+  - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
+    - 強制ログアウト or 白紙のページを見せる(こっちが有力)
+- pluginの作成
+  - API handler
+- 各ページの作成
+  - TODO
+
 ## CLI tool(jwtctl) enhancement
 
+- project delete commandの修正
 - 各APIへの対応
   - project get list
   - project get
@@ -65,6 +82,7 @@
   - user role add
   - user role delete
 - default config pathの修正
+- configコマンドの作成・修正
 - Production向け実行ファイルの作成
 
 ## operation enhancement
