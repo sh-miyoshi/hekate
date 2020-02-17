@@ -68,12 +68,10 @@
 
 ## CLI tool(jwtctl) enhancement
 
-- project delete commandの修正
 - 各APIへの対応
   - project get list
   - project get
   - project update
-  - project delete
   - user create
   - user get list
   - user get
