@@ -1,16 +1,14 @@
 package create
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
+	"os"
+
+	apiclient "github.com/sh-miyoshi/jwt-server/pkg/apiclient/v1"
 	projectapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/project"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/spf13/cobra"
-	"net/http"
-	"os"
 )
 
 type projectInfo struct {
@@ -32,48 +30,24 @@ var createProjectCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		serverAddr := config.Get().ServerAddr
-		req := projectapi.ProjectCreateRequest{
+		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		req := &projectapi.ProjectCreateRequest{
 			Name: project.Name,
 			TokenConfig: &projectapi.TokenConfig{
 				AccessTokenLifeSpan:  project.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: project.RefreshTokenLifeSpan,
+				SigningAlgorithm:     "RS256", // TODO(set param)
 			},
 		}
 
-		url := fmt.Sprintf("%s/api/v1/project", serverAddr)
-		body, err := json.Marshal(req)
+		res, err := handler.ProjectAdd(req)
 		if err != nil {
-			logger.Error("<Program Bug> Failed to marshal JSON: %v", err)
+			fmt.Printf("Failed to add project %s: %v", project.Name, err)
 			os.Exit(1)
 		}
 
-		httpReq, err := http.NewRequest("POST", url, bytes.NewReader(body))
-		if err != nil {
-			logger.Error("<Program Bug> Failed to create http request: %v", err)
-			os.Exit(1)
-		}
-		httpReq.Header.Add("Content-Type", "application/json")
-		httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", token))
-		client := &http.Client{}
-		httpRes, err := client.Do(httpReq)
-		if err != nil {
-			fmt.Printf("Failed to request server: %v", err)
-			os.Exit(1)
-		}
-		defer httpRes.Body.Close()
-
-		switch httpRes.StatusCode {
-		case 200:
-			var res projectapi.ProjectGetResponse
-			if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
-				logger.Error("<Program Bug> Failed to parse http response: %v", err)
-				os.Exit(1)
-			}
-
-			format := output.NewProjectInfoFormat(&res)
-			output.Print(format)
-		}
+		format := output.NewProjectInfoFormat(res)
+		output.Print(format)
 	},
 }
 
