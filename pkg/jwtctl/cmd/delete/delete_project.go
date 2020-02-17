@@ -2,11 +2,11 @@ package delete
 
 import (
 	"fmt"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/spf13/cobra"
-	"net/http"
 	"os"
+
+	"github.com/sh-miyoshi/jwt-server/pkg/apiclient/v1"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
+	"github.com/spf13/cobra"
 )
 
 var projectName string
@@ -22,26 +22,13 @@ var deleteProjectCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		serverAddr := config.Get().ServerAddr
-		url := fmt.Sprintf("%s/api/v1/project/%s", serverAddr, projectName)
-		httpReq, err := http.NewRequest("DELETE", url, nil)
-		if err != nil {
-			logger.Error("<Program Bug> Failed to create http request: %v", err)
+		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		if err := handler.ProjectDelete(projectName); err != nil {
+			fmt.Printf("Failed to delete project %s: %v", projectName, err)
 			os.Exit(1)
 		}
-		httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", token))
-		client := &http.Client{}
-		httpRes, err := client.Do(httpReq)
-		if err != nil {
-			fmt.Printf("Failed to request server: %v", err)
-			os.Exit(1)
-		}
-		defer httpRes.Body.Close()
 
-		switch httpRes.StatusCode {
-		case 204:
-			fmt.Printf("Successfully deleted\n")
-		}
+		fmt.Printf("Project %s successfully deleted\n", projectName)
 	},
 }
 
