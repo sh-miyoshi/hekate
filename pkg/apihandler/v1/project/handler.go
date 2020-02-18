@@ -2,6 +2,9 @@ package projectapi
 
 import (
 	"encoding/json"
+	"net/http"
+	"time"
+
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db"
@@ -9,8 +12,6 @@ import (
 	jwthttp "github.com/sh-miyoshi/jwt-server/pkg/http"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/role"
-	"net/http"
-	"time"
 )
 
 // AllProjectGetHandler ...
@@ -23,14 +24,27 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projectNames, err := db.GetInst().ProjectGetList()
+	projects, err := db.GetInst().ProjectGetList()
 	if err != nil {
 		logger.Error("Failed to get project list: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	jwthttp.ResponseWrite(w, "AllProjectGetHandler", &projectNames)
+	res := []ProjectGetResponse{}
+	for _, prj := range projects {
+		res = append(res, ProjectGetResponse{
+			Name:      prj.Name,
+			CreatedAt: prj.CreatedAt,
+			TokenConfig: &TokenConfig{
+				AccessTokenLifeSpan:  prj.TokenConfig.AccessTokenLifeSpan,
+				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
+				SigningAlgorithm:     prj.TokenConfig.SigningAlgorithm,
+			},
+		})
+	}
+
+	jwthttp.ResponseWrite(w, "AllProjectGetHandler", &res)
 }
 
 // ProjectCreateHandler ...

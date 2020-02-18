@@ -1,8 +1,9 @@
 package memory
 
 import (
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"sync"
+
+	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
@@ -35,10 +36,10 @@ func (h *ProjectInfoHandler) Delete(name string) error {
 }
 
 // GetList ...
-func (h *ProjectInfoHandler) GetList() ([]string, error) {
-	res := []string{}
-	for key := range h.projectList {
-		res = append(res, key)
+func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
+	res := []*model.ProjectInfo{}
+	for _, prj := range h.projectList {
+		res = append(res, &prj)
 	}
 	return res, nil
 }

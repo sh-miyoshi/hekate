@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/memory"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
@@ -192,7 +193,7 @@ func (m *Manager) ProjectDelete(name string) error {
 }
 
 // ProjectGetList ...
-func (m *Manager) ProjectGetList() ([]string, error) {
+func (m *Manager) ProjectGetList() ([]*model.ProjectInfo, error) {
 	return m.project.GetList()
 }
 

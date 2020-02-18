@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // TokenConfig ...
@@ -47,7 +48,7 @@ var (
 type ProjectInfoHandler interface {
 	Add(ent *ProjectInfo) error
 	Delete(name string) error
-	GetList() ([]string, error)
+	GetList() ([]*ProjectInfo, error)
 	Get(name string) (*ProjectInfo, error)
 
 	// Update method updates existing project

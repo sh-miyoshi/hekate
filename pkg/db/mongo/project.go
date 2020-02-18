@@ -2,13 +2,14 @@ package mongo
 
 import (
 	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
@@ -85,7 +86,7 @@ func (h *ProjectInfoHandler) Delete(name string) error {
 }
 
 // GetList ...
-func (h *ProjectInfoHandler) GetList() ([]string, error) {
+func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -93,17 +94,27 @@ func (h *ProjectInfoHandler) GetList() ([]string, error) {
 
 	cursor, err := col.Find(ctx, bson.D{})
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get project list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get project list from mongodb")
 	}
 
 	projects := []projectInfo{}
 	if err := cursor.All(ctx, &projects); err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get project list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get project list from mongodb")
 	}
 
-	res := []string{}
+	res := []*model.ProjectInfo{}
 	for _, prj := range projects {
-		res = append(res, prj.Name)
+		res = append(res, &model.ProjectInfo{
+			Name:      prj.Name,
+			CreatedAt: prj.CreatedAt,
+			TokenConfig: &model.TokenConfig{
+				AccessTokenLifeSpan:  prj.TokenConfig.AccessTokenLifeSpan,
+				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
+				SigningAlgorithm:     prj.TokenConfig.SigningAlgorithm,
+				SignPublicKey:        prj.TokenConfig.SignPublicKey,
+				SignSecretKey:        prj.TokenConfig.SignSecretKey,
+			},
+		})
 	}
 
 	return res, nil
