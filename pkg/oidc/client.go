@@ -12,14 +12,14 @@ func ClientAuth(clientID string, clientSecret string) error {
 	if err != nil {
 		e := errors.Cause(err)
 		if e == model.ErrNoSuchClient || e == model.ErrClientValidateFailed {
-			return ErrInvalidClient
+			return errors.Wrap(ErrInvalidClient, err.Error())
 		}
 		return errors.Wrap(err, "Failed to get client")
 	}
 
 	if client.AccessType != "public" {
 		if client.Secret != clientSecret {
-			return ErrInvalidClient
+			return errors.Wrap(ErrInvalidClient, "client auth failed")
 		}
 	}
 
