@@ -90,7 +90,7 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 	usr, err := user.Verify(project.Name, userName, password)
 	if err != nil {
 		if errors.Cause(err) == user.ErrAuthFailed {
-			return nil, ErrInvalidRequest
+			return nil, errors.Wrap(ErrInvalidRequest, "user authentication failed")
 		}
 		return nil, err
 	}
