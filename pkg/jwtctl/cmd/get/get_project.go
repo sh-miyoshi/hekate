@@ -6,6 +6,7 @@ import (
 
 	apiclient "github.com/sh-miyoshi/jwt-server/pkg/apiclient/v1"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -32,13 +33,8 @@ var getProjectCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// TODO(output)
-		for _, prj := range res {
-			fmt.Printf("res: %v\n", prj)
-		}
-
-		// format := output.NewProjectInfoFormat(res)
-		// output.Print(format)
+		format := output.NewProjectsInfoFormat(res)
+		output.Print(format)
 	},
 }
 
