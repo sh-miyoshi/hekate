@@ -8,31 +8,38 @@
 
 ## jwt-server application enhancement
 
-- 各種APIの実装
-  - openid connect API
-    - implicit flow
-    - hybrid flow
-  - sessionの詳細取得(引数: project, useID, sessionID)
-  - 各リソースのGet APIの見直し
-    - 全体検索のみ？queryで検索できるようにする？
-- テストの追加
-  - ロジック部分のunit test
-  - API部分のテスト
+- GET LIST APIの修正
+  - すべての検索結果を取得するようにする
+  - http queryでfilterできるようにする
+    - API handlerの修正
+    - DB queryの修正
+  - API docの修正
 - roleの割り当てのvalidation
   - write権限のみはだめ(同リソースのreadは必須)
     - 作成・削除時にvalidationをかける
   - masterプロジェクトユーザはcluster-read必須？
   - その他はcluster系は付けられないようにする？
+- DBGCの追加
+  - Expiredしたsessionなどを一定期間ごとに削除する
 - audit log
   - time
   - resource type (or url path and method)
   - client
   - success or failed
+- 各種APIの実装
+  - openid connect API
+    - implicit flow
+    - hybrid flow
+  - sessionの詳細取得(引数: project, useID, sessionID)
+- テストの追加
+  - ロジック部分のunit test
+  - API部分のテスト
 - 設定項目の追加
   - パスワードポリシー
-  - encrypt_type
-- DBGCの追加
-  - Expiredしたsessionなどを一定期間ごとに削除する
+  - encrypt_type(signing_method)
+- authroztion code flowのユーザーログインの修正
+  - ログイン失敗時にエラーを表示する
+    - Invalid user name or password
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - projectのimport/export
