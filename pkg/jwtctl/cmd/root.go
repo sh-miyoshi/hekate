@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/create"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/delete"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/get"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/login"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
@@ -28,6 +30,7 @@ func init() {
 	rootCmd.AddCommand(login.GetCommand())
 	rootCmd.AddCommand(create.GetCommand())
 	rootCmd.AddCommand(delete.GetCommand())
+	rootCmd.AddCommand(get.GetCommand())
 }
 
 func initOutput() {
