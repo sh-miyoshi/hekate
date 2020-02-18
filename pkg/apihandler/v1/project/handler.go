@@ -43,6 +43,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 	}
+	logger.Debug("Project List: %v", res)
 
 	jwthttp.ResponseWrite(w, "AllProjectGetHandler", &res)
 }
