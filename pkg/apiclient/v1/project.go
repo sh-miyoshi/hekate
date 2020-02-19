@@ -87,3 +87,30 @@ func (h *Handler) ProjectGetList() ([]*projectapi.ProjectGetResponse, error) {
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
+
+// ProjectGet ...
+func (h *Handler) ProjectGet(projectName string) (*projectapi.ProjectGetResponse, error) {
+	url := fmt.Sprintf("%s/api/v1/project/%s", h.serverAddr, projectName)
+	httpReq, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Add("Content-Type", "application/json")
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 200:
+		var res projectapi.ProjectGetResponse
+		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
+			return nil, err
+		}
+
+		return &res, nil
+	}
+	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+}

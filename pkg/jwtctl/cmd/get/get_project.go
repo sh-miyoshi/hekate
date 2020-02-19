@@ -25,7 +25,17 @@ var getProjectCmd = &cobra.Command{
 
 		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
 
-		// TODO(filtering by projectName)
+		if projectName != "" {
+			res, err := handler.ProjectGet(projectName)
+			if err != nil {
+				fmt.Printf("Failed to get project %s: %v", projectName, err)
+				os.Exit(1)
+			}
+
+			format := output.NewProjectInfoFormat(res)
+			output.Print(format)
+			return
+		}
 
 		res, err := handler.ProjectGetList()
 		if err != nil {
