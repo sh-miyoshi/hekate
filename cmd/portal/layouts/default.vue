@@ -1,17 +1,18 @@
 <template>
   <div>
-    <header class="header black-bg">
-      <div class="sidebar-toggle-box">
-        <div
-          class="fa fa-bars tooltips"
-          data-placement="right"
-          data-original-title="Toggle Navigation"
-        ></div>
-      </div>
-    </header>
+    <Header />
     <nuxt />
   </div>
 </template>
+
+<script>
+import Header from '@/components/header.vue'
+export default {
+  components: {
+    Header
+  }
+}
+</script>
 
 <style>
 html {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="wrapper site-min-height">
     <h1>Login Succeeded!</h1>
     <button @click="logout">Logout</button>
   </div>
