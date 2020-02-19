@@ -10,24 +10,9 @@ import (
 	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
 )
 
-// Do ...
-func Do(serverAddr string, projectName string, userName string, password string) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, projectName)
-
-	form := url.Values{}
-	form.Add("username", userName)
-	form.Add("password", password)
-	form.Add("grant_type", "password")
-	form.Add("client_id", "admin-cli")
-	body := strings.NewReader(form.Encode())
-	httpReq, err := http.NewRequest("POST", u, body)
-	if err != nil {
-		return nil, fmt.Errorf("<Program Bug> Failed to create http request: %v", err)
-	}
-	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
+func tokenRequest(req *http.Request) (*oidcapi.TokenResponse, error) {
 	client := &http.Client{}
-	httpRes, err := client.Do(httpReq)
+	httpRes, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to request server: %v", err)
 	}
@@ -48,4 +33,41 @@ func Do(serverAddr string, projectName string, userName string, password string)
 	default:
 		return nil, fmt.Errorf("<Program Bug> Unexpected http response code: %d", httpRes.StatusCode)
 	}
+}
+
+// Do ...
+func Do(serverAddr string, projectName string, userName string, password string) (*oidcapi.TokenResponse, error) {
+	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, projectName)
+
+	form := url.Values{}
+	form.Add("username", userName)
+	form.Add("password", password)
+	form.Add("grant_type", "password")
+	form.Add("client_id", "admin-cli")
+	body := strings.NewReader(form.Encode())
+	httpReq, err := http.NewRequest("POST", u, body)
+	if err != nil {
+		return nil, fmt.Errorf("<Program Bug> Failed to create http request: %v", err)
+	}
+	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	return tokenRequest(httpReq)
+}
+
+// DoWithRefresh ...
+func DoWithRefresh(serverAddr string, projectName string, refreshToken string) (*oidcapi.TokenResponse, error) {
+	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, projectName)
+
+	form := url.Values{}
+	form.Add("refresh_token", refreshToken)
+	form.Add("grant_type", "refresh_token")
+	form.Add("client_id", "admin-cli")
+	body := strings.NewReader(form.Encode())
+	httpReq, err := http.NewRequest("POST", u, body)
+	if err != nil {
+		return nil, fmt.Errorf("<Program Bug> Failed to create http request: %v", err)
+	}
+	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	return tokenRequest(httpReq)
 }

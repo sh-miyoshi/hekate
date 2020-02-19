@@ -3,12 +3,13 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
+
+	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
 )
 
 type secret struct {
@@ -53,8 +54,7 @@ func GetAccessToken() (string, error) {
 
 	if time.Now().After(s.AccessTokenExpiresTime) {
 		// Refresh token by using refresh-token
-		// TODO(do not work this)
-		res, err := login.Do(sysConf.ServerAddr, sysConf.ProjectName, s.UserName, s.RefreshToken)
+		res, err := login.DoWithRefresh(sysConf.ServerAddr, sysConf.ProjectName, s.RefreshToken)
 		if err != nil {
 			return "", err
 		}
