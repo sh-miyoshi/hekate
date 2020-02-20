@@ -288,7 +288,7 @@ func (m *Manager) UserDelete(userID string) error {
 }
 
 // UserGetList ...
-func (m *Manager) UserGetList(projectName string) ([]string, error) {
+func (m *Manager) UserGetList(projectName string) ([]*model.UserInfo, error) {
 	// TODO(validate projectName)
 	return m.user.GetList(projectName)
 }

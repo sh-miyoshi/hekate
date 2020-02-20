@@ -2,12 +2,13 @@ package mongo
 
 import (
 	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
@@ -82,7 +83,7 @@ func (h *UserInfoHandler) Delete(userID string) error {
 }
 
 // GetList ...
-func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
+func (h *UserInfoHandler) GetList(projectName string) ([]*model.UserInfo, error) {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 
 	filter := bson.D{
@@ -94,17 +95,25 @@ func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get user list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get user list from mongodb")
 	}
 
 	users := []userInfo{}
 	if err := cursor.All(ctx, &users); err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get user list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get user list from mongodb")
 	}
 
-	res := []string{}
+	res := []*model.UserInfo{}
 	for _, user := range users {
-		res = append(res, user.ID)
+		res = append(res, &model.UserInfo{
+			ID:           user.ID,
+			ProjectName:  user.ProjectName,
+			Name:         user.Name,
+			CreatedAt:    user.CreatedAt,
+			PasswordHash: user.PasswordHash,
+			SystemRoles:  user.SystemRoles,
+			CustomRoles:  user.CustomRoles,
+		})
 	}
 
 	return res, nil

@@ -2,6 +2,9 @@ package userapi
 
 import (
 	"encoding/json"
+	"net/http"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
@@ -11,8 +14,6 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
 	"github.com/sh-miyoshi/jwt-server/pkg/role"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
-	"net/http"
-	"time"
 )
 
 // AllUserGetHandler ...
@@ -40,7 +41,19 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &users)
+	res := []*UserGetResponse{}
+	for _, user := range users {
+		res = append(res, &UserGetResponse{
+			ID:           user.ID,
+			Name:         user.Name,
+			PasswordHash: user.PasswordHash,
+			CreatedAt:    user.CreatedAt.String(),
+			SystemRoles:  user.SystemRoles,
+			CustomRoles:  user.CustomRoles,
+		})
+	}
+
+	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
 }
 
 // UserCreateHandler ...

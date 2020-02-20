@@ -1,8 +1,9 @@
 package memory
 
 import (
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 	"sync"
+
+	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
@@ -38,12 +39,12 @@ func (h *UserInfoHandler) Delete(userID string) error {
 }
 
 // GetList ...
-func (h *UserInfoHandler) GetList(projectName string) ([]string, error) {
-	res := []string{}
+func (h *UserInfoHandler) GetList(projectName string) ([]*model.UserInfo, error) {
+	res := []*model.UserInfo{}
 
 	for _, user := range h.userList {
 		if user.ProjectName == projectName {
-			res = append(res, user.ID)
+			res = append(res, user)
 		}
 	}
 

@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // UserInfo ...
@@ -48,7 +49,7 @@ var (
 type UserInfoHandler interface {
 	Add(ent *UserInfo) error
 	Delete(userID string) error
-	GetList(projectName string) ([]string, error)
+	GetList(projectName string) ([]*UserInfo, error)
 	Get(userID string) (*UserInfo, error)
 	GetByName(projectName string, userName string) (*UserInfo, error)
 	Update(ent *UserInfo) error
