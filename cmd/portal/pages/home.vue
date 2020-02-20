@@ -1,7 +1,6 @@
 <template>
-  <div class="wrapper site-min-height">
-    <h1>Login Succeeded!</h1>
-    <button @click="logout">Logout</button>
+  <div class="wrapper content">
+    Please select item from menu bar
   </div>
 </template>
 
