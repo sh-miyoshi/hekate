@@ -1,5 +1,11 @@
-.index-window{
+.index-window {
 	margin-top: 50px;
 	max-width: 400px;
 	text-align: center;
+}
+
+#project-name {
+	padding: 5px 0px;
+	border-bottom: solid 1px;
+	font-size: 18px;
 }

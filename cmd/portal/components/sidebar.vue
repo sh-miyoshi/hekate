@@ -2,7 +2,12 @@
   <aside>
     <div id="sidebar" class="nav-collapse">
       <ul id="nav-accordion" class="sidebar-menu">
-        <li>master(project一覧から選択できるようにする)</li>
+        <li>
+          <nuxt-link id="project-name" to="/home">
+            <span>master</span>
+            <i class="fa fa-edit"></i>
+          </nuxt-link>
+        </li>
         <li><nuxt-link to="/home">Project Setting</nuxt-link></li>
         <li><nuxt-link to="/home">Role</nuxt-link></li>
         <li><nuxt-link to="/home">User</nuxt-link></li>
