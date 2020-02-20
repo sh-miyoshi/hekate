@@ -4,7 +4,7 @@
       <ul id="nav-accordion" class="sidebar-menu">
         <li>
           <nuxt-link id="project-name" to="/home">
-            <span>master</span>
+            <span>{{ this.$store.state.current_project }}</span>
             <i class="fa fa-edit"></i>
           </nuxt-link>
         </li>
