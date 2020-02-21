@@ -123,7 +123,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, codeID string, r
 		code.ClientID,
 	}
 
-	return genTokenRes(audiences, code.UserID, project, r, false, true)
+	return genTokenRes(audiences, code.UserID, project, r, true, true)
 }
 
 // ReqAuthByRefreshToken ...
