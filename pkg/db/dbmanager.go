@@ -252,13 +252,14 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	}
 
 	// Check duplicate user by name
-	_, err = m.user.GetByName(ent.ProjectName, ent.Name)
-	if err != model.ErrNoSuchUser {
+	users, err := m.user.GetList(ent.ProjectName, &model.UserFilter{Name: ent.Name})
+	if err != nil {
 		m.user.AbortTx()
-		if err == nil {
-			return model.ErrUserAlreadyExists
-		}
 		return errors.Wrap(err, "Failed to get user info by name")
+	}
+	if len(users) > 0 {
+		m.user.AbortTx()
+		return model.ErrUserAlreadyExists
 	}
 
 	if err := m.user.Add(ent); err != nil {
@@ -288,9 +289,9 @@ func (m *Manager) UserDelete(userID string) error {
 }
 
 // UserGetList ...
-func (m *Manager) UserGetList(projectName string) ([]*model.UserInfo, error) {
+func (m *Manager) UserGetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, error) {
 	// TODO(validate projectName)
-	return m.user.GetList(projectName)
+	return m.user.GetList(projectName, filter)
 }
 
 // UserGet ...
@@ -324,12 +325,6 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 	}
 	m.user.CommitTx()
 	return nil
-}
-
-// UserGetByName ...
-func (m *Manager) UserGetByName(projectName string, userName string) (*model.UserInfo, error) {
-	// TODO(validate projectName, userName)
-	return m.user.GetByName(projectName, userName)
 }
 
 // UserAddRole ...

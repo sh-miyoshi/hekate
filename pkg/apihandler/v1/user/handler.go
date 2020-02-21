@@ -29,7 +29,9 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
-	users, err := db.GetInst().UserGetList(projectName)
+	// TODO(set filter by query)
+
+	users, err := db.GetInst().UserGetList(projectName, nil)
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)

@@ -14,13 +14,14 @@ var (
 
 // Verify ...
 func Verify(projectName string, name string, password string) (*model.UserInfo, error) {
-	user, err := db.GetInst().UserGetByName(projectName, name)
+	users, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: name})
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchUser {
-			return nil, ErrAuthFailed
-		}
 		return nil, err
 	}
+	if len(users) != 1 {
+		return nil, ErrAuthFailed
+	}
+	user := users[0]
 
 	hash := util.CreateHash(password)
 	if user.PasswordHash != hash {

@@ -39,13 +39,18 @@ func (h *UserInfoHandler) Delete(userID string) error {
 }
 
 // GetList ...
-func (h *UserInfoHandler) GetList(projectName string) ([]*model.UserInfo, error) {
+func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, error) {
 	res := []*model.UserInfo{}
 
 	for _, user := range h.userList {
 		if user.ProjectName == projectName {
 			res = append(res, user)
 		}
+	}
+
+	// TODO
+	if filter != nil {
+		res = filterUserList(res, filter)
 	}
 
 	return res, nil
@@ -70,20 +75,6 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	h.userList[ent.ID] = ent
 
 	return nil
-}
-
-// GetByName ...
-func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model.UserInfo, error) {
-	if _, err := h.projectHandler.Get(projectName); err != nil {
-		return nil, model.ErrNoSuchProject
-	}
-
-	for _, user := range h.userList {
-		if user.ProjectName == projectName && user.Name == userName {
-			return user, nil
-		}
-	}
-	return nil, model.ErrNoSuchUser
 }
 
 // DeleteAll ...
@@ -178,4 +169,22 @@ func (h *UserInfoHandler) CommitTx() error {
 func (h *UserInfoHandler) AbortTx() error {
 	h.mu.Unlock()
 	return nil
+}
+
+func filterUserList(data []*model.UserInfo, filter *model.UserFilter) []*model.UserInfo {
+	if filter == nil {
+		return data
+	}
+	res := []*model.UserInfo{}
+
+	for _, user := range data {
+		if filter.Name != "" && user.Name != filter.Name {
+			// missmatch name
+			continue
+		}
+		// TODO(add other filter)
+		res = append(res, user)
+	}
+
+	return res
 }

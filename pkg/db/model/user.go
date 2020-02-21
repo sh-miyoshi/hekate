@@ -17,6 +17,12 @@ type UserInfo struct {
 	CustomRoles  []string
 }
 
+// UserFilter ...
+type UserFilter struct {
+	Name string
+	// TODO(CreatedAt, SystemRoles, CustomRoles, ...)
+}
+
 // RoleType ...
 type RoleType struct {
 	value string
@@ -49,9 +55,8 @@ var (
 type UserInfoHandler interface {
 	Add(ent *UserInfo) error
 	Delete(userID string) error
-	GetList(projectName string) ([]*UserInfo, error)
+	GetList(projectName string, filter *UserFilter) ([]*UserInfo, error)
 	Get(userID string) (*UserInfo, error)
-	GetByName(projectName string, userName string) (*UserInfo, error)
 	Update(ent *UserInfo) error
 	DeleteAll(projectName string) error
 	AddRole(userID string, roleType RoleType, roleID string) error

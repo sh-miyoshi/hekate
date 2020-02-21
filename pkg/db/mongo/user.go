@@ -83,17 +83,24 @@ func (h *UserInfoHandler) Delete(userID string) error {
 }
 
 // GetList ...
-func (h *UserInfoHandler) GetList(projectName string) ([]*model.UserInfo, error) {
+func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, error) {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 
-	filter := bson.D{
+	f := bson.D{
 		{Key: "projectName", Value: projectName},
+	}
+
+	if filter != nil {
+		if filter.Name != "" {
+			f = append(f, bson.E{Key: "name", Value: filter.Name})
+		}
+		// TODO(add other filter)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	cursor, err := col.Find(ctx, filter)
+	cursor, err := col.Find(ctx, f)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to get user list from mongodb")
 	}
@@ -177,36 +184,6 @@ func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
 	}
 
 	return nil
-}
-
-// GetByName ...
-func (h *UserInfoHandler) GetByName(projectName string, userName string) (*model.UserInfo, error) {
-	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
-	filter := bson.D{
-		{Key: "projectName", Value: projectName},
-		{Key: "name", Value: userName},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	res := &userInfo{}
-	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchUser
-		}
-		return nil, errors.Wrap(err, "Failed to get user by name from mongodb")
-	}
-
-	return &model.UserInfo{
-		ID:           res.ID,
-		ProjectName:  res.ProjectName,
-		Name:         res.Name,
-		CreatedAt:    res.CreatedAt,
-		PasswordHash: res.PasswordHash,
-		SystemRoles:  res.SystemRoles,
-		CustomRoles:  res.CustomRoles,
-	}, nil
 }
 
 // DeleteAll ...
