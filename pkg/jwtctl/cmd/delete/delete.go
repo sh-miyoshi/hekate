@@ -2,11 +2,13 @@ package delete
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	deleteCmd.AddCommand(deleteProjectCmd)
+	deleteCmd.AddCommand(deleteUserCmd)
 }
 
 var deleteCmd = &cobra.Command{

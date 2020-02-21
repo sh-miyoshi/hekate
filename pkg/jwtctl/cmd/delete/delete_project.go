@@ -9,13 +9,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var projectName string
-
 var deleteProjectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Delete Project",
 	Long:  "Delete Project",
 	Run: func(cmd *cobra.Command, args []string) {
+		projectName, _ := cmd.Flags().GetString("project")
+
 		token, err := config.GetAccessToken()
 		if err != nil {
 			fmt.Printf("%s\n", err.Error())
@@ -33,6 +33,6 @@ var deleteProjectCmd = &cobra.Command{
 }
 
 func init() {
-	deleteProjectCmd.Flags().StringVarP(&projectName, "name", "n", "", "[Required] name of delete project")
+	deleteProjectCmd.Flags().StringP("name", "n", "", "[Required] name of delete project")
 	deleteProjectCmd.MarkFlagRequired("name")
 }

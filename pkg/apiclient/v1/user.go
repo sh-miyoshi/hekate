@@ -42,6 +42,8 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 
 // UserDelete ...
 func (h *Handler) UserDelete(projectName string, userName string) error {
+	fmt.Printf("project: %s, user: %s\n", projectName, userName)
+	//url := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
 	// TODO(get userid by name, delete user by id)
 	return nil
 }
