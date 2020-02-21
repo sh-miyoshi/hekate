@@ -48,7 +48,6 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 		}
 	}
 
-	// TODO
 	if filter != nil {
 		res = filterUserList(res, filter)
 	}
