@@ -13,7 +13,7 @@ export default {
   layout: 'index',
   methods: {
     login() {
-      // TODO(login to system)
+      this.$auth.Login()
     }
   }
 }
