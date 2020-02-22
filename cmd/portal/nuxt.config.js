@@ -31,7 +31,9 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [],
+  plugins: [
+    '~/plugins/auth.js'
+  ],
   /*
    ** Nuxt.js dev-modules
    */
@@ -43,7 +45,6 @@ export default {
    ** Nuxt.js modules
    */
   modules: [
-    '@nuxtjs/auth',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     // Doc: https://github.com/nuxt-community/dotenv-module
@@ -85,28 +86,5 @@ export default {
 
   env: {
     SERVER_ADDR: 'http://localhost:8080'
-  },
-
-  auth: {
-    redirect: {
-      login: '/',
-      logout: '/',
-      callback: '/callback',
-      home: '/home',
-    },
-    strategies: {
-      jwtserver: {
-        _scheme: 'oauth2',
-        authorization_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/auth',
-        userinfo_endpoint: undefined,
-        scope: ['openid'],
-        access_token_endpoint: 'http://localhost:8080/api/v1/project/master/openid-connect/token',
-        response_type: 'code',
-        token_type: 'Bearer',
-        redirect_uri: "http://localhost:3000/callback", // TODO(set correct value)
-        client_id: 'admin-cli',
-        grant_type: "authorization_code"
-      }
-    },
   }
 }

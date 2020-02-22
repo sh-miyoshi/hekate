@@ -16,7 +16,7 @@
 export default {
   methods: {
     logout() {
-      this.$auth.logout()
+      // TODO(logout and redirect to top)
     }
   }
 }

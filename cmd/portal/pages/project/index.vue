@@ -11,12 +11,13 @@
 
 <script>
 export default {
-  async asyncData({ $axios }) {
-    const url = process.env.SERVER_ADDR + '/api/v1/project'
-    const res = await $axios.$get(url)
+  data() {
     return {
-      projects: res
+      projects: []
     }
+  },
+  created() {
+    // TODO(set projects)
   }
 }
 </script>

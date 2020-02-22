@@ -13,7 +13,7 @@ export default {
   layout: 'index',
   methods: {
     login() {
-      this.$auth.loginWith('jwtserver')
+      // TODO(login to system)
     }
   }
 }
