@@ -26,6 +26,8 @@
   - resource type (or url path and method)
   - client
   - success or failed
+- OIDC Authorization Code APIの修正
+  - ログインページを返す際に適切なheaderをつける
 - 各種APIの実装
   - openid connect API
     - implicit flow
