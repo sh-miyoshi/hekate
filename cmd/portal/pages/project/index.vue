@@ -3,7 +3,12 @@
     <h1>Projects</h1>
     <ul>
       <li v-for="(project, i) in projects" :key="i">
-        {{ project.name }}
+        <nuxt-link
+          to="/home"
+          class="name"
+          @click.native="setCurrentProject(project)"
+          >{{ project }}</nuxt-link
+        >
       </li>
     </ul>
   </div>
@@ -11,7 +16,7 @@
 
 <script>
 export default {
-  middleware: 'auth',
+  // middleware: 'auth',
   data() {
     return {
       projects: []
@@ -19,6 +24,17 @@ export default {
   },
   created() {
     // TODO(set projects)
+  },
+  methods: {
+    setCurrentProject(project) {
+      this.$store.commit('setCurrentProject', project)
+    }
   }
 }
 </script>
+
+<style scoped>
+.name {
+  list-style: space-counter;
+}
+</style>
