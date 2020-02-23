@@ -111,7 +111,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		e, ok := errors.Cause(err).(*oidc.Error)
-		if ok && e.Code == http.StatusUnauthorized {
+		if ok {
 			logger.Info("Failed to verify request: %v", err)
 			writeTokenErrorResponse(w, e, state)
 		} else {
