@@ -17,6 +17,13 @@ class AuthHandler {
       .join('&')
   }
 
+  _setToken(obj) {
+    window.localStorage.setItem('access_token', obj.access_token)
+    window.localStorage.setItem('expires_in', obj.expires_in)
+    window.localStorage.setItem('refresh_token', obj.refresh_token)
+    window.localStorage.setItem('refresh_expires_in', obj.refresh_expires_in)
+  }
+
   Login() {
     // TODO(consider state)
     const opts = {
@@ -58,10 +65,9 @@ class AuthHandler {
 
     try {
       const res = await handler.post(url, querystring.stringify(opts))
-
-      console.log(res)
-
-      // set token to local storage and redirect to top page
+      console.log('successfully got token: %o', res)
+      this._setToken(res.data)
+      this.context.redirect('/home')
     } catch (error) {
       console.log(error)
       if (error.response) {
