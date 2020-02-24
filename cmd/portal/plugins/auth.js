@@ -106,7 +106,17 @@ export class AuthHandler {
     }
   }
 
-  async TokenRefresh(refreshToken) {
+  async GetToken() {
+    const expiresIn = window.localStorage.getItem('expires_in')
+    const refreshToken = window.localStorage.getItem('refresh_token')
+    const now = Date.now() / 1000
+    if (now < expiresIn) {
+      return {
+        ok: true,
+        accessToken: window.localStorage.getItem('access_token')
+      }
+    }
+
     // TODO(consider state)
     const opts = {
       grant_type: 'refresh_token',
@@ -118,6 +128,10 @@ export class AuthHandler {
     if (res.ok) {
       console.log('successfully got token: %o', res.data)
       this._setToken(res.data)
+      return {
+        ok: true,
+        accessToken: window.localStorage.getItem('access_token')
+      }
     }
 
     return res

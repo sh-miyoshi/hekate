@@ -2,13 +2,10 @@
   <div class="wrapper content">
     <h1>Projects</h1>
     <ul>
-      <li v-for="(project, i) in projects" :key="i">
-        <nuxt-link
-          to="/home"
-          class="name"
-          @click.native="setCurrentProject(project)"
-          >{{ project }}</nuxt-link
-        >
+      <li v-for="(project, i) in projects" :key="i" class="name">
+        <nuxt-link to="/home" @click.native="setCurrentProject(project)">{{
+          project
+        }}</nuxt-link>
       </li>
     </ul>
   </div>
@@ -16,18 +13,29 @@
 
 <script>
 export default {
-  // middleware: 'auth',
+  middleware: 'auth',
   data() {
     return {
       projects: []
     }
   },
   created() {
-    // TODO(set projects)
+    this.setProjects()
   },
   methods: {
     setCurrentProject(project) {
       this.$store.commit('setCurrentProject', project)
+    },
+    async setProjects() {
+      const res = await this.$api.ProjectGetList()
+      if (res.ok) {
+        this.projects = []
+        for (const prj of res.data) {
+          this.projects.push(prj.name)
+        }
+      } else {
+        console.log('Failed to get project list: %o', res)
+      }
     }
   }
 }
@@ -35,6 +43,6 @@ export default {
 
 <style scoped>
 .name {
-  list-style: space-counter;
+  list-style: disc;
 }
 </style>
