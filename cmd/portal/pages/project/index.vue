@@ -8,6 +8,9 @@
         }}</nuxt-link>
       </li>
     </ul>
+    <button class="btn btn-theme" @click="$router.push('/project/new')">
+      Add New Project
+    </button>
   </div>
 </template>
 
