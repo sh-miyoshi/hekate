@@ -79,6 +79,8 @@ func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.U
 		}
 
 		return res, nil
+	case 404:
+		return nil, fmt.Errorf("No such user in the project")
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
