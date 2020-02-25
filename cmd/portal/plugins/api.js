@@ -69,6 +69,13 @@ class APIClient {
     const res = await this._request(url, 'GET')
     return res
   }
+
+  async ProjectCreate(projectName) {
+    // TODO(set all param)
+    const url = process.env.SERVER_ADDR + '/api/v1/project'
+    const res = await this._request(url, 'POST', { name: projectName })
+    return res
+  }
 }
 
 export default (context, inject) => {

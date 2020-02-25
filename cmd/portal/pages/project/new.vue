@@ -15,7 +15,11 @@
 
       <div class="divider"></div>
 
-      <button class="btn btn-theme">Create</button>
+      <div v-if="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <button class="btn btn-theme" @click="create">Create</button>
       <nuxt-link to="/project">Cancel</nuxt-link>
     </div>
   </div>
@@ -25,7 +29,17 @@
 export default {
   data() {
     return {
-      name: ''
+      name: '',
+      error: ''
+    }
+  },
+  methods: {
+    async create() {
+      const res = await this.$api.ProjectCreate(this.name)
+      console.log('project create result: %o', res)
+      if (!res.ok) {
+        this.error = res.message
+      }
     }
   }
 }
