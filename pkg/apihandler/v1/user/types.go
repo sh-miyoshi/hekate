@@ -10,13 +10,12 @@ type UserCreateRequest struct {
 
 // UserGetResponse ...
 type UserGetResponse struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	PasswordHash string   `json:"passwordHash"`
-	CreatedAt    string   `json:"createdAt"`
-	SystemRoles  []string `json:"system_roles"`
-	CustomRoles  []string `json:"custom_roles"`
-	Sessions     []string `json:"sessions"` // Array of session IDs
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	CreatedAt   string   `json:"createdAt"`
+	SystemRoles []string `json:"system_roles"`
+	CustomRoles []string `json:"custom_roles"`
+	Sessions    []string `json:"sessions"` // Array of session IDs
 }
 
 // UserPutRequest ...

@@ -51,12 +51,11 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	res := []*UserGetResponse{}
 	for _, user := range users {
 		res = append(res, &UserGetResponse{
-			ID:           user.ID,
-			Name:         user.Name,
-			PasswordHash: user.PasswordHash,
-			CreatedAt:    user.CreatedAt.String(),
-			SystemRoles:  user.SystemRoles,
-			CustomRoles:  user.CustomRoles,
+			ID:          user.ID,
+			Name:        user.Name,
+			CreatedAt:   user.CreatedAt.String(),
+			SystemRoles: user.SystemRoles,
+			CustomRoles: user.CustomRoles,
 		})
 	}
 
@@ -111,12 +110,11 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Return Response
 	res := UserGetResponse{
-		ID:           user.ID,
-		Name:         user.Name,
-		PasswordHash: user.PasswordHash,
-		CreatedAt:    user.CreatedAt.String(),
-		SystemRoles:  user.SystemRoles,
-		CustomRoles:  user.CustomRoles,
+		ID:          user.ID,
+		Name:        user.Name,
+		CreatedAt:   user.CreatedAt.String(),
+		SystemRoles: user.SystemRoles,
+		CustomRoles: user.CustomRoles,
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
@@ -182,12 +180,11 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res := UserGetResponse{
-		ID:           user.ID,
-		Name:         user.Name,
-		PasswordHash: user.PasswordHash,
-		CreatedAt:    user.CreatedAt.String(),
-		SystemRoles:  user.SystemRoles,
-		CustomRoles:  user.CustomRoles,
+		ID:          user.ID,
+		Name:        user.Name,
+		CreatedAt:   user.CreatedAt.String(),
+		SystemRoles: user.SystemRoles,
+		CustomRoles: user.CustomRoles,
 	}
 
 	sessions, err := db.GetInst().SessionGetList(user.ID)
