@@ -21,7 +21,7 @@ var createCmd = &cobra.Command{
 	},
 }
 
-// GetCommand ...
-func GetCommand() *cobra.Command {
+// Command ...
+func Command() *cobra.Command {
 	return createCmd
 }

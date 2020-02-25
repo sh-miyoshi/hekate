@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	userapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/user"
 )
@@ -46,4 +47,38 @@ func (h *Handler) UserDelete(projectName string, userName string) error {
 	//url := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
 	// TODO(get userid by name, delete user by id)
 	return nil
+}
+
+// UserGetList ...
+func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.UserGetResponse, error) {
+	u := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
+	httpReq, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+
+	if userName != "" {
+		httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		values := url.Values{}
+		values.Set("name", userName)
+		httpReq.URL.RawQuery = values.Encode()
+	}
+
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 200:
+		var res []*userapi.UserGetResponse
+		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
+			return nil, err
+		}
+
+		return res, nil
+	}
+	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }

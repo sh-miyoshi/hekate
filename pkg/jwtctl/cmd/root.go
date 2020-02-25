@@ -27,10 +27,10 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of jwtctl config")
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
 
-	rootCmd.AddCommand(login.GetCommand())
-	rootCmd.AddCommand(create.GetCommand())
-	rootCmd.AddCommand(delete.GetCommand())
-	rootCmd.AddCommand(get.GetCommand())
+	rootCmd.AddCommand(login.Command())
+	rootCmd.AddCommand(create.Command())
+	rootCmd.AddCommand(delete.Command())
+	rootCmd.AddCommand(get.Command())
 }
 
 func initOutput() {

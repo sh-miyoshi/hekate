@@ -21,7 +21,7 @@ var deleteCmd = &cobra.Command{
 	},
 }
 
-// GetCommand ...
-func GetCommand() *cobra.Command {
+// Command ...
+func Command() *cobra.Command {
 	return deleteCmd
 }

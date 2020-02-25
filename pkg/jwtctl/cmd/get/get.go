@@ -8,6 +8,7 @@ import (
 
 func init() {
 	getCmd.AddCommand(getProjectCmd)
+	getCmd.AddCommand(getUserCmd)
 }
 
 var getCmd = &cobra.Command{
@@ -20,7 +21,7 @@ var getCmd = &cobra.Command{
 	},
 }
 
-// GetCommand ...
-func GetCommand() *cobra.Command {
+// Command ...
+func Command() *cobra.Command {
 	return getCmd
 }
