@@ -42,7 +42,7 @@ var createProjectCmd = &cobra.Command{
 
 		res, err := handler.ProjectAdd(req)
 		if err != nil {
-			fmt.Printf("Failed to add project %s: %v", project.Name, err)
+			fmt.Printf("Failed to add project %s: %v\n", project.Name, err)
 			os.Exit(1)
 		}
 

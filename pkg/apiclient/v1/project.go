@@ -36,6 +36,10 @@ func (h *Handler) ProjectAdd(req *projectapi.ProjectCreateRequest) (*projectapi.
 		}
 
 		return &res, nil
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+	case 409:
+		return nil, fmt.Errorf("Project %s is already exists", req.Name)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
