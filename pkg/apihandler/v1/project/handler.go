@@ -36,7 +36,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		res = append(res, ProjectGetResponse{
 			Name:      prj.Name,
 			CreatedAt: prj.CreatedAt,
-			TokenConfig: &TokenConfig{
+			TokenConfig: TokenConfig{
 				AccessTokenLifeSpan:  prj.TokenConfig.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
 				SigningAlgorithm:     prj.TokenConfig.SigningAlgorithm,
@@ -96,7 +96,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	res := ProjectGetResponse{
 		Name:      project.Name,
 		CreatedAt: project.CreatedAt,
-		TokenConfig: &TokenConfig{
+		TokenConfig: TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
@@ -168,7 +168,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	res := ProjectGetResponse{
 		Name:      project.Name,
 		CreatedAt: project.CreatedAt,
-		TokenConfig: &TokenConfig{
+		TokenConfig: TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
