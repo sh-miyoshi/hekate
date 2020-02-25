@@ -8,7 +8,7 @@
             <i class="fa fa-edit"></i>
           </nuxt-link>
         </li>
-        <li><nuxt-link to="/home">Project Setting</nuxt-link></li>
+        <li><nuxt-link to="/project/detail">Project Setting</nuxt-link></li>
         <li><nuxt-link to="/home">Role</nuxt-link></li>
         <li><nuxt-link to="/home">User</nuxt-link></li>
         <li><nuxt-link to="/home">Client</nuxt-link></li>
