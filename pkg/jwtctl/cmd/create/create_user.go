@@ -7,6 +7,7 @@ import (
 	apiclient "github.com/sh-miyoshi/jwt-server/pkg/apiclient/v1"
 	userapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -45,10 +46,8 @@ var createUserCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Printf("result: %v\n", res) // TODO
-
-		// format := output.NewProjectInfoFormat(res)
-		// output.Print(format)
+		format := output.NewUserInfoFormat(res)
+		output.Print(format)
 	},
 }
 

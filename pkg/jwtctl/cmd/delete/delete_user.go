@@ -29,7 +29,7 @@ var deleteUserCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Printf("User %s successfully deleted\n", projectName)
+		fmt.Printf("User %s successfully deleted\n", userName)
 	},
 }
 
