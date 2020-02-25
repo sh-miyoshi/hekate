@@ -60,6 +60,7 @@ func GetAccessToken() (string, error) {
 		}
 
 		SetSecret(s.UserName, res)
+		s.AccessToken = res.AccessToken
 	}
 
 	return s.AccessToken, nil
