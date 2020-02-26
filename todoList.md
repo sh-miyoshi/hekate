@@ -76,8 +76,10 @@
 - middleware処理
   - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
     - 強制ログアウト or 白紙のページを見せる(こっちが有力)
-- pluginの作成
-  - API handler
+- redirect先
+  - 前回開いていたページに戻る
+- alert画面のcss修正
+- project選択を一覧に
 - 各ページの作成
   - TODO
 
