@@ -1,5 +1,11 @@
 # TODO List
 
+## Bugs(?)
+
+- adminユーザーが消せる
+- admin-cliも多分消せる
+- userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
+
 ## new commands
 
 - Gateway
