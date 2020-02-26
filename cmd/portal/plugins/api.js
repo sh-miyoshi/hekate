@@ -83,6 +83,12 @@ class APIClient {
     const res = await this._request(url, 'POST', data)
     return res
   }
+
+  async ProjectDelete(projectName) {
+    const url = process.env.SERVER_ADDR + '/api/v1/project/' + projectName
+    const res = await this._request(url, 'DELETE')
+    return res
+  }
 }
 
 export default (context, inject) => {
