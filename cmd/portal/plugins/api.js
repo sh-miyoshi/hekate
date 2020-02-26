@@ -70,6 +70,12 @@ class APIClient {
     return res
   }
 
+  async ProjectGet(projectName) {
+    const url = process.env.SERVER_ADDR + '/api/v1/project/' + projectName
+    const res = await this._request(url, 'GET')
+    return res
+  }
+
   async ProjectCreate(projectName) {
     const data = {
       name: projectName,
