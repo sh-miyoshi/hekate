@@ -25,11 +25,22 @@
 
     <div class="form-panel">
       <label for="accessTokenLifeSpan" class="col-sm-5 control-label elem">
-        Access Token Life Span [sec]
+        Access Token Life Span [{{ accessTokenUnit }}]
       </label>
       <div class="col-sm-5 elem">
         <input
           v-model.number="accessTokenLifeSpan"
+          type="number"
+          class="form-control"
+        />
+      </div>
+
+      <label for="refreshTokenLifeSpan" class="col-sm-5 control-label elem">
+        Refresh Token Life Span [{{ refreshTokenUnit }}]
+      </label>
+      <div class="col-sm-5 elem">
+        <input
+          v-model.number="refreshTokenLifeSpan"
           type="number"
           class="form-control"
         />
@@ -53,7 +64,11 @@ export default {
   data() {
     return {
       error: '',
-      accessTokenLifeSpan: 0
+      accessTokenLifeSpan: 0,
+      accessTokenUnit: 'sec',
+      refreshTokenLifeSpan: 0,
+      refreshTokenUnit: 'sec',
+      signingAlgorithm: ''
     }
   },
   mounted() {
@@ -84,8 +99,9 @@ export default {
         return
       }
 
-      console.log(res.data)
       this.accessTokenLifeSpan = res.data.tokenConfig.accessTokenLifeSpan
+      this.refreshTokenLifeSpan = res.data.tokenConfig.refreshTokenLifeSpan
+      this.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
     }
   }
 }
