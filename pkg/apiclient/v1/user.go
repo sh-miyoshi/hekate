@@ -43,10 +43,36 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 
 // UserDelete ...
 func (h *Handler) UserDelete(projectName string, userName string) error {
-	fmt.Printf("project: %s, user: %s\n", projectName, userName)
-	//url := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
-	// TODO(get userid by name, delete user by id)
-	return nil
+	user, err := h.UserGetList(projectName, userName)
+	if err != nil {
+		return err
+	}
+	if len(user) != 1 {
+		if len(user) == 0 {
+			return fmt.Errorf("No such user")
+		}
+		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
+	}
+
+	userID := user[0].ID
+	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s", h.serverAddr, projectName, userID)
+	httpReq, err := http.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return err
+	}
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 204:
+		return nil
+	}
+	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
 
 // UserGetList ...

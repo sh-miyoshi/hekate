@@ -33,7 +33,7 @@ var createProjectCmd = &cobra.Command{
 		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
 		req := &projectapi.ProjectCreateRequest{
 			Name: project.Name,
-			TokenConfig: &projectapi.TokenConfig{
+			TokenConfig: projectapi.TokenConfig{
 				AccessTokenLifeSpan:  project.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: project.RefreshTokenLifeSpan,
 				SigningAlgorithm:     "RS256", // TODO(set param)
