@@ -22,7 +22,7 @@ export default {
       projects: []
     }
   },
-  created() {
+  mounted() {
     this.setProjects()
   },
   methods: {

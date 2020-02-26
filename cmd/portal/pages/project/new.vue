@@ -39,7 +39,11 @@ export default {
       console.log('project create result: %o', res)
       if (!res.ok) {
         this.error = res.message
+        return
       }
+
+      alert('successfully created.')
+      this.$router.push('/project')
     }
   }
 }

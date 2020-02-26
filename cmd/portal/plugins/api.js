@@ -51,7 +51,7 @@ class APIClient {
         if (error.response.status >= 400 && error.response.status < 500) {
           return {
             ok: false,
-            message: 'auth required',
+            message: error.response.data,
             statusCode: error.response.status
           }
         }
@@ -71,9 +71,16 @@ class APIClient {
   }
 
   async ProjectCreate(projectName) {
-    // TODO(set all param)
+    const data = {
+      name: projectName,
+      tokenConfig: {
+        accessTokenLifeSpan: 300, // 5 minutes
+        refreshTokenLifeSpan: 1209600, // 2 weeks
+        signingAlgorithm: 'RS256'
+      }
+    }
     const url = process.env.SERVER_ADDR + '/api/v1/project'
-    const res = await this._request(url, 'POST', { name: projectName })
+    const res = await this._request(url, 'POST', data)
     return res
   }
 }
