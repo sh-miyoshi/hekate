@@ -15,11 +15,13 @@
 ## jwt-server application enhancement
 
 - GET LIST APIの修正
+  - 残り: client, role
   - すべての検索結果を取得するようにする
-  - http queryでfilterできるようにする
-    - API handlerの修正
-    - DB queryの修正
+    - http queryでfilterできるようにする
+      - API handlerの修正
+      - DB queryの修正
   - API docの修正
+    - 残り: client, role, project, user
 - roleの割り当てのvalidation
   - write権限のみはだめ(同リソースのreadは必須)
     - 作成・削除時にvalidationをかける
@@ -72,8 +74,6 @@
 ## Portal(Admin Console) enhancement
 
 - middleware処理
-  - accessTokenがない or 有効期限が切れている
-    - ログイン処理
   - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
     - 強制ログアウト or 白紙のページを見せる(こっちが有力)
 - pluginの作成
