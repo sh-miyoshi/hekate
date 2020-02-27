@@ -171,12 +171,17 @@ func (m *Manager) ProjectDelete(name string) error {
 		return errors.New("name of entry is empty")
 	}
 
-	if name == "master" {
-		return errors.Wrap(model.ErrDeleteBlockedProject, "master project can not delete")
-	}
-
 	if err := m.project.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	prj, err := m.project.Get(name)
+	if err != nil {
+		return errors.Wrap(err, "Failed to get project info")
+	}
+
+	if !prj.PermitDelete {
+		return errors.Wrap(model.ErrDeleteBlockedProject, "the project can not delete")
 	}
 
 	if err := m.user.DeleteAll(name); err != nil {

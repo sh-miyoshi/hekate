@@ -17,9 +17,10 @@ type TokenConfig struct {
 
 // ProjectInfo ...
 type ProjectInfo struct {
-	Name        string
-	CreatedAt   time.Time
-	TokenConfig *TokenConfig
+	Name         string
+	CreatedAt    time.Time
+	TokenConfig  *TokenConfig
+	PermitDelete bool
 }
 
 const (

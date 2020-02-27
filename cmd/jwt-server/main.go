@@ -100,8 +100,9 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 
 	// Set Master Project if not exsits
 	err := db.GetInst().ProjectAdd(&model.ProjectInfo{
-		Name:      "master",
-		CreatedAt: time.Now(),
+		Name:         "master",
+		CreatedAt:    time.Now(),
+		PermitDelete: false,
 		TokenConfig: &model.TokenConfig{
 			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresTimeSec,
 			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresTimeSec,

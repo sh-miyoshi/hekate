@@ -68,8 +68,9 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create Project Entry
 	project := model.ProjectInfo{
-		Name:      request.Name,
-		CreatedAt: time.Now(),
+		Name:         request.Name,
+		CreatedAt:    time.Now(),
+		PermitDelete: true,
 		TokenConfig: &model.TokenConfig{
 			AccessTokenLifeSpan:  request.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: request.TokenConfig.RefreshTokenLifeSpan,

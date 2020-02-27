@@ -13,9 +13,10 @@ type tokenConfig struct {
 }
 
 type projectInfo struct {
-	Name        string       `bson:"name"`
-	CreatedAt   time.Time    `bson:"createAt"`
-	TokenConfig *tokenConfig `bson:"tokenConfig"`
+	Name         string       `bson:"name"`
+	CreatedAt    time.Time    `bson:"createAt"`
+	TokenConfig  *tokenConfig `bson:"tokenConfig"`
+	PermitDelete bool         `bson:"permitDelete"`
 }
 
 type session struct {

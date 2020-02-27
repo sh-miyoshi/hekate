@@ -44,8 +44,9 @@ func NewProjectHandler(dbClient *mongo.Client) (*ProjectInfoHandler, error) {
 // Add ...
 func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 	v := &projectInfo{
-		Name:      ent.Name,
-		CreatedAt: ent.CreatedAt,
+		Name:         ent.Name,
+		CreatedAt:    ent.CreatedAt,
+		PermitDelete: ent.PermitDelete,
 		TokenConfig: &tokenConfig{
 			AccessTokenLifeSpan:  ent.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: ent.TokenConfig.RefreshTokenLifeSpan,
@@ -105,8 +106,9 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
 	res := []*model.ProjectInfo{}
 	for _, prj := range projects {
 		res = append(res, &model.ProjectInfo{
-			Name:      prj.Name,
-			CreatedAt: prj.CreatedAt,
+			Name:         prj.Name,
+			CreatedAt:    prj.CreatedAt,
+			PermitDelete: prj.PermitDelete,
 			TokenConfig: &model.TokenConfig{
 				AccessTokenLifeSpan:  prj.TokenConfig.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
@@ -150,8 +152,9 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 	}
 
 	v := &projectInfo{
-		Name:      ent.Name,
-		CreatedAt: ent.CreatedAt,
+		Name:         ent.Name,
+		CreatedAt:    ent.CreatedAt,
+		PermitDelete: ent.PermitDelete,
 		TokenConfig: &tokenConfig{
 			AccessTokenLifeSpan:  ent.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: ent.TokenConfig.RefreshTokenLifeSpan,
