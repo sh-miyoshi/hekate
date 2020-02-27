@@ -24,26 +24,52 @@
     </div>
 
     <div class="form-panel">
-      <label for="accessTokenLifeSpan" class="col-sm-5 control-label elem">
-        Access Token Life Span [{{ accessTokenUnit }}]
-      </label>
-      <div class="col-sm-5 elem">
-        <input
-          v-model.number="accessTokenLifeSpan"
-          type="number"
-          class="form-control"
-        />
+      <div>
+        <label for="accessTokenLifeSpan" class="col-sm-4 control-label elem">
+          Access Token Life Span
+        </label>
+        <div class="col-sm-3 elem">
+          <input
+            v-model.number="accessTokenLifeSpan"
+            type="number"
+            class="form-control"
+          />
+        </div>
+        <div class="col-sm-2 elem">
+          <select
+            v-model="accessTokenUnit"
+            name="accessUnit"
+            class="form-control"
+          >
+            <option v-for="unit in units" :key="unit" :value="unit">
+              {{ unit }}
+            </option>
+          </select>
+        </div>
       </div>
 
-      <label for="refreshTokenLifeSpan" class="col-sm-5 control-label elem">
-        Refresh Token Life Span [{{ refreshTokenUnit }}]
-      </label>
-      <div class="col-sm-5 elem">
-        <input
-          v-model.number="refreshTokenLifeSpan"
-          type="number"
-          class="form-control"
-        />
+      <div>
+        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label elem">
+          Refresh Token Life Span
+        </label>
+        <div class="col-sm-3 elem">
+          <input
+            v-model.number="refreshTokenLifeSpan"
+            type="number"
+            class="form-control"
+          />
+        </div>
+        <div class="col-sm-2 elem">
+          <select
+            v-model="refreshTokenUnit"
+            name="refreshUnit"
+            class="form-control"
+          >
+            <option v-for="unit in units" :key="unit" :value="unit">
+              {{ unit }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="divider"></div>
@@ -53,7 +79,6 @@
       </div>
 
       <button class="btn btn-theme">Update</button>
-      <nuxt-link to="/project">Cancel</nuxt-link>
     </div>
   </div>
 </template>
@@ -63,6 +88,7 @@ export default {
   middleware: 'auth',
   data() {
     return {
+      units: ['sec', 'minutes', 'hours', 'days'],
       error: '',
       accessTokenLifeSpan: 0,
       accessTokenUnit: 'sec',
@@ -99,9 +125,47 @@ export default {
         return
       }
 
-      this.accessTokenLifeSpan = res.data.tokenConfig.accessTokenLifeSpan
-      this.refreshTokenLifeSpan = res.data.tokenConfig.refreshTokenLifeSpan
+      let t = this.setUnit(res.data.tokenConfig.accessTokenLifeSpan)
+      this.accessTokenLifeSpan = t.span
+      this.accessTokenUnit = t.unit
+      t = this.setUnit(res.data.tokenConfig.refreshTokenLifeSpan)
+      this.refreshTokenLifeSpan = t.span
+      this.refreshTokenUnit = t.unit
       this.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
+    },
+    setUnit(span) {
+      let unit = 'sec'
+      while (true) {
+        switch (unit) {
+          case 'sec':
+            if (span >= 60 && span % 60 === 0) {
+              span /= 60
+              unit = 'minutes'
+            } else {
+              return { span, unit }
+            }
+            break
+          case 'minutes':
+            if (span >= 60 && span % 60 === 0) {
+              span /= 60
+              unit = 'hours'
+            } else {
+              return { span, unit }
+            }
+            break
+          case 'hours':
+            if (span >= 24 && span % 24 === 0) {
+              span /= 24
+              unit = 'days'
+            }
+            return { span, unit }
+          case 'days':
+            return { span, unit }
+          default:
+            console.log('unexpect unit %s', unit)
+            return
+        }
+      }
     }
   }
 }
