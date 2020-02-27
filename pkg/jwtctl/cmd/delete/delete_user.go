@@ -35,7 +35,7 @@ var deleteUserCmd = &cobra.Command{
 
 func init() {
 	deleteUserCmd.Flags().StringP("project", "p", "", "[Required] name of project to which the user belongs")
-	deleteUserCmd.Flags().StringP("user", "u", "", "[Required] name of delete user")
+	deleteUserCmd.Flags().StringP("name", "name", "", "[Required] name of delete user")
 	deleteUserCmd.MarkFlagRequired("project")
 	deleteUserCmd.MarkFlagRequired("name")
 }

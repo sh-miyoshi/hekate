@@ -10,13 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var projectName string
-
 var getProjectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Get Projects in the cluster",
 	Long:  "Get Projects in the cluster",
 	Run: func(cmd *cobra.Command, args []string) {
+		projectName, _ := cmd.Flags().GetString("project")
+
 		token, err := config.GetAccessToken()
 		if err != nil {
 			fmt.Printf("%s\n", err.Error())
@@ -49,5 +49,5 @@ var getProjectCmd = &cobra.Command{
 }
 
 func init() {
-	getProjectCmd.Flags().StringVarP(&projectName, "name", "n", "", "name of new project")
+	getProjectCmd.Flags().StringP("name", "n", "", "name of new project")
 }
