@@ -5,6 +5,7 @@
 - adminユーザーが消せる
 - admin-cliも多分消せる
 - userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
+- redirect_uril登録してなくてもredirectされてしまう？
 
 ## new commands
 
@@ -86,16 +87,24 @@
 ## CLI tool(jwtctl) enhancement
 
 - 各APIへの対応
-  - project get list
-  - project get
-  - project update
-  - user create
-  - user get list
-  - user get
-  - user update
-  - user delete
-  - user role add
-  - user role delete
+  - project
+    - update
+  - user
+    - create
+      - file flagの追加
+    - update
+    - role add
+    - role delete
+  - client
+    - create
+    - get
+    - delete
+    - update
+  - customrole
+    - create
+    - get
+    - delete
+    - update
 - default config pathの修正
 - configコマンドの作成・修正
 - Production向け実行ファイルの作成
