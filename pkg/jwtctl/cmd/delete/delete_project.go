@@ -14,7 +14,7 @@ var deleteProjectCmd = &cobra.Command{
 	Short: "Delete Project",
 	Long:  "Delete Project",
 	Run: func(cmd *cobra.Command, args []string) {
-		projectName, _ := cmd.Flags().GetString("project")
+		projectName, _ := cmd.Flags().GetString("name")
 
 		token, err := config.GetAccessToken()
 		if err != nil {
@@ -24,7 +24,7 @@ var deleteProjectCmd = &cobra.Command{
 
 		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
 		if err := handler.ProjectDelete(projectName); err != nil {
-			fmt.Printf("Failed to delete project %s: %v", projectName, err)
+			fmt.Printf("Failed to delete project %s: %v\n", projectName, err)
 			os.Exit(1)
 		}
 

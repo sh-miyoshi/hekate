@@ -181,6 +181,7 @@ func (m *Manager) ProjectDelete(name string) error {
 	}
 
 	if !prj.PermitDelete {
+		m.project.AbortTx()
 		return errors.Wrap(model.ErrDeleteBlockedProject, "the project can not delete")
 	}
 

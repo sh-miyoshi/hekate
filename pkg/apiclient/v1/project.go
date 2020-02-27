@@ -61,6 +61,8 @@ func (h *Handler) ProjectDelete(projectName string) error {
 	switch httpRes.StatusCode {
 	case 204:
 		return nil
+	case 403:
+		return fmt.Errorf("The project cannot be deleted")
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
