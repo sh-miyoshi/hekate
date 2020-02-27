@@ -166,6 +166,22 @@ export default {
             return
         }
       }
+    },
+    getSpan(span, unit) {
+      switch (unit) {
+        case 'sec':
+          return span
+        case 'minutes':
+          return span * 60
+        case 'hours':
+          return span * 60 * 60
+        case 'days':
+          return span * 60 * 60 * 24
+        default:
+          console.log('unexpect unit %s', unit)
+          break
+      }
+      return span
     }
   }
 }
