@@ -78,7 +78,7 @@
         {{ error }}
       </div>
 
-      <button class="btn btn-theme">Update</button>
+      <button class="btn btn-theme" @click="update">Update</button>
     </div>
   </div>
 </template>
@@ -117,6 +117,32 @@ export default {
       alert('successfully deleted.')
       this.$store.commit('setCurrentProject', 'master') // TODO(set correct project name)
       this.$router.push('/home')
+    },
+    async update() {
+      const data = {
+        tokenConfig: {
+          accessTokenLifeSpan: this.getSpan(
+            this.accessTokenLifeSpan,
+            this.accessTokenUnit
+          ),
+          refreshTokenLifeSpan: this.getSpan(
+            this.refreshTokenLifeSpan,
+            this.refreshTokenUnit
+          ),
+          signingAlgorithm: 'RS256'
+        }
+      }
+      const res = await this.$api.ProjectUpdate(
+        this.$store.state.current_project,
+        data
+      )
+      if (!res.ok) {
+        this.error = res.message
+        return
+      }
+
+      this.getProject()
+      alert('successfully updated.')
     },
     async getProject() {
       const res = await this.$api.ProjectGet(this.$store.state.current_project)
