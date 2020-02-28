@@ -177,7 +177,8 @@ func (m *Manager) ProjectDelete(name string) error {
 
 	prj, err := m.project.Get(name)
 	if err != nil {
-		return errors.Wrap(err, "Failed to get project info")
+		m.project.AbortTx()
+		return errors.Wrap(err, "Failed to get delete project info")
 	}
 
 	if !prj.PermitDelete {
@@ -282,10 +283,10 @@ func (m *Manager) UserDelete(userID string) error {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
-	// TODO(validate userID)
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
+
 	if err := m.user.Delete(userID); err != nil {
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to delete user")
