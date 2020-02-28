@@ -72,6 +72,23 @@
         </div>
       </div>
 
+      <div>
+        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label elem">
+          Token Signing Algorithm
+        </label>
+        <div class="col-sm-3 elem">
+          <select
+            v-model="signingAlgorithm"
+            name="signingAlgorithm"
+            class="form-control"
+          >
+            <option v-for="alg in algs" :key="alg" :value="alg">
+              {{ alg }}
+            </option>
+          </select>
+        </div>
+      </div>
+
       <div class="divider"></div>
 
       <div v-if="error" class="alert alert-danger">
@@ -94,7 +111,8 @@ export default {
       accessTokenUnit: 'sec',
       refreshTokenLifeSpan: 0,
       refreshTokenUnit: 'sec',
-      signingAlgorithm: ''
+      signingAlgorithm: 'RS256',
+      algs: ['RS256']
     }
   },
   mounted() {
@@ -129,7 +147,7 @@ export default {
             this.refreshTokenLifeSpan,
             this.refreshTokenUnit
           ),
-          signingAlgorithm: 'RS256'
+          signingAlgorithm: this.signingAlgorithm
         }
       }
       const res = await this.$api.ProjectUpdate(
