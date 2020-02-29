@@ -13,10 +13,30 @@
         <tr v-for="user in users" :key="user.id">
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
-          <td></td>
+          <td>
+            <button>edit</button>
+            <span v-if="allowEdit(user.name)" class="trush">
+              <i class="fa fa-trash" @click="trushConfirm"></i>
+            </span>
+          </td>
         </tr>
       </tbody>
     </table>
+
+    <div>
+      <b-modal
+        id="confirm-delete-user"
+        ref="confirm-delete-user"
+        title="Confirm"
+        cancel-variant="outline-dark"
+        ok-variant="danger"
+        ok-title="Delete user"
+        @ok="trush"
+      >
+        <p class="mb-0">Are you sure to delete the user ?</p>
+      </b-modal>
+    </div>
+
     <button class="btn btn-theme">
       Add New User
     </button>
@@ -45,7 +65,15 @@ export default {
       } else {
         console.log('Failed to get user list: %o', res)
       }
-    }
+    },
+    allowEdit(userName) {
+      // TODO(check userName and loggined user name)
+      return true
+    },
+    trushConfirm() {
+      this.$refs['confirm-delete-user'].show()
+    },
+    trush() {}
   }
 }
 </script>

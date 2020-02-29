@@ -232,10 +232,6 @@ export default {
 </script>
 
 <style scoped>
-.trush:hover {
-  cursor: pointer;
-}
-
 .project {
   padding-right: 20px;
 }
