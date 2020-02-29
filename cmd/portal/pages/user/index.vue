@@ -67,8 +67,8 @@ export default {
       }
     },
     allowEdit(userName) {
-      // TODO(check userName and loggined user name)
-      return true
+      const loginUser = window.localStorage.getItem('user')
+      return userName !== loginUser
     },
     trushConfirm() {
       this.$refs['confirm-delete-user'].show()

@@ -1,5 +1,6 @@
 import querystring from 'querystring'
 import axios from 'axios'
+import jwtdecode from 'jwt-decode'
 
 export class AuthHandler {
   constructor(context) {
@@ -26,6 +27,11 @@ export class AuthHandler {
       'refresh_expires_in',
       now + obj.refresh_expires_in
     )
+  }
+
+  _setLoginUser(token) {
+    const data = jwtdecode(token)
+    window.localStorage.setItem('user', data.preferred_username)
   }
 
   Login() {
@@ -93,6 +99,7 @@ export class AuthHandler {
     const res = await this._tokenRequest(opts)
     if (res.ok) {
       console.log('successfully got token: %o', res.data)
+      this._setLoginUser(res.data.access_token)
       this._setToken(res.data)
       this.context.redirect('/home')
     } else if (res.statusCode >= 400 && res.statusCode < 500) {

@@ -17,6 +17,7 @@
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/font-awesome": "^1.0.4",
     "bootstrap-vue": "^2.5.0",
+    "jwt-decode": "^2.2.0",
     "nuxt": "^2.0.0"
   },
   "devDependencies": {
