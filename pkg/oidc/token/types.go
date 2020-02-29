@@ -32,6 +32,7 @@ type AccessTokenClaims struct {
 	Project        string   `json:"project"`
 	Audience       []string `json:"aud"`
 	ResourceAccess RoleSet  `json:"resource_access"`
+	UserName       string   `json:"preferred_username"`
 }
 
 // RefreshTokenClaims ...

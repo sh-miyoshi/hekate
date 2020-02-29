@@ -49,6 +49,11 @@ func signToken(projectName string, claims jwt.Claims) (string, error) {
 func GenerateAccessToken(audiences []string, request Request) (string, error) {
 	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
 
+	user, err := db.GetInst().UserGet(request.UserID)
+	if err != nil {
+		return "", errors.Wrap(err, "Failed to get user")
+	}
+
 	now := time.Now()
 	claims := AccessTokenClaims{
 		jwt.StandardClaims{
@@ -66,12 +71,9 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 				Roles: []string{},
 			},
 		},
+		user.Name,
 	}
 
-	user, err := db.GetInst().UserGet(request.UserID)
-	if err != nil {
-		return "", errors.Wrap(err, "Failed to get user")
-	}
 	for _, role := range user.SystemRoles {
 		claims.ResourceAccess.SystemManagement.Roles = append(claims.ResourceAccess.SystemManagement.Roles, role)
 	}
