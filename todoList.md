@@ -79,8 +79,12 @@
   - 前回開いていたページに戻る
 - alert画面のcss修正
 - project選択を一覧に
+- logoutボタンの実装
+- headerにユーザー名を表示
 - 各ページの作成
-  - TODO
+  - User
+  - Role
+  - Client
 
 ## CLI tool(jwtctl) enhancement
 
@@ -93,6 +97,7 @@
     - update
     - role add
     - role delete
+    - session revoke
   - client
     - create
     - get
