@@ -50,13 +50,25 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := []*UserGetResponse{}
 	for _, user := range users {
-		res = append(res, &UserGetResponse{
+		tmp := &UserGetResponse{
 			ID:          user.ID,
 			Name:        user.Name,
 			CreatedAt:   user.CreatedAt.String(),
 			SystemRoles: user.SystemRoles,
 			CustomRoles: user.CustomRoles,
-		})
+		}
+		sessions, err := db.GetInst().SessionGetList(user.ID)
+		if err != nil {
+			logger.Error("Failed to get session list: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		for _, s := range sessions {
+			tmp.Sessions = append(tmp.Sessions, s)
+		}
+
+		res = append(res, tmp)
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
