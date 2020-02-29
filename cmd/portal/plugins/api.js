@@ -101,6 +101,13 @@ class APIClient {
     const res = await this._request(url, 'PUT', info)
     return res
   }
+
+  async UserGetList(projectName) {
+    const url =
+      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/user'
+    const res = await this._request(url, 'GET')
+    return res
+  }
 }
 
 export default (context, inject) => {
