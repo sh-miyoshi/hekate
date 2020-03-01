@@ -14,7 +14,12 @@
           <td>{{ user.id }}</td>
           <td>{{ user.name }}</td>
           <td>
-            <button>edit</button>
+            <button
+              class="btn btn-theme"
+              @click="$router.push('/user/' + user.id)"
+            >
+              edit
+            </button>
             <span v-if="allowEdit(user.name)" class="trush">
               <i class="fa fa-trash" @click="trushConfirm"></i>
             </span>
@@ -73,7 +78,9 @@ export default {
     trushConfirm() {
       this.$refs['confirm-delete-user'].show()
     },
-    trush() {}
+    trush() {
+      // TODO(implement this)
+    }
   }
 }
 </script>
