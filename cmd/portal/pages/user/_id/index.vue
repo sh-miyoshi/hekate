@@ -29,7 +29,12 @@
           ID
         </label>
         <div class="col-sm-3 elem">
-          <input v-if="user" v-model="user.id" class="form-control" />
+          <input
+            v-if="user"
+            v-model="user.id"
+            class="form-control"
+            disabled="disabled"
+          />
         </div>
       </div>
 
@@ -52,7 +57,21 @@ export default {
       error: ''
     }
   },
+  mounted() {
+    this.setUser(this.$route.params.id)
+  },
   methods: {
+    async setUser(userID) {
+      const res = await this.$api.UserGet(
+        this.$store.state.current_project,
+        userID
+      )
+      if (res.ok) {
+        this.user = res.data
+      } else {
+        console.log('Failed to get user: %o', res)
+      }
+    },
     allowEdit() {
       if (!this.user) {
         return false
