@@ -3,7 +3,6 @@
 ## Bugs(?)
 
 - userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
-- redirect_uril登録してなくてもredirectされてしまう？
 
 ## new commands
 
@@ -13,6 +12,8 @@
 
 ## jwt-server application enhancement
 
+- Auhtorization Code Flowのエラー時処理の修正
+  - error responseをhtmlで返す
 - GET LIST APIの修正
   - 残り: client, role
   - すべての検索結果を取得するようにする
@@ -33,8 +34,6 @@
   - resource type (or url path and method)
   - client
   - success or failed
-- OIDC Authorization Code APIの修正
-  - ログインページを返す際に適切なheaderをつける
 - 各種APIの実装
   - openid connect API
     - implicit flow
