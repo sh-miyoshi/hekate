@@ -69,3 +69,7 @@ body {
 .login-wrap {
 	padding: 20px;
 }
+
+.alert-msg{
+    color: #ff0000;
+}
