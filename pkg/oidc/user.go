@@ -31,6 +31,7 @@ func WriteUserLoginPage(code string, state string, projectName string, w http.Re
 		"ResourcePath": userLoginResPath,
 	}
 
+	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
 	tpl.Execute(w, d)
 }
 
