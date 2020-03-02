@@ -1,0 +1,29 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login Error</title>
+
+  <!-- for debug -->
+  <!--
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  -->
+
+  <!-- for production -->
+  <link href="{{.CSSResourcePath}}/bootstrap.min.css" rel="stylesheet">
+  <link href="{{.CSSResourcePath}}/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <div class="form-login">
+      <h2 class="form-login-heading">We are sorry ...</h2>
+      <div class="login-wrap">
+        <div>{{.Error}}</div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
