@@ -370,6 +370,25 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 	return nil
 }
 
+// UserSessionsDelete ...
+func (m *Manager) UserSessionsDelete(userID string) error {
+	if !model.ValidateUserID(userID) {
+		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
+	if err := m.session.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	if err := m.session.RevokeAll(userID); err != nil {
+		m.session.AbortTx()
+		return errors.Wrap(err, "Revoke session failed")
+	}
+
+	m.session.CommitTx()
+	return nil
+}
+
 // LoginSessionAdd ...
 func (m *Manager) LoginSessionAdd(info *model.LoginSessionInfo) error {
 	// TODO(add validation)

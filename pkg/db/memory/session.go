@@ -36,6 +36,18 @@ func (h *SessionHandler) Revoke(sessionID string) error {
 	return model.ErrNoSuchSession
 }
 
+// RevokeAll ...
+func (h *SessionHandler) RevokeAll(userID string) error {
+	newList := make(map[string]*model.Session)
+	for _, s := range h.sessionList {
+		if s.UserID != userID {
+			newList[s.SessionID] = s
+		}
+	}
+	h.sessionList = newList
+	return nil
+}
+
 // Get ...
 func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 	if _, exists := h.sessionList[sessionID]; !exists {

@@ -146,6 +146,14 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
+	// Revoke All User Sessions
+	if err := db.GetInst().UserSessionsDelete(userID); err != nil {
+		logger.Error("Failed to revoke user session: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Delete User
 	if err := db.GetInst().UserDelete(userID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
