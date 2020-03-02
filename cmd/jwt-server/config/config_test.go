@@ -19,8 +19,7 @@ debug_mode: true
 db:
   type: "memory"
   connection_string: ""
-oidc_auth_code_expires_time: 300
-oidc_auth_code_user_login_html: "auth_code_user_login.html"`)
+oidc_auth_code_expires_time: 300`)
 
 	// Test loading correct yaml file
 	if _, err := InitConfig(tmpFile.Name()); err != nil {

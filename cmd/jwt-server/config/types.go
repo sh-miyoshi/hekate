@@ -23,7 +23,6 @@ type GlobalConfig struct {
 	AdminName            string      `yaml:"admin_name"`
 	AdminPassword        string      `yaml:"admin_password"`
 	AuthCodeExpiresTime  uint64      `yaml:"oidc_auth_code_expires_time"`
-	UserLoginPage        string      `yaml:"oidc_user_login_page"`
-	UserLoginResourceDir string      `yaml:"oidc_user_login_resource_dir"`
+	UserLoginResourceDir string      `yaml:"oidc_user_login_page_res"`
 	HTTPSConfig          HTTPSConfig `yaml:"https"`
 }

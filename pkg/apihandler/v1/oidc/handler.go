@@ -184,6 +184,31 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check Redirect URL
+	client, err := db.GetInst().ClientGet(authReq.ClientID)
+	if err != nil {
+		if errors.Cause(err) == model.ErrNoSuchClient {
+			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
+			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, authReq.State)
+		} else {
+			logger.Error("Failed to get allowed callback urls in client: %+v", err)
+			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+		}
+		return
+	}
+	found := false
+	for _, u := range client.AllowedCallbackURLs {
+		if u == authReq.RedirectURI {
+			found = true
+			break
+		}
+	}
+	if !found {
+		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
+		writeTokenErrorResponse(w, oidc.ErrInvalidRequestURI, authReq.State)
+		return
+	}
+
 	// return end user auth prompt
 	code, err := oidc.RegisterUserLoginSession(authReq)
 	if err != nil {
@@ -219,6 +244,31 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Error("Failed to cast to *oidc.Error, this is critical program bug: %+v", err)
 			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
 		}
+		return
+	}
+
+	// Check Redirect URL
+	client, err := db.GetInst().ClientGet(authReq.ClientID)
+	if err != nil {
+		if errors.Cause(err) == model.ErrNoSuchClient {
+			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
+			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, authReq.State)
+		} else {
+			logger.Error("Failed to get allowed callback urls in client: %+v", err)
+			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+		}
+		return
+	}
+	found := false
+	for _, u := range client.AllowedCallbackURLs {
+		if u == authReq.RedirectURI {
+			found = true
+			break
+		}
+	}
+	if !found {
+		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
+		writeTokenErrorResponse(w, oidc.ErrInvalidRequestURI, authReq.State)
 		return
 	}
 

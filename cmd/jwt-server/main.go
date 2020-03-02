@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,6 +25,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/oidc/token"
 	defaultrole "github.com/sh-miyoshi/jwt-server/pkg/role"
 	"github.com/sh-miyoshi/jwt-server/pkg/util"
+	"path/filepath"
 )
 
 const (
@@ -86,9 +88,9 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	}).Methods("GET")
 
 	// File Server for User Login Page
-	fs := http.FileServer(http.Dir(cfg.UserLoginResourceDir))
-	path := authCodeUserLoginResourcePath + "/"
-	r.PathPrefix(path).Handler(http.StripPrefix(path, fs))
+	fs := http.FileServer(http.Dir(path.Join(cfg.UserLoginResourceDir, "/css")))
+	pt := path.Join(authCodeUserLoginResourcePath, "/css") + "/"
+	r.PathPrefix(pt).Handler(http.StripPrefix(pt, fs))
 
 	r.Use(loggingMiddleware)
 }
@@ -139,6 +141,9 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		ProjectName: "master",
 		AccessType:  "public",
 		CreatedAt:   time.Now(),
+		AllowedCallbackURLs: []string{
+			"http://localhost:3000/callback", // TODO(for debug)
+		},
 	})
 
 	if err != nil {
@@ -179,7 +184,8 @@ func main() {
 	token.InitConfig(cfg.HTTPSConfig.Enabled)
 
 	// Initialize OIDC Config
-	oidc.InitConfig(cfg.AuthCodeExpiresTime, cfg.UserLoginPage, authCodeUserLoginResourcePath)
+	loginPage := filepath.Join(cfg.UserLoginResourceDir, "index.html")
+	oidc.InitConfig(cfg.AuthCodeExpiresTime, loginPage, authCodeUserLoginResourcePath)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
