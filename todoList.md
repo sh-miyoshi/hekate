@@ -27,6 +27,12 @@
     - 作成・削除時にvalidationをかける
   - masterプロジェクトユーザはcluster-read必須？
   - その他はcluster系は付けられないようにする？
+- ユーザーパスワードロック
+  - 仕様の検討
+    - ロック時の仕様
+    - ロック解除の方法
+  - Project Infoに追加
+  - APIの修正
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
 - audit log
