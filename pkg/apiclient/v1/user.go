@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	userapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/user"
+	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
 )
 
 // UserAdd ...
@@ -109,4 +110,44 @@ func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.U
 		return nil, fmt.Errorf("No such user in the project")
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+}
+
+// UserRoleAdd ...
+func (h *Handler) UserRoleAdd(projectName string, userName string, roleName string, roleType model.RoleType) error {
+	user, err := h.UserGetList(projectName, userName)
+	if err != nil {
+		return err
+	}
+	if len(user) != 1 {
+		if len(user) == 0 {
+			return fmt.Errorf("No such user")
+		}
+		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
+	}
+
+	roleID := roleName
+	if roleType == model.RoleCustom {
+		// TODO(get role id from name)
+		return fmt.Errorf("Custom role request is not implemented yet")
+	}
+
+	userID := user[0].ID
+	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
+	httpReq, err := http.NewRequest("POST", u, nil)
+	if err != nil {
+		return err
+	}
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 200:
+		return nil
+	}
+	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
