@@ -10,6 +10,7 @@ import (
 	userapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/util"
 	"github.com/spf13/cobra"
 )
 
@@ -50,9 +51,16 @@ var createUserCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		} else {
-			password, _ := cmd.Flags().GetString("name")
+			password, _ := cmd.Flags().GetString("password")
 			if password == "" {
-				// TODO(read password from console)
+				// read password from console
+				fmt.Printf("Password: ")
+				var err error
+				password, err = util.ReadPasswordFromConsole()
+				if err != nil {
+					fmt.Printf("Failed to read password: %v\n", err)
+					os.Exit(1)
+				}
 			}
 			req.Name = name
 			req.Password = password

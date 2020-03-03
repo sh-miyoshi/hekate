@@ -4,12 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"syscall"
 
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/util"
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
@@ -36,7 +35,7 @@ var loginCmd = &cobra.Command{
 			// input password in STDIN
 			fmt.Printf("Password: ")
 			var err error
-			password, err = readPasswordFromConsole()
+			password, err = util.ReadPasswordFromConsole()
 			if err != nil {
 				fmt.Printf("Failed to read password: %v\n", err)
 				os.Exit(1)
@@ -62,14 +61,4 @@ func init() {
 // Command ...
 func Command() *cobra.Command {
 	return loginCmd
-}
-
-func readPasswordFromConsole() (string, error) {
-	passwordBytes, err := terminal.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return "", err
-	}
-	fmt.Println()
-	password := string(passwordBytes)
-	return password, nil
 }
