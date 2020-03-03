@@ -93,12 +93,12 @@
 
 ## CLI tool(jwtctl) enhancement
 
+- command体系をかえる
+  - jwtctl \<resource\> \<sub-resource\> \<command(add, delete , ....)\>
 - 各APIへの対応
   - project
     - update
   - user
-    - create
-      - file flagの追加
     - update
     - role add
     - role delete
