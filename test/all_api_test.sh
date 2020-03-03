@@ -138,7 +138,7 @@ if [ $result != "success" ]; then
 fi
 
 # Add User Role
-result=`test_api "$URL/project/master/user/$userID/role/project-read" POST $master_access_token`
+result=`test_api "$URL/project/master/user/$userID/role/read-project" POST $master_access_token`
 echo $result
 if [ $result != "success" ]; then
 	echo "Failed to add role to user"
@@ -146,7 +146,7 @@ if [ $result != "success" ]; then
 fi
 
 # Delete User Role
-result=`test_api "$URL/project/master/user/$userID/role/project-read" DELETE $master_access_token`
+result=`test_api "$URL/project/master/user/$userID/role/read-project" DELETE $master_access_token`
 echo $result
 if [ $result != "success" ]; then
 	echo "Failed to delete role from user"
