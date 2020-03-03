@@ -238,12 +238,20 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
+	// Validate Roles
 	for _, r := range ent.SystemRoles {
 		if !role.GetInst().IsValid(r) {
-			return errors.Wrap(model.ErrUserValidateFailed, "Invalid role")
+			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
 	}
-	// TODO(validate custom role)
+	for _, r := range ent.CustomRoles {
+		if _, err := m.customRole.Get(r); err != nil {
+			if errors.Cause(err) == model.ErrNoSuchCustomRole {
+				return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
+			}
+			return errors.Wrap(err, "Custom role get error")
+		}
+	}
 
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
@@ -316,12 +324,20 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
+	// Validate Role
 	for _, r := range ent.SystemRoles {
 		if !role.GetInst().IsValid(r) {
-			return errors.Wrap(model.ErrUserValidateFailed, "Invalid role")
+			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
 	}
-	// TODO(validate custom role)
+	for _, r := range ent.CustomRoles {
+		if _, err := m.customRole.Get(r); err != nil {
+			if errors.Cause(err) == model.ErrNoSuchCustomRole {
+				return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
+			}
+			return errors.Wrap(err, "Custom role get error")
+		}
+	}
 
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
@@ -340,18 +356,23 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
-	// Validate RoleID when type is system
+	// Validate RoleID
 	if roleType == model.RoleSystem {
 		if !role.GetInst().IsValid(roleID) {
-			return errors.Wrap(model.ErrUserValidateFailed, "Invalid role")
+			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
+		}
+	} else if roleType == model.RoleCustom {
+		if _, err := m.customRole.Get(roleID); err != nil {
+			if errors.Cause(err) == model.ErrNoSuchCustomRole {
+				return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
+			}
+			return errors.Wrap(err, "Custom role get error")
 		}
 	}
 
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
-
-	// TODO(validate roleID)
 
 	if err := m.user.AddRole(userID, roleType, roleID); err != nil {
 		m.user.AbortTx()
