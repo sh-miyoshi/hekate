@@ -42,7 +42,7 @@ var createProjectCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			if err := json.Unmarshal(bytes, req); err != nil {
-				fmt.Printf("Failed to parse json: %v\n", err)
+				fmt.Printf("Failed to parse input file to json: %v\n", err)
 				os.Exit(1)
 			}
 		}
