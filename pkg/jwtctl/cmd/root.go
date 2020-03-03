@@ -3,10 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/add"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/delete"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/get"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/login"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/project"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/user"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/sh-miyoshi/jwt-server/pkg/logger"
@@ -21,16 +20,15 @@ var (
 )
 
 func init() {
-	const defaultConfigDir = "./.config"
+	const defaultConfigDir = "./.config" // TODO(set correct path)
 	cobra.OnInitialize(initOutput)
 
 	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of jwtctl config")
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
 
 	rootCmd.AddCommand(login.Command())
-	rootCmd.AddCommand(add.Command())
-	rootCmd.AddCommand(delete.Command())
-	rootCmd.AddCommand(get.Command())
+	rootCmd.AddCommand(project.GetCommand())
+	rootCmd.AddCommand(user.GetCommand())
 }
 
 func initOutput() {

@@ -1,4 +1,4 @@
-package add
+package user
 
 import (
 	"encoding/json"
@@ -15,7 +15,7 @@ import (
 )
 
 var addUserCmd = &cobra.Command{
-	Use:   "user",
+	Use:   "add",
 	Short: "Add New User",
 	Long:  "Add new user into the project",
 	Run: func(cmd *cobra.Command, args []string) {

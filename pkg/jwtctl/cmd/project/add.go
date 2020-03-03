@@ -1,4 +1,4 @@
-package add
+package project
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ import (
 var project projectapi.ProjectCreateRequest
 
 var addProjectCmd = &cobra.Command{
-	Use:   "project",
+	Use:   "add",
 	Short: "Add New Project",
 	Long:  "Add New Project",
 	Run: func(cmd *cobra.Command, args []string) {

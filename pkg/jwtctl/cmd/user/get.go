@@ -1,4 +1,4 @@
-package get
+package user
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 var getUserCmd = &cobra.Command{
-	Use:   "user",
+	Use:   "get",
 	Short: "Get users in the project",
 	Long:  "Get users in the project",
 	Run: func(cmd *cobra.Command, args []string) {

@@ -1,4 +1,4 @@
-package get
+package project
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 var getProjectCmd = &cobra.Command{
-	Use:   "project",
+	Use:   "get",
 	Short: "Get Projects in the cluster",
 	Long:  "Get Projects in the cluster",
 	Run: func(cmd *cobra.Command, args []string) {

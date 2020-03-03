@@ -1,4 +1,4 @@
-package delete
+package project
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 var deleteProjectCmd = &cobra.Command{
-	Use:   "project",
+	Use:   "delete",
 	Short: "Delete Project",
 	Long:  "Delete Project",
 	Run: func(cmd *cobra.Command, args []string) {

@@ -1,4 +1,4 @@
-package delete
+package user
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 var deleteUserCmd = &cobra.Command{
-	Use:   "user",
+	Use:   "delete",
 	Short: "Delete User",
 	Long:  "Delete User",
 	Run: func(cmd *cobra.Command, args []string) {
