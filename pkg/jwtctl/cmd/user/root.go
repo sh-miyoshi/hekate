@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/user/role"
 	"github.com/spf13/cobra"
 )
 
@@ -10,6 +11,7 @@ func init() {
 	userCmd.AddCommand(addUserCmd)
 	userCmd.AddCommand(deleteUserCmd)
 	userCmd.AddCommand(getUserCmd)
+	userCmd.AddCommand(role.GetCommand())
 }
 
 var userCmd = &cobra.Command{
