@@ -29,6 +29,7 @@ func WriteUserLoginPage(code string, state string, projectName string, w http.Re
 	d := map[string]string{
 		"URL":             url,
 		"CSSResourcePath": userLoginResPath + "/css",
+		"IMGResourcePath": userLoginResPath + "/img",
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")

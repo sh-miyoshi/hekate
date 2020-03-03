@@ -17,11 +17,10 @@
 
 <body>
   <div class="container">
-    <div class="form-login">
-      <h2 class="form-login-heading">We are sorry ...</h2>
-      <div class="login-wrap">
-        <div>{{.Error}}</div>
-      </div>
+    <div class="error centered">
+      <img src="{{.IMGResourcePath}}/error_icon.png" alt="error_icon">
+      <h1>We are sorry ...</h1>
+      <h3>{{.Error}}</h3>
     </div>
   </div>
 </body>
