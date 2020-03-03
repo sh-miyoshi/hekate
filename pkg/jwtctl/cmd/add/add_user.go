@@ -1,4 +1,4 @@
-package create
+package add
 
 import (
 	"encoding/json"
@@ -14,10 +14,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var createUserCmd = &cobra.Command{
+var addUserCmd = &cobra.Command{
 	Use:   "user",
-	Short: "Create New User",
-	Long:  "Create new user into the project",
+	Short: "Add New User",
+	Long:  "Add new user into the project",
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName, _ := cmd.Flags().GetString("project")
 		file, _ := cmd.Flags().GetString("file")
@@ -82,11 +82,11 @@ var createUserCmd = &cobra.Command{
 }
 
 func init() {
-	createUserCmd.Flags().String("project", "", "[Required] name of the project to which the user belongs")
-	createUserCmd.Flags().StringP("file", "f", "", "file path for create user info")
-	createUserCmd.Flags().StringP("name", "n", "", "name of new user")
-	createUserCmd.Flags().StringP("password", "p", "", "password of new user")
-	createUserCmd.Flags().StringSlice("customRoles", nil, "custom role list")
-	createUserCmd.Flags().StringSlice("systemRoles", nil, "system role list")
-	createUserCmd.MarkFlagRequired("project")
+	addUserCmd.Flags().String("project", "", "[Required] name of the project to which the user belongs")
+	addUserCmd.Flags().StringP("file", "f", "", "file path for new user info")
+	addUserCmd.Flags().StringP("name", "n", "", "name of new user")
+	addUserCmd.Flags().StringP("password", "p", "", "password of new user")
+	addUserCmd.Flags().StringSlice("customRoles", nil, "custom role list")
+	addUserCmd.Flags().StringSlice("systemRoles", nil, "system role list")
+	addUserCmd.MarkFlagRequired("project")
 }

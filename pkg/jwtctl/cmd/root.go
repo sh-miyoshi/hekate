@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/create"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/add"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/delete"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/get"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/login"
@@ -28,7 +28,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
 
 	rootCmd.AddCommand(login.Command())
-	rootCmd.AddCommand(create.Command())
+	rootCmd.AddCommand(add.Command())
 	rootCmd.AddCommand(delete.Command())
 	rootCmd.AddCommand(get.Command())
 }

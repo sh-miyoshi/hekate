@@ -1,4 +1,4 @@
-package create
+package add
 
 import (
 	"encoding/json"
@@ -15,10 +15,10 @@ import (
 
 var project projectapi.ProjectCreateRequest
 
-var createProjectCmd = &cobra.Command{
+var addProjectCmd = &cobra.Command{
 	Use:   "project",
-	Short: "Create New Project",
-	Long:  "Create New Project",
+	Short: "Add New Project",
+	Long:  "Add New Project",
 	Run: func(cmd *cobra.Command, args []string) {
 		fileName, _ := cmd.Flags().GetString("file")
 
@@ -60,9 +60,9 @@ var createProjectCmd = &cobra.Command{
 }
 
 func init() {
-	createProjectCmd.Flags().StringVarP(&project.Name, "name", "n", "", "name of new project")
-	createProjectCmd.Flags().UintVar(&project.TokenConfig.AccessTokenLifeSpan, "accessExpires", 5*60, "access token life span [sec]")
-	createProjectCmd.Flags().UintVar(&project.TokenConfig.RefreshTokenLifeSpan, "refreshExpires", 14*24*60*60, "refresh token life span [sec]")
-	createProjectCmd.Flags().StringVar(&project.TokenConfig.SigningAlgorithm, "signAlg", "RS256", "token sigining algorithm, one of RS256, ")
-	createProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
+	addProjectCmd.Flags().StringVarP(&project.Name, "name", "n", "", "name of new project")
+	addProjectCmd.Flags().UintVar(&project.TokenConfig.AccessTokenLifeSpan, "accessExpires", 5*60, "access token life span [sec]")
+	addProjectCmd.Flags().UintVar(&project.TokenConfig.RefreshTokenLifeSpan, "refreshExpires", 14*24*60*60, "refresh token life span [sec]")
+	addProjectCmd.Flags().StringVar(&project.TokenConfig.SigningAlgorithm, "signAlg", "RS256", "token sigining algorithm, one of RS256, ")
+	addProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
 }
