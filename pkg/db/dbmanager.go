@@ -340,10 +340,19 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
-	// TODO(validate roleID)
+	// Validate RoleID when type is system
+	if roleType == model.RoleSystem {
+		if !role.GetInst().IsValid(roleID) {
+			return errors.Wrap(model.ErrUserValidateFailed, "Invalid role")
+		}
+	}
+
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
+
+	// TODO(validate roleID)
+
 	if err := m.user.AddRole(userID, roleType, roleID); err != nil {
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to add role to user")
