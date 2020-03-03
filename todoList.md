@@ -93,8 +93,6 @@
 
 ## CLI tool(jwtctl) enhancement
 
-- command体系をかえる
-  - jwtctl \<resource\> \<sub-resource\> \<command(add, delete , ....)\>
 - 各APIへの対応
   - project
     - update
@@ -113,6 +111,7 @@
     - get
     - delete
     - update
+- logoutコマンドの実装
 - default config pathの修正
 - configコマンドの作成・修正
 - Production向け実行ファイルの作成
