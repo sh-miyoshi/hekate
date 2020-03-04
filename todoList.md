@@ -12,9 +12,6 @@
 
 ## jwt-server application enhancement
 
-- 仕様書の更新
-  - parameterの仕様
-  - ユーザーパスワードロック
 - Auhtorization Code Flowのエラー時処理の修正
   - CSSの変更
   - error responseをhtmlで返す
@@ -33,10 +30,10 @@
   - その他はcluster系は付けられないようにする？
 - ユーザーパスワードロック
   - 仕様の検討
-    - ロック時の仕様
-    - ロック解除の方法
+    - ロック解除の方法(APIで解除できるようにする？)
   - Project Infoに追加
   - APIの修正
+  - API docの修正
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
 - audit log
@@ -65,7 +62,6 @@
 - OpenID Connect部分のエンハンス
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
-  - preferred_usernameの追加
 - APIのRBACの見直し
 - userのパスワード変更のrole見直し
   - 本人のみが変更できるようにする
