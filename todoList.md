@@ -13,6 +13,7 @@
 ## jwt-server application enhancement
 
 - Auhtorization Code Flowのエラー時処理の修正
+  - CSSの変更
   - error responseをhtmlで返す
 - GET LIST APIの修正
   - 残り: client, role
@@ -48,6 +49,7 @@
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
+    - エラー処理回り
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type(signing_method)
@@ -77,6 +79,7 @@
 
 ## Portal(Admin Console) enhancement
 
+- CSSの変更
 - middleware処理
   - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
     - 強制ログアウト or 白紙のページを見せる(こっちが有力)
