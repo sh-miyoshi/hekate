@@ -9,6 +9,7 @@ import (
 	apiclient "github.com/sh-miyoshi/jwt-server/pkg/apiclient/v1"
 	clientapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/client"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
 	"github.com/spf13/cobra"
 )
 
@@ -71,9 +72,8 @@ var addClientCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Printf("test: %v\n", res)
-		// format := output.NewClientInfoFormat(res)
-		// output.Print(format)
+		format := output.NewClientInfoFormat(res)
+		output.Print(format)
 	},
 }
 
