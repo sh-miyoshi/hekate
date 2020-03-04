@@ -631,10 +631,10 @@ func (m *Manager) AuthCodeGet(codeID string) (*model.AuthCode, error) {
 
 // CustomRoleAdd ...
 func (m *Manager) CustomRoleAdd(ent *model.CustomRole) error {
-	// TODO(add validation)
-	// if err := ent.Validate(); err != nil {
-	// 	return errors.Wrap(err, "Failed to validate entry")
-	// }
+	if err := ent.Validate(); err != nil {
+		return errors.Wrap(err, "Failed to validate entry")
+	}
+
 	// TODO(validate name uniquness in project)
 
 	if err := m.customRole.BeginTx(); err != nil {
@@ -688,10 +688,10 @@ func (m *Manager) CustomRoleGet(customRoleID string) (*model.CustomRole, error) 
 
 // CustomRoleUpdate ...
 func (m *Manager) CustomRoleUpdate(ent *model.CustomRole) error {
-	// TODO(add validation)
-	// if err := ent.Validate(); err != nil {
-	// 	return errors.Wrap(err, "Failed to validate entry")
-	// }
+	if err := ent.Validate(); err != nil {
+		return errors.Wrap(err, "Failed to validate entry")
+	}
+
 	// TODO(validate name uniquness in project)
 
 	if err := m.customRole.BeginTx(); err != nil {

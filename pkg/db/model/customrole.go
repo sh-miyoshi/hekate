@@ -19,6 +19,9 @@ var (
 
 	// ErrCustomRoleAlreadyExists ...
 	ErrCustomRoleAlreadyExists = errors.New("Custom Role Already Exists")
+
+	// ErrCustomRoleValidateFailed ...
+	ErrCustomRoleValidateFailed = errors.New("Custom Role Already Exists")
 )
 
 // CustomRoleHandler ...
@@ -38,4 +41,17 @@ type CustomRoleHandler interface {
 
 	// AbortTx method abort and rollback the transaction
 	AbortTx() error
+}
+
+// Validate ...
+func (c *CustomRole) Validate() error {
+	if !ValidateCustomRoleName(c.Name) {
+		return errors.Wrap(ErrCustomRoleValidateFailed, "Invalid Custom Role Name format")
+	}
+
+	if !ValidateProjectName(c.ProjectName) {
+		return errors.Wrap(ErrCustomRoleValidateFailed, "Invalid Project Name format")
+	}
+
+	return nil
 }
