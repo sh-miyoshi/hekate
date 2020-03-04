@@ -12,6 +12,9 @@
 
 ## jwt-server application enhancement
 
+- 仕様書の更新
+  - parameterの仕様
+  - ユーザーパスワードロック
 - Auhtorization Code Flowのエラー時処理の修正
   - CSSの変更
   - error responseをhtmlで返す
