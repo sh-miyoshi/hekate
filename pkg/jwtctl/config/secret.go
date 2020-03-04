@@ -65,3 +65,28 @@ func GetAccessToken() (string, error) {
 
 	return s.AccessToken, nil
 }
+
+// GetRefreshToken ...
+func GetRefreshToken() (string, error) {
+	// Get Secret Info
+	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
+	buf, err := ioutil.ReadFile(secretFile)
+	if err != nil {
+		return "", fmt.Errorf("Failed to read secret file: %v", err)
+	}
+
+	var s secret
+	json.Unmarshal(buf, &s)
+
+	if time.Now().After(s.RefreshTokenExpiresTime) {
+		return "", fmt.Errorf("Refresh token was already expired")
+	}
+
+	return s.RefreshToken, nil
+}
+
+// RemoveSecretFile ...
+func RemoveSecretFile() error {
+	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
+	return os.Remove(secretFile)
+}

@@ -111,7 +111,10 @@
     - get
     - delete
     - update
-- logoutコマンドの実装
+- outputの修正
+  - error出力の方法
+  - debug出力
+  - error messageの内容
 - default config pathの修正
 - configコマンドの作成・修正
 - Production向け実行ファイルの作成
