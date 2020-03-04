@@ -29,7 +29,7 @@ var addUserCmd = &cobra.Command{
 		}
 
 		if file != "" && name != "" {
-			fmt.Printf("either \"name\" or \"file\" flag must be specified.")
+			fmt.Println("either \"name\" or \"file\" flag must be specified.")
 			os.Exit(1)
 		}
 
