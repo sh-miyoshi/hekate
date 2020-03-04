@@ -7,7 +7,7 @@ import (
 
 // ValidateProjectName ...
 func ValidateProjectName(name string) bool {
-	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-]{2,31}$`)
+	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-\.\_]{3,63}$`)
 	return prjNameRegExp.MatchString(name)
 }
 
@@ -32,10 +32,8 @@ func ValidateLifeSpan(span uint) bool {
 
 // ValidateClientID ...
 func ValidateClientID(clientID string) bool {
-	if !(2 <= len(clientID) && len(clientID) < 128) {
-		return false
-	}
-	return true
+	clientIDRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-\.\_]{3,63}$`)
+	return clientIDRegExp.MatchString(clientID)
 }
 
 // ValidateClientSecret ...
@@ -80,4 +78,12 @@ func ValidateUserID(id string) bool {
 // ValidateSessionID ...
 func ValidateSessionID(id string) bool {
 	return govalidator.IsUUID(id)
+}
+
+// ValidateCustomRoleName ...
+func ValidateCustomRoleName(name string) bool {
+	if !(3 <= len(name) && len(name) < 64) {
+		return false
+	}
+	return true
 }
