@@ -7,20 +7,22 @@
   <!-- for debug -->
   <!--
   <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/coreui.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   -->
 
   <!-- for production -->
   <link href="{{.CSSResourcePath}}/bootstrap.min.css" rel="stylesheet">
+  <link href="{{.CSSResourcePath}}/coreui.min.css" rel="stylesheet">
   <link href="{{.CSSResourcePath}}/style.css" rel="stylesheet">
 </head>
 
 <body>
   <div class="container">
-    <div class="error centered">
+    <div class="error">
       <img src="{{.IMGResourcePath}}/error_icon.png" alt="error_icon">
       <h1>We are sorry ...</h1>
-      <h3>{{.Error}}</h3>
+      <h2>{{.Error}}</h2>
     </div>
   </div>
 </body>

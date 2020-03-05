@@ -1,87 +1,11 @@
-/**
-* Template Name: Dashio
-* Template URL: https://templatemag.com/dashio-bootstrap-admin-template/
-* Author: TemplateMag.com
-* License: https://templatemag.com/license/
-*/
-/*
-Template Name: DASHIO - Bootstrap 3.1.1 Admin Theme
-Template Version: 1.0
-Author: Carlos Alvarez
-Website: http://Alvarez.is/
-*/
-
-/* Import fonts */
-@import url(http://fonts.googleapis.com/css?family=Ruda:400,700,900);
-
-/* BASIC THEME CONFIGURATION */
-body {
-    color: #797979;
-	background: #eaeaea;
-    font-family: 'Ruda', sans-serif;
-    padding: 0px !important;
-    margin: 0px !important;
-    font-size:13px;
-}
-
-#container {
-    width: 100%;
-    height: 100%;
-}
-
-.btn-theme {
-  color: #fff;
-  background-color: #4ECDC4;
-  border-color: #48bcb4;
-}
-.btn-theme:hover,
-.btn-theme:focus,
-.btn-theme:active,
-.btn-theme.active,
-.open .dropdown-toggle.btn-theme {
-  color: #fff;
-  background-color: #48bcb4;
-  border-color: #48bcb4;
-}
-
-
-/*LOGIN CONFIGURATION PAGE*/
-.form-login {
-	max-width: 330px;
-	margin: 100px auto 0;
-	background: #fff;
-	border-radius: 5px;
-	-webkit-border-radius: 5px;
-}
-
-.form-login h2.form-login-heading {
-	margin: 0;
-	padding: 25px 20px;
-	text-align: center;
-	background: #4ecdc4;
-	border-radius: 5px 5px 0 0;
-	-webkit-border-radius: 5px 5px 0 0;
-	color: #fff;
-	font-size: 20px;
-	text-transform: uppercase;
-	font-weight: 300;
-}
-.login-wrap {
-	padding: 20px;
-}
-
-.alert-msg{
-    color: #ff0000;
-}
-
-.centered {
+.error {
 	text-align: center;
 }
 
 .error img {
-	margin-top: 120px;
+	margin-top: 100px;
 }
 
 .error h1 {
-	font-weight: 900;
+	font-size: 48px;
 }
