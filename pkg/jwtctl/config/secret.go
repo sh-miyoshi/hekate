@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/login"
+	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/login"
 )
 
 type secret struct {

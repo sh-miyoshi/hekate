@@ -2,8 +2,8 @@ package oidc
 
 import (
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/db"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/db"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 )
 
 // ClientAuth ...

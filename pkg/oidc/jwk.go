@@ -5,7 +5,7 @@ import (
 	"github.com/dvsekhvalnov/jose2go/base64url"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/util"
+	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
 // GenerateJWKSet ...

@@ -5,10 +5,10 @@ go build -o test-server
 ./test-server -logfile=test-server.log &
 echo "start test backend app"
 
-cd ../../cmd/jwt-server
+cd ../../cmd/hekate
 go build
-./jwt-server &
-echo "start jwt-server"
+./hekate &
+echo "start hekate"
 
 cd ../../test/gatekeeper
 

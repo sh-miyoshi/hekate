@@ -3,7 +3,7 @@ package memory
 import (
 	"testing"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 )
 
 func TestFilterUserList(t *testing.T) {

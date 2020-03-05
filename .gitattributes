@@ -1,4 +1,4 @@
 api/api.html linguist-generated=true
-cmd/jwt-server/_data/**/* linguist-vendored=true
+cmd/hekate/_data/**/* linguist-vendored=true
 cmd/portal/assets/css/bootstrap.min.css linguist-vendored=true
 cmd/portal/assets/css/dashio.css linguist-vendored=true

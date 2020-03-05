@@ -7,11 +7,11 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/memory"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/mongo"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/role"
+	"github.com/sh-miyoshi/hekate/pkg/db/memory"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/db/mongo"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/role"
 )
 
 // Manager ...

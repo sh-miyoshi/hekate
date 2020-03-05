@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"sync"
 )
 

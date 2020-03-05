@@ -1,7 +1,7 @@
 <template>
   <header class="header black-bg">
     <!-- logo start -->
-    <nuxt-link to="/home" class="logo">jwt-server</nuxt-link>
+    <nuxt-link to="/home" class="logo">hekate</nuxt-link>
     <!-- logo end -->
 
     <div class="top-menu">

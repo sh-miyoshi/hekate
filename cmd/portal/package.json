@@ -1,7 +1,7 @@
 {
-  "name": "jwt-server",
+  "name": "hekate",
   "version": "1.0.0",
-  "description": "frontend web page for jwt-server",
+  "description": "frontend web page for hekate",
   "author": "s.miyoshi",
   "private": true,
   "scripts": {

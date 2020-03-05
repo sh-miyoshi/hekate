@@ -6,11 +6,11 @@ import (
 	"io/ioutil"
 	"os"
 
-	apiclient "github.com/sh-miyoshi/jwt-server/pkg/apiclient/v1"
-	userapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/user"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/util"
+	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
+	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/output"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/util"
 	"github.com/spf13/cobra"
 )
 

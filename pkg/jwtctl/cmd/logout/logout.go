@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/logout"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/logout"
 	"github.com/spf13/cobra"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/config"
 )
 
 // Debug method output debug message is run as debug mode

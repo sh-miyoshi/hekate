@@ -1,0 +1,6 @@
+# binary files
+hekate
+hekate.exe
+
+# log files
+*.log

@@ -3,7 +3,7 @@ package memory
 import (
 	"sync"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 )
 
 // ProjectInfoHandler implement db.ProjectInfoHandler

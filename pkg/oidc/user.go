@@ -1,15 +1,15 @@
 package oidc
 
 import (
-	"github.com/sh-miyoshi/jwt-server/pkg/db"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/db"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"html/template"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
 // WriteUserLoginPage ...

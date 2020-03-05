@@ -3,14 +3,14 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/client"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/login"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/logout"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/project"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/user"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/print"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/cmd/client"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/cmd/login"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/cmd/logout"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/cmd/project"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/cmd/user"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/output"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/print"
 	"github.com/spf13/cobra"
 
 	"os"
@@ -55,8 +55,8 @@ func initOutput() {
 
 var rootCmd = &cobra.Command{
 	Use:   "jwtctl",
-	Short: "jwtctl is a command line tool for jwt-server",
-	Long:  "jwtctl is a command line tool for jwt-server",
+	Short: "jwtctl is a command line tool for hekate",
+	Long:  "jwtctl is a command line tool for hekate",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},

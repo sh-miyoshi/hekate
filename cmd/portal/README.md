@@ -1,6 +1,6 @@
 # portal
 
-> frontend web page for jwt-server
+> frontend web page for hekate
 
 ## Build Setup
 

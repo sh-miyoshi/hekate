@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	projectapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/project"
+	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 )
 
 // ProjectInfoFormat ...

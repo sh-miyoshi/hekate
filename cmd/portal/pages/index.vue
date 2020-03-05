@@ -1,6 +1,6 @@
 <template>
   <div class="container index-window">
-    <h1>JWT-Server</h1>
+    <h1>hekate</h1>
     <p><i>simple identity management server</i></p>
     <button class="btn btn-compose" @click="login">
       Login to admin console

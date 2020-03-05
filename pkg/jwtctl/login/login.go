@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	oidcapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/oidc"
+	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
 )
 
 func tokenRequest(req *http.Request) (*oidcapi.TokenResponse, error) {

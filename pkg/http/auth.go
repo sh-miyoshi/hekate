@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/oidc/token"
-	"github.com/sh-miyoshi/jwt-server/pkg/role"
+	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
+	"github.com/sh-miyoshi/hekate/pkg/role"
 )
 
 func parseHTTPHeaderToken(tokenString string) (string, error) {

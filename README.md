@@ -1,8 +1,8 @@
-# [WIP]jwt-server
+# [WIP]hekate
 
 ## Overview
 
-`jwt-server`はGo言語で記述されたOpenID Connectに対応したシンプルな認証・認可サーバです。  
+`hekate`はGo言語で記述されたOpenID Connectに対応したシンプルな認証・認可サーバです。  
 単一バイナリでユーザー管理と認証・認可処理を実装しています。  
 
 ## Project Goal
@@ -19,11 +19,11 @@
 ### サーバの起動
 
 ```bash
-cd cmd/jwt-server
+cd cmd/hekate
 vi config.yaml
   # 必要に応じて修正
 go build
-./jwt-server
+./hekate
 ```
 
 ### JWT Tokenの取得

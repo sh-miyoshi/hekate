@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
-	userapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/user"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
+	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 )
 
 // UserAdd ...

@@ -10,7 +10,7 @@
   - Backendのユーザープログラムに対してアクセス制御するようなツール
   - keycloak-gatekeeperのようなものを想定
 
-## jwt-server application enhancement
+## server application enhancement
 
 - Auhtorization Code Flowのエラー時処理の修正
   - CSSの変更

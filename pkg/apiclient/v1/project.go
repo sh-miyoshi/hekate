@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	projectapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/project"
+	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 )
 
 // ProjectAdd ...

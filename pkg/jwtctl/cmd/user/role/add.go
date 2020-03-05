@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/apiclient/v1"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
+	"github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/config"
 
 	"github.com/spf13/cobra"
 )

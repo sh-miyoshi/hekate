@@ -10,7 +10,7 @@ if [ "x$STATUS" = "x" ]; then
     mongo
 fi
 
-# Run jwt-server with mongo driver
+# Run hekate with mongo driver
 cat << EOF > config.yaml
 server_port: 8080
 server_bind_address: "0.0.0.0"
@@ -21,7 +21,7 @@ db:
   connection_string: "mongodb://root:example@localhost:27017"
 admin_name: admin
 admin_password: password
-token_issuer: jwt-server
+token_issuer: hekate
 token_secret_key: testsecretkey
 EOF
 

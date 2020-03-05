@@ -2,8 +2,8 @@ package oidc
 
 import (
 	"encoding/json"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
-	"github.com/sh-miyoshi/jwt-server/pkg/oidc"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/oidc"
 	"net/http"
 )
 

@@ -3,7 +3,7 @@ package user
 import (
 	"fmt"
 
-	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/user/role"
+	"github.com/sh-miyoshi/hekate/pkg/jwtctl/cmd/user/role"
 	"github.com/spf13/cobra"
 )
 

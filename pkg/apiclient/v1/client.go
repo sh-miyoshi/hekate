@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	clientapi "github.com/sh-miyoshi/jwt-server/pkg/apihandler/v1/client"
+	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 )
 
 // ClientAdd ...

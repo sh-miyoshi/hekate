@@ -8,10 +8,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/db"
-	"github.com/sh-miyoshi/jwt-server/pkg/db/model"
-	"github.com/sh-miyoshi/jwt-server/pkg/oidc/token"
-	"github.com/sh-miyoshi/jwt-server/pkg/user"
+	"github.com/sh-miyoshi/hekate/pkg/db"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
+	"github.com/sh-miyoshi/hekate/pkg/user"
 )
 
 func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, r *http.Request, genRefresh, genIDToken bool) (*TokenResponse, error) {

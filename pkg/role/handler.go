@@ -3,7 +3,7 @@ package role
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
 // Handler ...

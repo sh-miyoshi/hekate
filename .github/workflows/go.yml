@@ -24,9 +24,9 @@ jobs:
     
     - name: Run server in local for test
       run: |
-        cd cmd/jwt-server
-        go build -o jwt-server
-        ./jwt-server &
+        cd cmd/hekate
+        go build -o hekate
+        ./hekate &
 
     - name: API Test
       run: |
