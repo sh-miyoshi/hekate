@@ -6,26 +6,33 @@
 
   <!-- for debug -->
   <!--
+  <link href="css/coreui.min.css" rel="stylesheet">
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   -->
 
   <!-- for production -->
+  <link href="{{.CSSResourcePath}}/coreui.min.css" rel="stylesheet">
   <link href="{{.CSSResourcePath}}/bootstrap.min.css" rel="stylesheet">
   <link href="{{.CSSResourcePath}}/style.css" rel="stylesheet">
 </head>
 
 <body>
   <div class="container">
-    <form class="form-login" method="POST" action="{{.URL}}">
-      <h2 class="form-login-heading">Login to hekate</h2>
-      <div class="login-wrap">
-        <div class="alert-msg">{{.Error}}</div>
-        <input type="text" class="form-control" name="username" placeholder="user name(e.g. admin)" autofocus /><br />
-        <input type="password" class="form-control" name="password" placeholder="password" /><br />
-        <button type="submit" class="btn btn-theme btn-block">Login</button>
+    <div class="row justify-content-center">
+      <div class="card login-form">
+        <form method="POST" action="{{.URL}}">
+          <h1>LOGIN to Hekate</h1>
+          <div class="mt-3">
+            <div class="error-msg">{{.Error}}</div>
+            <input type="text" class="form-control" name="username" placeholder="user name(e.g. admin)"
+              autofocus /><br />
+            <input type="password" class="form-control" name="password" placeholder="password" /><br />
+            <button type="submit" class="btn btn-primary px-4 btn-block">LOGIN</button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </body>
 

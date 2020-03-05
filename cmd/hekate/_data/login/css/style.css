@@ -1,3 +1,13 @@
+@import url(http://fonts.googleapis.com/css?family=Ruda:400,700,900);
+
+body{
+	font-weight: 400;
+	font-size: 14px;
+	color: #3c4b64;
+	background-color: #ebedef;
+	font-family: 'Ruda', sans-serif;
+}
+
 .error {
 	text-align: center;
 }
@@ -6,6 +16,16 @@
 	margin-top: 100px;
 }
 
-.error h1 {
-	font-size: 48px;
+h1 {
+	font-size: 42px;
+}
+
+.login-form{
+	margin-top: 120px;
+	padding-left: 40px;
+	padding-right: 40px;
+}
+
+.error-msg{
+	color: #ff0000;
 }
