@@ -1,9 +1,9 @@
-# [WIP]hekate
+# [WIP]Hekate
 
 ## Overview
 
-`hekate`はGo言語で記述されたOpenID Connectに対応したシンプルな認証・認可サーバです。  
-単一バイナリでユーザー管理と認証・認可処理を実装しています。  
+`Hekate`はGo言語で記述されたOpenID Connectに対応したシンプルな認証・認可サーバです。  
+ユーザー管理と認証・認可処理を実行できます。
 
 ## Project Goal
 
