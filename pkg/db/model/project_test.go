@@ -12,11 +12,11 @@ func TestValidate(t *testing.T) {
 		refreshTokenLifeSpan uint
 		expectSuccess        bool
 	}{
-		{"project-ok", "RS256", 1, 1, true},
+		{"project-ok._", "RS256", 1, 1, true},
 		{"project-ng-str-!", "RS256", 1, 1, false},
 		{"project-ok", "invalid", 1, 1, false},
 		{"pr", "RS256", 1, 1, false},
-		{"project-name-too-long012345678901", "RS256", 1, 1, false},
+		{"project-name-too-long0123456789012345678901234567890123456789012", "RS256", 1, 1, false},
 		{"0prject", "RS256", 1, 1, false},
 	}
 

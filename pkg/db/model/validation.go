@@ -1,13 +1,14 @@
 package model
 
 import (
-	"github.com/asaskevich/govalidator"
 	"regexp"
+
+	"github.com/asaskevich/govalidator"
 )
 
 // ValidateProjectName ...
 func ValidateProjectName(name string) bool {
-	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-\.\_]{3,63}$`)
+	prjNameRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-\.\_]{2,62}$`)
 	return prjNameRegExp.MatchString(name)
 }
 
@@ -32,7 +33,7 @@ func ValidateLifeSpan(span uint) bool {
 
 // ValidateClientID ...
 func ValidateClientID(clientID string) bool {
-	clientIDRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-\.\_]{3,63}$`)
+	clientIDRegExp := regexp.MustCompile(`^[a-z][a-z0-9\-\.\_]{2,62}$`)
 	return clientIDRegExp.MatchString(clientID)
 }
 
