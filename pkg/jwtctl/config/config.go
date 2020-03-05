@@ -1,9 +1,10 @@
 package config
 
 import (
-	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path/filepath"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 // SystemConfig ...
@@ -32,6 +33,11 @@ func InitConfig(confDir string) error {
 	sysConf.ConfigDir = confDir
 
 	return nil
+}
+
+// EnableDebugMode ...
+func EnableDebugMode() {
+	sysConf.EnableDebug = true
 }
 
 // Get ...

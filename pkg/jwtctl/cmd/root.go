@@ -10,7 +10,7 @@ import (
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/cmd/user"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/config"
 	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/output"
-	"github.com/sh-miyoshi/jwt-server/pkg/logger"
+	"github.com/sh-miyoshi/jwt-server/pkg/jwtctl/print"
 	"github.com/spf13/cobra"
 
 	"os"
@@ -19,6 +19,7 @@ import (
 var (
 	outputFormat string
 	configDir    string
+	debugMode    bool
 )
 
 func init() {
@@ -26,7 +27,8 @@ func init() {
 	cobra.OnInitialize(initOutput)
 
 	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of jwtctl config")
-	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Output format: json, text")
+	rootCmd.PersistentFlags().BoolVar(&debugMode, "debug", false, "Output debug message")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Set output format: json, text")
 
 	rootCmd.AddCommand(login.GetCommand())
 	rootCmd.AddCommand(logout.GetCommand())
@@ -37,14 +39,16 @@ func init() {
 
 func initOutput() {
 	if err := config.InitConfig(configDir); err != nil {
-		fmt.Printf("[ERROR] Failed to initialize config: %v\n", err)
+		print.Error("Failed to initialize config: %v\n", err)
 		os.Exit(1)
 	}
 
-	logger.InitLogger(config.Get().EnableDebug, "")
+	if debugMode {
+		config.EnableDebugMode()
+	}
 
 	if err := output.Init(outputFormat); err != nil {
-		fmt.Printf("[ERROR] Failed to set output option: %v\n", err)
+		print.Error("Failed to set output option: %v\n", err)
 		os.Exit(1)
 	}
 }
