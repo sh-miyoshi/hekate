@@ -14,3 +14,12 @@
 
 - `--output`, `-o`: 出力フォーマットを変更する(text, json)
 - `--debug`: (WIP)debugログを出力する
+
+## ログ・メッセージの仕様
+
+- メッセージタイプ
+  - Debug
+  - Info
+  - Error
+- Info, Debugメッセージは標準出力に、Errorメッセージは標準エラー出力に表示する
+- Errorメッセージの場合、表示する際は`[ERROR]`とつける
