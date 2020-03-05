@@ -1,0 +1,8 @@
+{
+    "name": "new-project",
+    "tokenConfig": {
+        "accessTokenLifeSpan": 300,
+        "refreshTokenLifeSpan": 1209600,
+        "signingAlgorithm": "RS256"
+    }
+}

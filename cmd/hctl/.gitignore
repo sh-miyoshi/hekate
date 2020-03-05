@@ -1,0 +1,6 @@
+# binary files
+hctl
+hctl.exe
+
+# secret file
+.config/secret

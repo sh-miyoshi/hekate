@@ -1,6 +1,0 @@
-# binary files
-jwtctl
-jwtctl.exe
-
-# secret file
-.config/secret

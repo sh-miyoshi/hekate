@@ -93,7 +93,7 @@
   - Role
   - Client
 
-## CLI tool(jwtctl) enhancement
+## CLI tool(hctl) enhancement
 
 - 各APIへの対応
   - project
