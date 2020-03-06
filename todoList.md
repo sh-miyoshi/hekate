@@ -25,12 +25,12 @@
     - 残り: client, role, project, user
 - roleの割り当てのvalidation
   - write権限のみはだめ(同リソースのreadは必須)
-    - 作成・削除時にvalidationをかける
+    - 削除時にvalidationをかける
+  - masterプロジェクト以外のユーザはcluster系は付けられないようにする
   - masterプロジェクトユーザはcluster-read必須？
-  - その他はcluster系は付けられないようにする？
 - ユーザーパスワードロック
   - 仕様の検討
-    - ロック解除の方法(APIで解除できるようにする？)
+    - ロック解除の方法(APIで解除できるようにする)
   - Project Infoに追加
   - APIの修正
   - API docの修正
