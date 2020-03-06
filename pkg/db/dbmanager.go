@@ -238,11 +238,15 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
+	// TODO(start transaction)
+
 	// Validate Roles
 	for _, r := range ent.SystemRoles {
-		if !role.GetInst().IsValid(r) {
+		if _, _, ok := role.GetInst().Parse(r); !ok {
 			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
+
+		// TODO(add more validation)
 	}
 	for _, r := range ent.CustomRoles {
 		if _, err := m.customRole.Get(r); err != nil {
@@ -324,11 +328,14 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
+	// TODO(start transaction)
+
 	// Validate Role
 	for _, r := range ent.SystemRoles {
-		if !role.GetInst().IsValid(r) {
+		if _, _, ok := role.GetInst().Parse(r); !ok {
 			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
+		// TODO(add more validate)
 	}
 	for _, r := range ent.CustomRoles {
 		if _, err := m.customRole.Get(r); err != nil {
@@ -358,8 +365,15 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 
 	// Validate RoleID
 	if roleType == model.RoleSystem {
-		if !role.GetInst().IsValid(roleID) {
+		_, typ, ok := role.GetInst().Parse(roleID)
+		if !ok {
 			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
+		}
+
+		// check user already has read permission if roleID type is write
+		if *typ == role.TypeWrite {
+			//user, err := m.user.Get(userID)
+			// TODO(check user has read permission)
 		}
 	} else if roleType == model.RoleCustom {
 		if _, err := m.customRole.Get(roleID); err != nil {

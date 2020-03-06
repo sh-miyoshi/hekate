@@ -2,6 +2,7 @@ package role
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
@@ -44,6 +45,19 @@ func InitHandler() error {
 	return nil
 }
 
+// Authorize ...
+func Authorize(roles []string, targetResource Resource, roleType Type) bool {
+	name := fmt.Sprintf("%s-%s", roleType.String(), targetResource.String())
+	logger.Debug("Auth want: %s, have: %v", name, roles)
+
+	for _, role := range roles {
+		if role == name {
+			return true
+		}
+	}
+	return false
+}
+
 // GetInst returns an instance of DB Manager
 func GetInst() *Handler {
 	return inst
@@ -58,27 +72,14 @@ func (h *Handler) GetList() []string {
 	return res
 }
 
-// IsValid return true if role is registered
-func (h *Handler) IsValid(role string) bool {
+// Parse ...
+func (h *Handler) Parse(role string) (*Resource, *Type, bool) {
 	for _, r := range h.roleList {
 		if r.ID == role {
-			return true
+			return &r.TargetResource, &r.RoleType, true
 		}
 	}
-	return false
-}
-
-// Authorize ...
-func (h *Handler) Authorize(roles []string, targetResource Resource, roleType Type) bool {
-	name := fmt.Sprintf("%s-%s", roleType.String(), targetResource.String())
-	logger.Debug("Auth want: %s, have: %v", name, roles)
-
-	for _, role := range roles {
-		if role == name {
-			return true
-		}
-	}
-	return false
+	return nil, nil, false
 }
 
 func (h *Handler) createRole(targetResource Resource, roleType Type) {

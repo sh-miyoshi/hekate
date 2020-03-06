@@ -293,7 +293,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := vars["roleID"]
 
 	roleType := model.RoleCustom
-	if ok := role.GetInst().IsValid(roleID); ok {
+	if _, _, ok := role.GetInst().Parse(roleID); ok {
 		roleType = model.RoleSystem
 	}
 

@@ -43,12 +43,10 @@ func TestAuthorize(t *testing.T) {
 		},
 	}
 
-	handler := &Handler{}
-
 	for _, target := range tt {
 		res := target.targetResource
 		typ := target.roleType
-		result := handler.Authorize(roles, res, typ)
+		result := Authorize(roles, res, typ)
 		if result != target.expectSuccess {
 			t.Errorf("Authorize role %s-%s returns wrong status. got %v, want %v", res, typ, result, target.expectSuccess)
 		}
