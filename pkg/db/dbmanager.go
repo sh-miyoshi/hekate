@@ -252,11 +252,12 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 			}
 		}
 	}
-	for _, r := range ent.CustomRoles {
-		if err := m.customRole.BeginTx(); err != nil {
-			return errors.Wrap(err, "BeginTx failed")
-		}
 
+	if err := m.customRole.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	for _, r := range ent.CustomRoles {
 		if _, err := m.customRole.Get(r); err != nil {
 			m.customRole.CommitTx()
 			if errors.Cause(err) == model.ErrNoSuchCustomRole {
@@ -360,11 +361,12 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 			}
 		}
 	}
-	for _, r := range ent.CustomRoles {
-		if err := m.customRole.BeginTx(); err != nil {
-			return errors.Wrap(err, "BeginTx failed")
-		}
 
+	if err := m.customRole.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	for _, r := range ent.CustomRoles {
 		if _, err := m.customRole.Get(r); err != nil {
 			if errors.Cause(err) == model.ErrNoSuchCustomRole {
 				m.customRole.CommitTx()
@@ -429,11 +431,15 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 	}
 
 	if err := m.user.AddRole(userID, roleType, roleID); err != nil {
-		m.customRole.CommitTx()
+		if roleType == model.RoleCustom {
+			m.customRole.CommitTx()
+		}
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to add role to user")
 	}
-	m.customRole.CommitTx()
+	if roleType == model.RoleCustom {
+		m.customRole.CommitTx()
+	}
 	m.user.CommitTx()
 	return nil
 }
