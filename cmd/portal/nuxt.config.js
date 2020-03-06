@@ -25,8 +25,8 @@ export default {
    */
   css: [
     '@/assets/css/bootstrap.min.css',
-    '@/assets/css/style.css',
-    '@/assets/css/dashio.css'
+    '@/assets/css/coreui.min.css',
+    '@/assets/css/style.css'
   ],
   /*
    ** Plugins to load before mounting the App

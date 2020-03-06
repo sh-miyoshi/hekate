@@ -1,19 +1,20 @@
+@import url(http://fonts.googleapis.com/css?family=Ruda:400,700,900);
+
+body{
+	font-weight: 400;
+	font-size: 14px;
+	color: #3c4b64;
+	background-color: #ebedef;
+	font-family: 'Ruda', sans-serif;
+}
+
+h1 {
+	font-size: 42px;
+}
+
 .index-window {
 	margin-top: 50px;
 	max-width: 400px;
 	text-align: center;
-}
-
-#project-name {
-	padding: 5px 0px;
-	border-bottom: solid 1px;
-	font-size: 18px;
-}
-
-.content {
-	font-size: 16px;
-}
-
-.trush:hover {
-  cursor: pointer;
+	padding: 20px;
 }

@@ -1,8 +1,8 @@
 <template>
   <div class="container index-window">
-    <h1>hekate</h1>
+    <h1 class="h1">HEKATE</h1>
     <p><i>simple identity management server</i></p>
-    <button class="btn btn-compose" @click="login">
+    <button class="btn btn-primary px-4 btn-block" @click="login">
       Login to admin console
     </button>
   </div>
