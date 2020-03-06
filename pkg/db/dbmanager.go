@@ -238,18 +238,27 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
-	// TODO(start transaction)
-
 	// Validate Roles
 	for _, r := range ent.SystemRoles {
-		if _, _, ok := role.GetInst().Parse(r); !ok {
+		res, typ, ok := role.GetInst().Parse(r)
+		if !ok {
 			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
 
-		// TODO(add more validation)
+		// Require read permission if append write permission
+		if *typ == role.TypeWrite {
+			if ok := role.Authorize(ent.SystemRoles, *res, role.TypeRead); !ok {
+				return errors.Wrap(model.ErrUserValidateFailed, "Do not have read permission")
+			}
+		}
 	}
 	for _, r := range ent.CustomRoles {
+		if err := m.customRole.BeginTx(); err != nil {
+			return errors.Wrap(err, "BeginTx failed")
+		}
+
 		if _, err := m.customRole.Get(r); err != nil {
+			m.customRole.CommitTx()
 			if errors.Cause(err) == model.ErrNoSuchCustomRole {
 				return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
 			}
@@ -258,11 +267,13 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	}
 
 	if err := m.user.BeginTx(); err != nil {
+		m.customRole.CommitTx()
 		return errors.Wrap(err, "BeginTx failed")
 	}
 
 	_, err := m.user.Get(ent.ID)
 	if err != model.ErrNoSuchUser {
+		m.customRole.CommitTx()
 		m.user.AbortTx()
 		if err == nil {
 			return model.ErrUserAlreadyExists
@@ -273,18 +284,22 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 	// Check duplicate user by name
 	users, err := m.user.GetList(ent.ProjectName, &model.UserFilter{Name: ent.Name})
 	if err != nil {
+		m.customRole.CommitTx()
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to get user info by name")
 	}
 	if len(users) > 0 {
+		m.customRole.CommitTx()
 		m.user.AbortTx()
 		return model.ErrUserAlreadyExists
 	}
 
 	if err := m.user.Add(ent); err != nil {
+		m.customRole.CommitTx()
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to add user")
 	}
+	m.customRole.CommitTx()
 	m.user.CommitTx()
 	return nil
 }
@@ -309,7 +324,10 @@ func (m *Manager) UserDelete(userID string) error {
 
 // UserGetList ...
 func (m *Manager) UserGetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, error) {
-	// TODO(validate projectName)
+	if !model.ValidateProjectName(projectName) {
+		return nil, errors.Wrap(model.ErrUserValidateFailed, "invalid project name format")
+	}
+
 	return m.user.GetList(projectName, filter)
 }
 
@@ -328,18 +346,28 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
-	// TODO(start transaction)
-
 	// Validate Role
 	for _, r := range ent.SystemRoles {
-		if _, _, ok := role.GetInst().Parse(r); !ok {
+		res, typ, ok := role.GetInst().Parse(r)
+		if !ok {
 			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
-		// TODO(add more validate)
+
+		// Require read permission if append write permission
+		if *typ == role.TypeWrite {
+			if ok := role.Authorize(ent.SystemRoles, *res, role.TypeRead); !ok {
+				return errors.Wrap(model.ErrUserValidateFailed, "Do not have read permission")
+			}
+		}
 	}
 	for _, r := range ent.CustomRoles {
+		if err := m.customRole.BeginTx(); err != nil {
+			return errors.Wrap(err, "BeginTx failed")
+		}
+
 		if _, err := m.customRole.Get(r); err != nil {
 			if errors.Cause(err) == model.ErrNoSuchCustomRole {
+				m.customRole.CommitTx()
 				return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
 			}
 			return errors.Wrap(err, "Custom role get error")
@@ -347,12 +375,15 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 	}
 
 	if err := m.user.BeginTx(); err != nil {
+		m.customRole.CommitTx()
 		return errors.Wrap(err, "BeginTx failed")
 	}
 	if err := m.user.Update(ent); err != nil {
+		m.customRole.CommitTx()
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to update user")
 	}
+	m.customRole.CommitTx()
 	m.user.CommitTx()
 	return nil
 }
@@ -370,28 +401,39 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
 
+		if err := m.user.BeginTx(); err != nil {
+			return errors.Wrap(err, "BeginTx failed")
+		}
+
 		// check user already has read permission if roleID type is write
 		if *typ == role.TypeWrite {
 			//user, err := m.user.Get(userID)
 			// TODO(check user has read permission)
 		}
 	} else if roleType == model.RoleCustom {
+		if err := m.customRole.BeginTx(); err != nil {
+			return errors.Wrap(err, "BeginTx failed")
+		}
+
 		if _, err := m.customRole.Get(roleID); err != nil {
+			m.customRole.CommitTx()
 			if errors.Cause(err) == model.ErrNoSuchCustomRole {
 				return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
 			}
 			return errors.Wrap(err, "Custom role get error")
 		}
-	}
 
-	if err := m.user.BeginTx(); err != nil {
-		return errors.Wrap(err, "BeginTx failed")
+		if err := m.user.BeginTx(); err != nil {
+			return errors.Wrap(err, "BeginTx failed")
+		}
 	}
 
 	if err := m.user.AddRole(userID, roleType, roleID); err != nil {
+		m.customRole.CommitTx()
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to add role to user")
 	}
+	m.customRole.CommitTx()
 	m.user.CommitTx()
 	return nil
 }
@@ -576,7 +618,10 @@ func (m *Manager) ClientDelete(clientID string) error {
 
 // ClientGetList ...
 func (m *Manager) ClientGetList(projectName string) ([]string, error) {
-	// TODO(validate projectName)
+	if !model.ValidateProjectName(projectName) {
+		return nil, errors.Wrap(model.ErrClientValidateFailed, "Invalid project name format")
+	}
+
 	return m.client.GetList(projectName)
 }
 
