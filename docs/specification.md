@@ -31,6 +31,24 @@
 - custom role
   - Name: 3~63文字
 
+## System Role
+
+### Role Typeについて
+
+System Roleは各リソースに対してread, writeが存在する
+userに対してwriteのみを付与することはできない
+そのため、以下の制約をつける
+
+- Role 追加時
+  - write権限を付与する際はすでにuserにそのリソースに対するread権限が存在するか、同時に登録しようとしているRoleの中にそのリソースに対するread権限が必要
+- Role 削除時
+  - read権限を削除する場合、userにそのリソースに対するwrite権限がついていないか、そのリソースのread権限も同時に削除しなければならない
+
+### Cluster Resourceについて
+
+Cluster全体を管理できるcluster roleはmaster projectに存在するユーザーにのみ付与できる
+なお、上記のread, writeに関する制約は受ける
+
 ## ユーザーパスワードロック
 
 - x分以内にn回連続で間違ったパスワードを入力するとそのユーザーはy分ロックされる
