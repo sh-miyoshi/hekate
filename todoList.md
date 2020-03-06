@@ -3,6 +3,7 @@
 ## Bugs(?)
 
 - userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
+- custom role削除時にユーザからremoveしなくてよい？
 
 ## new commands
 
