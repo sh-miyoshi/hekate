@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper content">
+  <div>
     <h3>
       <span v-if="user">
         {{ user.name }}
@@ -83,6 +83,9 @@ export default {
       this.$refs['confirm-delete-user'].show()
     },
     trush() {
+      // TODO(implement this)
+    },
+    update() {
       // TODO(implement this)
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper content">
+  <div>
     <h3>
       <span class="project">
         {{ this.$store.state.current_project }}

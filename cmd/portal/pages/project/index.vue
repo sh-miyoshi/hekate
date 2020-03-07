@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper content">
+  <div>
     <h1>Projects</h1>
     <ul>
       <li v-for="(project, i) in projects" :key="i" class="name">

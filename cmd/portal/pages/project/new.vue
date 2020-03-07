@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div>
     <h2>New Project Info</h2>
     <div class="form-panel">
       <label for="name" class="col-sm-2 control-label elem">
@@ -57,12 +57,5 @@ export default {
 
 .elem {
   float: left;
-}
-
-.divider {
-  clear: both;
-  border-bottom: 1px solid #eff2f7;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
 }
 </style>

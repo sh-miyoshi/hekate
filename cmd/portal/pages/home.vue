@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div>
     Please select item from menu bar
   </div>
 </template>

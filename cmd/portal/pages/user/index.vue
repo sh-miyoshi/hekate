@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper content">
+  <div>
     <h1>Users</h1>
     <table border="1">
       <thead>
