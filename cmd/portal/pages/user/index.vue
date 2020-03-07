@@ -15,7 +15,7 @@
           <td>{{ user.name }}</td>
           <td>
             <button
-              class="btn btn-theme"
+              class="btn btn-primary"
               @click="$router.push('/user/' + user.id)"
             >
               edit
@@ -42,7 +42,7 @@
       </b-modal>
     </div>
 
-    <button class="btn btn-theme">
+    <button class="btn btn-primary">
       Add New User
     </button>
   </div>

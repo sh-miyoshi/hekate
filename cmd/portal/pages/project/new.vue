@@ -19,7 +19,7 @@
         {{ error }}
       </div>
 
-      <button class="btn btn-theme" @click="create">Create</button>
+      <button class="btn btn-primary" @click="create">Create</button>
       <nuxt-link to="/project">Cancel</nuxt-link>
     </div>
   </div>

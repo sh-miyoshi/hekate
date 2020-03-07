@@ -44,7 +44,7 @@
         {{ error }}
       </div>
 
-      <button class="btn btn-theme" @click="update">Update</button>
+      <button class="btn btn-primary" @click="update">Update</button>
     </div>
   </div>
 </template>
