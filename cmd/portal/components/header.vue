@@ -1,12 +1,12 @@
 <template>
-  <header class="header black-bg">
+  <header class="c-header">
     <!-- logo start -->
-    <nuxt-link to="/home" class="logo">hekate</nuxt-link>
+    <nuxt-link to="/home" class="logo">HEKATE</nuxt-link>
     <!-- logo end -->
 
-    <div class="top-menu">
-      <ul class="nav pull-right top-menu">
-        <li><button class="logout" @click="logout">Logout</button></li>
+    <div class="">
+      <ul class="">
+        <li><button class="" @click="logout">Logout</button></li>
       </ul>
     </div>
   </header>

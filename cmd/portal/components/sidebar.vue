@@ -1,18 +1,33 @@
 <template>
-  <aside>
-    <div id="sidebar" class="nav-collapse">
-      <ul id="nav-accordion" class="sidebar-menu">
-        <li>
-          <nuxt-link id="project-name" to="/project">
-            <span>{{ this.$store.state.current_project }}</span>
-            <i class="fa fa-edit"></i>
-          </nuxt-link>
-        </li>
-        <li><nuxt-link to="/project/detail">Project Setting</nuxt-link></li>
-        <li><nuxt-link to="/user">User</nuxt-link></li>
-        <li><nuxt-link to="/home">Role</nuxt-link></li>
-        <li><nuxt-link to="/home">Client</nuxt-link></li>
-      </ul>
-    </div>
-  </aside>
+  <div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show">
+    <ul class="c-sidebar-nav">
+      <li class="c-sidebar-nav-item">
+        <nuxt-link to="/project" class="c-sidebar-nav-link project">
+          <span class="mr-2">{{ this.$store.state.current_project }}</span>
+          <i class="fa fa-edit"></i>
+        </nuxt-link>
+      </li>
+      <li class="c-sidebar-nav-item">
+        <nuxt-link to="/project/detail" class="c-sidebar-nav-link">
+          Project Setting
+        </nuxt-link>
+      </li>
+      <li class="c-sidebar-nav-item">
+        <nuxt-link to="/user" class="c-sidebar-nav-link">User</nuxt-link>
+      </li>
+      <li class="c-sidebar-nav-item">
+        <nuxt-link to="/home" class="c-sidebar-nav-link">Role</nuxt-link>
+      </li>
+      <li class="c-sidebar-nav-item">
+        <nuxt-link to="/home" class="c-sidebar-nav-link">Client</nuxt-link>
+      </li>
+    </ul>
+  </div>
 </template>
+
+<style scoped>
+.project {
+  font-size: 130%;
+  border-bottom: 1px solid;
+}
+</style>

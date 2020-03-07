@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper content">
+  <div class="">
     Please select item from menu bar
   </div>
 </template>
