@@ -3,10 +3,8 @@
     <Sidebar />
     <div class="c-wrapper">
       <Header />
-      <div class="c-body">
-        <main class="c-main">
-          <nuxt />
-        </main>
+      <div class="c-body main">
+        <nuxt />
       </div>
       <footer class="c-footer"></footer>
     </div>
@@ -24,3 +22,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.main {
+  padding: 15px;
+}
+</style>
