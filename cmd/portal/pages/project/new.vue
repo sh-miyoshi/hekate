@@ -1,26 +1,36 @@
 <template>
-  <div>
-    <h2>New Project Info</h2>
-    <div class="form-panel">
-      <label for="name" class="col-sm-2 control-label elem">
-        Name
-        <span class="required">*</span>
-      </label>
-      <div class="col-sm-5 elem">
-        <input v-model="name" type="text" class="form-control" />
-        <span class="help-block">
-          TODO(help message)
-        </span>
+  <div class="card">
+    <div class="card-header">
+      <h3>New Project Info</h3>
+    </div>
+
+    <div class="card-body">
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label">
+          Name
+          <span class="required">*</span>
+        </label>
+        <div class="col-md-5">
+          <input
+            v-model="name"
+            type="text"
+            class="form-control"
+            :class="{ 'is-invalid': nameValidateError }"
+          />
+          <div class="invalid-feedback">
+            {{ nameValidateError }}
+          </div>
+        </div>
       </div>
 
-      <div class="divider"></div>
+      <div class="card-footer">
+        <div v-if="error" class="alert alert-danger">
+          {{ error }}
+        </div>
 
-      <div v-if="error" class="alert alert-danger">
-        {{ error }}
+        <button class="btn btn-primary mr-2" @click="create">Create</button>
+        <nuxt-link to="/project">Cancel</nuxt-link>
       </div>
-
-      <button class="btn btn-primary" @click="create">Create</button>
-      <nuxt-link to="/project">Cancel</nuxt-link>
     </div>
   </div>
 </template>
@@ -30,6 +40,7 @@ export default {
   data() {
     return {
       name: '',
+      nameValidateError: '',
       error: ''
     }
   },
@@ -53,9 +64,5 @@ export default {
 .required {
   color: #ee2222;
   font-size: 18px;
-}
-
-.elem {
-  float: left;
 }
 </style>
