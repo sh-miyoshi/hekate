@@ -1,50 +1,54 @@
 <template>
-  <div>
-    <h1>Users</h1>
-    <table border="1">
-      <thead>
-        <tr>
-          <td>ID</td>
-          <td>Name</td>
-          <td>Actions</td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.name }}</td>
-          <td>
-            <button
-              class="btn btn-primary"
-              @click="$router.push('/user/' + user.id)"
-            >
-              edit
-            </button>
-            <span v-if="allowEdit(user.name)" class="trush">
-              <i class="fa fa-trash" @click="trushConfirm"></i>
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div>
-      <b-modal
-        id="confirm-delete-user"
-        ref="confirm-delete-user"
-        title="Confirm"
-        cancel-variant="outline-dark"
-        ok-variant="danger"
-        ok-title="Delete user"
-        @ok="trush"
-      >
-        <p class="mb-0">Are you sure to delete the user ?</p>
-      </b-modal>
+  <div class="card">
+    <div class="card-header">
+      <h3>Users</h3>
     </div>
+    <div class="card-body">
+      <div>
+        <b-modal
+          id="confirm-delete-user"
+          ref="confirm-delete-user"
+          title="Confirm"
+          cancel-variant="outline-dark"
+          ok-variant="danger"
+          ok-title="Delete user"
+          @ok="trush"
+        >
+          <p class="mb-0">Are you sure to delete the user ?</p>
+        </b-modal>
+      </div>
 
-    <button class="btn btn-primary">
-      Add New User
-    </button>
+      <table class="table table-responsive-sm">
+        <thead>
+          <tr>
+            <td>ID</td>
+            <td>Name</td>
+            <td>Actions</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user in users" :key="user.id">
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>
+              <button
+                class="btn btn-primary"
+                @click="$router.push('/user/' + user.id)"
+              >
+                edit
+              </button>
+              <span v-if="allowEdit(user.name)" class="trush">
+                <i class="fa fa-trash" @click="trushConfirm"></i>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="btn btn-primary">
+        Add New User
+      </button>
+    </div>
   </div>
 </template>
 
