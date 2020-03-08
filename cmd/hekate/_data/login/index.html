@@ -5,30 +5,49 @@
   <title>Login</title>
 
   <!-- for debug -->
-  <!--
-  <link href="css/coreui.min.css" rel="stylesheet">
+  <!-- 
   <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/coreui.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
   -->
 
   <!-- for production -->
-  <link href="{{.CSSResourcePath}}/coreui.min.css" rel="stylesheet">
   <link href="{{.CSSResourcePath}}/bootstrap.min.css" rel="stylesheet">
+  <link href="{{.CSSResourcePath}}/coreui.min.css" rel="stylesheet">
   <link href="{{.CSSResourcePath}}/style.css" rel="stylesheet">
 </head>
 
 <body>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="card login-form">
+  <div class="c-wrapper">
+    <div class="c-body login-form">
+      <div class="card">
         <form method="POST" action="{{.URL}}">
-          <h1>LOGIN to Hekate</h1>
-          <div class="mt-3">
-            <div class="error-msg">{{.Error}}</div>
-            <input type="text" class="form-control" name="username" placeholder="user name(e.g. admin)"
-              autofocus /><br />
-            <input type="password" class="form-control" name="password" placeholder="password" /><br />
-            <button type="submit" class="btn btn-primary px-4 btn-block">LOGIN</button>
+          <div class="card-header">
+            <h1>LOGIN to Hekate</h1>
+          </div>
+          <div class="card-body">
+            <div class="form-group row">
+              <label for="username" class="col-sm-4 control-label">
+                Name
+              </label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" name="username" placeholder="user name(e.g. admin)" autofocus />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="password" class="col-sm-4 control-label">
+                Password
+              </label>
+              <div class="col-sm-6">
+                <input type="password" class="form-control" name="password" placeholder="password" />
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="error-msg">{{.Error}}</div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">LOGIN</button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
