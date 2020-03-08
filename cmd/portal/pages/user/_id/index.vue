@@ -1,34 +1,34 @@
 <template>
-  <div>
-    <h3>
-      <span v-if="user">
-        {{ user.name }}
-      </span>
-      <span v-if="allowEdit()" class="trush">
-        <i class="fa fa-trash" @click="trushConfirm"></i>
-      </span>
-    </h3>
-
-    <div>
-      <b-modal
-        id="confirm-delete-user"
-        ref="confirm-delete-user"
-        title="Confirm"
-        cancel-variant="outline-dark"
-        ok-variant="danger"
-        ok-title="Delete user"
-        @ok="trush"
-      >
-        <p class="mb-0">Are you sure to delete the user ?</p>
-      </b-modal>
+  <div class="card">
+    <div class="card-header">
+      <h3>
+        {{ currentUserName }}
+        <span v-if="allowEdit()" class="trush">
+          <i class="fa fa-trash" @click="trushConfirm"></i>
+        </span>
+      </h3>
     </div>
 
-    <div class="form-panel">
+    <div class="card-body">
       <div>
-        <label for="id" class="col-sm-4 control-label elem">
+        <b-modal
+          id="confirm-delete-user"
+          ref="confirm-delete-user"
+          title="Confirm"
+          cancel-variant="outline-dark"
+          ok-variant="danger"
+          ok-title="Delete user"
+          @ok="trush"
+        >
+          <p class="mb-0">Are you sure to delete the user ?</p>
+        </b-modal>
+      </div>
+
+      <div class="form-group row">
+        <label for="id" class="col-sm-2 control-label">
           ID
         </label>
-        <div class="col-sm-3 elem">
+        <div class="col-sm-5">
           <input
             v-if="user"
             v-model="user.id"
@@ -38,13 +38,22 @@
         </div>
       </div>
 
-      <div class="divider"></div>
-
-      <div v-if="error" class="alert alert-danger">
-        {{ error }}
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 control-label">
+          Name
+        </label>
+        <div class="col-sm-5">
+          <input v-if="user" v-model="user.name" class="form-control" />
+        </div>
       </div>
 
-      <button class="btn btn-primary" @click="update">Update</button>
+      <div class="card-footer">
+        <div v-if="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+
+        <button class="btn btn-primary" @click="update">Update</button>
+      </div>
     </div>
   </div>
 </template>
@@ -53,6 +62,7 @@
 export default {
   data() {
     return {
+      currentUserName: '',
       user: null,
       error: ''
     }
@@ -68,16 +78,14 @@ export default {
       )
       if (res.ok) {
         this.user = res.data
+        this.currentUserName = res.data.name
       } else {
         console.log('Failed to get user: %o', res)
       }
     },
     allowEdit() {
-      if (!this.user) {
-        return false
-      }
       const loginUser = window.localStorage.getItem('user')
-      return this.user.name !== loginUser
+      return this.currentUserName !== loginUser
     },
     trushConfirm() {
       this.$refs['confirm-delete-user'].show()
