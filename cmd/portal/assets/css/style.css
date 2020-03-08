@@ -19,9 +19,6 @@ h1 {
 	padding: 20px;
 }
 
-.divider {
-  clear: both;
-  border-bottom: 1px solid #eff2f7;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
+.trush:hover {
+  cursor: pointer;
 }

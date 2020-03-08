@@ -1,41 +1,43 @@
 <template>
-  <div>
-    <h3>
-      <span class="project">
-        {{ this.$store.state.current_project }}
-      </span>
-      <span class="trush">
-        <i class="fa fa-trash" @click="trushConfirm"></i>
-      </span>
-    </h3>
-
-    <div>
-      <b-modal
-        id="confirm-delete-project"
-        ref="confirm-delete-project"
-        title="Confirm"
-        cancel-variant="outline-dark"
-        ok-variant="danger"
-        ok-title="Delete project"
-        @ok="trush"
-      >
-        <p class="mb-0">Are you sure to delete the project ?</p>
-      </b-modal>
+  <div class="card">
+    <div class="card-header">
+      <h3>
+        <span class="project">
+          {{ this.$store.state.current_project }}
+        </span>
+        <span class="trush">
+          <i class="fa fa-trash" @click="trushConfirm"></i>
+        </span>
+      </h3>
     </div>
 
-    <div class="form-panel">
+    <div class="card-body">
       <div>
-        <label for="accessTokenLifeSpan" class="col-sm-4 control-label elem">
+        <b-modal
+          id="confirm-delete-project"
+          ref="confirm-delete-project"
+          title="Confirm"
+          cancel-variant="outline-dark"
+          ok-variant="danger"
+          ok-title="Delete project"
+          @ok="trush"
+        >
+          <p class="mb-0">Are you sure to delete the project ?</p>
+        </b-modal>
+      </div>
+
+      <div class="form-group row">
+        <label for="accessTokenLifeSpan" class="col-sm-4 control-label">
           Access Token Life Span
         </label>
-        <div class="col-sm-3 elem">
+        <div class="col-sm-3">
           <input
             v-model.number="accessTokenLifeSpan"
             type="number"
             class="form-control"
           />
         </div>
-        <div class="col-sm-2 elem">
+        <div class="col-sm-2">
           <select
             v-model="accessTokenUnit"
             name="accessUnit"
@@ -48,18 +50,18 @@
         </div>
       </div>
 
-      <div>
-        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label elem">
+      <div class="form-group row">
+        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
           Refresh Token Life Span
         </label>
-        <div class="col-sm-3 elem">
+        <div class="col-sm-3">
           <input
             v-model.number="refreshTokenLifeSpan"
             type="number"
             class="form-control"
           />
         </div>
-        <div class="col-sm-2 elem">
+        <div class="col-sm-2">
           <select
             v-model="refreshTokenUnit"
             name="refreshUnit"
@@ -72,11 +74,11 @@
         </div>
       </div>
 
-      <div>
-        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label elem">
+      <div class="form-group row">
+        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
           Token Signing Algorithm
         </label>
-        <div class="col-sm-3 elem">
+        <div class="col-sm-3">
           <select
             v-model="signingAlgorithm"
             name="signingAlgorithm"
@@ -89,13 +91,13 @@
         </div>
       </div>
 
-      <div class="divider"></div>
+      <div class="card-footer">
+        <div v-if="error" class="alert alert-danger">
+          {{ error }}
+        </div>
 
-      <div v-if="error" class="alert alert-danger">
-        {{ error }}
+        <button class="btn btn-primary" @click="update">Update</button>
       </div>
-
-      <button class="btn btn-primary" @click="update">Update</button>
     </div>
   </div>
 </template>
@@ -234,16 +236,5 @@ export default {
 <style scoped>
 .project {
   padding-right: 20px;
-}
-
-.elem {
-  float: left;
-}
-
-.divider {
-  clear: both;
-  border-bottom: 1px solid #eff2f7;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
 }
 </style>
