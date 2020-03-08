@@ -45,7 +45,7 @@
         </tbody>
       </table>
 
-      <button class="btn btn-primary">
+      <button class="btn btn-primary" @click="$router.push('/user/new')">
         Add New User
       </button>
     </div>
