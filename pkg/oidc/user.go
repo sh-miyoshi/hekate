@@ -13,7 +13,7 @@ import (
 )
 
 // WriteUserLoginPage ...
-func WriteUserLoginPage(code string, state string, projectName string, w http.ResponseWriter) {
+func WriteUserLoginPage(projectName, code, errMsg, state string, w http.ResponseWriter) {
 	tpl, err := template.ParseFiles(userLoginHTML)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
@@ -30,6 +30,7 @@ func WriteUserLoginPage(code string, state string, projectName string, w http.Re
 		"URL":             url,
 		"CSSResourcePath": userLoginResPath + "/css",
 		"IMGResourcePath": userLoginResPath + "/img",
+		"Error":           errMsg,
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")

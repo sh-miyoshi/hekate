@@ -174,26 +174,23 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	authReq := oidc.NewAuthRequest(queries)
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
-		e, ok := err.(*oidc.Error)
-		if ok {
-			writeTokenErrorResponse(w, e, authReq.State)
-		} else {
-			logger.Error("Failed to cast to *oidc.Error, this is critical program bug: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, "")
-		}
+		errMsg := "Request failed. " + err.Error()
+		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
 		return
 	}
 
 	// Check Redirect URL
 	client, err := db.GetInst().ClientGet(authReq.ClientID)
 	if err != nil {
+		errMsg := ""
 		if errors.Cause(err) == model.ErrNoSuchClient {
 			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
-			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, authReq.State)
+			errMsg = "Request faild. no such client"
 		} else {
 			logger.Error("Failed to get allowed callback urls in client: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+			errMsg = "Request faild. internal server error occured"
 		}
+		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
 		return
 	}
 	found := false
@@ -205,7 +202,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if !found {
 		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
-		writeTokenErrorResponse(w, oidc.ErrInvalidRequestURI, authReq.State)
+		oidc.WriteUserLoginPage(projectName, "", "Request failed. the redirect url is not allowed", "", w)
 		return
 	}
 
@@ -213,11 +210,11 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	code, err := oidc.RegisterUserLoginSession(authReq)
 	if err != nil {
 		logger.Error("Failed to register login session %+v", err)
-		writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+		oidc.WriteUserLoginPage(projectName, "", "Request failed. internal server error occuerd", "", w)
 		return
 	}
 
-	oidc.WriteUserLoginPage(code, authReq.State, projectName, w)
+	oidc.WriteUserLoginPage(projectName, code, "", authReq.State, w)
 }
 
 // AuthPOSTHandler ...
@@ -228,7 +225,8 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
+		errMsg := "Request failed. invalid form value"
+		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
 		return
 	}
 
@@ -237,26 +235,23 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	authReq := oidc.NewAuthRequest(r.Form)
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
-		e, ok := err.(*oidc.Error)
-		if ok {
-			writeTokenErrorResponse(w, e, authReq.State)
-		} else {
-			logger.Error("Failed to cast to *oidc.Error, this is critical program bug: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
-		}
+		errMsg := "Request failed. " + err.Error()
+		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
 		return
 	}
 
 	// Check Redirect URL
 	client, err := db.GetInst().ClientGet(authReq.ClientID)
 	if err != nil {
+		errMsg := ""
 		if errors.Cause(err) == model.ErrNoSuchClient {
 			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
-			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, authReq.State)
+			errMsg = "Request faild. no such client"
 		} else {
 			logger.Error("Failed to get allowed callback urls in client: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+			errMsg = "Request faild. internal server error occured"
 		}
+		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
 		return
 	}
 	found := false
@@ -268,7 +263,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if !found {
 		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
-		writeTokenErrorResponse(w, oidc.ErrInvalidRequestURI, authReq.State)
+		oidc.WriteUserLoginPage(projectName, "", "Request failed. the redirect url is not allowed", "", w)
 		return
 	}
 
@@ -276,11 +271,11 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	code, err := oidc.RegisterUserLoginSession(authReq)
 	if err != nil {
 		logger.Error("Failed to register login session %+v", err)
-		writeTokenErrorResponse(w, oidc.ErrServerError, authReq.State)
+		oidc.WriteUserLoginPage(projectName, "", "Request failed. internal server error occuerd", "", w)
 		return
 	}
 
-	oidc.WriteUserLoginPage(code, authReq.State, projectName, w)
+	oidc.WriteUserLoginPage(projectName, code, "", authReq.State, w)
 }
 
 // UserLoginHandler ...
