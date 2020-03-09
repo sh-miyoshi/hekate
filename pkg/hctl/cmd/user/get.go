@@ -1,12 +1,12 @@
 package user
 
 import (
-	"fmt"
 	"os"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +20,7 @@ var getUserCmd = &cobra.Command{
 
 		token, err := config.GetAccessToken()
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			print.Error("Token get failed: %v", err)
 			os.Exit(1)
 		}
 
@@ -28,8 +28,7 @@ var getUserCmd = &cobra.Command{
 
 		res, err := handler.UserGetList(projectName, userName)
 		if err != nil {
-			fmt.Printf("Failed to get user: %v", err)
-			os.Exit(1)
+			print.Fatal("Failed to get user: %v", err)
 		}
 
 		format := output.NewUsersInfoFormat(res)

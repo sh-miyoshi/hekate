@@ -1,8 +1,7 @@
 package project
 
 import (
-	"fmt"
-
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +17,7 @@ var projectCmd = &cobra.Command{
 	Long:  `Manage project in the cluster`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
-		fmt.Println("project command requires subcommand")
+		print.Error("project command requires subcommand")
 	},
 }
 

@@ -1,12 +1,12 @@
 package role
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 
 	"github.com/spf13/cobra"
 )
@@ -39,22 +39,21 @@ var addRoleCmd = &cobra.Command{
 		case "custom":
 			roleType = model.RoleCustom
 		default:
-			fmt.Printf("Please set role type to system or custom.")
+			print.Error("Please set role type to system or custom.")
 			os.Exit(1)
 		}
 
 		token, err := config.GetAccessToken()
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			print.Error("Token get failed: %v", err)
 			os.Exit(1)
 		}
 
 		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
 		if err := handler.UserRoleAdd(projectName, userName, roleName, roleType); err != nil {
-			fmt.Printf("Failed to add role %s to user %s in %s: %v", roleName, userName, projectName, err)
-			os.Exit(1)
+			print.Fatal("Failed to add role %s to user %s in %s: %v", roleName, userName, projectName, err)
 		}
 
-		fmt.Printf("Successfully added\n")
+		print.Print("Successfully added")
 	},
 }

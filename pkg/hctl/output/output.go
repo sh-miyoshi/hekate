@@ -2,6 +2,8 @@ package output
 
 import (
 	"fmt"
+
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 var outputFormat string
@@ -23,13 +25,13 @@ func Print(data Format) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s\n", out)
+		print.Print(out)
 	case "json":
 		out, err := data.ToJSON()
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s\n", out)
+		print.Print(out)
 	}
 	return nil
 }

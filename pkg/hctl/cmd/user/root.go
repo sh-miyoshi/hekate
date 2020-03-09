@@ -1,9 +1,8 @@
 package user
 
 import (
-	"fmt"
-
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/user/role"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +19,7 @@ var userCmd = &cobra.Command{
 	Long:  `Manage user in the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
-		fmt.Println("user command requires subcommand")
+		print.Error("user command requires subcommand")
 	},
 }
 

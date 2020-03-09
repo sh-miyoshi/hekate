@@ -1,12 +1,12 @@
 package project
 
 import (
-	"fmt"
 	"os"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +19,7 @@ var getProjectCmd = &cobra.Command{
 
 		token, err := config.GetAccessToken()
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			print.Error("Token get failed: %v", err)
 			os.Exit(1)
 		}
 
@@ -28,8 +28,7 @@ var getProjectCmd = &cobra.Command{
 		if projectName != "" {
 			res, err := handler.ProjectGet(projectName)
 			if err != nil {
-				fmt.Printf("Failed to get project %s: %v", projectName, err)
-				os.Exit(1)
+				print.Fatal("Failed to get project %s: %v", projectName, err)
 			}
 
 			format := output.NewProjectInfoFormat(res)
@@ -39,8 +38,7 @@ var getProjectCmd = &cobra.Command{
 
 		res, err := handler.ProjectGetList()
 		if err != nil {
-			fmt.Printf("Failed to get project: %v", err)
-			os.Exit(1)
+			print.Fatal("Failed to get project: %v", err)
 		}
 
 		format := output.NewProjectsInfoFormat(res)

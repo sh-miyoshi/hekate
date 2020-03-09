@@ -1,11 +1,11 @@
 package project
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -18,17 +18,16 @@ var deleteProjectCmd = &cobra.Command{
 
 		token, err := config.GetAccessToken()
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			print.Error("Token get failed: %v", err)
 			os.Exit(1)
 		}
 
 		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
 		if err := handler.ProjectDelete(projectName); err != nil {
-			fmt.Printf("Failed to delete project %s: %v\n", projectName, err)
-			os.Exit(1)
+			print.Fatal("Failed to delete project %s: %v", projectName, err)
 		}
 
-		fmt.Printf("Project %s successfully deleted\n", projectName)
+		print.Print("Project %s successfully deleted", projectName)
 	},
 }
 

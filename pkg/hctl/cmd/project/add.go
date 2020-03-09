@@ -2,7 +2,6 @@ package project
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -10,6 +9,7 @@ import (
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -23,13 +23,13 @@ var addProjectCmd = &cobra.Command{
 		fileName, _ := cmd.Flags().GetString("file")
 
 		if fileName == "" && project.Name == "" {
-			fmt.Printf("\"name\" or \"file\" flag must be required")
+			print.Error("\"name\" or \"file\" flag must be required")
 			os.Exit(1)
 		}
 
 		token, err := config.GetAccessToken()
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			print.Error("Token get failed: %v", err)
 			os.Exit(1)
 		}
 
@@ -38,11 +38,11 @@ var addProjectCmd = &cobra.Command{
 		if fileName != "" {
 			bytes, err := ioutil.ReadFile(fileName)
 			if err != nil {
-				fmt.Printf("Failed to read file %s: %v\n", fileName, err)
+				print.Error("Failed to read file %s: %v", fileName, err)
 				os.Exit(1)
 			}
 			if err := json.Unmarshal(bytes, req); err != nil {
-				fmt.Printf("Failed to parse input file to json: %v\n", err)
+				print.Error("Failed to parse input file to json: %v", err)
 				os.Exit(1)
 			}
 		}
@@ -50,8 +50,7 @@ var addProjectCmd = &cobra.Command{
 		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
 		res, err := handler.ProjectAdd(req)
 		if err != nil {
-			fmt.Printf("Failed to add project %s: %v\n", project.Name, err)
-			os.Exit(1)
+			print.Fatal("Failed to add project %s: %v", project.Name, err)
 		}
 
 		format := output.NewProjectInfoFormat(res)

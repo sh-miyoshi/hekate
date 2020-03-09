@@ -7,6 +7,7 @@ import (
 
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/login"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/util"
 	"github.com/spf13/cobra"
 )
@@ -37,19 +38,17 @@ var loginCmd = &cobra.Command{
 			var err error
 			password, err = util.ReadPasswordFromConsole()
 			if err != nil {
-				fmt.Printf("Failed to read password: %v\n", err)
-				os.Exit(1)
+				print.Fatal("Failed to read password: %v", err)
 			}
 		}
 
 		res, err := login.Do(config.Get().ServerAddr, config.Get().ProjectName, userName, password)
 		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
+			print.Fatal("Failed to login: %v", err)
 		}
 
 		config.SetSecret(userName, res)
-		fmt.Println("Successfully logged in")
+		print.Print("Successfully logged in")
 	},
 }
 

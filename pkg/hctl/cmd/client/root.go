@@ -1,8 +1,7 @@
 package client
 
 import (
-	"fmt"
-
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +17,7 @@ var clientCmd = &cobra.Command{
 	Long:  `Manage client in the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
-		fmt.Println("client command requires subcommand")
+		print.Error("client command requires subcommand")
 	},
 }
 

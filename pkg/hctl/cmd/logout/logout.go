@@ -1,11 +1,9 @@
 package logout
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/logout"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -17,21 +15,19 @@ var logoutCmd = &cobra.Command{
 		cfg := config.Get()
 		token, err := config.GetRefreshToken()
 		if err != nil {
-			// TODO(Output err to debug message)
+			print.Debug("Failed to get token: %v", err)
 			return
 		}
 
 		if err := logout.Logout(cfg.ServerAddr, cfg.ProjectName, token); err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
+			print.Fatal("Logout failed: %v", err)
 		}
 
 		if err := config.RemoveSecretFile(); err != nil {
-			fmt.Printf("Failed to remove secret file: %v\n", err)
-			os.Exit(1)
+			print.Fatal("Failed to remove secret file: %v", err)
 		}
 
-		fmt.Println("Successfully logged out")
+		print.Print("Successfully logged out")
 	},
 }
 

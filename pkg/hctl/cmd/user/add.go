@@ -10,6 +10,7 @@ import (
 	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/util"
 	"github.com/spf13/cobra"
 )
@@ -24,18 +25,18 @@ var addUserCmd = &cobra.Command{
 		name, _ := cmd.Flags().GetString("name")
 
 		if file == "" && name == "" {
-			fmt.Println("\"name\" or \"file\" flag must be required")
+			print.Error("\"name\" or \"file\" flag must be required.")
 			os.Exit(1)
 		}
 
 		if file != "" && name != "" {
-			fmt.Println("either \"name\" or \"file\" flag must be specified.")
+			print.Error("Either \"name\" or \"file\" flag must be specified.")
 			os.Exit(1)
 		}
 
 		token, err := config.GetAccessToken()
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			print.Error("Token get failed: %v", err)
 			os.Exit(1)
 		}
 
@@ -43,11 +44,11 @@ var addUserCmd = &cobra.Command{
 		if file != "" {
 			bytes, err := ioutil.ReadFile(file)
 			if err != nil {
-				fmt.Printf("Failed to read file %s: %v\n", file, err)
+				print.Error("Failed to read file %s: %v", file, err)
 				os.Exit(1)
 			}
 			if err := json.Unmarshal(bytes, req); err != nil {
-				fmt.Printf("Failed to parse input file to json: %v\n", err)
+				print.Error("Failed to parse input file to json: %v", err)
 				os.Exit(1)
 			}
 		} else {
@@ -58,8 +59,7 @@ var addUserCmd = &cobra.Command{
 				var err error
 				password, err = util.ReadPasswordFromConsole()
 				if err != nil {
-					fmt.Printf("Failed to read password: %v\n", err)
-					os.Exit(1)
+					print.Fatal("Failed to read password: %v", err)
 				}
 			}
 			req.Name = name
@@ -72,8 +72,7 @@ var addUserCmd = &cobra.Command{
 
 		res, err := handler.UserAdd(projectName, req)
 		if err != nil {
-			fmt.Printf("Failed to add new user %s to %s: %v", req.Name, projectName, err)
-			os.Exit(1)
+			print.Fatal("Failed to add new user %s to %s: %v", req.Name, projectName, err)
 		}
 
 		format := output.NewUserInfoFormat(res)

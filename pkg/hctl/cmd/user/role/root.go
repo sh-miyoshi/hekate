@@ -1,8 +1,7 @@
 package role
 
 import (
-	"fmt"
-
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +15,7 @@ var roleCmd = &cobra.Command{
 	Long:  `Manage role in the user`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
-		fmt.Println("role command requires subcommand")
+		print.Print("role command requires subcommand")
 	},
 }
 
