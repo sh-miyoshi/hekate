@@ -14,7 +14,6 @@
 ## server application enhancement
 
 - Auhtorization Code Flowのエラー時処理の修正
-  - CSSの変更
   - error responseをhtmlで返す
 - GET LIST APIの修正
   - 残り: client, role
@@ -30,10 +29,10 @@
   - masterプロジェクト以外のユーザはcluster系は付けられないようにする
   - masterプロジェクトユーザはcluster-read必須？
 - ユーザーパスワードロック
-  - 仕様の検討
-    - ロック解除の方法(APIで解除できるようにする)
   - Project Infoに追加
   - APIの修正
+    - ログインリクエスト失敗時にロックする
+    - 強制ロック解除用のAPI
   - API docの修正
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
