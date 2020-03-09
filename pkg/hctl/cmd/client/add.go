@@ -2,7 +2,6 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -10,6 +9,7 @@ import (
 	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
 
@@ -23,18 +23,18 @@ var addClientCmd = &cobra.Command{
 		id, _ := cmd.Flags().GetString("id")
 
 		if file == "" && id == "" {
-			fmt.Println("\"id\" or \"file\" flag must be required")
+			print.Error("\"id\" or \"file\" flag must be required.")
 			os.Exit(1)
 		}
 
 		if file != "" && id != "" {
-			fmt.Println("either \"id\" or \"file\" flag must be specified.")
+			print.Error("Either \"id\" or \"file\" flag must be specified.")
 			os.Exit(1)
 		}
 
 		token, err := config.GetAccessToken()
 		if err != nil {
-			fmt.Printf("%s\n", err.Error())
+			print.Error("Token get failed: %v", err)
 			os.Exit(1)
 		}
 
@@ -42,11 +42,11 @@ var addClientCmd = &cobra.Command{
 		if file != "" {
 			bytes, err := ioutil.ReadFile(file)
 			if err != nil {
-				fmt.Printf("Failed to read file %s: %v\n", file, err)
+				print.Error("Failed to read file %s: %v", file, err)
 				os.Exit(1)
 			}
 			if err := json.Unmarshal(bytes, req); err != nil {
-				fmt.Printf("Failed to parse input file to json: %v\n", err)
+				print.Error("Failed to parse input file to json: %v", err)
 				os.Exit(1)
 			}
 		} else {
@@ -54,7 +54,7 @@ var addClientCmd = &cobra.Command{
 			accessType, _ := cmd.Flags().GetString("accessType")
 
 			if accessType == "confidential" && secret == "" {
-				fmt.Println("Please set client secret if access type is confidential")
+				print.Error("Please set client secret if access type is confidential")
 				os.Exit(1)
 			}
 
@@ -68,8 +68,7 @@ var addClientCmd = &cobra.Command{
 
 		res, err := handler.ClientAdd(projectName, req)
 		if err != nil {
-			fmt.Printf("Failed to add new client %s to %s: %v", req.ID, projectName, err)
-			os.Exit(1)
+			print.Fatal("Failed to add new client %s to %s: %v", req.ID, projectName, err)
 		}
 
 		format := output.NewClientInfoFormat(res)
