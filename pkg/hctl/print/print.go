@@ -10,17 +10,27 @@ import (
 // Debug method output debug message is run as debug mode
 func Debug(format string, a ...interface{}) {
 	if config.Get().EnableDebug {
-		fmt.Printf(format, a...)
+		msg := fmt.Sprintf(format, a...)
+		fmt.Printf("%s\n", msg)
 	}
 }
 
 // Print ...
 func Print(format string, a ...interface{}) {
-	fmt.Printf(format, a...)
+	msg := fmt.Sprintf(format, a...)
+	fmt.Printf("%s\n", msg)
 }
 
-// Error ...
+// Error method output message to STDERR
+// this method use in an error caused by user
 func Error(format string, a ...interface{}) {
 	msg := fmt.Sprintf(format, a...)
-	fmt.Fprintf(os.Stderr, "[ERROR] %s", msg)
+	fmt.Fprintf(os.Stderr, "%s\n", msg)
+}
+
+// Fatal ...
+func Fatal(format string, a ...interface{}) {
+	msg := fmt.Sprintf(format, a...)
+	fmt.Fprintf(os.Stderr, "[ERROR] %s\n", msg)
+	os.Exit(1)
 }
