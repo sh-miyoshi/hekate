@@ -13,6 +13,8 @@
 
 ## server application enhancement
 
+- DBManagerで各リソースを削除時に紐づくリソースも削除する
+  - デッドロック対策をどうするか
 - Auhtorization Code Flowのエラー時処理の修正
   - error responseをhtmlで返す
 - GET LIST APIの修正
@@ -23,8 +25,6 @@
       - DB queryの修正
   - API docの修正
     - 残り: client, role, project, user
-- roleの割り当てのvalidation
-  - masterプロジェクト以外のユーザはcluster系は付けられないようにする
 - ユーザーパスワードロック
   - Project Infoに追加
   - APIの修正

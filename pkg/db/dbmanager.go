@@ -186,6 +186,8 @@ func (m *Manager) ProjectDelete(name string) error {
 		return errors.Wrap(model.ErrDeleteBlockedProject, "the project can not delete")
 	}
 
+	// TODO(user transaction)
+
 	if err := m.user.DeleteAll(name); err != nil {
 		m.project.AbortTx()
 		return errors.Wrap(err, "Failed to delete user data")
@@ -195,6 +197,9 @@ func (m *Manager) ProjectDelete(name string) error {
 		m.project.AbortTx()
 		return errors.Wrap(err, "Failed to delete project")
 	}
+
+	// TODO(dlete custom role, loginsession, oidc_code, session, client)
+
 	m.project.CommitTx()
 	return nil
 }
@@ -314,6 +319,8 @@ func (m *Manager) UserDelete(userID string) error {
 	if err := m.user.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
+
+	// TODO(delete loginsession, oidc_code, session)
 
 	if err := m.user.Delete(userID); err != nil {
 		m.user.AbortTx()
@@ -646,6 +653,8 @@ func (m *Manager) ClientDelete(clientID string) error {
 		return errors.Wrap(err, "BeginTx failed")
 	}
 
+	// TODO(delete loginsession, oidc_code, session)
+
 	if err := m.client.Delete(clientID); err != nil {
 		m.client.AbortTx()
 		return errors.Wrap(err, "Failed to delete client")
@@ -762,6 +771,8 @@ func (m *Manager) CustomRoleDelete(customRoleID string) error {
 	if err := m.customRole.BeginTx(); err != nil {
 		return errors.Wrap(err, "BeginTx failed")
 	}
+
+	// TODO(delete role from user)
 
 	if err := m.customRole.Delete(customRoleID); err != nil {
 		m.customRole.AbortTx()
