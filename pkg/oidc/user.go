@@ -37,6 +37,25 @@ func WriteUserLoginPage(projectName, code, errMsg, state string, w http.Response
 	tpl.Execute(w, d)
 }
 
+// WriteErrorPage ...
+func WriteErrorPage(errMsg string, w http.ResponseWriter) {
+	tpl, err := template.ParseFiles(userLoginErrorHTML)
+	if err != nil {
+		logger.Error("Failed to parse template: %v", err)
+		http.Error(w, "User Login Error Page maybe broken", http.StatusInternalServerError)
+		return
+	}
+
+	d := map[string]string{
+		"CSSResourcePath": userLoginResPath + "/css",
+		"IMGResourcePath": userLoginResPath + "/img",
+		"Error":           errMsg,
+	}
+
+	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
+	tpl.Execute(w, d)
+}
+
 // RegisterUserLoginSession ...
 func RegisterUserLoginSession(req *AuthRequest) (string, error) {
 	code := uuid.New().String()

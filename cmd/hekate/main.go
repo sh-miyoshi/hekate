@@ -25,7 +25,6 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 	defaultrole "github.com/sh-miyoshi/hekate/pkg/role"
 	"github.com/sh-miyoshi/hekate/pkg/util"
-	"path/filepath"
 )
 
 const (
@@ -187,8 +186,7 @@ func main() {
 	token.InitConfig(cfg.HTTPSConfig.Enabled)
 
 	// Initialize OIDC Config
-	loginPage := filepath.Join(cfg.UserLoginResourceDir, "index.html")
-	oidc.InitConfig(cfg.AuthCodeExpiresTime, loginPage, authCodeUserLoginResourcePath)
+	oidc.InitConfig(cfg.AuthCodeExpiresTime, cfg.UserLoginResourceDir, authCodeUserLoginResourcePath)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {

@@ -175,7 +175,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
 		errMsg := "Request failed. " + err.Error()
-		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
@@ -190,7 +190,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Error("Failed to get allowed callback urls in client: %+v", err)
 			errMsg = "Request faild. internal server error occured"
 		}
-		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 	found := false
@@ -202,7 +202,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if !found {
 		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
-		oidc.WriteUserLoginPage(projectName, "", "Request failed. the redirect url is not allowed", "", w)
+		oidc.WriteErrorPage("Request failed. the redirect url is not allowed", w)
 		return
 	}
 
@@ -210,7 +210,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	code, err := oidc.RegisterUserLoginSession(authReq)
 	if err != nil {
 		logger.Error("Failed to register login session %+v", err)
-		oidc.WriteUserLoginPage(projectName, "", "Request failed. internal server error occuerd", "", w)
+		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
 
@@ -226,7 +226,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
 		errMsg := "Request failed. invalid form value"
-		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
@@ -236,7 +236,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
 		errMsg := "Request failed. " + err.Error()
-		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
@@ -251,7 +251,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Error("Failed to get allowed callback urls in client: %+v", err)
 			errMsg = "Request faild. internal server error occured"
 		}
-		oidc.WriteUserLoginPage(projectName, "", errMsg, "", w)
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 	found := false
@@ -263,7 +263,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if !found {
 		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
-		oidc.WriteUserLoginPage(projectName, "", "Request failed. the redirect url is not allowed", "", w)
+		oidc.WriteErrorPage("Request failed. the redirect url is not allowed", w)
 		return
 	}
 
@@ -271,7 +271,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	code, err := oidc.RegisterUserLoginSession(authReq)
 	if err != nil {
 		logger.Error("Failed to register login session %+v", err)
-		oidc.WriteUserLoginPage(projectName, "", "Request failed. internal server error occuerd", "", w)
+		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
 
@@ -282,6 +282,8 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
+
+	// TODO(return error page)
 
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
