@@ -398,7 +398,7 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 
 	// Validate RoleID
 	if roleType == model.RoleSystem {
-		_, typ, ok := role.GetInst().Parse(roleID)
+		res, typ, ok := role.GetInst().Parse(roleID)
 		if !ok {
 			return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 		}
@@ -409,8 +409,17 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 
 		// check user already has read permission if roleID type is write
 		if *typ == role.TypeWrite {
-			//user, err := m.user.Get(userID)
-			// TODO(check user has read permission)
+			usr, err := m.user.Get(userID)
+			if err != nil {
+				m.user.AbortTx()
+				return errors.Wrap(err, "Failed to get user system roles")
+			}
+
+			// If user do not have read permission to the target resource, return error
+			if !role.Authorize(usr.SystemRoles, *res, role.TypeRead) {
+				m.user.AbortTx()
+				return errors.Wrap(model.ErrUserValidateFailed, "Do not have read permission")
+			}
 		}
 	} else if roleType == model.RoleCustom {
 		if err := m.customRole.BeginTx(); err != nil {
@@ -450,10 +459,34 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
-	// TODO(validate roleID)
-	if err := m.user.BeginTx(); err != nil {
-		return errors.Wrap(err, "BeginTx failed")
+	res, typ, ok := role.GetInst().Parse(roleID)
+	if ok {
+		if err := m.user.BeginTx(); err != nil {
+			return errors.Wrap(err, "BeginTx failed")
+		}
+
+		usr, err := m.user.Get(userID)
+		if err != nil {
+			m.user.AbortTx()
+			return errors.Wrap(err, "Failed to get user system roles")
+		}
+
+		// roleID is system role, so check write permission
+		if *typ == role.TypeRead {
+			if role.Authorize(usr.SystemRoles, *res, role.TypeWrite) {
+				m.user.AbortTx()
+				return errors.Wrap(model.ErrUserValidateFailed, "Remove write permission at first")
+			}
+		}
+	} else {
+		// TODO
+		//   check user have roleID
+		//   if exists? remove it; else return Bad Request
+		if err := m.user.BeginTx(); err != nil {
+			return errors.Wrap(err, "BeginTx failed")
+		}
 	}
+
 	if err := m.user.DeleteRole(userID, roleID); err != nil {
 		m.user.AbortTx()
 		return errors.Wrap(err, "Failed to delete role from user")
