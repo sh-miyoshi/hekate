@@ -308,6 +308,9 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Cause(err) == model.ErrRoleAlreadyAppended {
 			logger.Info("Role %s is already appended", roleID)
 			http.Error(w, "Role Already Appended", http.StatusConflict)
+		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("Invalid role was specified: %v", err)
+			http.Error(w, "Invalid Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to add role to user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -345,6 +348,9 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Cause(err) == model.ErrNoSuchRoleInUser {
 			logger.Info("User %s do not have Role %s", userID, roleID)
 			http.Error(w, "No Such Role in User", http.StatusNotFound)
+		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("Invalid ID was specified: %v", err)
+			http.Error(w, "Invalid Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to delete role from user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
