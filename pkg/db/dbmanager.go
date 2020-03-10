@@ -406,10 +406,15 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 		if err := m.user.BeginTx(); err != nil {
 			return errors.Wrap(err, "BeginTx failed")
 		}
+		usr, err := m.user.Get(userID)
+
+		if *res == role.ResCluster && usr.ProjectName != "master" {
+			m.user.AbortTx()
+			return errors.Wrap(model.ErrUserValidateFailed, "Resource cluster can add to master project user")
+		}
 
 		// check user already has read permission if roleID type is write
 		if *typ == role.TypeWrite {
-			usr, err := m.user.Get(userID)
 			if err != nil {
 				m.user.AbortTx()
 				return errors.Wrap(err, "Failed to get user system roles")
