@@ -459,18 +459,18 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
+	if err := m.user.BeginTx(); err != nil {
+		return errors.Wrap(err, "BeginTx failed")
+	}
+
+	usr, err := m.user.Get(userID)
+	if err != nil {
+		m.user.AbortTx()
+		return errors.Wrap(err, "Failed to get user system roles")
+	}
+
 	res, typ, ok := role.GetInst().Parse(roleID)
 	if ok {
-		if err := m.user.BeginTx(); err != nil {
-			return errors.Wrap(err, "BeginTx failed")
-		}
-
-		usr, err := m.user.Get(userID)
-		if err != nil {
-			m.user.AbortTx()
-			return errors.Wrap(err, "Failed to get user system roles")
-		}
-
 		// roleID is system role, so check write permission
 		if *typ == role.TypeRead {
 			if role.Authorize(usr.SystemRoles, *res, role.TypeWrite) {
@@ -478,14 +478,8 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 				return errors.Wrap(model.ErrUserValidateFailed, "Remove write permission at first")
 			}
 		}
-	} else {
-		// TODO
-		//   check user have roleID
-		//   if exists? remove it; else return Bad Request
-		if err := m.user.BeginTx(); err != nil {
-			return errors.Wrap(err, "BeginTx failed")
-		}
 	}
+	// If not ok, roleID maybe Custom Role
 
 	if err := m.user.DeleteRole(userID, roleID); err != nil {
 		m.user.AbortTx()
