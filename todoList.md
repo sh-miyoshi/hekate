@@ -13,6 +13,10 @@
 
 ## server application enhancement
 
+- user auth failed処理のアップデート
+  - loginSession structにScope,ResponseTypeを追加
+  - user.LoginVerifyする前にsession情報を取得
+  - 失敗時はsession情報から再度codeを発行
 - PUT APIの修正
   - フィールドがない or nullの場合は更新しない
 - Auhtorization Code Flowのエラー時処理の修正
