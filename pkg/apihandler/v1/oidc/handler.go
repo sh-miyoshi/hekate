@@ -283,12 +283,11 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
-	// TODO(return error page)
-
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
+		errMsg := "Request failed. invalid form value"
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
@@ -299,7 +298,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	info, err := oidc.UserLoginVerify(r.Form.Get("login_verify_code"))
 	if err != nil {
 		logger.Info("Failed to verify user login session: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, state)
+		errMsg := "Request failed. failed to verify login code"
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
@@ -310,10 +310,26 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Cause(err) == user.ErrAuthFailed {
 			logger.Info("Failed to authenticate user %s: %v", uname, err)
-			writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, state)
+			// TODO(create new code for relogin)
+			// req := &oidc.AuthRequest{
+			// 	Scope:
+			// 	ResponseType
+			// 	ClientID
+			// 	RedirectURI
+			// 	State
+			// }
+			// code, err := oidc.RegisterUserLoginSession(req)
+			// if err != nil {
+			// 	logger.Error("Failed to register login session %+v", err)
+			// 	oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+			// 	return
+			// }
+			code := "test"
+			oidc.WriteUserLoginPage(projectName, code, "invalid user name or password", state, w)
 		} else {
 			logger.Error("Failed to verify user: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, state)
+			errMsg := "Request failed. internal server error occuerd"
+			oidc.WriteErrorPage(errMsg, w)
 		}
 		return
 	}
@@ -328,7 +344,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	req, err := http.NewRequest("GET", info.RedirectURI, nil)
 	if err != nil {
 		logger.Error("Failed to create response: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrServerError, state)
+		errMsg := "Request failed. internal server error occuerd"
+		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
