@@ -1,23 +1,20 @@
 package memory
 
 import (
-	"sync"
-
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 )
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
 type ProjectInfoHandler struct {
-	mu          sync.Mutex
 	projectList map[string]*model.ProjectInfo
 }
 
 // NewProjectHandler ...
-func NewProjectHandler() (*ProjectInfoHandler, error) {
+func NewProjectHandler() *ProjectInfoHandler {
 	res := &ProjectInfoHandler{
 		projectList: make(map[string]*model.ProjectInfo),
 	}
-	return res, nil
+	return res
 }
 
 // Add ...
@@ -60,22 +57,4 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 		return nil
 	}
 	return model.ErrNoSuchProject
-}
-
-// BeginTx ...
-func (h *ProjectInfoHandler) BeginTx() error {
-	h.mu.Lock()
-	return nil
-}
-
-// CommitTx ...
-func (h *ProjectInfoHandler) CommitTx() error {
-	h.mu.Unlock()
-	return nil
-}
-
-// AbortTx ...
-func (h *ProjectInfoHandler) AbortTx() error {
-	h.mu.Unlock()
-	return nil
 }

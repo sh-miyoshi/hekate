@@ -2,17 +2,17 @@ package mongo
 
 import (
 	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 // LoginSessionHandler implement db.LoginSessionHandler
 type LoginSessionHandler struct {
-	session  mongo.Session
 	dbClient *mongo.Client
 }
 
@@ -102,41 +102,4 @@ func (h *LoginSessionHandler) Get(code string) (*model.LoginSessionInfo, error) 
 		ClientID:    res.ClientID,
 		RedirectURI: res.RedirectURI,
 	}, nil
-}
-
-// BeginTx ...
-func (h *LoginSessionHandler) BeginTx() error {
-	var err error
-	h.session, err = h.dbClient.StartSession()
-	if err != nil {
-		return err
-	}
-	err = h.session.StartTransaction()
-	if err != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-		defer cancel()
-		h.session.EndSession(ctx)
-		return err
-	}
-	return nil
-}
-
-// CommitTx ...
-func (h *LoginSessionHandler) CommitTx() error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	err := h.session.CommitTransaction(ctx)
-	h.session.EndSession(ctx)
-	return err
-}
-
-// AbortTx ...
-func (h *LoginSessionHandler) AbortTx() error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	err := h.session.AbortTransaction(ctx)
-	h.session.EndSession(ctx)
-	return err
 }

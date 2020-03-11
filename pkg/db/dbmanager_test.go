@@ -10,9 +10,8 @@ import (
 )
 
 func TestProjectAdd(t *testing.T) {
-	prjHandler, _ := memory.NewProjectHandler()
 	mgr := &Manager{
-		project: prjHandler,
+		project: memory.NewProjectHandler(),
 	}
 
 	prjInfo := &model.ProjectInfo{

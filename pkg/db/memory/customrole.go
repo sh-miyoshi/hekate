@@ -2,22 +2,20 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
-	"sync"
 )
 
 // CustomRoleHandler implement db.CustomRoleHandler
 type CustomRoleHandler struct {
 	// roleList[roleID] = CustomRole
 	roleList map[string]*model.CustomRole
-	mu       sync.Mutex
 }
 
 // NewCustomRoleHandler ...
-func NewCustomRoleHandler() (*CustomRoleHandler, error) {
+func NewCustomRoleHandler() *CustomRoleHandler {
 	res := &CustomRoleHandler{
 		roleList: make(map[string]*model.CustomRole),
 	}
-	return res, nil
+	return res
 }
 
 // Add ...
@@ -76,23 +74,5 @@ func (h *CustomRoleHandler) DeleteAll(projectName string) error {
 			delete(h.roleList, role.ID)
 		}
 	}
-	return nil
-}
-
-// BeginTx ...
-func (h *CustomRoleHandler) BeginTx() error {
-	h.mu.Lock()
-	return nil
-}
-
-// CommitTx ...
-func (h *CustomRoleHandler) CommitTx() error {
-	h.mu.Unlock()
-	return nil
-}
-
-// AbortTx ...
-func (h *CustomRoleHandler) AbortTx() error {
-	h.mu.Unlock()
 	return nil
 }

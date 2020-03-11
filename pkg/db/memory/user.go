@@ -1,26 +1,21 @@
 package memory
 
 import (
-	"sync"
-
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
 type UserInfoHandler struct {
 	// userList[userID] = UserInfo
-	userList       map[string]*model.UserInfo
-	projectHandler *ProjectInfoHandler
-	mu             sync.Mutex
+	userList map[string]*model.UserInfo
 }
 
 // NewUserHandler ...
-func NewUserHandler(projectHandler *ProjectInfoHandler) (*UserInfoHandler, error) {
+func NewUserHandler() *UserInfoHandler {
 	res := &UserInfoHandler{
-		userList:       make(map[string]*model.UserInfo),
-		projectHandler: projectHandler,
+		userList: make(map[string]*model.UserInfo),
 	}
-	return res, nil
+	return res
 }
 
 // Add ...
@@ -150,24 +145,6 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 	}
 
 	return model.ErrNoSuchRoleInUser
-}
-
-// BeginTx ...
-func (h *UserInfoHandler) BeginTx() error {
-	h.mu.Lock()
-	return nil
-}
-
-// CommitTx ...
-func (h *UserInfoHandler) CommitTx() error {
-	h.mu.Unlock()
-	return nil
-}
-
-// AbortTx ...
-func (h *UserInfoHandler) AbortTx() error {
-	h.mu.Unlock()
-	return nil
 }
 
 func filterUserList(data []*model.UserInfo, filter *model.UserFilter) []*model.UserInfo {

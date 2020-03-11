@@ -2,22 +2,20 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
-	"sync"
 )
 
 // LoginSessionHandler implement db.LoginSessionHandler
 type LoginSessionHandler struct {
 	// sessionList[verifyCode] = LoginSessionInfo
 	sessionList map[string]*model.LoginSessionInfo
-	mu          sync.Mutex
 }
 
 // NewLoginSessionHandler ...
-func NewLoginSessionHandler() (*LoginSessionHandler, error) {
+func NewLoginSessionHandler() *LoginSessionHandler {
 	res := &LoginSessionHandler{
 		sessionList: make(map[string]*model.LoginSessionInfo),
 	}
-	return res, nil
+	return res
 }
 
 // Add ...
@@ -47,22 +45,4 @@ func (h *LoginSessionHandler) Get(verifyCode string) (*model.LoginSessionInfo, e
 	}
 
 	return h.sessionList[verifyCode], nil
-}
-
-// BeginTx ...
-func (h *LoginSessionHandler) BeginTx() error {
-	h.mu.Lock()
-	return nil
-}
-
-// CommitTx ...
-func (h *LoginSessionHandler) CommitTx() error {
-	h.mu.Unlock()
-	return nil
-}
-
-// AbortTx ...
-func (h *LoginSessionHandler) AbortTx() error {
-	h.mu.Unlock()
-	return nil
 }

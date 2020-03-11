@@ -2,22 +2,20 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
-	"sync"
 )
 
 // ClientInfoHandler implement db.ClientInfoHandler
 type ClientInfoHandler struct {
 	// clientList[clientID] = ClientInfo
 	clientList map[string]*model.ClientInfo
-	mu         sync.Mutex
 }
 
 // NewClientHandler ...
-func NewClientHandler() (*ClientInfoHandler, error) {
+func NewClientHandler() *ClientInfoHandler {
 	res := &ClientInfoHandler{
 		clientList: make(map[string]*model.ClientInfo),
 	}
-	return res, nil
+	return res
 }
 
 // Add ...
@@ -76,23 +74,5 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) error {
 			delete(h.clientList, client.ID)
 		}
 	}
-	return nil
-}
-
-// BeginTx ...
-func (h *ClientInfoHandler) BeginTx() error {
-	h.mu.Lock()
-	return nil
-}
-
-// CommitTx ...
-func (h *ClientInfoHandler) CommitTx() error {
-	h.mu.Unlock()
-	return nil
-}
-
-// AbortTx ...
-func (h *ClientInfoHandler) AbortTx() error {
-	h.mu.Unlock()
 	return nil
 }

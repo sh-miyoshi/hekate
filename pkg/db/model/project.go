@@ -55,15 +55,6 @@ type ProjectInfoHandler interface {
 	// Update method updates existing project
 	// It must return error if project is not found
 	Update(ent *ProjectInfo) error
-
-	// BeginTx method starts a transaction
-	BeginTx() error
-
-	// CommitTx method commits the transaction
-	CommitTx() error
-
-	// AbortTx method abort and rollback the transaction
-	AbortTx() error
 }
 
 // Validate ...

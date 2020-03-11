@@ -2,17 +2,17 @@ package mongo
 
 import (
 	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 // ClientInfoHandler implement db.ClientInfoHandler
 type ClientInfoHandler struct {
-	session  mongo.Session
 	dbClient *mongo.Client
 }
 
@@ -175,41 +175,4 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) error {
 		return errors.Wrap(err, "Failed to delete client from mongodb")
 	}
 	return nil
-}
-
-// BeginTx ...
-func (h *ClientInfoHandler) BeginTx() error {
-	var err error
-	h.session, err = h.dbClient.StartSession()
-	if err != nil {
-		return err
-	}
-	err = h.session.StartTransaction()
-	if err != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-		defer cancel()
-		h.session.EndSession(ctx)
-		return err
-	}
-	return nil
-}
-
-// CommitTx ...
-func (h *ClientInfoHandler) CommitTx() error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	err := h.session.CommitTransaction(ctx)
-	h.session.EndSession(ctx)
-	return err
-}
-
-// AbortTx ...
-func (h *ClientInfoHandler) AbortTx() error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	err := h.session.AbortTransaction(ctx)
-	h.session.EndSession(ctx)
-	return err
 }

@@ -13,8 +13,8 @@
 
 ## server application enhancement
 
-- DBManagerで各リソースを削除時に紐づくリソースも削除する
-  - デッドロック対策をどうするか
+- PUT APIの修正
+  - フィールドがない or nullの場合は更新しない
 - Auhtorization Code Flowのエラー時処理の修正
   - error responseをhtmlで返す
 - GET LIST APIの修正
