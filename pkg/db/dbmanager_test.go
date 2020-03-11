@@ -12,6 +12,7 @@ import (
 func TestProjectAdd(t *testing.T) {
 	mgr := &Manager{
 		project: memory.NewProjectHandler(),
+		transaction:  memory.NewTransactionManager(),
 	}
 
 	prjInfo := &model.ProjectInfo{
