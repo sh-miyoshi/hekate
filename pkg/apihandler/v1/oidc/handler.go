@@ -310,21 +310,20 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Cause(err) == user.ErrAuthFailed {
 			logger.Info("Failed to authenticate user %s: %v", uname, err)
-			// TODO(create new code for relogin)
-			// req := &oidc.AuthRequest{
-			// 	Scope:
-			// 	ResponseType
-			// 	ClientID
-			// 	RedirectURI
-			// 	State
-			// }
-			// code, err := oidc.RegisterUserLoginSession(req)
-			// if err != nil {
-			// 	logger.Error("Failed to register login session %+v", err)
-			// 	oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-			// 	return
-			// }
-			code := "test"
+			// create new code for relogin
+			req := &oidc.AuthRequest{
+				Scope:        info.Scope,
+				ResponseType: info.ResponseType,
+				ClientID:     info.ClientID,
+				RedirectURI:  info.RedirectURI,
+				State:        state,
+			}
+			code, err := oidc.RegisterUserLoginSession(req)
+			if err != nil {
+				logger.Error("Failed to register login session %+v", err)
+				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+				return
+			}
 			oidc.WriteUserLoginPage(projectName, code, "invalid user name or password", state, w)
 		} else {
 			logger.Error("Failed to verify user: %+v", err)

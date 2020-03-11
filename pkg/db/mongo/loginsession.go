@@ -42,10 +42,12 @@ func NewLoginSessionHandler(dbClient *mongo.Client) (*LoginSessionHandler, error
 // Add ...
 func (h *LoginSessionHandler) Add(info *model.LoginSessionInfo) error {
 	v := &loginSessionInfo{
-		VerifyCode:  info.VerifyCode,
-		ExpiresIn:   info.ExpiresIn,
-		ClientID:    info.ClientID,
-		RedirectURI: info.RedirectURI,
+		VerifyCode:   info.VerifyCode,
+		ExpiresIn:    info.ExpiresIn,
+		Scope:        info.Scope,
+		ResponseType: info.ResponseType,
+		ClientID:     info.ClientID,
+		RedirectURI:  info.RedirectURI,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
@@ -97,9 +99,11 @@ func (h *LoginSessionHandler) Get(code string) (*model.LoginSessionInfo, error) 
 	}
 
 	return &model.LoginSessionInfo{
-		VerifyCode:  res.VerifyCode,
-		ExpiresIn:   res.ExpiresIn,
-		ClientID:    res.ClientID,
-		RedirectURI: res.RedirectURI,
+		VerifyCode:   res.VerifyCode,
+		ExpiresIn:    res.ExpiresIn,
+		Scope:        res.Scope,
+		ResponseType: res.ResponseType,
+		ClientID:     res.ClientID,
+		RedirectURI:  res.RedirectURI,
 	}, nil
 }

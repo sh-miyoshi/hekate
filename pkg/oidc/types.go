@@ -1,8 +1,9 @@
 package oidc
 
 import (
-	validator "github.com/go-playground/validator/v10"
 	"strings"
+
+	validator "github.com/go-playground/validator/v10"
 )
 
 // AuthRequest ...
@@ -27,8 +28,10 @@ type AuthRequest struct {
 
 // UserLoginInfo ...
 type UserLoginInfo struct {
-	ClientID    string
-	RedirectURI string
+	Scope        string
+	ResponseType string
+	ClientID     string
+	RedirectURI  string
 }
 
 // Validate ...

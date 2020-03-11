@@ -8,10 +8,12 @@ import (
 
 // LoginSessionInfo ...
 type LoginSessionInfo struct {
-	VerifyCode  string
-	ExpiresIn   time.Time
-	ClientID    string
-	RedirectURI string
+	VerifyCode   string
+	ExpiresIn    time.Time
+	Scope        string
+	ResponseType string
+	ClientID     string
+	RedirectURI  string
 }
 
 var (

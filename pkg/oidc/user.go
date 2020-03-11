@@ -1,11 +1,12 @@
 package oidc
 
 import (
-	"github.com/sh-miyoshi/hekate/pkg/db"
-	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"html/template"
 	"net/http"
 	"time"
+
+	"github.com/sh-miyoshi/hekate/pkg/db"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -89,7 +90,9 @@ func UserLoginVerify(code string) (*UserLoginInfo, error) {
 		return nil, errors.New("Session already expired")
 	}
 	return &UserLoginInfo{
-		ClientID:    s.ClientID,
-		RedirectURI: s.RedirectURI,
+		Scope:        s.Scope,
+		ResponseType: s.ResponseType,
+		ClientID:     s.ClientID,
+		RedirectURI:  s.RedirectURI,
 	}, nil
 }

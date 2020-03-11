@@ -28,10 +28,12 @@ type session struct {
 }
 
 type loginSessionInfo struct {
-	VerifyCode  string    `bson:"verifyCode"`
-	ExpiresIn   time.Time `bson:"expiresIn"`
-	ClientID    string    `bson:"clientID"`
-	RedirectURI string    `bson:"redirectURI"`
+	VerifyCode   string    `bson:"verifyCode"`
+	ExpiresIn    time.Time `bson:"expiresIn"`
+	Scope        string    `bson:"scope"`
+	ResponseType string    `bson:"responseType"`
+	ClientID     string    `bson:"clientID"`
+	RedirectURI  string    `bson:"redirectURI"`
 }
 
 type userInfo struct {
