@@ -7,6 +7,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/login"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/logout"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/project"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/role"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/user"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
@@ -35,6 +36,7 @@ func init() {
 	rootCmd.AddCommand(project.GetCommand())
 	rootCmd.AddCommand(user.GetCommand())
 	rootCmd.AddCommand(client.GetCommand())
+	rootCmd.AddCommand(role.GetCommand())
 }
 
 func initOutput() {
