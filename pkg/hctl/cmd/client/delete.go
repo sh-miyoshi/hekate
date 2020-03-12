@@ -35,7 +35,7 @@ var deleteClientCmd = &cobra.Command{
 
 func init() {
 	deleteClientCmd.Flags().String("project", "", "[Required] name of the project to which the client belongs")
-	deleteClientCmd.Flags().String("id", "", "id of the client")
+	deleteClientCmd.Flags().String("id", "", "[Required] id of the client")
 	deleteClientCmd.MarkFlagRequired("project")
 	deleteClientCmd.MarkFlagRequired("id")
 }
