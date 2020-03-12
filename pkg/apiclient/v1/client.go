@@ -11,7 +11,7 @@ import (
 
 // ClientAdd ...
 func (h *Handler) ClientAdd(clientName string, req *clientapi.ClientCreateRequest) (*clientapi.ClientGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/client/%s/client", h.serverAddr, clientName)
+	url := fmt.Sprintf("%s/api/v1/project/%s/client", h.serverAddr, clientName)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -38,6 +38,28 @@ func (h *Handler) ClientAdd(clientName string, req *clientapi.ClientCreateReques
 		return &res, nil
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+}
+
+// ClientDelete ...
+func (h *Handler) ClientDelete(projectName string, clientID string) error {
+	u := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
+	httpReq, err := http.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return err
+	}
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 204:
+		return nil
+	}
+	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
 
 // ClientGetList ...
