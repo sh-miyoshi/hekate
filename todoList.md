@@ -13,6 +13,11 @@
 
 ## server application enhancement
 
+- Custom RoleにDescriptionを追加
+  - API docの修正
+  - DBの修正
+  - Validationの追加
+  - APIの修正
 - PUT APIの修正
   - フィールドがない or nullの場合は更新しない
 - GET LIST APIの修正
@@ -21,6 +26,8 @@
     - http queryでfilterできるようにする
       - API handlerの修正
       - DB queryの修正
+  - API Clientの修正
+    - 引数をroleNameにして中でIDに変換
   - API docの修正
     - 残り: client, role, project, user
 - ユーザーパスワードロック
