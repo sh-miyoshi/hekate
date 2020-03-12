@@ -2,6 +2,9 @@ package clientapi
 
 import (
 	"encoding/json"
+	"net/http"
+	"time"
+
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
@@ -9,8 +12,6 @@ import (
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/role"
-	"net/http"
-	"time"
 )
 
 // AllClientGetHandler ...
@@ -38,7 +39,18 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwthttp.ResponseWrite(w, "ClientGetAllClientGetHandlerHandler", &clients)
+	res := []*ClientGetResponse{}
+	for _, client := range clients {
+		res = append(res, &ClientGetResponse{
+			ID:                  client.ID,
+			Secret:              client.Secret,
+			AccessType:          client.AccessType,
+			CreatedAt:           client.CreatedAt.String(),
+			AllowedCallbackURLs: client.AllowedCallbackURLs,
+		})
+	}
+
+	jwthttp.ResponseWrite(w, "ClientGetAllClientGetHandlerHandler", res)
 }
 
 // ClientCreateHandler ...

@@ -81,7 +81,7 @@ func (h *ClientInfoHandler) Delete(clientID string) error {
 }
 
 // GetList ...
-func (h *ClientInfoHandler) GetList(projectName string) ([]string, error) {
+func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, error) {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 
 	filter := bson.D{
@@ -93,17 +93,24 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]string, error) {
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get client list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get client list from mongodb")
 	}
 
 	clients := []clientInfo{}
 	if err := cursor.All(ctx, &clients); err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get client list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get client list from mongodb")
 	}
 
-	res := []string{}
+	res := []*model.ClientInfo{}
 	for _, client := range clients {
-		res = append(res, client.ID)
+		res = append(res, &model.ClientInfo{
+			ID:                  client.ID,
+			ProjectName:         client.ProjectName,
+			Secret:              client.Secret,
+			AccessType:          client.AccessType,
+			CreatedAt:           client.CreatedAt,
+			AllowedCallbackURLs: client.AllowedCallbackURLs,
+		})
 	}
 
 	return res, nil
@@ -119,7 +126,7 @@ func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &model.ClientInfo{}
+	res := &clientInfo{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchClient
@@ -127,7 +134,14 @@ func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
 		return nil, errors.Wrap(err, "Failed to get client from mongodb")
 	}
 
-	return res, nil
+	return &model.ClientInfo{
+		ID:                  res.ID,
+		ProjectName:         res.ProjectName,
+		Secret:              res.Secret,
+		AccessType:          res.AccessType,
+		CreatedAt:           res.CreatedAt,
+		AllowedCallbackURLs: res.AllowedCallbackURLs,
+	}, nil
 }
 
 // Update ...

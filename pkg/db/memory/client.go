@@ -34,12 +34,12 @@ func (h *ClientInfoHandler) Delete(clientID string) error {
 }
 
 // GetList ...
-func (h *ClientInfoHandler) GetList(projectName string) ([]string, error) {
-	res := []string{}
+func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, error) {
+	res := []*model.ClientInfo{}
 
 	for _, client := range h.clientList {
 		if client.ProjectName == projectName {
-			res = append(res, client.ID)
+			res = append(res, client)
 		}
 	}
 

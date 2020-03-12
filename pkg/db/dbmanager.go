@@ -523,7 +523,7 @@ func (m *Manager) ClientDelete(clientID string) error {
 }
 
 // ClientGetList ...
-func (m *Manager) ClientGetList(projectName string) ([]string, error) {
+func (m *Manager) ClientGetList(projectName string) ([]*model.ClientInfo, error) {
 	if !model.ValidateProjectName(projectName) {
 		return nil, errors.Wrap(model.ErrClientValidateFailed, "Invalid project name format")
 	}
