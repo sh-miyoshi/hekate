@@ -7,7 +7,7 @@ import (
 
 func init() {
 	clientCmd.AddCommand(addClientCmd)
-	// clientCmd.AddCommand(deleteClientCmd)
+	clientCmd.AddCommand(deleteClientCmd)
 	clientCmd.AddCommand(getClientCmd)
 }
 
