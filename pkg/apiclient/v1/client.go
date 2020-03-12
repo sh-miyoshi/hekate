@@ -10,8 +10,8 @@ import (
 )
 
 // ClientAdd ...
-func (h *Handler) ClientAdd(clientName string, req *clientapi.ClientCreateRequest) (*clientapi.ClientGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/client", h.serverAddr, clientName)
+func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateRequest) (*clientapi.ClientGetResponse, error) {
+	url := fmt.Sprintf("%s/api/v1/project/%s/client", h.serverAddr, projectName)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
