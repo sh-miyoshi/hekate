@@ -189,6 +189,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.GetInst().UserGet(userID)
 	if err != nil {
+		// TODO(user not found)
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -268,6 +269,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().UserUpdate(user); err != nil {
+		// TODO(check duplicate user name: Bad Request)
 		logger.Error("Failed to update user: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

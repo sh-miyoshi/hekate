@@ -168,6 +168,7 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	role, err := db.GetInst().CustomRoleGet(roleID)
 	if err != nil {
+		// TODO(role not found)
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
