@@ -21,13 +21,6 @@
 - PUT APIの修正
   - フィールドがない or nullの場合は更新しない
 - GET LIST APIの修正
-  - 残り: role
-  - すべての検索結果を取得するようにする
-    - http queryでfilterできるようにする
-      - API handlerの修正
-      - DB queryの修正
-  - API Clientの修正
-    - 引数をroleNameにして中でIDに変換
   - API docの修正
     - 残り: client, role, project, user
 - ユーザーパスワードロック
@@ -77,6 +70,7 @@
   - Project名を表示
 - LDAP連携？
 - http headerの追加
+- API responseのtime formatの見直し
 
 ## Portal(Admin Console) enhancement
 
@@ -102,16 +96,11 @@
     - update
   - user
     - update
-    - role add
     - role delete
     - session revoke
   - client
-    - create
-    - get
-    - delete
     - update
   - customrole
-    - create
     - get
     - delete
     - update
