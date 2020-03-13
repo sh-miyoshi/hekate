@@ -16,7 +16,6 @@
 - API responseのエラーコードが足りてないバグの修正
   - ClientUpdateHandler
   - RoleUpdateHandler
-  - ProjectUpdateHandler
   - UserUpdateHandler
 - Custom RoleにDescriptionを追加
   - API docの修正
