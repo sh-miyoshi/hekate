@@ -34,13 +34,17 @@ func (h *CustomRoleHandler) Delete(roleID string) error {
 }
 
 // GetList ...
-func (h *CustomRoleHandler) GetList(projectName string) ([]string, error) {
-	res := []string{}
+func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRoleFilter) ([]*model.CustomRole, error) {
+	res := []*model.CustomRole{}
 
 	for _, role := range h.roleList {
 		if role.ProjectName == projectName {
-			res = append(res, role.ID)
+			res = append(res, role)
 		}
+	}
+
+	if filter != nil {
+		res = filterRoleList(res, filter)
 	}
 
 	return res, nil
@@ -75,4 +79,22 @@ func (h *CustomRoleHandler) DeleteAll(projectName string) error {
 		}
 	}
 	return nil
+}
+
+func filterRoleList(data []*model.CustomRole, filter *model.CustomRoleFilter) []*model.CustomRole {
+	if filter == nil {
+		return data
+	}
+	res := []*model.CustomRole{}
+
+	for _, role := range data {
+		if filter.Name != "" && role.Name != filter.Name {
+			// missmatch name
+			continue
+		}
+		// TODO(add other filter)
+		res = append(res, role)
+	}
+
+	return res
 }

@@ -79,29 +79,41 @@ func (h *CustomRoleHandler) Delete(roleID string) error {
 }
 
 // GetList ...
-func (h *CustomRoleHandler) GetList(projectName string) ([]string, error) {
+func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRoleFilter) ([]*model.CustomRole, error) {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 
-	filter := bson.D{
+	f := bson.D{
 		{Key: "projectName", Value: projectName},
+	}
+
+	if filter != nil {
+		if filter.Name != "" {
+			f = append(f, bson.E{Key: "name", Value: filter.Name})
+		}
+		// TODO(add other filter)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	cursor, err := col.Find(ctx, filter)
+	cursor, err := col.Find(ctx, f)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get role list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get custom role list from mongodb")
 	}
 
 	roles := []customRole{}
 	if err := cursor.All(ctx, &roles); err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get role list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get custom role list from mongodb")
 	}
 
-	res := []string{}
+	res := []*model.CustomRole{}
 	for _, role := range roles {
-		res = append(res, role.ID)
+		res = append(res, &model.CustomRole{
+			ID:          role.ID,
+			ProjectName: role.ProjectName,
+			CreatedAt:   role.CreatedAt,
+			Name:        role.Name,
+		})
 	}
 
 	return res, nil

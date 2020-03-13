@@ -621,9 +621,11 @@ func (m *Manager) CustomRoleDelete(customRoleID string) error {
 }
 
 // CustomRoleGetList ...
-func (m *Manager) CustomRoleGetList(projectName string) ([]string, error) {
-	// TODO(validate projectName)
-	return m.customRole.GetList(projectName)
+func (m *Manager) CustomRoleGetList(projectName string, filter *model.CustomRoleFilter) ([]*model.CustomRole, error) {
+	if !model.ValidateProjectName(projectName) {
+		return nil, errors.Wrap(model.ErrCustomRoleValidateFailed, "invalid project name format")
+	}
+	return m.customRole.GetList(projectName, filter)
 }
 
 // CustomRoleGet ...

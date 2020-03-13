@@ -14,6 +14,12 @@ type CustomRole struct {
 	ProjectName string
 }
 
+// CustomRoleFilter ...
+type CustomRoleFilter struct {
+	Name string
+	// TODO(CreatedAt)
+}
+
 var (
 	// ErrNoSuchCustomRole ...
 	ErrNoSuchCustomRole = errors.New("No Such Custom Role")
@@ -30,7 +36,7 @@ type CustomRoleHandler interface {
 	Add(ent *CustomRole) error
 	Delete(roleID string) error
 	Get(roleID string) (*CustomRole, error)
-	GetList(projectName string) ([]string, error)
+	GetList(projectName string, filter *CustomRoleFilter) ([]*CustomRole, error)
 	Update(ent *CustomRole) error
 	DeleteAll(projectName string) error
 }
