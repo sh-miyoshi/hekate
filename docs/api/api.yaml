@@ -136,9 +136,7 @@ paths:
         # TODO(set other params)
       responses:
         '200':
-          description: "Show login page"
-        '400':
-          description: "Validation failed"
+          description: "Show login page or error page"
         '500':
           description: "Internal server error"
     post:
@@ -177,9 +175,7 @@ paths:
         # TODO(set other params)
       responses:
         '200':
-          description: "Show login page"
-        '400':
-          description: "Validation failed"
+          description: "Show login page or error page"
         '500':
           description: "Internal server error"
   '/api/v1/project/{projectName}/openid-connect/userinfo':
@@ -249,12 +245,10 @@ paths:
           schema:
             type: string
       responses:
+        '200':
+          description: "Return error page"
         '302':
           description: "Redirect to callback URL"
-        '400':
-          description: "Invalid Request"
-        '401':
-          description: "Unauthorized"
         '500':
           description: "Internal server error"
   '/api/v1/project/{projectName}/openid-connect/revoke':
@@ -365,10 +359,10 @@ paths:
           description: 'Updated'
         '400':
           description: 'Bad Request'
-        '404':
-          description: 'Project Not Found'
         '403':
           description: 'Forbidden'
+        '404':
+          description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
     delete:
@@ -383,10 +377,10 @@ paths:
       responses:
         '204':
           description: 'Deleted'
-        '404':
-          description: 'Project Not Found'
         '403':
           description: 'Forbidden'
+        '404':
+          description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user':
@@ -413,6 +407,8 @@ paths:
                 $ref: '#/components/schemas/UserGetResponse'
         '400':
           description: 'Bad Request'
+        '404':
+          description: 'Project Not Found'
         '409':
           description: 'User Already Exists'
         '403':
@@ -428,19 +424,23 @@ paths:
           required: true
           schema:
             type: string
+        - name: name
+          in: query
+          schema:
+            type: string
       responses:
         '200':
-          description: 'Get All User IDs'
+          description: 'Get All Users'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: string
-        '404':
-          description: 'User Not Found'
+                  $ref: '#/components/schemas/UserGetResponse'
         '403':
           description: 'Forbidden'
+        '404':
+          description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user/{userID}':
@@ -465,10 +465,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserGetResponse'
-        '404':
-          description: 'User Not Found'
         '403':
           description: 'Forbidden'
+        '404':
+          description: 'User or Project Not Found'
         '500':
           description: 'Internal Server Error'
     put:
@@ -496,7 +496,7 @@ paths:
         '400':
           description: 'Bad Request'
         '404':
-          description: 'User Not Found'
+          description: 'User or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -519,7 +519,7 @@ paths:
         '204':
           description: 'Deleted'
         '404':
-          description: 'User Not Found'
+          description: 'User or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -548,8 +548,12 @@ paths:
       responses:
         '204':
           description: 'Added'
+        '400':
+          description: 'Bad Request'
         '404':
           description: 'User or Project or Role Not Found'
+        '409':
+          description: 'Role Already Appended'
         '403':
           description: 'Forbidden'
         '500':
@@ -577,8 +581,10 @@ paths:
       responses:
         '204':
           description: 'Deleted'
+        '400':
+          description: 'Invalid Request'
         '404':
-          description: 'User or Project or Role Not Found'
+          description: 'User or Project or Role Not Found or No Such Role in User'
         '403':
           description: 'Forbidden'
         '500':
@@ -607,6 +613,8 @@ paths:
                 $ref: '#/components/schemas/ClientGetResponse'
         '400':
           description: 'Bad Request'
+        '404':
+          description: 'Project Not Found'
         '409':
           description: 'Client Already Exists'
         '403':
@@ -624,7 +632,7 @@ paths:
             type: string
       responses:
         '200':
-          description: 'Get All Client IDs'
+          description: 'Get All Clients'
           content:
             application/json:
               schema:
@@ -660,7 +668,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClientGetResponse'
         '404':
-          description: 'Client Not Found'
+          description: 'Client or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -690,7 +698,7 @@ paths:
         '400':
           description: 'Bad Request'
         '404':
-          description: 'Client Not Found'
+          description: 'Client or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -713,7 +721,7 @@ paths:
         '204':
           description: 'Deleted'
         '404':
-          description: 'Client Not Found'
+          description: 'Client or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -742,6 +750,8 @@ paths:
                 $ref: '#/components/schemas/CustomRoleGetResponse'
         '400':
           description: 'Bad Request'
+        '404':
+          description: 'Project Not Found'
         '409':
           description: 'Role Already Exists'
         '403':
@@ -757,15 +767,21 @@ paths:
           required: true
           schema:
             type: string
+        - name: name
+          in: query
+          schema:
+            type: string
       responses:
         '200':
-          description: 'Get All Custom Role IDs'
+          description: 'Get All Custom Roles'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/CustomRoleGetResponse'
+        '400':
+          description: 'Bad Request'
         '404':
           description: 'Project Not Found'
         '403':
@@ -795,7 +811,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomRoleGetResponse'
         '404':
-          description: 'Role Not Found'
+          description: 'Role or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -825,7 +841,7 @@ paths:
         '400':
           description: 'Bad Request'
         '404':
-          description: 'Role Not Found'
+          description: 'Role or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -848,7 +864,7 @@ paths:
         '204':
           description: 'Deleted'
         '404':
-          description: 'Role Not Found'
+          description: 'Role or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -1065,4 +1081,3 @@ components:
           type: string
         preferred_username:
           type: string
-
