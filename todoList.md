@@ -13,6 +13,11 @@
 
 ## server application enhancement
 
+- API responseのエラーコードが足りてないバグの修正
+  - ClientGetHandler
+  - RoleGetHandler
+  - UserGetHandler
+  - UserUpdateHandler
 - Custom RoleにDescriptionを追加
   - API docの修正
   - DBの修正
@@ -20,9 +25,6 @@
   - APIの修正
 - PUT APIの修正
   - フィールドがない or nullの場合は更新しない
-- GET LIST APIの修正
-  - API docの修正
-    - 残り: client, role, project, user
 - ユーザーパスワードロック
   - Project Infoに追加
   - APIの修正
@@ -31,15 +33,15 @@
   - API docの修正
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
+- リソース削除時に紐づくリソースも削除
+- db manager validationの追加
+- filterの追加(user, role)
 - audit log
   - time
   - resource type (or url path and method)
   - client
   - success or failed
 - 各種APIの実装
-  - openid connect API
-    - implicit flow
-    - hybrid flow
   - sessionの詳細取得(引数: project, useID, sessionID)
 - テストの追加
   - ロジック部分のunit test
@@ -48,13 +50,18 @@
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type(signing_method)
-- authroztion code flowのユーザーログインの修正
-  - ログイン失敗時にエラーを表示する
-    - Invalid user name or password
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - projectのimport/export
 - OpenID Connect部分のエンハンス
+  - openid connect APIの実装
+    - implicit flow
+    - hybrid flow
+  - TokenAPIでredirect_uriのチェック
+    - query内に存在するならallowed listにあるかチェック
+  - access tokenのrevocation
+  - AuthRequestに他のパラメータを追加
+  - code認証失敗時、すべてのtokenを無効化
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
 - APIのRBACの見直し
@@ -86,8 +93,14 @@
 - headerにユーザー名を表示
 - 各ページの作成
   - User
+    - user削除コマンドの実装
+    - user createページの作成
+    - user更新コマンドの実装
   - Role
   - Client
+- home pageにmiddlewareを使用
+- oidc authのstateチェック
+- client_idやproject nameをどうするか(変数化)
 
 ## CLI tool(hctl) enhancement
 
@@ -96,6 +109,8 @@
     - update
   - user
     - update
+    - role add
+      - UserRoleAddの修正
     - role delete
     - session revoke
   - client
@@ -111,6 +126,7 @@
 - default config pathの修正
 - configコマンドの作成・修正
 - Production向け実行ファイルの作成
+- support authorization code flow
 
 ## operation enhancement
 
@@ -119,3 +135,8 @@
 - add release pipeline
   - create public docker image
   - create binary files
+
+## For production
+
+- 初期allowed callback urlの初期化
+- CLIのinsecure, timeoutの設定見直し
