@@ -159,8 +159,10 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	client, err := db.GetInst().ClientGet(clientID)
 	if err != nil {
-		// TODO(client not found)
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrNoSuchClient {
+			logger.Info("No such client: %s", clientID)
+			http.Error(w, "Client Not Found", http.StatusNotFound)
+		} else if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -206,6 +208,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Client Info
 	client, err := db.GetInst().ClientGet(clientID)
 	if err != nil {
+		// TODO check conflict
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)

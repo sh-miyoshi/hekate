@@ -189,10 +189,12 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.GetInst().UserGet(userID)
 	if err != nil {
-		// TODO(user not found)
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if errors.Cause(err) == model.ErrNoSuchUser {
+			logger.Info("No such user: %s", userID)
+			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

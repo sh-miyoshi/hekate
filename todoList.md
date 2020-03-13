@@ -14,9 +14,9 @@
 ## server application enhancement
 
 - API responseのエラーコードが足りてないバグの修正
-  - ClientGetHandler
-  - RoleGetHandler
-  - UserGetHandler
+  - ClientUpdateHandler
+  - RoleUpdateHandler
+  - ProjectUpdateHandler
   - UserUpdateHandler
 - Custom RoleにDescriptionを追加
   - API docの修正
