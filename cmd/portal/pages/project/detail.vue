@@ -135,7 +135,7 @@ export default {
       }
 
       alert('successfully deleted.')
-      this.$store.commit('setCurrentProject', 'master') // TODO(set correct project name)
+      this.$store.commit('setCurrentProject', 'master')
       this.$router.push('/home')
     },
     async update() {

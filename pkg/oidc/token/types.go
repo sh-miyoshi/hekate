@@ -1,8 +1,9 @@
 package token
 
 import (
-	jwt "github.com/dgrijalva/jwt-go"
 	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 // Request ...
@@ -11,7 +12,6 @@ type Request struct {
 	ExpiredTime time.Duration
 	ProjectName string
 	UserID      string
-	// TODO(add user name)
 }
 
 // RoleValue ...
