@@ -125,10 +125,20 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
 	}
 
-	roleID := roleName
+	roleID := ""
 	if roleType == model.RoleCustom {
-		// TODO(get role id from name)
-		return fmt.Errorf("Custom role request is not implemented yet")
+		role, err := h.RoleGetList(projectName, roleName)
+		if err != nil {
+			return err
+		}
+		if len(role) != 1 {
+			if len(role) == 0 {
+				return fmt.Errorf("No such role")
+			}
+			return fmt.Errorf("Unexpect the number of role %s, expect 1, but got %d", roleName, len(role))
+		}
+
+		roleID = role[0].ID
 	}
 
 	userID := user[0].ID
