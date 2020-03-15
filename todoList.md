@@ -80,7 +80,6 @@
 
 ## Portal(Admin Console) enhancement
 
-- CSSの変更
 - middleware処理
   - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
     - 強制ログアウト or 白紙のページを見せる(こっちが有力)
@@ -108,8 +107,6 @@
     - update
   - user
     - update
-    - role add
-      - UserRoleAddの修正
     - role delete
     - session revoke
   - client
