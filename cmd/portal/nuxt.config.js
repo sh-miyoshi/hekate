@@ -87,6 +87,20 @@ export default {
   },
 
   env: {
-    SERVER_ADDR: 'http://localhost:8080'
+    SERVER_ADDR: 'http://localhost:8080',
+    SYSTEM_ROLES: [
+      "read-cluster",
+      "write-cluster",
+      "read-project",
+      "write-project",
+      "read-role",
+      "write-role",
+      "read-user",
+      "write-user",
+      "read-client",
+      "write-client",
+      "read-customrole",
+      "write-customrole",
+    ]
   }
 }

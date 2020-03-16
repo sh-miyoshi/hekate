@@ -47,6 +47,15 @@
         </div>
       </div>
 
+      <div class="form-group row">
+        <label for="system-roles" class="col-sm-2 control-label">
+          System Role
+        </label>
+        <div class="col-sm-5">
+          <List v-if="user" :current="user.system_roles" :all="systemRoles" />
+        </div>
+      </div>
+
       <div class="card-footer">
         <div v-if="error" class="alert alert-danger">
           {{ error }}
@@ -59,15 +68,22 @@
 </template>
 
 <script>
+import List from '@/components/list.vue'
+
 export default {
+  components: {
+    List
+  },
   data() {
     return {
       currentUserName: '',
       user: null,
-      error: ''
+      error: '',
+      systemRoles: []
     }
   },
   mounted() {
+    this.systemRoles = process.env.SYSTEM_ROLES
     this.setUser(this.$route.params.id)
   },
   methods: {
