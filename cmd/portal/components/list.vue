@@ -1,14 +1,15 @@
 <template>
   <div>
-    <ul>
-      <li v-for="item in current" :key="item">
+    <div v-for="item in current" :key="item">
+      <div class="mb-1 input-group-text role-item">
+        <i class="fa fa-remove"></i>
         {{ item }}
-      </li>
-    </ul>
+      </div>
+    </div>
     <div>
       <b-form-select
-        v-model="appendRole"
-        :options="appendCandidates"
+        v-model="assignedRole"
+        :options="assignedCandidates"
       ></b-form-select>
     </div>
   </div>
@@ -28,13 +29,13 @@ export default {
   },
   data() {
     return {
-      appendCandidates: this.getCandidates(),
-      appendRole: null
+      assignedCandidates: this.getCandidates(),
+      assignedRole: null
     }
   },
   methods: {
     getCandidates() {
-      const res = [{ value: null, text: 'Please select an append role' }]
+      const res = [{ value: null, text: 'Please select an assigned role' }]
       for (const item of this.all) {
         if (!this.current.includes(item)) {
           res.push({ value: item, text: item })
@@ -45,3 +46,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.role-item {
+  display: inline-block;
+  padding: 0.175rem 0.55rem;
+  width: auto;
+}
+</style>
