@@ -21,7 +21,6 @@ type UserGetResponse struct {
 // UserPutRequest ...
 type UserPutRequest struct {
 	Name        string   `json:"name"`
-	Password    string   `json:"password"`
 	SystemRoles []string `json:"system_roles"`
 	CustomRoles []string `json:"custom_roles"`
 }

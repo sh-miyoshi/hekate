@@ -263,9 +263,8 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update Parameters
-	// name, password, roles
+	// name, roles
 	user.Name = request.Name
-	user.PasswordHash = util.CreateHash(request.Password)
 	user.SystemRoles = request.SystemRoles
 	user.CustomRoles = request.CustomRoles
 
