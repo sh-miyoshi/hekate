@@ -206,9 +206,6 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrProjectAlreadyExists {
-			logger.Info("Project %s already exists", projectName)
-			http.Error(w, "Project Already Exists", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
