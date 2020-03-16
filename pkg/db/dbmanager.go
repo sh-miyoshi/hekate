@@ -187,14 +187,6 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		_, err := m.project.Get(ent.Name)
-		if errors.Cause(err) != model.ErrNoSuchProject {
-			if err == nil {
-				return model.ErrProjectAlreadyExists
-			}
-			return errors.Wrap(err, "Project duplication check failed")
-		}
-
 		if err := m.project.Update(ent); err != nil {
 			return errors.Wrap(err, "Failed to update project")
 		}
