@@ -4,6 +4,7 @@
 
 - userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
 - custom role削除時にユーザからremoveしなくてよい？
+- 別projectのリソースを変更できないか要確認
 
 ## new commands
 
@@ -13,6 +14,9 @@
 
 ## server application enhancement
 
+- userのパスワード変更のrole見直し
+  - 本人のみが変更できるようにする
+- APIのRBACの見直し
 - API responseのエラーコードが足りてないバグの修正
   - ClientUpdateHandler
   - RoleUpdateHandler
@@ -63,9 +67,6 @@
   - code認証失敗時、すべてのtokenを無効化
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
-- APIのRBACの見直し
-- userのパスワード変更のrole見直し
-  - 本人のみが変更できるようにする
 - SAML対応
 - (project/user) enabledの有効化
 - user federation
