@@ -101,6 +101,7 @@ export default {
       "write-client",
       "read-customrole",
       "write-customrole",
+      "TODO-test"
     ]
   }
 }
