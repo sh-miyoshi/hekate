@@ -3,8 +3,8 @@
     <div class="card-header">
       <h3>
         {{ currentUserName }}
-        <span v-if="allowEdit()" class="trush">
-          <i class="fa fa-trash" @click="trushConfirm"></i>
+        <span v-if="allowEdit()" class="icon">
+          <i class="fa fa-trash" @click="deleteUserConfirm"></i>
         </span>
       </h3>
     </div>
@@ -18,7 +18,7 @@
           cancel-variant="outline-dark"
           ok-variant="danger"
           ok-title="Delete user"
-          @ok="trush"
+          @ok="deleteUser"
         >
           <p class="mb-0">Are you sure to delete the user ?</p>
         </b-modal>
@@ -52,7 +52,22 @@
           System Role
         </label>
         <div class="col-sm-5">
-          <List v-if="user" :current="user.system_roles" :all="systemRoles" />
+          <div v-if="user">
+            <div v-for="item in user.system_roles" :key="item">
+              <div class="mb-1 input-group-text role-item">
+                <span class="icon">
+                  <i class="fa fa-remove" @click="removeSystemRole(item)"></i>
+                </span>
+                {{ item }}
+              </div>
+            </div>
+            <div>
+              <b-form-select
+                v-model="assignedSystemRole"
+                :options="assignedSystemRoleCandidates"
+              ></b-form-select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -68,22 +83,17 @@
 </template>
 
 <script>
-import List from '@/components/list.vue'
-
 export default {
-  components: {
-    List
-  },
   data() {
     return {
       currentUserName: '',
       user: null,
       error: '',
-      systemRoles: []
+      assignedSystemRole: null,
+      assignedSystemRoleCandidates: this.getSystemRoleCandidates()
     }
   },
   mounted() {
-    this.systemRoles = process.env.SYSTEM_ROLES
     this.setUser(this.$route.params.id)
   },
   methods: {
@@ -103,14 +113,35 @@ export default {
       const loginUser = window.localStorage.getItem('user')
       return this.currentUserName !== loginUser
     },
-    trushConfirm() {
+    deleteUserConfirm() {
       this.$refs['confirm-delete-user'].show()
     },
-    trush() {
+    deleteUser() {
       // TODO(implement this)
     },
     update() {
       // TODO(implement this)
+      console.log(this.user.system_roles)
+    },
+    getSystemRoleCandidates() {
+      const res = [{ value: null, text: 'Please select an assigned role' }]
+      if (!this.user) {
+        return res
+      }
+      for (const item of process.env.SYSTEM_ROLES) {
+        if (!this.user.system_roles.includes(item)) {
+          res.push({ value: item, text: item })
+        }
+      }
+      return res
+    },
+    removeSystemRole(role) {
+      if (!this.user) {
+        return
+      }
+      const tmp = this.user.system_roles.filter((v) => v !== role)
+      this.user.system_roles = tmp
+      this.assignedSystemRoleCandidates = this.getSystemRoleCandidates()
     }
   }
 }

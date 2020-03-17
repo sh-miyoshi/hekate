@@ -12,7 +12,7 @@
           cancel-variant="outline-dark"
           ok-variant="danger"
           ok-title="Delete user"
-          @ok="trush"
+          @ok="deleteUser"
         >
           <p class="mb-0">Are you sure to delete the user ?</p>
         </b-modal>
@@ -37,8 +37,8 @@
               >
                 edit
               </button>
-              <span v-if="allowEdit(user.name)" class="trush">
-                <i class="fa fa-trash" @click="trushConfirm"></i>
+              <span v-if="allowEdit(user.name)" class="icon">
+                <i class="fa fa-trash" @click="deleteUserConfirm"></i>
               </span>
             </td>
           </tr>
@@ -79,10 +79,10 @@ export default {
       const loginUser = window.localStorage.getItem('user')
       return userName !== loginUser
     },
-    trushConfirm() {
+    deleteUserConfirm() {
       this.$refs['confirm-delete-user'].show()
     },
-    trush() {
+    deleteUser() {
       // TODO(implement this)
     }
   }

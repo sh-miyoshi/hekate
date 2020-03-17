@@ -19,6 +19,8 @@ h1 {
 	padding: 20px;
 }
 
-.trush:hover {
+.icon:hover {
   cursor: pointer;
+  transform: scale(1.2);
+  display:inline-block;
 }

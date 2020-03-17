@@ -5,8 +5,8 @@
         <span class="project">
           {{ this.$store.state.current_project }}
         </span>
-        <span class="trush">
-          <i class="fa fa-trash" @click="trushConfirm"></i>
+        <span class="icon">
+          <i class="fa fa-trash" @click="deleteProjectConfirm"></i>
         </span>
       </h3>
     </div>
@@ -20,7 +20,7 @@
           cancel-variant="outline-dark"
           ok-variant="danger"
           ok-title="Delete project"
-          @ok="trush"
+          @ok="deleteProject"
         >
           <p class="mb-0">Are you sure to delete the project ?</p>
         </b-modal>
@@ -121,10 +121,10 @@ export default {
     this.getProject()
   },
   methods: {
-    trushConfirm() {
+    deleteProjectConfirm() {
       this.$refs['confirm-delete-project'].show()
     },
-    async trush() {
+    async deleteProject() {
       const res = await this.$api.ProjectDelete(
         this.$store.state.current_project
       )
