@@ -66,7 +66,23 @@
                 v-model="assignedSystemRole"
                 :options="assignedSystemRoleCandidates"
               ></b-form-select>
+              <button>Assign</button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="system-roles" class="col-sm-2 control-label">
+          Custom Role
+        </label>
+        <div class="col-sm-5">
+          <div v-if="user">
+            <ul>
+              <li v-for="item in user.custom_roles" :key="item">
+                {{ item }}
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -76,7 +92,7 @@
           {{ error }}
         </div>
 
-        <button class="btn btn-primary" @click="update">Update</button>
+        <button class="btn btn-primary" @click="updateUser">Update</button>
       </div>
     </div>
   </div>
@@ -119,7 +135,7 @@ export default {
     deleteUser() {
       // TODO(implement this)
     },
-    update() {
+    updateUser() {
       // TODO(implement this)
       console.log(this.user.system_roles)
     },
@@ -146,3 +162,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.role-item {
+  display: inline-block;
+  padding: 0.175rem 0.55rem;
+  width: auto;
+}
+</style>
