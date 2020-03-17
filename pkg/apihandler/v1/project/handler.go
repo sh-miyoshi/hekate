@@ -18,7 +18,7 @@ import (
 //   require role: cluster-read
 func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResCluster, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -52,7 +52,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 //   require role: cluster-write
 func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResCluster, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -110,15 +110,15 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 // ProjectDeleteHandler ...
 //   require role: cluster-write
 func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResCluster, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResCluster, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
@@ -142,15 +142,15 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 // ProjectGetHandler ...
 //   require role: project-read
 func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	// Get Project
 	project, err := db.GetInst().ProjectGet(projectName)
@@ -182,15 +182,15 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 // ProjectUpdateHandler ...
 //   require role: project-write
 func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	// Parse Request
 	var request ProjectPutRequest

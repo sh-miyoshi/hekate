@@ -17,15 +17,15 @@ import (
 // AllClientGetHandler ...
 //   require role: project-read
 func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	clients, err := db.GetInst().ClientGetList(projectName)
 	if err != nil {
@@ -56,15 +56,15 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 // ClientCreateHandler ...
 //   require role: project-write
 func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	// Parse Request
 	var request ClientCreateRequest
@@ -113,16 +113,16 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 // ClientDeleteHandler ...
 //   require role: project-write
 func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	clientID := vars["clientID"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-	clientID := vars["clientID"]
 
 	if err := db.GetInst().ClientDelete(clientID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
@@ -146,16 +146,16 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 // ClientGetHandler ...
 //   require role: client-read
 func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	clientID := vars["clientID"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResClient, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResClient, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-	clientID := vars["clientID"]
 
 	client, err := db.GetInst().ClientGet(clientID)
 	if err != nil {
@@ -186,16 +186,16 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 // ClientUpdateHandler ...
 //   require role: client-write
 func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	clientID := vars["clientID"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResClient, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResClient, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-	clientID := vars["clientID"]
 
 	// Parse Request
 	var request ClientPutRequest

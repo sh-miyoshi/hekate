@@ -18,15 +18,15 @@ import (
 // AllRoleGetHandler ...
 //   require role: project-read
 func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResProject, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	queries := r.URL.Query()
 	logger.Debug("Query: %v", queries)
@@ -67,15 +67,15 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 // RoleCreateHandler ...
 //   require role: customrole-write
 func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResCustomRole, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	// Parse Request
 	var request CustomRoleCreateRequest
@@ -122,16 +122,16 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 // RoleDeleteHandler ...
 //   require role: role-write
 func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	roleID := vars["roleID"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResCustomRole, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-	roleID := vars["roleID"]
 
 	if err := db.GetInst().CustomRoleDelete(roleID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
@@ -155,16 +155,16 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 // RoleGetHandler ...
 //   require role: role-read
 func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	roleID := vars["roleID"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResCustomRole, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-	roleID := vars["roleID"]
 
 	role, err := db.GetInst().CustomRoleGet(roleID)
 	if err != nil {
@@ -194,16 +194,16 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 // RoleUpdateHandler ...
 //   require role: role-write
 func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	roleID := vars["roleID"]
+
 	// Authorize API Request
-	if err := jwthttp.AuthHeader(r, role.ResCustomRole, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-	roleID := vars["roleID"]
 
 	// Parse Request
 	var request CustomRolePutRequest

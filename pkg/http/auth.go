@@ -40,16 +40,26 @@ func ValidateAPIRequest(req *http.Request) (*token.AccessTokenClaims, error) {
 	return claims, nil
 }
 
-// AuthHeader ...
-func AuthHeader(req *http.Request, reqTrgRes role.Resource, reqRoleType role.Type) error {
+// Authorize ...
+func Authorize(req *http.Request, projectName string, reqTrgRes role.Resource, reqRoleType role.Type) error {
 	claims, err := ValidateAPIRequest(req)
 	if err != nil {
 		return errors.Wrap(err, "Failed to validate token")
 	}
 
+	// return ok when request has cluster-role
+	if role.Authorize(claims.ResourceAccess.SystemManagement.Roles, role.ResCluster, reqRoleType) {
+		return nil
+	}
+
 	// Authorize API Request
 	if !role.Authorize(claims.ResourceAccess.SystemManagement.Roles, reqTrgRes, reqRoleType) {
-		return errors.New("Do not have authority")
+		return errors.New("Do not have permission")
+	}
+
+	// check project
+	if claims.Project != projectName {
+		return errors.New("Wrong project")
 	}
 
 	return nil
