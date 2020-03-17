@@ -35,9 +35,10 @@
 
 ### Role Typeについて
 
-System Roleは各リソースに対してread, writeが存在する
-userに対してwriteのみを付与することはできない
-そのため、以下の制約をつける
+System Roleは各リソースに対してread, writeが存在する。
+リソースは自プロジェクトのみに対して有効であり、他プロジェクトのリソースに干渉できない。
+また、userに対してwriteのみを付与することはできない。
+そのため、以下の制約をつける。
 
 - Role 追加時
   - write権限を付与する際はすでにuserにそのリソースに対するread権限が存在するか、同時に登録しようとしているRoleの中にそのリソースに対するread権限が必要
@@ -46,8 +47,8 @@ userに対してwriteのみを付与することはできない
 
 ### Cluster Resourceについて
 
-Cluster全体を管理できるcluster roleはmaster projectに存在するユーザーにのみ付与できる
-なお、上記のread, writeに関する制約は受ける
+Cluster全体を管理できるcluster roleはmaster projectに存在するユーザーにのみ付与できる。
+cluster権限はすべてのprojectのすべてのリソースに対してread, write可能である。
 
 ## ユーザーパスワードロック
 
