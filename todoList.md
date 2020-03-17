@@ -16,7 +16,6 @@
 
 - userのパスワード変更のrole見直し
   - 本人のみが変更できるようにする
-- APIのRBACの見直し
 - API responseのエラーコードが足りてないバグの修正
   - ClientUpdateHandler
   - RoleUpdateHandler
@@ -103,6 +102,8 @@
 
 ## CLI tool(hctl) enhancement
 
+- loginコマンドに--projectオプションの追加
+  - configファイルはdefault値にして上書きする
 - 各APIへの対応
   - project
     - update
