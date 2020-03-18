@@ -51,8 +51,8 @@
         <label for="system-roles" class="col-sm-2 control-label">
           System Role
         </label>
-        <div class="col-sm-5">
-          <div v-if="user">
+        <div v-if="user" class="col-sm-5">
+          <div v-if="user.system_roles.length > 0">
             <div v-for="item in user.system_roles" :key="item">
               <div class="mb-1 input-group-text role-item">
                 <span class="icon">
@@ -61,6 +61,9 @@
                 {{ item }}
               </div>
             </div>
+          </div>
+          <div v-else>
+            No assigned roles
           </div>
         </div>
         <div class="col-sm-5">
@@ -75,11 +78,11 @@
       </div>
 
       <div class="form-group row">
-        <label for="system-roles" class="col-sm-2 control-label">
+        <label for="custom-roles" class="col-sm-2 control-label">
           Custom Role
         </label>
-        <div class="col-sm-5">
-          <div v-if="user">
+        <div v-if="user" class="col-sm-5">
+          <div v-if="user.custom_roles.length > 0">
             <div v-for="item in user.custom_roles" :key="item">
               <div class="mb-1 input-group-text role-item">
                 <span class="icon">
@@ -88,6 +91,9 @@
                 {{ item }}
               </div>
             </div>
+          </div>
+          <div v-else>
+            No assigned roles
           </div>
         </div>
         <div class="col-sm-5">
@@ -98,6 +104,17 @@
           <button class="btn btn-primary mt-2" @click="assignCustomRole()">
             Assign
           </button>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-2 control-label">
+          Login Sessions
+        </label>
+        <div v-if="user" class="col-sm-5">
+          <ul>
+            <li v-for="item in user.sessions" :key="item">{{ item }}</li>
+          </ul>
         </div>
       </div>
 
@@ -134,7 +151,14 @@ export default {
       )
       if (res.ok) {
         this.user = res.data
+        if (!this.user.system_roles) {
+          this.user.system_roles = []
+        }
+        if (!this.user.custom_roles) {
+          this.user.custom_roles = []
+        }
         this.currentUserName = res.data.name
+        console.log(this.user)
       } else {
         console.log('Failed to get user: %o', res)
       }
@@ -178,6 +202,7 @@ export default {
       }
 
       this.user.system_roles.push(this.assignedSystemRole)
+      this.assignedSystemRole = null
     },
     getCustomRoleCandidates() {
       const res = [{ value: null, text: 'Please select an assigned role' }]
@@ -197,6 +222,7 @@ export default {
       }
 
       this.user.custom_roles.push(this.assignedCustomRole)
+      this.assignedCustomRole = null
     }
   }
 }
