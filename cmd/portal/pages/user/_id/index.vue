@@ -61,14 +61,16 @@
                 {{ item }}
               </div>
             </div>
-            <div>
-              <b-form-select
-                v-model="assignedSystemRole"
-                :options="assignedSystemRoleCandidates"
-              ></b-form-select>
-              <button>Assign</button>
-            </div>
           </div>
+        </div>
+        <div class="col-sm-5">
+          <b-form-select
+            v-model="assignedSystemRole"
+            :options="getSystemRoleCandidates()"
+          ></b-form-select>
+          <button class="btn btn-primary mt-2" @click="assignSystemRole()">
+            Assign
+          </button>
         </div>
       </div>
 
@@ -78,12 +80,24 @@
         </label>
         <div class="col-sm-5">
           <div v-if="user">
-            <ul>
-              <li v-for="item in user.custom_roles" :key="item">
+            <div v-for="item in user.custom_roles" :key="item">
+              <div class="mb-1 input-group-text role-item">
+                <span class="icon">
+                  <i class="fa fa-remove" @click="removeCustomRole(item)"></i>
+                </span>
                 {{ item }}
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="col-sm-5">
+          <b-form-select
+            v-model="assignedCustomRole"
+            :options="getCustomRoleCandidates()"
+          ></b-form-select>
+          <button class="btn btn-primary mt-2" @click="assignCustomRole()">
+            Assign
+          </button>
         </div>
       </div>
 
@@ -106,7 +120,7 @@ export default {
       user: null,
       error: '',
       assignedSystemRole: null,
-      assignedSystemRoleCandidates: this.getSystemRoleCandidates()
+      assignedCustomRole: null
     }
   },
   mounted() {
@@ -157,7 +171,32 @@ export default {
       }
       const tmp = this.user.system_roles.filter((v) => v !== role)
       this.user.system_roles = tmp
-      this.assignedSystemRoleCandidates = this.getSystemRoleCandidates()
+    },
+    assignSystemRole() {
+      if (!this.user || !this.assignedSystemRole) {
+        return
+      }
+
+      this.user.system_roles.push(this.assignedSystemRole)
+    },
+    getCustomRoleCandidates() {
+      const res = [{ value: null, text: 'Please select an assigned role' }]
+      // TODO(get all custom roles, check user.custom_roles)
+      return res
+    },
+    removeCustomRole(role) {
+      if (!this.user) {
+        return
+      }
+      const tmp = this.user.custom_roles.filter((v) => v !== role)
+      this.user.custom_roles = tmp
+    },
+    assignCustomRole() {
+      if (!this.user || !this.assignedCustomRole) {
+        return
+      }
+
+      this.user.custom_roles.push(this.assignedCustomRole)
     }
   }
 }
