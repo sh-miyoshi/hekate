@@ -12,17 +12,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	userName string
-	password string
-)
-
 var loginCmd = &cobra.Command{
 	Use:   "login",
 	Short: "Login to system",
 	Long:  `Login to system`,
 	Run: func(cmd *cobra.Command, args []string) {
+		projectName, _ := cmd.Flags().GetString("project")
+		userName, _ := cmd.Flags().GetString("name")
+		password, _ := cmd.Flags().GetString("password")
+
 		// TODO(support authorization code flow)
+
+		if projectName != "" {
+			config.SetProjectName(projectName)
+		}
 
 		if userName == "" {
 			// Set user name from STDIN
@@ -53,8 +56,9 @@ var loginCmd = &cobra.Command{
 }
 
 func init() {
-	loginCmd.Flags().StringVarP(&userName, "name", "n", "", "Login User Name")
-	loginCmd.Flags().StringVarP(&password, "password", "p", "", "Login User Password")
+	loginCmd.Flags().String("project", "", "name of the project to which the user belongs")
+	loginCmd.Flags().StringP("name", "n", "", "Login User Name")
+	loginCmd.Flags().StringP("password", "p", "", "Login User Password")
 }
 
 // GetCommand ...

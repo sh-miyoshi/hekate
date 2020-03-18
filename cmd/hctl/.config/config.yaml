@@ -1,3 +1,2 @@
 server_addr: "http://localhost:8080"
-enable_debug_log: false
-project_name: master
+default_project: master
