@@ -475,9 +475,9 @@ func (m *Manager) SessionDelete(sessionID string) error {
 }
 
 // SessionGetList ...
-func (m *Manager) SessionGetList(userID string) ([]string, error) {
+func (m *Manager) SessionGetList(userID string) ([]*model.Session, error) {
 	if !model.ValidateUserID(userID) {
-		return []string{}, errors.Wrap(model.ErrSessionValidateFailed, "invalid user id format")
+		return nil, errors.Wrap(model.ErrSessionValidateFailed, "invalid user id format")
 	}
 
 	return m.session.GetList(userID)

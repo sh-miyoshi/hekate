@@ -22,7 +22,7 @@ type SessionHandler interface {
 	Revoke(sessionID string) error
 	RevokeAll(userID string) error
 	Get(sessionID string) (*Session, error)
-	GetList(userID string) ([]string, error)
+	GetList(userID string) ([]*Session, error)
 }
 
 var (

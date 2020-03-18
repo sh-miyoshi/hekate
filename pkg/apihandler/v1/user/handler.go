@@ -65,7 +65,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, s := range sessions {
-			tmp.Sessions = append(tmp.Sessions, s)
+			tmp.Sessions = append(tmp.Sessions, s.SessionID)
 		}
 
 		res = append(res, tmp)
@@ -218,7 +218,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, s := range sessions {
-		res.Sessions = append(res.Sessions, s)
+		res.Sessions = append(res.Sessions, s.SessionID)
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetHandler", &res)

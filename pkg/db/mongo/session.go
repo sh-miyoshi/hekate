@@ -118,7 +118,7 @@ func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 }
 
 // GetList ...
-func (h *SessionHandler) GetList(userID string) ([]string, error) {
+func (h *SessionHandler) GetList(userID string) ([]*model.Session, error) {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 
 	filter := bson.D{
@@ -130,17 +130,23 @@ func (h *SessionHandler) GetList(userID string) ([]string, error) {
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get session list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get session list from mongodb")
 	}
 
 	sessions := []session{}
 	if err := cursor.All(ctx, &sessions); err != nil {
-		return []string{}, errors.Wrap(err, "Failed to get session list from mongodb")
+		return nil, errors.Wrap(err, "Failed to get session list from mongodb")
 	}
 
-	res := []string{}
+	res := []*model.Session{}
 	for _, s := range sessions {
-		res = append(res, s.SessionID)
+		res = append(res, &model.Session{
+			UserID:    s.UserID,
+			SessionID: s.SessionID,
+			CreatedAt: s.CreatedAt,
+			ExpiresIn: s.ExpiresIn,
+			FromIP:    s.FromIP,
+		})
 	}
 
 	return res, nil

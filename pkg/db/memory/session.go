@@ -55,12 +55,12 @@ func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 }
 
 // GetList ...
-func (h *SessionHandler) GetList(userID string) ([]string, error) {
-	res := []string{}
+func (h *SessionHandler) GetList(userID string) ([]*model.Session, error) {
+	res := []*model.Session{}
 
-	for id, s := range h.sessionList {
+	for _, s := range h.sessionList {
 		if s.UserID == userID {
-			res = append(res, id)
+			res = append(res, s)
 		}
 	}
 
