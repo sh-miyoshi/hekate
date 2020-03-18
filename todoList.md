@@ -16,6 +16,10 @@
 
 - userのパスワード変更のrole見直し
   - 本人のみが変更できるようにする
+  - 専用APIの用意
+    - /api/v1/project/{projectName}/user/{userID}/change-password
+    - API docの修正
+    - API Handlerの追加
 - API responseのエラーコードが足りてないバグの修正
   - ClientUpdateHandler
   - RoleUpdateHandler
