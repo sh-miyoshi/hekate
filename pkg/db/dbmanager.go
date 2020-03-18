@@ -256,7 +256,11 @@ func (m *Manager) UserDelete(userID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		// TODO(delete loginsession, oidc_code, session)
+		// TODO(delete loginsession, oidc_code)
+
+		if err := m.session.RevokeAll(userID); err != nil {
+			return errors.Wrap(err, "Delete user session failed")
+		}
 
 		if err := m.user.Delete(userID); err != nil {
 			return errors.Wrap(err, "Failed to delete user")
