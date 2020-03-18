@@ -99,11 +99,16 @@
 - home pageにmiddlewareを使用
 - oidc authのstateチェック
 - client_idやproject nameをどうするか(変数化)
+- 各ユーザーのアカウント管理画面
+  - user名変更
+  - パスワード変更
 
 ## CLI tool(hctl) enhancement
 
-- loginコマンドに--projectオプションの追加
-  - configファイルはdefault値にして上書きする
+- configファイルの扱い
+  - `no such file or directory`のとき、新規作成
+  - permission: 0700, 0600
+  - デフォルト値(localhost:8080, master)
 - 各APIへの対応
   - project
     - update
