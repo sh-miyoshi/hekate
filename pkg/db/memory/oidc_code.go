@@ -40,3 +40,15 @@ func (h *AuthCodeHandler) Delete(codeID string) error {
 
 	return model.ErrNoSuchCode
 }
+
+// DeleteAll ...
+func (h *AuthCodeHandler) DeleteAll(userID string) error {
+	newList := make(map[string]*model.AuthCode)
+	for _, a := range h.authCodeList {
+		if a.UserID != userID {
+			newList[a.CodeID] = a
+		}
+	}
+	h.authCodeList = newList
+	return nil
+}

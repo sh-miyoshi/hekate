@@ -79,6 +79,23 @@ func (h *AuthCodeHandler) Delete(codeID string) error {
 	return nil
 }
 
+// DeleteAll ...
+func (h *AuthCodeHandler) DeleteAll(userID string) error {
+	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)
+	filter := bson.D{
+		{Key: "userID", Value: userID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete auth code from mongodb")
+	}
+	return nil
+}
+
 // Get ...
 func (h *AuthCodeHandler) Get(codeID string) (*model.AuthCode, error) {
 	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)

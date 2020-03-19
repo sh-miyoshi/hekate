@@ -21,6 +21,7 @@ type AuthCodeHandler interface {
 	New(code *AuthCode) error
 	Get(codeID string) (*AuthCode, error)
 	Delete(codeID string) error
+	DeleteAll(userID string) error
 }
 
 var (
