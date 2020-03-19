@@ -33,7 +33,8 @@ export default {
    */
   plugins: [
     '~/plugins/auth.js',
-    '~/plugins/api.js'
+    '~/plugins/api.js',
+    '~/plugins/validation.js'
   ],
   /*
    ** Nuxt.js dev-modules

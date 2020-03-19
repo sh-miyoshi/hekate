@@ -16,6 +16,7 @@
             type="text"
             class="form-control"
             :class="{ 'is-invalid': nameValidateError }"
+            @blur="validateUserName()"
           />
           <div class="invalid-feedback">
             {{ nameValidateError }}
@@ -24,7 +25,21 @@
       </div>
 
       <div class="form-group row">
-        TODO(add more value)
+        <label for="password" class="col-sm-2 col-form-label">
+          Password
+          <span class="required">*</span>
+        </label>
+        <div class="col-md-5">
+          <input
+            v-model="password"
+            type="password"
+            class="form-control"
+            :class="{ 'is-invalid': passwordValidateError }"
+          />
+          <div class="invalid-feedback">
+            {{ passwordValidateError }}
+          </div>
+        </div>
       </div>
 
       <div class="card-footer">
@@ -45,6 +60,8 @@ export default {
     return {
       name: '',
       nameValidateError: '',
+      password: '',
+      passwordValidateError: '',
       error: ''
     }
   },
@@ -60,6 +77,14 @@ export default {
 
       // alert('successfully created.')
       // this.$router.push('/project')
+    },
+    validateUserName() {
+      const res = this.$ValidateUserName(this.name)
+      if (!res.ok) {
+        this.nameValidateError = res.msg
+      } else {
+        this.nameValidateError = ''
+      }
     }
   }
 }
