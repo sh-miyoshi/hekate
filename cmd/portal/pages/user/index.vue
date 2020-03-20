@@ -37,7 +37,7 @@
               >
                 edit
               </button>
-              <span v-if="allowEdit(user.name)" class="icon">
+              <span v-if="allowEdit(user.name)" class="icon ml-2 h4">
                 <i class="fa fa-trash" @click="deleteUserConfirm"></i>
               </span>
             </td>
