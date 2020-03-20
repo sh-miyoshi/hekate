@@ -38,7 +38,7 @@
                 edit
               </button>
               <span v-if="allowEdit(user.name)" class="icon ml-2 h4">
-                <i class="fa fa-trash" @click="deleteUserConfirm"></i>
+                <i class="fa fa-trash" @click="deleteUserConfirm(user.id)"></i>
               </span>
             </td>
           </tr>
@@ -57,7 +57,9 @@ export default {
   middleware: 'auth',
   data() {
     return {
-      users: []
+      users: [],
+      deleteUserID: '',
+      error: ''
     }
   },
   mounted() {
@@ -79,11 +81,22 @@ export default {
       const loginUser = window.localStorage.getItem('user')
       return userName !== loginUser
     },
-    deleteUserConfirm() {
+    deleteUserConfirm(id) {
+      this.deleteUserID = id
       this.$refs['confirm-delete-user'].show()
     },
-    deleteUser() {
-      // TODO(implement this)
+    async deleteUser() {
+      console.log('delete user id: ' + this.deleteUserID)
+      const res = await this.$api.UserDelete(
+        this.$store.state.current_project,
+        this.deleteUserID
+      )
+      if (!res.ok) {
+        this.error = res.msg
+        return
+      }
+      this.setUsers()
+      alert('Successfully delete user')
     }
   }
 }
