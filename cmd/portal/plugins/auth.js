@@ -143,6 +143,40 @@ export class AuthHandler {
 
     return res
   }
+
+  async Logout() {
+    const refreshToken = window.localStorage.getItem('refresh_token')
+    if (refreshToken) {
+      const opts = {
+        token_type_hint: 'refresh_token',
+        refresh_token: refreshToken
+      }
+
+      const headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+
+      // TODO(use param: project_name, timeout)
+      const url =
+        process.env.SERVER_ADDR + '/api/v1/project/master/openid-connect/revoke'
+
+      const handler = axios.create({
+        headers,
+        timeout: 10000
+      })
+
+      try {
+        await handler.post(url, querystring.stringify(opts))
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    window.localStorage.removeItem('access_token')
+    window.localStorage.removeItem('refresh_token')
+    window.localStorage.removeItem('expires_in')
+    window.localStorage.removeItem('refresh_expires_in')
+    window.localStorage.removeItem('user')
+  }
 }
 
 export default (context, inject) => {

@@ -18,7 +18,8 @@
 export default {
   methods: {
     logout() {
-      // TODO(logout and redirect to top)
+      this.$auth.Logout()
+      this.$router.push('/')
     }
   }
 }
