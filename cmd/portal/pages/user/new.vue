@@ -66,17 +66,29 @@ export default {
     }
   },
   methods: {
-    create() {
-      alert('successfully created.')
-      // const res = await this.$api.ProjectCreate(this.name)
-      // console.log('project create result: %o', res)
-      // if (!res.ok) {
-      //   this.error = res.message
-      //   return
-      // }
+    async create() {
+      if (
+        this.nameValidateError.length > 0 ||
+        this.passwordValidateError.length > 0
+      ) {
+        this.error = 'Please fix validation error before create.'
+        return
+      }
 
-      // alert('successfully created.')
-      // this.$router.push('/project')
+      const data = {
+        name: this.name,
+        password: this.password
+      }
+      const projectName = this.$store.state.current_project
+      const res = await this.$api.UserCreate(projectName, data)
+      console.log('user create result: %o', res)
+      if (!res.ok) {
+        this.error = res.message
+        return
+      }
+
+      alert('successfully created.')
+      this.$router.push('/user')
     },
     validateUserName() {
       const res = this.$ValidateUserName(this.name)

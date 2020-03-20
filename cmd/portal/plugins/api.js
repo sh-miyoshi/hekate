@@ -102,6 +102,13 @@ class APIClient {
     return res
   }
 
+  async UserCreate(projectName, info) {
+    const url =
+      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/user'
+    const res = await this._request(url, 'POST', info)
+    return res
+  }
+
   async UserGetList(projectName) {
     const url =
       process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/user'
