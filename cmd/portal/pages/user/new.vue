@@ -48,7 +48,7 @@
         </div>
 
         <button class="btn btn-primary mr-2" @click="create">Create</button>
-        <nuxt-link to="/project">Cancel</nuxt-link>
+        <nuxt-link to="/user">Cancel</nuxt-link>
       </div>
     </div>
   </div>
