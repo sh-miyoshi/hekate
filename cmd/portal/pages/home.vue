@@ -7,6 +7,6 @@
 
 <script>
 export default {
-  // TODO middleware: 'auth'
+  middleware: 'auth'
 }
 </script>
