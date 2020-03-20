@@ -90,19 +90,15 @@
 - redirect先
   - 前回開いていたページに戻る
 - alert画面のcss修正
-- project選択を一覧に
-- logoutボタンの実装
 - headerにユーザー名を表示
 - 各ページの作成
   - User
-    - user削除コマンドの実装
-    - user createページの作成
-    - user更新コマンドの実装
+    - Login Sessionの表示
   - Role
   - Client
-- home pageにmiddlewareを使用
 - oidc authのstateチェック
 - client_idやproject nameをどうするか(変数化)
+
 - 各ユーザーのアカウント管理画面
   - user名変更
   - パスワード変更
