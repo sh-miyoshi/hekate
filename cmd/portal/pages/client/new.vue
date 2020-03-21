@@ -75,6 +75,12 @@ export default {
         return
       }
 
+      // validate secret
+      if (this.accessType === 'confidential' && this.secret.length < 1) {
+        this.error = 'Please input secret when access type is confidential.'
+        return
+      }
+
       const data = {
         id: this.id,
         access_type: this.accessType,
