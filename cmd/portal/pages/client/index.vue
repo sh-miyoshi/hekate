@@ -90,7 +90,7 @@ export default {
     },
     async deleteClient() {
       console.log('delete client id: ' + this.deleteClientID)
-      const res = await this.$api.UserDelete(
+      const res = await this.$api.ClientDelete(
         this.$store.state.current_project,
         this.deleteClientID
       )

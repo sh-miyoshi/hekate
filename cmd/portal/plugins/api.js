@@ -144,6 +144,8 @@ class APIClient {
     const res = await this._request(url, 'GET')
     return res
   }
+
+  // TODO(ClientDelete)
 }
 
 export default (context, inject) => {
