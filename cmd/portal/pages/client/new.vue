@@ -36,15 +36,6 @@
         </div>
       </div>
 
-      <div class="form-group row">
-        <label for="secret" class="col-sm-2 col-form-label">
-          Secret
-        </label>
-        <div class="col-md-5">
-          <input v-model="secret" type="text" class="form-control" />
-        </div>
-      </div>
-
       <div class="card-footer">
         <div v-if="error" class="alert alert-danger">
           {{ error }}
@@ -58,13 +49,14 @@
 </template>
 
 <script>
+import { v4 as uuidv4 } from 'uuid'
+
 export default {
   data() {
     return {
       id: '',
       accessType: 'confidential',
       idValidateError: '',
-      secret: '',
       error: ''
     }
   },
@@ -75,16 +67,15 @@ export default {
         return
       }
 
-      // validate secret
-      if (this.accessType === 'confidential' && this.secret.length < 1) {
-        this.error = 'Please input secret when access type is confidential.'
-        return
+      let secret = ''
+      if (this.accessType !== 'public') {
+        secret = uuidv4()
       }
 
       const data = {
         id: this.id,
         access_type: this.accessType,
-        secret: this.secret
+        secret
       }
       const projectName = this.$store.state.current_project
       const res = await this.$api.ClientCreate(projectName, data)
