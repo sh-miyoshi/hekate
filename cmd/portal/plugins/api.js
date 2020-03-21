@@ -138,6 +138,13 @@ class APIClient {
     return res
   }
 
+  async ClientCreate(projectName, info) {
+    const url =
+      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/client'
+    const res = await this._request(url, 'POST', info)
+    return res
+  }
+
   async ClientGetList(projectName) {
     const url =
       process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/client'
@@ -145,7 +152,16 @@ class APIClient {
     return res
   }
 
-  // TODO(ClientDelete)
+  async ClientDelete(projectName, clientID) {
+    const url =
+      process.env.SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/client/' +
+      clientID
+    const res = await this._request(url, 'DELETE')
+    return res
+  }
 }
 
 export default (context, inject) => {
