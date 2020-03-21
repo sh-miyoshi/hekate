@@ -91,6 +91,9 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Cause(err) == model.ErrClientAlreadyExists {
 			logger.Info("Client %s is already exists", client.ID)
 			http.Error(w, "Client already exists", http.StatusConflict)
+		} else if errors.Cause(err) == model.ErrClientValidateFailed {
+			logger.Info("Invalid Request: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to create client: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
