@@ -31,11 +31,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [
-    '~/plugins/auth.js',
-    '~/plugins/api.js',
-    '~/plugins/validation.js'
-  ],
+  plugins: ['~/plugins/auth.js', '~/plugins/api.js', '~/plugins/validation.js'],
   /*
    ** Nuxt.js dev-modules
    */
@@ -90,19 +86,18 @@ export default {
   env: {
     SERVER_ADDR: 'http://localhost:8080',
     SYSTEM_ROLES: [
-      "read-cluster",
-      "write-cluster",
-      "read-project",
-      "write-project",
-      "read-role",
-      "write-role",
-      "read-user",
-      "write-user",
-      "read-client",
-      "write-client",
-      "read-customrole",
-      "write-customrole",
-      "TODO-test"
+      'read-cluster',
+      'write-cluster',
+      'read-project',
+      'write-project',
+      'read-role',
+      'write-role',
+      'read-user',
+      'write-user',
+      'read-client',
+      'write-client',
+      'read-customrole',
+      'write-customrole'
     ]
   }
 }
