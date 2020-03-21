@@ -152,6 +152,17 @@ class APIClient {
     return res
   }
 
+  async ClientGet(projectName, clientID) {
+    const url =
+      process.env.SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/client/' +
+      clientID
+    const res = await this._request(url, 'GET')
+    return res
+  }
+
   async ClientDelete(projectName, clientID) {
     const url =
       process.env.SERVER_ADDR +
