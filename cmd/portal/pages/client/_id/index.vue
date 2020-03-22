@@ -150,8 +150,21 @@ export default {
     deleteClientConfirm() {
       this.$refs['confirm-delete-client'].show()
     },
-    deleteClient() {
-      // TODO(implement this)
+    async deleteClient() {
+      if (!this.client) {
+        return
+      }
+      console.log('delete client id: ' + this.client.id)
+      const res = await this.$api.ClientDelete(
+        this.$store.state.current_project,
+        this.client.id
+      )
+      if (!res.ok) {
+        this.error = res.msg
+        return
+      }
+      alert('Successfully delete client')
+      this.$router.push('/client')
     },
     updateClient() {
       // TODO(implement this)

@@ -37,7 +37,7 @@
               >
                 edit
               </button>
-              <span class="icon ml-2 h4">
+              <span v-if="client.id !== 'admin-cli'" class="icon ml-2 h4">
                 <i
                   class="fa fa-trash"
                   @click="deleteClientConfirm(client.id)"
