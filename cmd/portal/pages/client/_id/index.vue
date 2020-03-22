@@ -90,14 +90,14 @@
               type="url"
             />
             <div class="input-group-append">
-              <span class="input-group-text icon">
+              <span class="input-group-text icon" @click="removeCallback(i)">
                 <i class="fa fa-trash"></i>
               </span>
             </div>
           </div>
           <div class="input-group mb-1">
-            <input class="form-control" type="url" />
-            <div class="input-group-append">
+            <input v-model="newCallback" class="form-control" type="url" />
+            <div class="input-group-append" @click="appendCallback">
               <span class="input-group-text icon">
                 +
               </span>
@@ -125,7 +125,8 @@ export default {
     return {
       currentClientID: '',
       client: null,
-      error: ''
+      error: '',
+      newCallback: ''
     }
   },
   mounted() {
@@ -160,6 +161,23 @@ export default {
         return
       }
       this.client.secret = uuidv4()
+    },
+    appendCallback() {
+      if (!this.client) {
+        return
+      }
+
+      // TODO(validate this.newCallback)
+      // TODO(check duplication)
+
+      this.client.allowed_callback_urls.push(this.newCallback)
+      this.newCallback = ''
+    },
+    removeCallback(index) {
+      if (!this.client) {
+      }
+
+      this.client.allowed_callback_urls.splice(index, 1)
     }
   }
 }
