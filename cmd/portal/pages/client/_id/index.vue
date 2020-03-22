@@ -74,6 +74,33 @@
       </div>
 
       <!-- TODO AllowedCallbackURLs -->
+      <div class="form-group row">
+        <label for="callbacks" class="col-sm-2 col-form-label">
+          Allowed Callback URL
+        </label>
+        <div v-if="client" class="col-md-5">
+          <div
+            v-for="(url, i) in client.allowed_callback_urls"
+            :key="i"
+            class="input-group mb-1"
+          >
+            <input class="form-control" type="url" :value="url" />
+            <div class="input-group-append">
+              <span class="input-group-text icon">
+                <i class="fa fa-trash"></i>
+              </span>
+            </div>
+          </div>
+          <div class="input-group mb-1">
+            <input class="form-control" type="url" />
+            <div class="input-group-append">
+              <span class="input-group-text icon">
+                +
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="card-footer">
         <div v-if="error" class="alert alert-danger">
