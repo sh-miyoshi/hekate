@@ -589,6 +589,37 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/user/{userID}/change-password':
+    post:
+      tags:
+        - user
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserChangePasswordRequest'
+      responses:
+        '200':
+          description: 'Success'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'Project Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
   '/api/v1/project/{projectName}/client':
     post:
       tags:
@@ -942,6 +973,11 @@ components:
           type: array
           items:
             type: string
+    UserChangePasswordRequest:
+      type: object
+      properties:
+        password:
+          type: string
     ClientCreateRequest:
       type: object
       properties:
