@@ -37,9 +37,8 @@
     - ログインリクエスト失敗時にロックする
     - 強制ロック解除用のAPI
   - API docの修正
-- DBGCの追加
-  - Expiredしたsessionなどを一定期間ごとに削除する
 - リソース削除時に紐づくリソースも削除
+- Client Secretに証明書を追加できるようにする
 - db manager validationの追加
 - filterの追加(user, role)
 - audit log
@@ -47,6 +46,8 @@
   - resource type (or url path and method)
   - client
   - success or failed
+- DBGCの追加
+  - Expiredしたsessionなどを一定期間ごとに削除する
 - 各種APIの実装
   - sessionの詳細取得(引数: project, useID, sessionID)
 - テストの追加
@@ -56,10 +57,22 @@
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type(signing_method)
+  - grant type
+    - Implicit
+    - Authorization Code
+    - Refresh Token
+    - Client Credentials
+    - Password
+    - (MFA)
+    - (Passwordless OTP)
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - projectのimport/export
 - OpenID Connect部分のエンハンス
+  - grant_type=client_credentials
+    - 参考
+      - [RFC 6749](https://tools.ietf.org/html/rfc6749#section-2.3.1)
+      - [Qiita](https://qiita.com/TakahikoKawasaki/items/200951e5b5929f840a1f#4-%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%82%AF%E3%83%AC%E3%83%87%E3%83%B3%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BA%E3%83%95%E3%83%AD%E3%83%BC)
   - openid connect APIの実装
     - implicit flow
     - hybrid flow
@@ -84,6 +97,13 @@
 
 ## Portal(Admin Console) enhancement
 
+- 各ページの作成
+  - User
+    - Login Sessionの表示
+  - Client
+  - Role
+- oidc authのstateチェック
+- client_idやproject nameをどうするか(変数化)
 - middleware処理
   - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
     - 強制ログアウト or 白紙のページを見せる(こっちが有力)
@@ -91,13 +111,6 @@
   - 前回開いていたページに戻る
 - alert画面のcss修正
 - headerにユーザー名を表示
-- 各ページの作成
-  - User
-    - Login Sessionの表示
-  - Role
-  - Client
-- oidc authのstateチェック
-- client_idやproject nameをどうするか(変数化)
 
 - 各ユーザーのアカウント管理画面
   - user名変更
