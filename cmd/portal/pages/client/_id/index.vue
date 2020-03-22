@@ -84,7 +84,11 @@
             :key="i"
             class="input-group mb-1"
           >
-            <input class="form-control" type="url" :value="url" />
+            <input
+              v-model="client.allowed_callback_urls[i]"
+              class="form-control"
+              type="url"
+            />
             <div class="input-group-append">
               <span class="input-group-text icon">
                 <i class="fa fa-trash"></i>
@@ -149,6 +153,7 @@ export default {
     },
     updateClient() {
       // TODO(implement this)
+      console.log(this.client)
     },
     generateSecret() {
       if (!this.client) {
