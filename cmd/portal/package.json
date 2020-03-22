@@ -19,7 +19,8 @@
     "bootstrap-vue": "^2.5.0",
     "jwt-decode": "^2.2.0",
     "nuxt": "^2.0.0",
-    "uuid": "^7.0.2"
+    "uuid": "^7.0.2",
+    "validator": "^13.0.0"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^2.0.0",

@@ -119,6 +119,7 @@
 
 <script>
 import { v4 as uuidv4 } from 'uuid'
+import validator from 'validator'
 
 export default {
   data() {
@@ -167,8 +168,16 @@ export default {
         return
       }
 
-      // TODO(validate this.newCallback)
-      // TODO(check duplication)
+      if (!validator.isURL(this.newCallback, { require_tld: false })) {
+        this.error = 'New callback url is invalid url format.'
+        return
+      }
+
+      if (this.client.allowed_callback_urls.includes(this.newCallback)) {
+        this.error = 'The url ' + this.newCallback + ' was already appended'
+        this.newCallback = ''
+        return
+      }
 
       this.client.allowed_callback_urls.push(this.newCallback)
       this.newCallback = ''
