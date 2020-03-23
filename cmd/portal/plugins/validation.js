@@ -1,4 +1,4 @@
-function ValidateUserName(name) {
+export function ValidateUserName(name) {
   if (typeof name !== 'string') {
     return { ok: false, msg: 'Invalid name type.' }
   }
@@ -10,7 +10,7 @@ function ValidateUserName(name) {
   return { ok: true, msg: '' }
 }
 
-function ValidateClientID(id) {
+export function ValidateClientID(id) {
   if (typeof id !== 'string') {
     return { ok: false, msg: 'Invalid client id type.' }
   }
@@ -20,9 +20,4 @@ function ValidateClientID(id) {
     return { ok: false, msg: 'Invalid client id format.' }
   }
   return { ok: true, msg: '' }
-}
-
-export default ({ app }, inject) => {
-  inject('ValidateUserName', (string) => ValidateUserName(string))
-  inject('ValidateClientID', (string) => ValidateClientID(string))
 }

@@ -200,7 +200,11 @@ export default {
         return
       }
 
-      if (!validator.isURL(this.newCallback, { require_tld: false })) {
+      const opts = {
+        require_tld: false,
+        require_protocol: true
+      }
+      if (!validator.isURL(this.newCallback, opts)) {
         this.error = 'New callback url is invalid url format.'
         return
       }

@@ -50,6 +50,7 @@
 
 <script>
 import { v4 as uuidv4 } from 'uuid'
+import { ValidateClientID } from '~/plugins/validation'
 
 export default {
   data() {
@@ -89,7 +90,7 @@ export default {
       this.$router.push('/client')
     },
     validateClientID() {
-      const res = this.$ValidateClientID(this.id)
+      const res = ValidateClientID(this.id)
       if (!res.ok) {
         this.idValidateError = res.msg
       } else {

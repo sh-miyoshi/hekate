@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import { ValidateUserName } from '~/plugins/validation'
+
 export default {
   data() {
     return {
@@ -91,7 +93,7 @@ export default {
       this.$router.push('/user')
     },
     validateUserName() {
-      const res = this.$ValidateUserName(this.name)
+      const res = ValidateUserName(this.name)
       if (!res.ok) {
         this.nameValidateError = res.msg
       } else {
