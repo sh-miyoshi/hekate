@@ -22,7 +22,7 @@
         <nuxt-link to="/client" class="c-sidebar-nav-link">Client</nuxt-link>
       </li>
       <li class="c-sidebar-nav-item">
-        <nuxt-link to="/home" class="c-sidebar-nav-link">Role</nuxt-link>
+        <nuxt-link to="/role" class="c-sidebar-nav-link">Role</nuxt-link>
       </li>
     </ul>
     <button
