@@ -232,8 +232,13 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().ClientUpdate(client); err != nil {
-		logger.Error("Failed to update client: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if errors.Cause(err) == model.ErrClientValidateFailed {
+			logger.Info("Invalid Request: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		} else {
+			logger.Error("Failed to update client: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 

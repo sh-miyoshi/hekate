@@ -166,9 +166,28 @@ export default {
       alert('Successfully delete client')
       this.$router.push('/client')
     },
-    updateClient() {
-      // TODO(implement this)
-      console.log(this.client)
+    async updateClient() {
+      if (!this.client) {
+        return
+      }
+
+      const data = {
+        secret: this.client.secret,
+        access_type: this.client.access_type,
+        allowed_callback_urls: this.client.allowed_callback_urls
+      }
+
+      const res = await this.$api.ClientUpdate(
+        this.$store.state.current_project,
+        this.client.id,
+        data
+      )
+
+      if (!res.ok) {
+        this.error = res.msg
+        return
+      }
+      alert('Successfully update client')
     },
     generateSecret() {
       if (!this.client) {
@@ -183,6 +202,12 @@ export default {
 
       if (!validator.isURL(this.newCallback, { require_tld: false })) {
         this.error = 'New callback url is invalid url format.'
+        return
+      }
+
+      if (!this.client.allowed_callback_urls) {
+        this.client.allowed_callback_urls = [this.newCallback]
+        this.newCallback = ''
         return
       }
 
