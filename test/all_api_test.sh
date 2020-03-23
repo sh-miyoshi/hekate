@@ -153,11 +153,28 @@ if [ $result != "success" ]; then
 	exit 1
 fi
 
-# User Delete
-result=`test_api "$URL/project/master/user/$userID" DELETE $master_access_token`
+# User Password Change
+## Get User Token
+token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=user1" \
+  -d "password=password" \
+  -d "client_id=admin-cli" \
+  -d 'grant_type=password'`
+user_access_token=`echo $token_info | jq -r .access_token`
+## Change Password
+result=`test_api "$URL/project/master/user/$userID/change-password" POST $user_access_token`
 echo $result
 if [ $result != "success" ]; then
-	echo "Failed to delete user"
+	echo "Failed to delete role from user"
+	exit 1
+fi
+
+# User Delete
+result=`test_api "$URL/project/master/user/$userID" DELETE $master_access_token 'inputs/user_change_password.json'`
+echo $result
+if [ $result != "success" ]; then
+	echo "Failed to change user password"
 	exit 1
 fi
 
