@@ -70,6 +70,18 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	clientID := r.Form.Get("client_id")
 	clientSecret := r.Form.Get("client_secret")
 
+	if clientID == "" {
+		// maybe basic authentication
+		i, s, ok := r.BasicAuth()
+		if !ok {
+			logger.Info("Failed to get client ID from request, Request header: %v", r.Header)
+			writeTokenErrorResponse(w, oidc.ErrInvalidClient, state)
+			return
+		}
+		clientID = i
+		clientSecret = s
+	}
+
 	if err := oidc.ClientAuth(clientID, clientSecret); err != nil {
 		if errors.Cause(err) == oidc.ErrInvalidClient {
 			logger.Info("Failed to authenticate client: %s", clientID)
