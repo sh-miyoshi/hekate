@@ -184,6 +184,53 @@ class APIClient {
     const res = await this._request(url, 'PUT', info)
     return res
   }
+
+  async RoleCreate(projectName, info) {
+    const url =
+      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/role'
+    const res = await this._request(url, 'POST', info)
+    return res
+  }
+
+  async RoleGetList(projectName) {
+    const url =
+      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/role'
+    const res = await this._request(url, 'GET')
+    return res
+  }
+
+  async RoleGet(projectName, roleID) {
+    const url =
+      process.env.SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/role/' +
+      roleID
+    const res = await this._request(url, 'GET')
+    return res
+  }
+
+  async RoleDelete(projectName, roleID) {
+    const url =
+      process.env.SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/role/' +
+      roleID
+    const res = await this._request(url, 'DELETE')
+    return res
+  }
+
+  async RoleUpdate(projectName, roleID, info) {
+    const url =
+      process.env.SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/role/' +
+      roleID
+    const res = await this._request(url, 'PUT', info)
+    return res
+  }
 }
 
 export default (context, inject) => {
