@@ -24,3 +24,8 @@ type UserPutRequest struct {
 	SystemRoles []string `json:"system_roles"`
 	CustomRoles []string `json:"custom_roles"`
 }
+
+// UserChangePasswordRequest ...
+type UserChangePasswordRequest struct {
+	Password string `json:"password"`
+}

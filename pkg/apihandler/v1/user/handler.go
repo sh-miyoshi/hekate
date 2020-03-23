@@ -364,3 +364,42 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserRoleDeleteHandler method successfully finished")
 }
+
+// UserChangePasswordHandler ...
+//   require role: <oneself>
+func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	// projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIRequest(r)
+	if claims.Subject != userID {
+		logger.Info("Failed to authorize user: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	var req UserChangePasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		logger.Info("Failed to decode user change password request: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	if err := db.GetInst().UserChangePassword(userID, req.Password); err != nil {
+		if errors.Cause(err) == model.ErrNoSuchUser {
+			logger.Info("No such user: %s", userID)
+			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("Invalid request was specified: %v", err)
+			http.Error(w, "Invalid Request", http.StatusBadRequest)
+		} else {
+			logger.Error("Failed to change user password: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	logger.Info("UserChangePasswordHandler method successfully finished")
+}

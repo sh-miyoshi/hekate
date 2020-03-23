@@ -12,6 +12,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/role"
+	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
 // Manager ...
@@ -413,6 +414,30 @@ func (m *Manager) UserSessionsDelete(userID string) error {
 	return m.transaction.Transaction(func() error {
 		if err := m.session.RevokeAll(userID); err != nil {
 			return errors.Wrap(err, "Revoke session failed")
+		}
+
+		return nil
+	})
+}
+
+// UserChangePassword ...
+func (m *Manager) UserChangePassword(userID string, password string) error {
+	if !model.ValidateUserID(userID) {
+		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
+	// TODO(validate password)
+
+	return m.transaction.Transaction(func() error {
+		usr, err := m.user.Get(userID)
+		if err != nil {
+			return errors.Wrap(err, "Failed to get user of change password")
+		}
+
+		usr.PasswordHash = util.CreateHash(password)
+
+		if err := m.user.Update(usr); err != nil {
+			return errors.Wrap(err, "Failed to update user password")
 		}
 
 		return nil
