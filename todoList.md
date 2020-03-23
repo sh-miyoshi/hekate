@@ -14,12 +14,11 @@
 
 ## server application enhancement
 
-- userのパスワード変更のrole見直し
-  - 本人のみが変更できるようにする
-  - 専用APIの用意
-    - /api/v1/project/{projectName}/user/{userID}/change-password
-    - API docの修正
-    - API Handlerの追加
+- OIDCのエンハンス(その1)
+  - grant_type=client_credentialsの実装
+    - 参考
+      - [RFC 6749](https://tools.ietf.org/html/rfc6749#section-2.3.1)
+      - [Qiita](https://qiita.com/TakahikoKawasaki/items/200951e5b5929f840a1f#4-%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%82%AF%E3%83%AC%E3%83%87%E3%83%B3%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BA%E3%83%95%E3%83%AD%E3%83%BC)
 - API responseのエラーコードが足りてないバグの修正
   - ClientUpdateHandler
   - RoleUpdateHandler
@@ -68,11 +67,7 @@
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - projectのimport/export
-- OpenID Connect部分のエンハンス
-  - grant_type=client_credentials
-    - 参考
-      - [RFC 6749](https://tools.ietf.org/html/rfc6749#section-2.3.1)
-      - [Qiita](https://qiita.com/TakahikoKawasaki/items/200951e5b5929f840a1f#4-%E3%82%AF%E3%83%A9%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%82%AF%E3%83%AC%E3%83%87%E3%83%B3%E3%82%B7%E3%83%A3%E3%83%AB%E3%82%BA%E3%83%95%E3%83%AD%E3%83%BC)
+- OpenID Connect部分のエンハンス(その2)
   - openid connect APIの実装
     - implicit flow
     - hybrid flow
