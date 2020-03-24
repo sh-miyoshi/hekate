@@ -21,3 +21,8 @@ export function ValidateClientID(id) {
   }
   return { ok: true, msg: '' }
 }
+
+export function ValidateRoleName(name) {
+  // TODO(add validation)
+  return { ok: true, msg: '' }
+}
