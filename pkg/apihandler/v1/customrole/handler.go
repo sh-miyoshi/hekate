@@ -60,7 +60,7 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	jwthttp.ResponseWrite(w, "AllRoleGetHandler", &roles)
+	jwthttp.ResponseWrite(w, "AllRoleGetHandler", res)
 
 }
 
