@@ -95,8 +95,6 @@
 - 各ページの作成
   - User
     - Login Sessionの表示
-  - Client
-  - Role
 - oidc authのstateチェック
 - client_idやproject nameをどうするか(変数化)
 - middleware処理
