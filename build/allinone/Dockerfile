@@ -24,8 +24,8 @@ WORKDIR /myapp
 RUN mkdir -p server && mkdir -p portal
 
 COPY --from=server-builder /myapp/cmd/hekate/hekate-server /myapp/server
-COPY config.yaml /myapp/server
-COPY secret /myapp/server
+COPY build/allinone/config.yaml /myapp/server
+COPY cmd/hekate/_data/testcerts /myapp/server/secret
 COPY cmd/hekate/_data/login /myapp/server
 
 COPY --from=front-builder /myapp/cmd/portal/node_modules /myapp/portal
