@@ -139,14 +139,19 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		}
 	}
 
+	callbacks := []string{
+		"http://localhost:3000/callback", // TODO(for debug)
+	}
+	portalAddr := os.Getenv("HEKATE_PORTAL_ADDR")
+	if portalAddr != "" {
+		callbacks = append(callbacks, portalAddr)
+	}
 	err = db.GetInst().ClientAdd(&model.ClientInfo{
-		ID:          "admin-cli",
-		ProjectName: "master",
-		AccessType:  "public",
-		CreatedAt:   time.Now(),
-		AllowedCallbackURLs: []string{
-			"http://localhost:3000/callback", // TODO(for debug)
-		},
+		ID:                  "admin-cli",
+		ProjectName:         "master",
+		AccessType:          "public",
+		CreatedAt:           time.Now(),
+		AllowedCallbackURLs: callbacks,
 	})
 
 	if err != nil {
