@@ -1,7 +1,10 @@
 FROM golang:1.13 as builder
 
 WORKDIR /myapp
-COPY . .
+COPY go.mod .
+COPY go.sum .
+COPY pkg ./pkg
+COPY cmd/hekate ./cmd/hekate
 WORKDIR /myapp/cmd/hekate
 RUN go build -o hekate-server
 
