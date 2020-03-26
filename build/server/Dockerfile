@@ -3,13 +3,15 @@ FROM golang:1.13 as builder
 WORKDIR /myapp
 COPY . .
 WORKDIR /myapp/cmd/hekate
-RUN go build -o hekate
+RUN go build -o hekate-server
 
 
 FROM ubuntu:18.04
 
 WORKDIR /myapp
-COPY --from=builder /myapp/cmd/hekate/hekate /myapp
-COPY --from=builder /myapp/cmd/hekate/config.yaml /myapp
+COPY --from=builder /myapp/cmd/hekate/hekate-server /myapp/server/hekate-server
+COPY build/allinone/config.yaml /myapp/server/config.yaml
+COPY cmd/hekate/_data/testcerts /myapp/server/secret
+COPY cmd/hekate/_data/login /myapp/server/login
 
-CMD ["./hekate"]
+CMD ["./hekate-server", "--help"]
