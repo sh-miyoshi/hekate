@@ -1,9 +1,9 @@
 # Name of Server Admin
-#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_NAME
+#   This parameter is overwritten by OS env HEKATE_ADMIN_NAME
 admin_name: admin
 
 # Password of Server Admin
-#   This parameter is overwritten by OS env JWT_SERVER_ADMIN_PASSWORD
+#   This parameter is overwritten by OS env HEKATE_ADMIN_PASSWORD
 admin_password: password
 
 # Listen Port of Server

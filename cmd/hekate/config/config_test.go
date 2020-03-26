@@ -29,8 +29,8 @@ oidc_auth_code_expires_time: 300`)
 	// Test overwrite by env
 	admin := "hekate"
 	passwd := "securepassword"
-	os.Setenv("JWT_SERVER_ADMIN_NAME", admin)
-	os.Setenv("JWT_SERVER_ADMIN_PASSWORD", passwd)
+	os.Setenv("HEKATE_ADMIN_NAME", admin)
+	os.Setenv("HEKATE_ADMIN_PASSWORD", passwd)
 	cfg, _ := InitConfig(tmpFile.Name())
 	if cfg.AdminName != admin || cfg.AdminPassword != passwd {
 		t.Errorf("Failed to overwrite by os.Env: want %s:%s, got %s:%s", admin, passwd, cfg.AdminName, cfg.AdminPassword)

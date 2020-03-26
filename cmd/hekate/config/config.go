@@ -1,9 +1,10 @@
 package config
 
 import (
+	"os"
+
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
-	"os"
 )
 
 func setEnvVar(key string, target *string) {
@@ -27,8 +28,8 @@ func InitConfig(filePath string) (*GlobalConfig, error) {
 		return nil, errors.Wrap(err, "Failed to decode config yaml")
 	}
 
-	setEnvVar("JWT_SERVER_ADMIN_NAME", &res.AdminName)
-	setEnvVar("JWT_SERVER_ADMIN_PASSWORD", &res.AdminPassword)
+	setEnvVar("HEKATE_ADMIN_NAME", &res.AdminName)
+	setEnvVar("HEKATE_ADMIN_PASSWORD", &res.AdminPassword)
 
 	return res, nil
 }
