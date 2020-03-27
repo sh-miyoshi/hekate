@@ -36,4 +36,7 @@ COPY --from=front-builder /myapp/cmd/portal/.env /myapp/portal
 COPY --from=front-builder /myapp/cmd/portal/.nuxt /myapp/portal/.nuxt
 COPY --from=front-builder /myapp/cmd/portal/nuxt.config.js /myapp/portal
 COPY --from=front-builder /myapp/cmd/portal/dist /myapp/portal/dist
-# TODO(front setting)
+
+COPY build/allinone/run.sh .
+
+CMD ["./run.sh"]
