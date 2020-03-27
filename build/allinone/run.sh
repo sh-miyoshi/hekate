@@ -5,7 +5,8 @@ if [ "x$SERVER_ADDR" = "x" ]; then
   exit 1
 fi
 
-export HEKATE_PORTAL_ADDR=$SERVER_ADDR
+export HEKATE_PORTAL_ADDR=$SERVER_ADDR:3000
+export HEKATE_SERVER_ADDR=$SERVER_ADDR:8080
 
 # Run Portal
 cd /myapp/portal
