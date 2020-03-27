@@ -84,7 +84,7 @@ export default {
   },
 
   env: {
-    SERVER_ADDR: 'http://localhost:8080',
+    HEKATE_SERVER_ADDR: process.env.HEKATE_SERVER_ADDR || 'http://localhost:8080',
     SYSTEM_ROLES: [
       'read-cluster',
       'write-cluster',

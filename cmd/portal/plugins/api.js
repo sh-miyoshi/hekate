@@ -65,13 +65,14 @@ class APIClient {
   }
 
   async ProjectGetList() {
-    const url = process.env.SERVER_ADDR + '/api/v1/project'
+    const url = process.env.HEKATE_SERVER_ADDR + '/api/v1/project'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ProjectGet(projectName) {
-    const url = process.env.SERVER_ADDR + '/api/v1/project/' + projectName
+    const url =
+      process.env.HEKATE_SERVER_ADDR + '/api/v1/project/' + projectName
     const res = await this._request(url, 'GET')
     return res
   }
@@ -85,40 +86,48 @@ class APIClient {
         signingAlgorithm: 'RS256'
       }
     }
-    const url = process.env.SERVER_ADDR + '/api/v1/project'
+    const url = process.env.HEKATE_SERVER_ADDR + '/api/v1/project'
     const res = await this._request(url, 'POST', data)
     return res
   }
 
   async ProjectDelete(projectName) {
-    const url = process.env.SERVER_ADDR + '/api/v1/project/' + projectName
+    const url =
+      process.env.HEKATE_SERVER_ADDR + '/api/v1/project/' + projectName
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async ProjectUpdate(projectName, info) {
-    const url = process.env.SERVER_ADDR + '/api/v1/project/' + projectName
+    const url =
+      process.env.HEKATE_SERVER_ADDR + '/api/v1/project/' + projectName
     const res = await this._request(url, 'PUT', info)
     return res
   }
 
   async UserCreate(projectName, info) {
     const url =
-      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/user'
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/user'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async UserGetList(projectName) {
     const url =
-      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/user'
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/user'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async UserGet(projectName, userID) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/user/' +
@@ -129,7 +138,7 @@ class APIClient {
 
   async UserDelete(projectName, userID) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/user/' +
@@ -140,21 +149,27 @@ class APIClient {
 
   async ClientCreate(projectName, info) {
     const url =
-      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/client'
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/client'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async ClientGetList(projectName) {
     const url =
-      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/client'
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/client'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ClientGet(projectName, clientID) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/client/' +
@@ -165,7 +180,7 @@ class APIClient {
 
   async ClientDelete(projectName, clientID) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/client/' +
@@ -176,7 +191,7 @@ class APIClient {
 
   async ClientUpdate(projectName, clientID, info) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/client/' +
@@ -187,21 +202,27 @@ class APIClient {
 
   async RoleCreate(projectName, info) {
     const url =
-      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/role'
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/role'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async RoleGetList(projectName) {
     const url =
-      process.env.SERVER_ADDR + '/api/v1/project/' + projectName + '/role'
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/role'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async RoleGet(projectName, roleID) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/role/' +
@@ -212,7 +233,7 @@ class APIClient {
 
   async RoleDelete(projectName, roleID) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/role/' +
@@ -223,7 +244,7 @@ class APIClient {
 
   async RoleUpdate(projectName, roleID, info) {
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
       projectName +
       '/role/' +

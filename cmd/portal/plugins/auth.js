@@ -45,7 +45,7 @@ export class AuthHandler {
 
     // TODO(use param: project_name)
     const url =
-      process.env.SERVER_ADDR +
+      process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/master/openid-connect/auth?' +
       this._encodeQuery(opts)
 
@@ -59,7 +59,8 @@ export class AuthHandler {
     }
 
     const url =
-      process.env.SERVER_ADDR + '/api/v1/project/master/openid-connect/token'
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/master/openid-connect/token'
 
     const handler = axios.create({
       headers,
@@ -158,7 +159,8 @@ export class AuthHandler {
 
       // TODO(use param: project_name, timeout)
       const url =
-        process.env.SERVER_ADDR + '/api/v1/project/master/openid-connect/revoke'
+        process.env.HEKATE_SERVER_ADDR +
+        '/api/v1/project/master/openid-connect/revoke'
 
       const handler = axios.create({
         headers,
