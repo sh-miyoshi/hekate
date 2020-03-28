@@ -96,9 +96,22 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	var tkn *oidc.TokenResponse
 
-	// TODO(consider redirect_uri)
 	if r.Form.Get("redirect_uri") != "" {
-		// TODO
+		if err := client.CheckRedirectURL(clientID, r.Form.Get("redirect_uri")); err != nil {
+			errMsg := ""
+			if errors.Cause(err) == client.ErrNoRedirectURL {
+				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
+				errMsg = "Request failed. the redirect url is not allowed"
+			} else if errors.Cause(err) == model.ErrNoSuchClient {
+				logger.Info("Failed to get allowed callback urls: No such client %s", clientID)
+				errMsg = "Request faild. no such client"
+			} else {
+				logger.Error("Failed to get allowed callback urls in client: %+v", err)
+				errMsg = "Request faild. internal server error occured"
+			}
+			oidc.WriteErrorPage(errMsg, w)
+			return
+		}
 	}
 
 	// Authetication

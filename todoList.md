@@ -71,8 +71,6 @@
   - openid connect APIの実装
     - implicit flow
     - hybrid flow
-  - TokenAPIでredirect_uriのチェック
-    - query内に存在するならallowed listにあるかチェック
   - access tokenのrevocation
   - AuthRequestに他のパラメータを追加
   - code認証失敗時、すべてのtokenを無効化
