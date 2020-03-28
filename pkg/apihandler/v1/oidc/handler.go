@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/client"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
@@ -96,6 +97,9 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var tkn *oidc.TokenResponse
 
 	// TODO(consider redirect_uri)
+	if r.Form.Get("redirect_uri") != "" {
+		// TODO
+	}
 
 	// Authetication
 	switch r.Form.Get("grant_type") {
@@ -192,10 +196,12 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check Redirect URL
-	client, err := db.GetInst().ClientGet(authReq.ClientID)
-	if err != nil {
+	if err := client.CheckRedirectURL(authReq.ClientID, authReq.RedirectURI); err != nil {
 		errMsg := ""
-		if errors.Cause(err) == model.ErrNoSuchClient {
+		if errors.Cause(err) == client.ErrNoRedirectURL {
+			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)
+			errMsg = "Request failed. the redirect url is not allowed"
+		} else if errors.Cause(err) == model.ErrNoSuchClient {
 			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
 			errMsg = "Request faild. no such client"
 		} else {
@@ -203,18 +209,6 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 			errMsg = "Request faild. internal server error occured"
 		}
 		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-	found := false
-	for _, u := range client.AllowedCallbackURLs {
-		if u == authReq.RedirectURI {
-			found = true
-			break
-		}
-	}
-	if !found {
-		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
-		oidc.WriteErrorPage("Request failed. the redirect url is not allowed", w)
 		return
 	}
 
@@ -253,10 +247,12 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check Redirect URL
-	client, err := db.GetInst().ClientGet(authReq.ClientID)
-	if err != nil {
+	if err := client.CheckRedirectURL(authReq.ClientID, authReq.RedirectURI); err != nil {
 		errMsg := ""
-		if errors.Cause(err) == model.ErrNoSuchClient {
+		if errors.Cause(err) == client.ErrNoRedirectURL {
+			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)
+			errMsg = "Request failed. the redirect url is not allowed"
+		} else if errors.Cause(err) == model.ErrNoSuchClient {
 			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
 			errMsg = "Request faild. no such client"
 		} else {
@@ -264,18 +260,6 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 			errMsg = "Request faild. internal server error occured"
 		}
 		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-	found := false
-	for _, u := range client.AllowedCallbackURLs {
-		if u == authReq.RedirectURI {
-			found = true
-			break
-		}
-	}
-	if !found {
-		logger.Info("Redirect URL %s is not in Allowed list: %v", authReq.RedirectURI, client.AllowedCallbackURLs)
-		oidc.WriteErrorPage("Request failed. the redirect url is not allowed", w)
 		return
 	}
 
