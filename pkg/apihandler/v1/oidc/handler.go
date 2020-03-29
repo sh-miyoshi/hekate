@@ -116,6 +116,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authetication
 	switch r.Form.Get("grant_type") {
+	case "client_credentials":
+		tkn, err = oidc.ReqAuthByRClientCredentials(project, clientID, r)
 	case "password":
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")

@@ -154,3 +154,19 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	userID := claims.Subject
 	return genTokenRes(claims.Audience, userID, project, r, true, false)
 }
+
+// ReqAuthByRClientCredentials ...
+func ReqAuthByRClientCredentials(project *model.ProjectInfo, clientID string, r *http.Request) (*TokenResponse, error) {
+	cli, err := db.GetInst().ClientGet(clientID)
+	if err != nil {
+		return nil, errors.Wrap(err, "Get client info failed")
+	}
+	if cli.AccessType != "confidential" {
+		return nil, ErrInvalidRequest
+	}
+
+	audiences := []string{
+		clientID,
+	}
+	return genTokenRes(audiences, "", project, r, false, false)
+}
