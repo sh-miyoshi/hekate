@@ -5,6 +5,8 @@ import jwtdecode from 'jwt-decode'
 export class AuthHandler {
   constructor(context) {
     this.context = context
+    this.client_id = 'admin-cli'
+    this.project = 'master'
   }
 
   _encodeQuery(queryObject) {
@@ -45,7 +47,7 @@ export class AuthHandler {
     const opts = {
       scope: 'openid',
       response_type: 'code',
-      client_id: 'admin-cli', // TODO(use param)
+      client_id: this.client_id,
       redirect_uri:
         protcol +
         '://' +
@@ -55,24 +57,27 @@ export class AuthHandler {
         '/callback'
     }
 
-    // TODO(use param: project_name)
     const url =
       process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/master/openid-connect/auth?' +
+      '/api/v1/project/' +
+      this.project +
+      '/openid-connect/auth?' +
       this._encodeQuery(opts)
 
     window.location = url
   }
 
   async _tokenRequest(opts) {
-    // TODO(use param: project_name, timeout)
+    // TODO(use param: timeout)
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
 
     const url =
       process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/master/openid-connect/token'
+      '/api/v1/project/' +
+      this.project +
+      '/openid-connect/token'
 
     const handler = axios.create({
       headers,
@@ -105,7 +110,7 @@ export class AuthHandler {
     // TODO(consider state)
     const opts = {
       grant_type: 'authorization_code',
-      client_id: 'admin-cli', // TODO(use param)
+      client_id: this.client_id,
       code: authCode
     }
 
@@ -140,7 +145,7 @@ export class AuthHandler {
     // TODO(consider state)
     const opts = {
       grant_type: 'refresh_token',
-      client_id: 'admin-cli', // TODO(use param)
+      client_id: this.client_id,
       refresh_token: refreshToken
     }
 
@@ -169,10 +174,12 @@ export class AuthHandler {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
 
-      // TODO(use param: project_name, timeout)
+      // TODO(use param: timeout)
       const url =
         process.env.HEKATE_SERVER_ADDR +
-        '/api/v1/project/master/openid-connect/revoke'
+        '/api/v1/project/' +
+        this.project +
+        '/openid-connect/revoke'
 
       const handler = axios.create({
         headers,
