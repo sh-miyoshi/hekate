@@ -15,7 +15,6 @@ WORKDIR /myapp
 COPY ./cmd/portal ./cmd/portal
 WORKDIR /myapp/cmd/portal
 RUN npm install
-RUN npm run build
 
 
 FROM ubuntu:18.04
@@ -29,13 +28,8 @@ COPY build/allinone/config.yaml /myapp/server/config.yaml
 COPY cmd/hekate/_data/testcerts /myapp/server/secret
 COPY cmd/hekate/_data/login /myapp/server/login
 
+COPY ./cmd/portal /myapp/portal/
 COPY --from=front-builder /myapp/cmd/portal/node_modules /myapp/portal/node_modules
-COPY --from=front-builder /myapp/cmd/portal/package.json /myapp/portal
-COPY --from=front-builder /myapp/cmd/portal/package-lock.json /myapp/portal
-COPY --from=front-builder /myapp/cmd/portal/.env /myapp/portal
-COPY --from=front-builder /myapp/cmd/portal/.nuxt /myapp/portal/.nuxt
-COPY --from=front-builder /myapp/cmd/portal/nuxt.config.js /myapp/portal
-COPY --from=front-builder /myapp/cmd/portal/dist /myapp/portal/dist
 
 COPY build/allinone/run.sh .
 
