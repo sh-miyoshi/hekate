@@ -10,6 +10,7 @@ export HEKATE_SERVER_ADDR=$SERVER_ADDR:8080
 
 # Run Portal
 cd /myapp/portal
+npm run build
 npm run start > portal.log 2>&1 &
 
 # Run server
