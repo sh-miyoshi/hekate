@@ -79,12 +79,16 @@ export default {
   },
 
   server: {
-    host: '0.0.0.0',
-    port: '3000'
+    host: process.env.HEKATE_PORTAL_HOST,
+    port: process.env.HEKATE_PORTAL_PORT
   },
 
   env: {
-    HEKATE_SERVER_ADDR: process.env.HEKATE_SERVER_ADDR || 'http://localhost:8080',
+    HEKATE_SERVER_ADDR:
+      process.env.HEKATE_SERVER_ADDR || 'http://localhost:8080',
+    HEKATE_PORTAL_HOST: process.env.HEKATE_PORTAL_HOST || 'localhost',
+    HEKATE_PORTAL_PORT: process.env.HEKATE_PORTAL_PORT || '3000',
+    // https: {}, // TODO(set params if run as https)
     SYSTEM_ROLES: [
       'read-cluster',
       'write-cluster',

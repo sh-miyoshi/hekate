@@ -36,11 +36,23 @@ export class AuthHandler {
 
   Login() {
     // TODO(consider state)
+
+    let protcol = 'https'
+    if (!process.env.https) {
+      protcol = 'http'
+    }
+
     const opts = {
       scope: 'openid',
       response_type: 'code',
       client_id: 'admin-cli', // TODO(use param)
-      redirect_uri: 'http://localhost:3000/callback' // TODO(use param)
+      redirect_uri:
+        protcol +
+        '://' +
+        process.env.HEKATE_PORTAL_HOST +
+        ':' +
+        process.env.HEKATE_PORTAL_PORT +
+        '/callback'
     }
 
     // TODO(use param: project_name)
