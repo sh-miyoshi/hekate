@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/coreos/go-oidc"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"golang.org/x/oauth2"
 	yaml "gopkg.in/yaml.v2"
-	"net/http"
-	"os"
 )
 
 type secretInfo struct {
@@ -27,7 +28,7 @@ func setAPI(r *mux.Router) {
 		// This is test code, so check bearer token in cookie
 		if _, err := r.Cookie("Authorization"); err != nil {
 			config, _ := getOIDCConfig()
-			url := config.AuthCodeURL("")
+			url := config.AuthCodeURL("", oidc.Nonce("jhgrgw3iohgor4jioh"))
 			http.Redirect(w, r, url, http.StatusFound)
 			return
 		}
@@ -54,6 +55,8 @@ func setAPI(r *mux.Router) {
 		fmt.Printf("Access Token: %v\n", accessToken)
 
 		rawIDToken, ok := accessToken.Extra("id_token").(string)
+		fmt.Printf("ID Token: %s\n", rawIDToken)
+
 		if !ok {
 			http.Error(w, "missing token", http.StatusInternalServerError)
 			return
