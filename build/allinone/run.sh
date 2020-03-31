@@ -5,8 +5,13 @@ if [ "x$SERVER_ADDR" = "x" ]; then
   exit 1
 fi
 
-export HEKATE_PORTAL_ADDR=$SERVER_ADDR:3000
-export HEKATE_SERVER_ADDR=$SERVER_ADDR:8080
+SERVER_HOST=`echo $SERVER_ADDR | sed -e 's|^[^/]*//||' -e 's|:.*$||' -e 's|/.*$||'`
+
+export HEKATE_PORTAL_HOST=$SERVER_HOST
+export HEKATE_PORTAL_PORT=3000
+# TODO(use https)
+export HEKATE_PORTAL_ADDR=http://$SERVER_HOST:3000
+export HEKATE_SERVER_ADDR=https://$SERVER_HOST:8080
 
 # Run Portal
 cd /myapp/portal
