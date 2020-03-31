@@ -3,15 +3,16 @@ package token
 import (
 	"crypto/x509"
 	"fmt"
+	"net/http"
+	"regexp"
+	"strings"
+	"time"
+
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"net/http"
-	"regexp"
-	"strings"
-	"time"
 )
 
 var (
@@ -105,6 +106,27 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 		request.ProjectName,
 		sessionID,
 		audiences,
+	}
+
+	return signToken(request.ProjectName, claims)
+}
+
+// GenerateIDToken ...
+func GenerateIDToken(sessionID string, audiences []string, request Request) (string, error) {
+	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
+
+	now := time.Now()
+	claims := &IDTokenClaims{
+		jwt.StandardClaims{
+			Id:        uuid.New().String(),
+			Issuer:    request.Issuer,
+			IssuedAt:  now.Unix(),
+			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+			NotBefore: 0,
+			Subject:   request.UserID,
+		},
+		audiences,
+		request.Nonce,
 	}
 
 	return signToken(request.ProjectName, claims)

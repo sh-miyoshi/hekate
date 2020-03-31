@@ -14,6 +14,7 @@ type LoginSessionInfo struct {
 	ResponseType string
 	ClientID     string
 	RedirectURI  string
+	Nonce        string
 }
 
 var (

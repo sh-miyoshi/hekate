@@ -12,6 +12,7 @@ type Request struct {
 	ExpiredTime time.Duration
 	ProjectName string
 	UserID      string
+	Nonce       string
 }
 
 // RoleValue ...
@@ -42,4 +43,14 @@ type RefreshTokenClaims struct {
 	Project   string   `json:"project"`
 	SessionID string   `json:"sessionID"`
 	Audience  []string `json:"aud"`
+}
+
+// IDTokenClaims ...
+type IDTokenClaims struct {
+	jwt.StandardClaims
+
+	Audience []string `json:"aud"`
+	Nonce    string   `json:"nonce"`
+	// TODO(auth_time, acr, amr, azp)
+	// ref. https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#IDToken
 }

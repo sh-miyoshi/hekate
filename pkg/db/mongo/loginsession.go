@@ -48,6 +48,7 @@ func (h *LoginSessionHandler) Add(info *model.LoginSessionInfo) error {
 		ResponseType: info.ResponseType,
 		ClientID:     info.ClientID,
 		RedirectURI:  info.RedirectURI,
+		Nonce:        info.Nonce,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
@@ -105,5 +106,6 @@ func (h *LoginSessionHandler) Get(code string) (*model.LoginSessionInfo, error) 
 		ResponseType: res.ResponseType,
 		ClientID:     res.ClientID,
 		RedirectURI:  res.RedirectURI,
+		Nonce:        res.Nonce,
 	}, nil
 }

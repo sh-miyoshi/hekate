@@ -34,6 +34,7 @@ type loginSessionInfo struct {
 	ResponseType string    `bson:"responseType"`
 	ClientID     string    `bson:"clientID"`
 	RedirectURI  string    `bson:"redirectURI"`
+	Nonce        string    `bson:"nonce"`
 }
 
 type userInfo struct {
@@ -61,6 +62,7 @@ type authCode struct {
 	ClientID    string    `bson:"clientID"`
 	RedirectURL string    `bson:"redirectURL"`
 	UserID      string    `bson:"userID"`
+	Nonce       string    `bson:"nonce"`
 }
 
 type customRole struct {

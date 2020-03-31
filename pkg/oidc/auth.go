@@ -14,7 +14,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/user"
 )
 
-func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, r *http.Request, genRefresh, genIDToken bool) (*TokenResponse, error) {
+func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, r *http.Request, genRefresh, genIDToken bool, nonce string) (*TokenResponse, error) {
 	// Generate JWT Token
 	res := TokenResponse{
 		TokenType: "Bearer",
@@ -73,8 +73,9 @@ func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, 
 			ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
 			ProjectName: project.Name,
 			UserID:      userID,
+			Nonce:       nonce,
 		}
-		res.IDToken, err = token.GenerateRefreshToken("", audiences, idTokenReq)
+		res.IDToken, err = token.GenerateIDToken("", audiences, idTokenReq)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to generate id token")
 		}
@@ -99,7 +100,7 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 		audiences = append(audiences, clientID)
 	}
 
-	return genTokenRes(audiences, usr.ID, project, r, true, false)
+	return genTokenRes(audiences, usr.ID, project, r, true, false, "")
 }
 
 // ReqAuthByCode ...
@@ -123,7 +124,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, codeID string, r
 		code.ClientID,
 	}
 
-	return genTokenRes(audiences, code.UserID, project, r, true, true)
+	return genTokenRes(audiences, code.UserID, project, r, true, true, code.Nonce)
 }
 
 // ReqAuthByRefreshToken ...
@@ -152,7 +153,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	}
 
 	userID := claims.Subject
-	return genTokenRes(claims.Audience, userID, project, r, true, false)
+	return genTokenRes(claims.Audience, userID, project, r, true, false, "")
 }
 
 // ReqAuthByRClientCredentials ...
@@ -168,5 +169,5 @@ func ReqAuthByRClientCredentials(project *model.ProjectInfo, clientID string, r 
 	audiences := []string{
 		clientID,
 	}
-	return genTokenRes(audiences, "", project, r, false, false)
+	return genTokenRes(audiences, "", project, r, false, false, "")
 }

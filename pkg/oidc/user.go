@@ -66,6 +66,7 @@ func RegisterUserLoginSession(req *AuthRequest) (string, error) {
 		ExpiresIn:   time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
 		ClientID:    req.ClientID,
 		RedirectURI: req.RedirectURI,
+		Nonce:       req.Nonce,
 	}
 
 	if err := db.GetInst().LoginSessionAdd(s); err != nil {
@@ -94,5 +95,6 @@ func UserLoginVerify(code string) (*UserLoginInfo, error) {
 		ResponseType: s.ResponseType,
 		ClientID:     s.ClientID,
 		RedirectURI:  s.RedirectURI,
+		Nonce:        s.Nonce,
 	}, nil
 }

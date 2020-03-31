@@ -344,7 +344,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, _ := oidc.GenerateAuthCode(info.ClientID, info.RedirectURI, usr.ID)
+	code, _ := oidc.GenerateAuthCode(info.ClientID, info.RedirectURI, usr.ID, info.Nonce)
 	values := url.Values{}
 	values.Set("code", code)
 	if state != "" {

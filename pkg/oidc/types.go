@@ -8,15 +8,20 @@ import (
 
 // AuthRequest ...
 type AuthRequest struct {
+	// Required
 	Scope        string `validate:"required"`
 	ResponseType string `validate:"required"`
 	ClientID     string `validate:"required"`
 	RedirectURI  string `validate:"required,url"`
-	State        string
+
+	// Recommend
+	State string
+
+	// Optional
+	Nonce string
 
 	// TODO(implement this)
 	// ResponseMode string // response_mode(OPTIONAL)
-	// Nonce string // nonce(OPTIONAL)
 	// Display string // display(OPTIONAL)
 	// Prompt string // prompt(OPTIONAL)
 	// MaxAge string // max_age(OPTIONAL)
@@ -32,6 +37,7 @@ type UserLoginInfo struct {
 	ResponseType string
 	ClientID     string
 	RedirectURI  string
+	Nonce        string
 }
 
 // Validate ...

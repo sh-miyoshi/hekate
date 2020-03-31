@@ -14,6 +14,7 @@ type AuthCode struct {
 	ClientID    string
 	RedirectURL string
 	UserID      string
+	Nonce       string
 }
 
 // AuthCodeHandler ...
