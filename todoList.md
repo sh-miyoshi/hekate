@@ -43,7 +43,7 @@
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
 - 各種APIの実装
-  - sessionの詳細取得(引数: project, useID, sessionID)
+  - sessionの詳細取得(引数: project, userID, sessionID)
 - テストの追加
   - ロジック部分のunit test
   - API部分のテスト
@@ -67,6 +67,14 @@
     - implicit flow
     - hybrid flow
   - AuthRequestに他のパラメータを追加
+    - response_mode
+    - display
+    - prompt
+    - max_age
+    - ui_locales
+    - id_token_hint
+    - login_hint
+    - acr_values
   - code認証失敗時、すべてのtokenを無効化
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
