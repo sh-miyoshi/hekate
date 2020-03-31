@@ -142,9 +142,9 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	callbacks := []string{
 		"http://localhost:3000/callback", // TODO(for debug)
 	}
-	portalAddr := os.Getenv("HEKATE_PORTAL_ADDR")
-	if portalAddr != "" {
-		callbacks = append(callbacks, portalAddr)
+	if os.Getenv("HEKATE_PORTAL_ADDR") != "" {
+		addr := os.Getenv("HEKATE_PORTAL_ADDR") + "/callback"
+		callbacks = append(callbacks, addr)
 	}
 	err = db.GetInst().ClientAdd(&model.ClientInfo{
 		ID:                  "admin-cli",
