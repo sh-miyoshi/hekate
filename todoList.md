@@ -66,7 +66,6 @@
   - openid connect APIの実装
     - implicit flow
     - hybrid flow
-  - access tokenのrevocation
   - AuthRequestに他のパラメータを追加
   - code認証失敗時、すべてのtokenを無効化
   - subject_types_supportedにpairwiseをサポート
