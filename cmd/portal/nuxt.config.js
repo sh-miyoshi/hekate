@@ -79,7 +79,7 @@ export default {
   },
 
   server: {
-    host: process.env.HEKATE_PORTAL_HOST,
+    host: '0.0.0.0',
     port: process.env.HEKATE_PORTAL_PORT
   },
 
