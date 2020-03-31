@@ -6,12 +6,16 @@ if [ "x$SERVER_ADDR" = "x" ]; then
 fi
 
 SERVER_HOST=`echo $SERVER_ADDR | sed -e 's|^[^/]*//||' -e 's|:.*$||' -e 's|/.*$||'`
+echo "Run Server Host: $SERVER_HOST"
 
 export HEKATE_PORTAL_HOST=$SERVER_HOST
 export HEKATE_PORTAL_PORT=3000
 # TODO(use https)
 export HEKATE_PORTAL_ADDR=http://$SERVER_HOST:3000
 export HEKATE_SERVER_ADDR=https://$SERVER_HOST:8080
+
+echo "Env:"
+env | grep HEKATE
 
 # Run Portal
 cd /myapp/portal
