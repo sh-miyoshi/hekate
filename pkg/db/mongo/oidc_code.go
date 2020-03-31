@@ -106,7 +106,7 @@ func (h *AuthCodeHandler) Get(codeID string) (*model.AuthCode, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &model.AuthCode{}
+	res := &authCode{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchCode
@@ -114,5 +114,11 @@ func (h *AuthCodeHandler) Get(codeID string) (*model.AuthCode, error) {
 		return nil, errors.Wrap(err, "Failed to get auth code from mongodb")
 	}
 
-	return res, nil
+	return &model.AuthCode{
+		CodeID:      res.CodeID,
+		ExpiresIn:   res.ExpiresIn,
+		ClientID:    res.ClientID,
+		RedirectURL: res.RedirectURL,
+		UserID:      res.UserID,
+	}, nil
 }
