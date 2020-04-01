@@ -54,6 +54,9 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 			SignSecretKey:        ent.TokenConfig.SignSecretKey,
 		},
 	}
+	for _, t := range ent.AllowGrantTypes {
+		v.AllowGrantTypes = append(v.AllowGrantTypes, t.String())
+	}
 
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 
@@ -104,7 +107,7 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
 
 	res := []*model.ProjectInfo{}
 	for _, prj := range projects {
-		res = append(res, &model.ProjectInfo{
+		info := &model.ProjectInfo{
 			Name:         prj.Name,
 			CreatedAt:    prj.CreatedAt,
 			PermitDelete: prj.PermitDelete,
@@ -115,7 +118,12 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
 				SignPublicKey:        prj.TokenConfig.SignPublicKey,
 				SignSecretKey:        prj.TokenConfig.SignSecretKey,
 			},
-		})
+		}
+		for _, t := range prj.AllowGrantTypes {
+			typ, _ := model.GetGrantType(t)
+			info.AllowGrantTypes = append(info.AllowGrantTypes, typ)
+		}
+		res = append(res, info)
 	}
 
 	return res, nil
@@ -161,6 +169,9 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 			SignPublicKey:        ent.TokenConfig.SignPublicKey,
 			SignSecretKey:        ent.TokenConfig.SignSecretKey,
 		},
+	}
+	for _, t := range ent.AllowGrantTypes {
+		v.AllowGrantTypes = append(v.AllowGrantTypes, t.String())
 	}
 
 	updates := bson.D{
