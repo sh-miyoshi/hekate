@@ -8,7 +8,8 @@
 ## Hekateでできること
 
 - APIレベルでのアクセス制御
-  - TODO(機能概要・Quick Start)
+  - 自身のサーバのアクセスをHekateの認証・認可機能と組み合わせて柔軟に制御できます
+  - Quick Start: [docs/quick_start/access_control.md](docs/quick_start/access_control.md)
 - ユーザーの認証・認可
   - TODO(機能概要・Quick Start)
 
@@ -50,7 +51,7 @@
 
 ## 注意事項
 
-`Hekate`は現在開発途中であり、Open ID Connectの一部パラメータが有効になっていません。
+Hekateは現在開発途中であり、Open ID Connectの一部パラメータが有効になっていません。
 そのため、Production環境ではまだ使用しないでください。
 なお、詳細は以下のRoad Mapを参照してください。
 
