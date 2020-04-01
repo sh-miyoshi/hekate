@@ -14,7 +14,30 @@
 
 ## インストール方法
 
-TODO
+- Dockerを使用する場合
+  - server, portalを起動
+    - ※現在設定ファイル的な理由で3000, 8080番以外のポートをport bindingできません。
+
+  ```bash
+  # SERVER_ADDRはアクセスしたい場所からアクセスできるアドレスにしてください。
+  export SERVER_ADDR=localhost
+
+  # この値を指定していない場合はデフォルトの値(admin/password)が使用されます
+  export ADMIN_NAME=admin
+  export ADMIN_PASSWORD=password
+
+  docker run -d --name hekate \
+    -p 3000:3000 -p 8080:8080 \
+    -e SERVER_ADDR=$SERVER_ADDR \
+    -e HEKATE_ADMIN_NAME=$ADMIN_NAME \
+    -e HEKATE_ADMIN_PASSWORD=$ADMIN_PASSWORD \
+    smiyoshi/hekate:all-in-one
+  ```
+
+  - [http://localhost:3000](http://localhost:3000)へアクセス
+
+- その他
+  - TODO
 
 ## 開発環境
 
