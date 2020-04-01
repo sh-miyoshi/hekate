@@ -14,6 +14,8 @@
 
 ## server application enhancement
 
+- kong対応
+  - URL: [https://konghq.com/](https://konghq.com/)
 - API responseのエラーコードが足りてないバグの修正
   - ClientUpdateHandler
   - RoleUpdateHandler
