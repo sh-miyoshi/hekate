@@ -10,8 +10,11 @@ TODO
 
 README.mdを参考にHekateをインストールしてください。
 
-以降では、Hekateには[http://localhost:3000](http://localhost:3000)でアクセスできるものとして説明します。
+以降では、Hekateには以下のアドレスでアクセスできるものとして説明します。
 他の場合は適宜読み替えてください。
+
+- Portal: [http://localhost:3000](http://localhost:3000)
+- Server: [http://localhost:8080](http://localhost:8080)
 
 ## 手順
 
@@ -37,10 +40,26 @@ TODO
 - configファイルの準備
 
   ```bash
-  # TODO
+  cat << EOF > config.yaml
+  client-id: sample-gw
+  client-secret: <確認したSecret>
+  discovery-url: http://localhost:8080/api/v1/project/master # Hekateサーバのアドレスとプロジェクトを変更した場合は適宜修正してください
+  enable-default-deny: true
+  skip-openid-provider-tls-verify: true
+  encryption_key: secret
+  listen: 0.0.0.0:5000
+  upstream-url: http://localhost:10000 # アクセスを制御したいサーバのアドレス
+  secure-cookie: false
+  resources:
+    - uri: /hello
+      methods:
+      - GET
+      roles:
+        - system_management:read-user
+  EOF
   ```
 
 - keycloak-gatekeeperの起動
-  - TODO
+  - `docker run -it --rm quay.io/keycloak/keycloak-gatekeeper`
 - アクセス
   - TODO
