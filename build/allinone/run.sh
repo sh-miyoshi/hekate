@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function ExecPortal() {
+  cd /myapp/portal
+  npm run build
+  npm run start > portal.log 2>&1
+}
+
 if [ "x$SERVER_ADDR" = "x" ]; then
   echo "Please set SERVER_ADDR to os env."
   exit 1
@@ -18,9 +24,7 @@ echo "Env:"
 env | grep HEKATE
 
 # Run Portal
-cd /myapp/portal
-npm run build
-npm run start > portal.log 2>&1 &
+ExecPortal &
 
 # Run server
 cd /myapp/server
