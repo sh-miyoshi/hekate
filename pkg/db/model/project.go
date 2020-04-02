@@ -57,13 +57,13 @@ var (
 	// Grant Types
 
 	// GrantTypeClientCredentials ...
-	GrantTypeClientCredentials = GrantType{"Client Credentials"}
+	GrantTypeClientCredentials = GrantType{"client_credentials"}
 	// GrantTypeAuthorizationCode ...
-	GrantTypeAuthorizationCode = GrantType{"Authorization Code"}
+	GrantTypeAuthorizationCode = GrantType{"authorization_code"}
 	// GrantTypeRefreshToken ...
-	GrantTypeRefreshToken = GrantType{"Refresh Token"}
+	GrantTypeRefreshToken = GrantType{"refresh_token"}
 	// GrantTypePassword ...
-	GrantTypePassword = GrantType{"Password"}
+	GrantTypePassword = GrantType{"password"}
 )
 
 // ProjectInfoHandler ...

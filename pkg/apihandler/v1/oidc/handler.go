@@ -14,6 +14,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 	"github.com/sh-miyoshi/hekate/pkg/user"
+	"github.com/stretchr/stew/slice"
 )
 
 // ConfigGetHandler method return a configuration of OpenID Connect
@@ -115,14 +116,26 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Authetication
-	switch r.Form.Get("grant_type") {
-	case "client_credentials":
+	gtStr := r.Form.Get("grant_type")
+	gt, err := model.GetGrantType(gtStr)
+	if err != nil {
+		logger.Info("No such Grant Type: %s", gtStr)
+		writeTokenErrorResponse(w, oidc.ErrInvalidGrant, state)
+		return
+	}
+	if ok := slice.Contains(project.AllowGrantTypes, model.GrantTypeClientCredentials); !ok {
+		logger.Info("Grant Type %s is not in allowed list %v", gtStr, project.AllowGrantTypes)
+		writeTokenErrorResponse(w, oidc.ErrUnsupportedGrantType, state)
+	}
+
+	switch gt {
+	case model.GrantTypeClientCredentials:
 		tkn, err = oidc.ReqAuthByRClientCredentials(project, clientID, r)
-	case "password":
+	case model.GrantTypePassword:
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")
 		tkn, err = oidc.ReqAuthByPassword(project, uname, passwd, r)
-	case "refresh_token":
+	case model.GrantTypeRefreshToken:
 		refreshToken := r.Form.Get("refresh_token")
 		tkn, err = oidc.ReqAuthByRefreshToken(project, clientID, refreshToken, r)
 
@@ -131,12 +144,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, state)
 			return
 		}
-	case "authorization_code":
+	case model.GrantTypeAuthorizationCode:
 		codeID := r.Form.Get("code")
 		tkn, err = oidc.ReqAuthByCode(project, clientID, codeID, r)
 	default:
-		logger.Info("No such Grant Type: %s", r.Form.Get("grant_type"))
-		writeTokenErrorResponse(w, oidc.ErrInvalidGrant, state)
+		logger.Info("Unexpected grant type got: %s", gt.String())
+		writeTokenErrorResponse(w, oidc.ErrServerError, state)
 		return
 	}
 

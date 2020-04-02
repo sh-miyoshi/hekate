@@ -113,6 +113,12 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresTimeSec,
 			SigningAlgorithm:     "RS256",
 		},
+		AllowGrantTypes: []model.GrantType{
+			model.GrantTypeAuthorizationCode,
+			model.GrantTypeClientCredentials,
+			model.GrantTypeRefreshToken,
+			model.GrantTypePassword, // TODO(for debug)
+		},
 	})
 	if err != nil {
 		if errors.Cause(err) == model.ErrProjectAlreadyExists {
