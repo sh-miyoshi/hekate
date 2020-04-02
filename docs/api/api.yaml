@@ -909,6 +909,10 @@ components:
           type: string
         tokenConfig:
           $ref: '#/components/schemas/TokenConfig'
+        allowGrantTypes:
+          type: array
+          items:
+            type: string
     ProjectGetResponse:
       type: object
       properties:
@@ -919,11 +923,19 @@ components:
           format: date
         tokenConfig:
           $ref: '#/components/schemas/TokenConfig'
+        allowGrantTypes:
+          type: array
+          items:
+            type: string
     ProjectPutRequest:
       type: object
       properties:
         tokenConfig:
           $ref: '#/components/schemas/TokenConfig'
+        allowGrantTypes:
+          type: array
+          items:
+            type: string
     TokenConfig:
       type: object
       properties:
