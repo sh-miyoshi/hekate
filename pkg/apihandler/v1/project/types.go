@@ -13,18 +13,21 @@ type TokenConfig struct {
 
 // ProjectCreateRequest ...
 type ProjectCreateRequest struct {
-	Name        string      `json:"name"`
-	TokenConfig TokenConfig `json:"tokenConfig"`
+	Name            string      `json:"name"`
+	TokenConfig     TokenConfig `json:"tokenConfig"`
+	AllowGrantTypes []string    `json:"allowGrantTypes"`
 }
 
 // ProjectGetResponse ...
 type ProjectGetResponse struct {
-	Name        string      `json:"name"`
-	CreatedAt   time.Time   `json:"createdAt"`
-	TokenConfig TokenConfig `json:"tokenConfig"`
+	Name            string      `json:"name"`
+	CreatedAt       time.Time   `json:"createdAt"`
+	TokenConfig     TokenConfig `json:"tokenConfig"`
+	AllowGrantTypes []string    `json:"allowGrantTypes"`
 }
 
 // ProjectPutRequest ...
 type ProjectPutRequest struct {
-	TokenConfig TokenConfig `json:"tokenConfig"`
+	TokenConfig     TokenConfig `json:"tokenConfig"`
+	AllowGrantTypes []string    `json:"allowGrantTypes"`
 }

@@ -33,6 +33,11 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := []ProjectGetResponse{}
 	for _, prj := range projects {
+		grantTypes := []string{}
+		for _, t := range prj.AllowGrantTypes {
+			grantTypes = append(grantTypes, t.String())
+		}
+
 		res = append(res, ProjectGetResponse{
 			Name:      prj.Name,
 			CreatedAt: prj.CreatedAt,
@@ -41,6 +46,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
 				SigningAlgorithm:     prj.TokenConfig.SigningAlgorithm,
 			},
+			AllowGrantTypes: grantTypes,
 		})
 	}
 	logger.Debug("Project List: %v", res)
@@ -66,6 +72,18 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Set Allow Grant Type List
+	grantTypes := []model.GrantType{}
+	for _, t := range request.AllowGrantTypes {
+		v, err := model.GetGrantType(t)
+		if err != nil {
+			logger.Info("Failed to get grant type %s: %v", t, err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		}
+		grantTypes = append(grantTypes, v)
+	}
+
 	// Create Project Entry
 	project := model.ProjectInfo{
 		Name:         request.Name,
@@ -76,6 +94,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshTokenLifeSpan: request.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     request.TokenConfig.SigningAlgorithm,
 		},
+		AllowGrantTypes: grantTypes,
 	}
 
 	// Create New Project
@@ -102,6 +121,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
 		},
+		AllowGrantTypes: request.AllowGrantTypes,
 	}
 
 	jwthttp.ResponseWrite(w, "ProjectCreateHandler", &res)
@@ -165,6 +185,11 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	grantTypes := []string{}
+	for _, t := range project.AllowGrantTypes {
+		grantTypes = append(grantTypes, t.String())
+	}
+
 	// Return Response
 	res := ProjectGetResponse{
 		Name:      project.Name,
@@ -174,6 +199,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
 		},
+		AllowGrantTypes: grantTypes,
 	}
 
 	jwthttp.ResponseWrite(w, "ProjectGetHandler", &res)
@@ -217,6 +243,16 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	project.TokenConfig.AccessTokenLifeSpan = request.TokenConfig.AccessTokenLifeSpan
 	project.TokenConfig.RefreshTokenLifeSpan = request.TokenConfig.RefreshTokenLifeSpan
 	project.TokenConfig.SigningAlgorithm = request.TokenConfig.SigningAlgorithm
+	project.AllowGrantTypes = []model.GrantType{}
+	for _, t := range request.AllowGrantTypes {
+		v, err := model.GetGrantType(t)
+		if err != nil {
+			logger.Info("Failed to get grant type %s: %v", t, err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
+		}
+		project.AllowGrantTypes = append(project.AllowGrantTypes, v)
+	}
 
 	// Update DB
 	if err := db.GetInst().ProjectUpdate(project); err != nil {
