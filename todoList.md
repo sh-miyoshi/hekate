@@ -6,20 +6,14 @@
 - custom role削除時にユーザからremoveしなくてよい？
 - 別projectのリソースを変更できないか要確認
 
-## new commands
-
-- Gateway
-  - Backendのユーザープログラムに対してアクセス制御するようなツール
-  - keycloak-gatekeeperのようなものを想定
-
 ## server application enhancement
 
-- kong対応
-  - URL: [https://konghq.com/](https://konghq.com/)
+- リソース削除時に紐づくリソースも削除
 - API responseのエラーコードが足りてないバグの修正
   - ClientUpdateHandler
   - RoleUpdateHandler
   - UserUpdateHandler
+- db manager validationの追加
 - Custom RoleにDescriptionを追加
   - API docの修正
   - DBの修正
@@ -33,23 +27,13 @@
     - ログインリクエスト失敗時にロックする
     - 強制ロック解除用のAPI
   - API docの修正
-- リソース削除時に紐づくリソースも削除
-- Client Secretに証明書を追加できるようにする
-- db manager validationの追加
-- filterの追加(user, role)
 - audit log
   - time
   - resource type (or url path and method)
   - client
   - success or failed
-- DBGCの追加
-  - Expiredしたsessionなどを一定期間ごとに削除する
-- 各種APIの実装
-  - sessionの詳細取得(引数: project, userID, sessionID)
-- テストの追加
-  - ロジック部分のunit test
-  - API部分のテスト
-    - エラー処理回り
+- http errorの充実
+  - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type(signing_method)
@@ -61,9 +45,13 @@
     - Password
     - (MFA)
     - (Passwordless OTP)
-- http errorの充実
-  - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
-- projectのimport/export
+- SQL DBの追加
+- DBGCの追加
+  - Expiredしたsessionなどを一定期間ごとに削除する
+- テストの追加
+  - ロジック部分のunit test
+  - API部分のテスト
+    - エラー処理回り
 - OpenID Connect部分のエンハンス
   - openid connect APIの実装
     - implicit flow
@@ -80,17 +68,23 @@
   - code認証失敗時、すべてのtokenを無効化
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
-- SAML対応
+- kong対応
+  - URL: [https://konghq.com/](https://konghq.com/)
 - (project/user) enabledの有効化
+- API responseのtime formatの見直し
+- projectのimport/export
+- 各種APIの実装
+  - sessionの詳細取得(引数: project, userID, sessionID)
+- Client Secretに証明書を追加できるようにする
+- filterの追加(user, role)
+- SAML対応
 - user federation
   - user情報を外部に保存し、それと連携する
-- redirect_urlの設定
 - User Authentication HTMLの拡充
   - Client IDを表示(optional)
   - Project名を表示
 - LDAP連携？
 - http headerの追加
-- API responseのtime formatの見直し
 
 ## Portal(Admin Console) enhancement
 
@@ -138,6 +132,12 @@
 - configコマンドの作成・修正
 - Production向け実行ファイルの作成
 - support authorization code flow
+
+## new commands
+
+- Gateway
+  - Backendのユーザープログラムに対してアクセス制御するようなツール
+  - keycloak-gatekeeperのようなものを想定
 
 ## operation enhancement
 
