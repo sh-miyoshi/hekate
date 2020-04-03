@@ -555,8 +555,11 @@ func (m *Manager) ClientDelete(clientID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
+		// TODO(delete oidc_code, session)
 
-		// TODO(delete loginsession, oidc_code, session)
+		if err := m.loginSession.DeleteAll(clientID); err != nil {
+			return errors.Wrap(err, "Failed to delete login session of the client")
+		}
 
 		if err := m.client.Delete(clientID); err != nil {
 			return errors.Wrap(err, "Failed to delete client")

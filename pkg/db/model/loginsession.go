@@ -29,4 +29,5 @@ type LoginSessionHandler interface {
 	Add(info *LoginSessionInfo) error
 	Delete(code string) error
 	Get(code string) (*LoginSessionInfo, error)
+	DeleteAll(clientID string) error
 }

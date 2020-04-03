@@ -109,3 +109,20 @@ func (h *LoginSessionHandler) Get(code string) (*model.LoginSessionInfo, error) 
 		Nonce:        res.Nonce,
 	}, nil
 }
+
+// DeleteAll ...
+func (h *LoginSessionHandler) DeleteAll(clientID string) error {
+	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
+	filter := bson.D{
+		{Key: "clientID", Value: clientID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete login session from mongodb")
+	}
+	return nil
+}

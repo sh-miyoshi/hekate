@@ -46,3 +46,19 @@ func (h *LoginSessionHandler) Get(verifyCode string) (*model.LoginSessionInfo, e
 
 	return h.sessionList[verifyCode], nil
 }
+
+// DeleteAll ...
+func (h *LoginSessionHandler) DeleteAll(clientID string) error {
+	codes := []string{}
+	for _, s := range h.sessionList {
+		if s.ClientID == clientID {
+			codes = append(codes, s.VerifyCode)
+		}
+	}
+
+	for _, code := range codes {
+		delete(h.sessionList, code)
+	}
+
+	return nil
+}
