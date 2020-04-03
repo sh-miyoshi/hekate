@@ -152,7 +152,19 @@ func (m *Manager) ProjectDelete(name string) error {
 			return errors.Wrap(model.ErrDeleteBlockedProject, "the project can not delete")
 		}
 
-		// TODO(delete custom role, loginsession, oidc_code, session, client)
+		// TODO(delete loginsession, session)
+
+		if err := m.authCode.DeleteAll(name); err != nil {
+			return errors.Wrap(err, "Failed to delete oidc code data")
+		}
+
+		if err := m.customRole.DeleteAll(name); err != nil {
+			return errors.Wrap(err, "Failed to delete custom role data")
+		}
+
+		if err := m.client.DeleteAll(name); err != nil {
+			return errors.Wrap(err, "Failed to delete client data")
+		}
 
 		if err := m.user.DeleteAll(name); err != nil {
 			return errors.Wrap(err, "Failed to delete user data")
