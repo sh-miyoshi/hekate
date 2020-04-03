@@ -37,14 +37,6 @@
 - 設定項目の追加
   - パスワードポリシー
   - encrypt_type(signing_method)
-  - grant type
-    - Implicit
-    - Authorization Code
-    - Refresh Token
-    - Client Credentials
-    - Password
-    - (MFA)
-    - (Passwordless OTP)
 - SQL DBの追加
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
@@ -113,6 +105,8 @@
   - デフォルト値(localhost:8080, master)
 - 各APIへの対応
   - project
+    - create
+      - Allow Grant Typeへの対応
     - update
   - user
     - update
