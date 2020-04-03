@@ -84,7 +84,13 @@ class APIClient {
         accessTokenLifeSpan: 300, // 5 minutes
         refreshTokenLifeSpan: 1209600, // 2 weeks
         signingAlgorithm: 'RS256'
-      }
+      },
+      allowGrantTypes: [
+        // set default allow grant types
+        'authorization_code',
+        'client_credentials',
+        'refresh_token'
+      ]
     }
     const url = process.env.HEKATE_SERVER_ADDR + '/api/v1/project'
     const res = await this._request(url, 'POST', data)

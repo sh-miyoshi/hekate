@@ -91,6 +91,27 @@
         </div>
       </div>
 
+      <div class="form-group row">
+        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
+          Allow Grant Types
+        </label>
+        <div class="col-md-7 col-form-label">
+          <div
+            v-for="type in grantTypes"
+            :key="type.value"
+            class="form-check checkbox"
+          >
+            <input
+              class="form-check-input"
+              type="checkbox"
+              :checked="type.checked"
+              @change="type.checked = !type.checked"
+            />
+            <label class="form-check-label">{{ type.name }}</label>
+          </div>
+        </div>
+      </div>
+
       <div class="card-footer">
         <div v-if="error" class="alert alert-danger">
           {{ error }}
@@ -114,11 +135,33 @@ export default {
       refreshTokenLifeSpan: 0,
       refreshTokenUnit: 'sec',
       signingAlgorithm: 'RS256',
-      algs: ['RS256']
+      algs: ['RS256'],
+      grantTypes: [
+        {
+          name: 'Authorization Code',
+          value: 'authorization_code',
+          checked: false
+        },
+        {
+          name: 'Client Credentials',
+          value: 'client_credentials',
+          checked: false
+        },
+        {
+          name: 'Refresh Token',
+          value: 'refresh_token',
+          checked: false
+        },
+        {
+          name: 'Password',
+          value: 'password',
+          checked: false
+        }
+      ]
     }
   },
   mounted() {
-    this.getProject()
+    this.setProjectInfo()
   },
   methods: {
     deleteProjectConfirm() {
@@ -139,6 +182,14 @@ export default {
       this.$router.push('/home')
     },
     async update() {
+      const grantTypes = []
+      console.log(this.grantTypes)
+      for (const type of this.grantTypes) {
+        if (type.checked) {
+          grantTypes.push(type.value)
+        }
+      }
+
       const data = {
         tokenConfig: {
           accessTokenLifeSpan: this.getSpan(
@@ -150,8 +201,11 @@ export default {
             this.refreshTokenUnit
           ),
           signingAlgorithm: this.signingAlgorithm
-        }
+        },
+        allowGrantTypes: grantTypes
       }
+      console.log(data)
+
       const res = await this.$api.ProjectUpdate(
         this.$store.state.current_project,
         data
@@ -161,10 +215,10 @@ export default {
         return
       }
 
-      this.getProject()
+      this.setProjectInfo()
       alert('successfully updated.')
     },
-    async getProject() {
+    async setProjectInfo() {
       const res = await this.$api.ProjectGet(this.$store.state.current_project)
       if (!res.ok) {
         this.error = res.message
@@ -178,6 +232,15 @@ export default {
       this.refreshTokenLifeSpan = t.span
       this.refreshTokenUnit = t.unit
       this.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
+
+      // set allow grant types
+      for (const type of res.data.allowGrantTypes) {
+        for (const t of this.grantTypes) {
+          if (type === t.value) {
+            t.checked = true
+          }
+        }
+      }
     },
     setUnit(span) {
       let unit = 'sec'
