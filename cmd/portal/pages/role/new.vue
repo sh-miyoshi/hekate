@@ -24,15 +24,6 @@
         </div>
       </div>
 
-      <div class="form-group row">
-        <label for="accessType" class="col-sm-2 col-form-label">
-          Description
-        </label>
-        <div class="col-md-5">
-          <input type="textarea" class="form-control" disabled="disabled" />
-        </div>
-      </div>
-
       <div class="card-footer">
         <div v-if="error" class="alert alert-danger">
           {{ error }}
