@@ -22,14 +22,12 @@
         <thead>
           <tr>
             <td>Name</td>
-            <td>Description</td>
             <td>Actions</td>
           </tr>
         </thead>
         <tbody>
           <tr v-for="role in roles" :key="role.id">
             <td>{{ role.name }}</td>
-            <td></td>
             <td>
               <button
                 class="btn btn-primary"
