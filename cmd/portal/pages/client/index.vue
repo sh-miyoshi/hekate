@@ -95,7 +95,7 @@ export default {
         this.deleteClientID
       )
       if (!res.ok) {
-        this.error = res.msg
+        this.error = res.message
         return
       }
       this.setClients()

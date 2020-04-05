@@ -94,7 +94,7 @@ export default {
         this.deleteUserID
       )
       if (!res.ok) {
-        this.error = res.msg
+        this.error = res.message
         return
       }
       this.setUsers()

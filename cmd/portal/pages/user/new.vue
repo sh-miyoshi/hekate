@@ -95,7 +95,7 @@ export default {
     validateUserName() {
       const res = ValidateUserName(this.name)
       if (!res.ok) {
-        this.nameValidateError = res.msg
+        this.nameValidateError = res.message
       } else {
         this.nameValidateError = ''
       }

@@ -82,7 +82,7 @@ export default {
         this.role.id
       )
       if (!res.ok) {
-        this.error = res.msg
+        this.error = res.message
         return
       }
       alert('Successfully delete role')
@@ -104,7 +104,7 @@ export default {
       )
 
       if (!res.ok) {
-        this.error = res.msg
+        this.error = res.message
         return
       }
       alert('Successfully update role')

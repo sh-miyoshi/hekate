@@ -71,7 +71,7 @@ export default {
     validateRoleName() {
       const res = ValidateRoleName(this.name)
       if (!res.ok) {
-        this.nameValidateError = res.msg
+        this.nameValidateError = res.message
       } else {
         this.nameValidateError = ''
       }

@@ -153,6 +153,17 @@ class APIClient {
     return res
   }
 
+  async UserUpdate(projectName, userID, info) {
+    const url =
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/user/' +
+      userID
+    const res = await this._request(url, 'PUT', info)
+    return res
+  }
+
   async ClientCreate(projectName, info) {
     const url =
       process.env.HEKATE_SERVER_ADDR +

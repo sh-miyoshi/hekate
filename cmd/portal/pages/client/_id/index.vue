@@ -160,7 +160,7 @@ export default {
         this.client.id
       )
       if (!res.ok) {
-        this.error = res.msg
+        this.error = res.message
         return
       }
       alert('Successfully delete client')
@@ -184,7 +184,7 @@ export default {
       )
 
       if (!res.ok) {
-        this.error = res.msg
+        this.error = res.message
         return
       }
       alert('Successfully update client')

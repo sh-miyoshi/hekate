@@ -92,7 +92,7 @@ export default {
     validateClientID() {
       const res = ValidateClientID(this.id)
       if (!res.ok) {
-        this.idValidateError = res.msg
+        this.idValidateError = res.message
       } else {
         this.idValidateError = ''
       }
