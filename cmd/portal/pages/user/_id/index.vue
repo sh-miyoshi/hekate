@@ -83,12 +83,12 @@
         </label>
         <div v-if="user" class="col-sm-5">
           <div v-if="user.custom_roles.length > 0">
-            <div v-for="item in user.custom_roles" :key="item">
+            <div v-for="role in user.custom_roles" :key="role.id">
               <div class="mb-1 input-group-text role-item">
                 <span class="icon">
-                  <i class="fa fa-remove" @click="removeCustomRole(item)"></i>
+                  <i class="fa fa-remove" @click="removeCustomRole(role)"></i>
                 </span>
-                {{ item }}
+                {{ role.name }}
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@
         <div class="col-sm-5">
           <b-form-select
             v-model="assignedCustomRole"
-            :options="getCustomRoleCandidates()"
+            :options="customRoleCandidates"
           ></b-form-select>
           <button class="btn btn-primary mt-2" @click="assignCustomRole()">
             Assign
@@ -137,11 +137,13 @@ export default {
       user: null,
       error: '',
       assignedSystemRole: null,
-      assignedCustomRole: null
+      assignedCustomRole: null,
+      customRoleCandidates: []
     }
   },
-  mounted() {
-    this.setUser(this.$route.params.id)
+  async mounted() {
+    await this.setUser(this.$route.params.id)
+    await this.setCustomRoleCandidates()
   },
   methods: {
     async setUser(userID) {
@@ -158,10 +160,11 @@ export default {
           this.user.custom_roles = []
         }
         this.currentUserName = res.data.name
-        console.log(this.user)
-      } else {
-        console.log('Failed to get user: %o', res)
+        console.log('User Info: %o', this.user)
+        return
       }
+      console.log('Failed to get user: %o', res)
+      this.error = res.error
     },
     allowEdit() {
       const loginUser = window.localStorage.getItem('user')
@@ -175,7 +178,9 @@ export default {
     },
     updateUser() {
       // TODO(implement this)
-      console.log(this.user.system_roles)
+      console.log(this.user)
+      // create update data from this.user
+      // request to server
     },
     getSystemRoleCandidates() {
       const res = [{ value: null, text: 'Please select an assigned role' }]
@@ -204,16 +209,37 @@ export default {
       this.user.system_roles.push(this.assignedSystemRole)
       this.assignedSystemRole = null
     },
-    getCustomRoleCandidates() {
+    async setCustomRoleCandidates() {
       const res = [{ value: null, text: 'Please select an assigned role' }]
-      // TODO(get all custom roles, check user.custom_roles)
-      return res
+      const roleRes = await this.$api.RoleGetList(
+        this.$store.state.current_project
+      )
+      if (!roleRes.ok) {
+        console.log('Custom role get failed: %o', roleRes)
+        this.error = 'Failed to get custom role list.'
+        return
+      }
+
+      for (const role of roleRes.data) {
+        // remove user assigned role
+        let append = true
+        for (const ur of this.user.custom_roles) {
+          if (role.id === ur.id) {
+            append = false
+            break
+          }
+        }
+        if (append) {
+          res.push({ value: role.id, text: role.name })
+        }
+      }
+      this.customRoleCandidates = res
     },
     removeCustomRole(role) {
       if (!this.user) {
         return
       }
-      const tmp = this.user.custom_roles.filter((v) => v !== role)
+      const tmp = this.user.custom_roles.filter((v) => v.id !== role.id)
       this.user.custom_roles = tmp
     },
     assignCustomRole() {
@@ -221,8 +247,17 @@ export default {
         return
       }
 
-      this.user.custom_roles.push(this.assignedCustomRole)
-      this.assignedCustomRole = null
+      for (const r of this.customRoleCandidates) {
+        if (r.value === this.assignedCustomRole) {
+          this.user.custom_roles.push({
+            id: r.value,
+            name: r.text
+          })
+          this.setCustomRoleCandidates()
+          this.assignedCustomRole = null
+          return
+        }
+      }
     }
   }
 }
