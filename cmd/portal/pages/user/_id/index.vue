@@ -164,7 +164,7 @@ export default {
         return
       }
       console.log('Failed to get user: %o', res)
-      this.error = res.error
+      this.error = res.message
     },
     allowEdit() {
       const loginUser = window.localStorage.getItem('user')
@@ -176,11 +176,30 @@ export default {
     deleteUser() {
       // TODO(implement this)
     },
-    updateUser() {
+    async updateUser() {
+      if (!this.user) {
+        return
+      }
       // TODO(implement this)
-      console.log(this.user)
       // create update data from this.user
       // request to server
+      const roles = []
+      for (const r of this.user.custom_roles) {
+        roles.push(r.id)
+      }
+      const data = {
+        name: this.user.name,
+        system_roles: this.user.system_roles,
+        custom_roles: roles
+      }
+      const projectName = this.$store.state.current_project
+      const userID = this.$route.params.id
+      const res = await this.$api.UserUpdate(projectName, userID, data)
+      if (!res.ok) {
+        this.error = res.message
+        return
+      }
+      alert('Successfully update user')
     },
     getSystemRoleCandidates() {
       const res = [{ value: null, text: 'Please select an assigned role' }]
@@ -223,10 +242,12 @@ export default {
       for (const role of roleRes.data) {
         // remove user assigned role
         let append = true
-        for (const ur of this.user.custom_roles) {
-          if (role.id === ur.id) {
-            append = false
-            break
+        if (this.user) {
+          for (const ur of this.user.custom_roles) {
+            if (role.id === ur.id) {
+              append = false
+              break
+            }
           }
         }
         if (append) {
