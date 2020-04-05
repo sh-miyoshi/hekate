@@ -235,6 +235,9 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Cause(err) == model.ErrNoSuchUser {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("Invalid User ID format: %v", err)
+			http.Error(w, "Invalid Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to get user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -309,6 +312,9 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Cause(err) == model.ErrNoSuchUser {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("Invalid User ID format: %v", err)
+			http.Error(w, "Invalid Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to update user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -325,8 +331,13 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update DB
 	if err := db.GetInst().UserUpdate(user); err != nil {
 		// TODO(check duplicate user name: Bad Request)
-		logger.Error("Failed to update user: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("Invalid user request format: %v", err)
+			http.Error(w, "Invalid Request", http.StatusBadRequest)
+		} else {
+			logger.Error("Failed to update user: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 
