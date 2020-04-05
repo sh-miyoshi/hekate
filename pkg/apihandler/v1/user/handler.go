@@ -48,14 +48,40 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get all custom roles due to check all users
+	customRoles, err := db.GetInst().CustomRoleGetList(projectName, nil)
+	if err != nil {
+		if errors.Cause(err) == model.ErrNoSuchProject {
+			logger.Info("No such project: %s", projectName)
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to get custom role list: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
 	res := []*UserGetResponse{}
 	for _, user := range users {
+		roles := []CustomRole{}
+		for _, rid := range user.CustomRoles {
+			for _, r := range customRoles {
+				if rid == r.ID {
+					roles = append(roles, CustomRole{
+						r.ID,
+						r.Name,
+					})
+					break
+				}
+			}
+		}
+
 		tmp := &UserGetResponse{
 			ID:          user.ID,
 			Name:        user.Name,
 			CreatedAt:   user.CreatedAt.String(),
 			SystemRoles: user.SystemRoles,
-			CustomRoles: user.CustomRoles,
+			CustomRoles: roles,
 		}
 		sessions, err := db.GetInst().SessionGetList(user.ID)
 		if err != nil {
@@ -120,13 +146,27 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	roles := []CustomRole{}
+	for _, rid := range user.CustomRoles {
+		r, err := db.GetInst().CustomRoleGet(rid)
+		if err != nil {
+			logger.Error("Failed to get user %s custom role %s info: %+v", user.ID, r.ID, err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		roles = append(roles, CustomRole{
+			ID:   r.ID,
+			Name: r.Name,
+		})
+	}
+
 	// Return Response
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
 		CreatedAt:   user.CreatedAt.String(),
 		SystemRoles: user.SystemRoles,
-		CustomRoles: user.CustomRoles,
+		CustomRoles: roles,
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
@@ -202,12 +242,26 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	roles := []CustomRole{}
+	for _, rid := range user.CustomRoles {
+		r, err := db.GetInst().CustomRoleGet(rid)
+		if err != nil {
+			logger.Error("Failed to get user %s custom role %s info: %+v", user.ID, r.ID, err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		roles = append(roles, CustomRole{
+			ID:   r.ID,
+			Name: r.Name,
+		})
+	}
+
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
 		CreatedAt:   user.CreatedAt.String(),
 		SystemRoles: user.SystemRoles,
-		CustomRoles: user.CustomRoles,
+		CustomRoles: roles,
 	}
 
 	sessions, err := db.GetInst().SessionGetList(user.ID)

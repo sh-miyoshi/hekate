@@ -951,8 +951,13 @@ components:
         password:
           type: string
           format: password
-        roles:
-          description: 'Array of role IDs'
+        system_roles:
+          description: 'Array of system role IDs'
+          type: array
+          items:
+            type: string
+        custom_roles:
+          description: 'Array of custom role IDs'
           type: array
           items:
             type: string
@@ -968,11 +973,21 @@ components:
         createdAt:
           type: string
           format: date
-        roles:
-          description: 'Array of role IDs'
+        system_roles:
+          description: 'Array of system role IDs'
           type: array
           items:
             type: string
+        custom_roles:
+          description: 'Array of custom roles'
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
     UserPutRequest:
       type: object
       properties:
@@ -980,8 +995,13 @@ components:
           type: string
         password:
           type: string
-        roles:
-          description: 'Array of role IDs'
+        system_roles:
+          description: 'Array of system role IDs'
+          type: array
+          items:
+            type: string
+        custom_roles:
+          description: 'Array of custom role IDs'
           type: array
           items:
             type: string

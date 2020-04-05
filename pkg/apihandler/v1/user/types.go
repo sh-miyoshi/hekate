@@ -1,5 +1,11 @@
 package userapi
 
+// CustomRole ...
+type CustomRole struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // UserCreateRequest ...
 type UserCreateRequest struct {
 	Name        string   `json:"name"`
@@ -10,12 +16,12 @@ type UserCreateRequest struct {
 
 // UserGetResponse ...
 type UserGetResponse struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	CreatedAt   string   `json:"createdAt"`
-	SystemRoles []string `json:"system_roles"`
-	CustomRoles []string `json:"custom_roles"`
-	Sessions    []string `json:"sessions"` // Array of session IDs
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	CreatedAt   string       `json:"createdAt"`
+	SystemRoles []string     `json:"system_roles"`
+	CustomRoles []CustomRole `json:"custom_roles"`
+	Sessions    []string     `json:"sessions"` // Array of session IDs
 }
 
 // UserPutRequest ...
