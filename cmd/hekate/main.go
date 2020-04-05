@@ -134,7 +134,11 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		Name:         adminName,
 		CreatedAt:    time.Now(),
 		PasswordHash: util.CreateHash(adminPassword),
-		SystemRoles:  defaultrole.GetInst().GetList(), // set all roles
+		SystemRoles: []string{
+			// append cluster admin role
+			"read-cluster",
+			"write-cluster",
+		},
 	})
 
 	if err != nil {
