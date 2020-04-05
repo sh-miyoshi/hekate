@@ -993,8 +993,6 @@ components:
       properties:
         name:
           type: string
-        password:
-          type: string
         system_roles:
           description: 'Array of system role IDs'
           type: array
