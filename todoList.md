@@ -8,14 +8,7 @@
 
 ## server application enhancement
 
-- role周りの見直し
 - リソース削除時に紐づくリソースも削除
-- API responseのエラーコードが足りてないバグの修正
-  - ClientUpdateHandler
-  - RoleUpdateHandler
-  - UserUpdateHandler
-  - その他
-    - Bad Request関係
 - db manager validationの追加
 - Custom RoleにDescriptionを追加
   - API docの修正
@@ -86,9 +79,10 @@
 - 各ページの作成
   - User
     - Login Sessionの表示
-- LoginしているUserの権限の編集はできなくする？
 - validationの追加
   - portal側でリクエストを出す前にはじく
+- user role更新時のvalidation
+  - cluster系とそれ以外を同時に付与しようとした場合警告を出す
 - oidc authのstateチェック
 - client_idやproject nameをどうするか(変数化)
 - middleware処理
