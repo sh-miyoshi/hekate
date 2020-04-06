@@ -5,24 +5,26 @@
   >
     <ul v-if="showSidebar" class="c-sidebar-nav">
       <li class="c-sidebar-nav-item">
-        <nuxt-link to="/project" class="c-sidebar-nav-link project">
+        <nuxt-link to="/admin/project" class="c-sidebar-nav-link project">
           <span class="mr-2">{{ this.$store.state.current_project }}</span>
           <i class="fa fa-edit"></i>
         </nuxt-link>
       </li>
       <li class="c-sidebar-nav-item">
-        <nuxt-link to="/project/detail" class="c-sidebar-nav-link">
+        <nuxt-link to="/admin/project/detail" class="c-sidebar-nav-link">
           Project Setting
         </nuxt-link>
       </li>
       <li class="c-sidebar-nav-item">
-        <nuxt-link to="/user" class="c-sidebar-nav-link">User</nuxt-link>
+        <nuxt-link to="/admin/user" class="c-sidebar-nav-link">User</nuxt-link>
       </li>
       <li class="c-sidebar-nav-item">
-        <nuxt-link to="/client" class="c-sidebar-nav-link">Client</nuxt-link>
+        <nuxt-link to="/admin/client" class="c-sidebar-nav-link"
+          >Client</nuxt-link
+        >
       </li>
       <li class="c-sidebar-nav-item">
-        <nuxt-link to="/role" class="c-sidebar-nav-link">Role</nuxt-link>
+        <nuxt-link to="/admin/role" class="c-sidebar-nav-link">Role</nuxt-link>
       </li>
     </ul>
     <button

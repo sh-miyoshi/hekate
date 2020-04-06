@@ -1,12 +1,12 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <h3>New Project Info</h3>
+      <h3>New Role Info</h3>
     </div>
 
     <div class="card-body">
       <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">
+        <label for="id" class="col-sm-2 col-form-label">
           Name
           <span class="required">*</span>
         </label>
@@ -16,6 +16,7 @@
             type="text"
             class="form-control"
             :class="{ 'is-invalid': nameValidateError }"
+            @blur="validateRoleName()"
           />
           <div class="invalid-feedback">
             {{ nameValidateError }}
@@ -29,13 +30,15 @@
         </div>
 
         <button class="btn btn-primary mr-2" @click="create">Create</button>
-        <nuxt-link to="/project">Cancel</nuxt-link>
+        <nuxt-link to="/admin/role">Cancel</nuxt-link>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ValidateRoleName } from '~/plugins/validation'
+
 export default {
   data() {
     return {
@@ -46,15 +49,32 @@ export default {
   },
   methods: {
     async create() {
-      const res = await this.$api.ProjectCreate(this.name)
-      console.log('project create result: %o', res)
+      if (this.nameValidateError.length > 0) {
+        this.error = 'Please fix validation error before create.'
+        return
+      }
+
+      const data = {
+        name: this.name
+      }
+      const projectName = this.$store.state.current_project
+      const res = await this.$api.RoleCreate(projectName, data)
+      console.log('role create result: %o', res)
       if (!res.ok) {
         this.error = res.message
         return
       }
 
       alert('successfully created.')
-      this.$router.push('/project')
+      this.$router.push('/admin/role')
+    },
+    validateRoleName() {
+      const res = ValidateRoleName(this.name)
+      if (!res.ok) {
+        this.nameValidateError = res.message
+      } else {
+        this.nameValidateError = ''
+      }
     }
   }
 }

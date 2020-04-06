@@ -3,12 +3,14 @@
     <h1>Projects</h1>
     <ul>
       <li v-for="(project, i) in projects" :key="i" class="name">
-        <nuxt-link to="/home" @click.native="setCurrentProject(project)">{{
-          project
-        }}</nuxt-link>
+        <nuxt-link
+          to="/admin/home"
+          @click.native="setCurrentProject(project)"
+          >{{ project }}</nuxt-link
+        >
       </li>
     </ul>
-    <button class="btn btn-primary" @click="$router.push('/project/new')">
+    <button class="btn btn-primary" @click="$router.push('/admin/project/new')">
       Add New Project
     </button>
   </div>

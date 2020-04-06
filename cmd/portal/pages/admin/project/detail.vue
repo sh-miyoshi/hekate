@@ -179,7 +179,7 @@ export default {
 
       alert('successfully deleted.')
       this.$store.commit('setCurrentProject', 'master')
-      this.$router.push('/home')
+      this.$router.push('/admin/home')
     },
     async update() {
       const grantTypes = []

@@ -180,9 +180,7 @@ export default {
       if (!this.user) {
         return
       }
-      // TODO(implement this)
-      // create update data from this.user
-      // request to server
+
       const roles = []
       for (const r of this.user.custom_roles) {
         roles.push(r.id)

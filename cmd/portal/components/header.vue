@@ -1,7 +1,7 @@
 <template>
   <header class="c-header">
     <!-- logo start -->
-    <nuxt-link to="/home" class="c-header-nav">
+    <nuxt-link to="/admin/home" class="c-header-nav">
       <img src="~/assets/img/logo.png" class="logo" />
     </nuxt-link>
     <!-- logo end -->
@@ -19,7 +19,7 @@ export default {
   methods: {
     logout() {
       this.$auth.Logout()
-      this.$router.push('/')
+      this.$router.push('/admin')
     }
   }
 }

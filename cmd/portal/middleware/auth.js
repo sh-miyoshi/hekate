@@ -11,7 +11,7 @@ export default async function(context) {
   const res = await handler.GetToken()
   if (!res.ok) {
     if (res.statusCode >= 400 && res.statusCode < 500) {
-      context.redirect('/')
+      context.redirect('/admin')
     } else {
       context.error({
         message: res.message,

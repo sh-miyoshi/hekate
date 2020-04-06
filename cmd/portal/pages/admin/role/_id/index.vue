@@ -86,7 +86,7 @@ export default {
         return
       }
       alert('Successfully delete role')
-      this.$router.push('/role')
+      this.$router.push('/admin/role')
     },
     async updateRole() {
       if (!this.role) {

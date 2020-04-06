@@ -73,7 +73,6 @@
         </div>
       </div>
 
-      <!-- TODO AllowedCallbackURLs -->
       <div class="form-group row">
         <label for="callbacks" class="col-sm-2 col-form-label">
           Allowed Callback URL
@@ -164,7 +163,7 @@ export default {
         return
       }
       alert('Successfully delete client')
-      this.$router.push('/client')
+      this.$router.push('/admin/client')
     },
     async updateClient() {
       if (!this.client) {

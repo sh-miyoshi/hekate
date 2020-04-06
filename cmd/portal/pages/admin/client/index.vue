@@ -33,7 +33,7 @@
             <td>
               <button
                 class="btn btn-primary"
-                @click="$router.push('/client/' + client.id)"
+                @click="$router.push('/admin/client/' + client.id)"
               >
                 edit
               </button>
@@ -50,7 +50,10 @@
 
       <!-- TODO show error -->
 
-      <button class="btn btn-primary" @click="$router.push('/client/new')">
+      <button
+        class="btn btn-primary"
+        @click="$router.push('/admin/client/new')"
+      >
         Add New Client
       </button>
     </div>

@@ -48,7 +48,7 @@
         </div>
 
         <button class="btn btn-primary mr-2" @click="create">Create</button>
-        <nuxt-link to="/user">Cancel</nuxt-link>
+        <nuxt-link to="/admin/user">Cancel</nuxt-link>
       </div>
     </div>
   </div>
@@ -90,7 +90,7 @@ export default {
       }
 
       alert('successfully created.')
-      this.$router.push('/user')
+      this.$router.push('/admin/user')
     },
     validateUserName() {
       const res = ValidateUserName(this.name)

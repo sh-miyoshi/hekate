@@ -119,10 +119,10 @@ export class AuthHandler {
       console.log('successfully got token: %o', res.data)
       this._setLoginUser(res.data.access_token)
       this._setToken(res.data)
-      this.context.redirect('/home')
+      this.context.redirect('/admin/home')
     } else if (res.statusCode >= 400 && res.statusCode < 500) {
       // redirect to login page
-      this.context.redirect('/')
+      this.context.redirect('/admin')
     } else {
       this.context.error({
         message: res.message,

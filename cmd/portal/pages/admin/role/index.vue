@@ -31,7 +31,7 @@
             <td>
               <button
                 class="btn btn-primary"
-                @click="$router.push('/role/' + role.id)"
+                @click="$router.push('/admin/role/' + role.id)"
               >
                 edit
               </button>
@@ -45,7 +45,7 @@
 
       <!-- TODO show error -->
 
-      <button class="btn btn-primary" @click="$router.push('/role/new')">
+      <button class="btn btn-primary" @click="$router.push('/admin/role/new')">
         Add New Role
       </button>
     </div>
