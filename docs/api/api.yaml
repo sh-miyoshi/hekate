@@ -582,7 +582,7 @@ paths:
         '204':
           description: 'Deleted'
         '400':
-          description: 'Invalid Request'
+          description: 'Bad Request'
         '404':
           description: 'User or Project or Role Not Found or No Such Role in User'
         '403':
