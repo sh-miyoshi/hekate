@@ -37,14 +37,11 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	roles, err := db.GetInst().CustomRoleGetList(projectName, filter)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectName)
+		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrCustomRoleValidateFailed {
+			logger.Info("Failed to get role list: %v", err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrCodeValidateFailed {
-			logger.Info("Custom role request validation failed: %v", err)
-			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to get role: %+v", err)
+			logger.Error("Failed to get role list: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -100,6 +97,9 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Cause(err) == model.ErrCustomRoleAlreadyExists {
 			logger.Info("Custom Role %s is already exists", role.Name)
 			http.Error(w, "Custom Role already exists", http.StatusConflict)
+		} else if errors.Cause(err) == model.ErrCustomRoleValidateFailed {
+			logger.Info("Custom role validation failed: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to create role: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -137,8 +137,8 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchCustomRole {
-			logger.Info("No such custom role: %s", roleID)
+		} else if errors.Cause(err) == model.ErrNoSuchCustomRole || errors.Cause(err) == model.ErrCustomRoleValidateFailed {
+			logger.Info("Custom role %s is not found: %v", roleID, err)
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to delete custom role: %+v", err)
@@ -168,9 +168,9 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	role, err := db.GetInst().CustomRoleGet(roleID)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchCustomRole {
-			logger.Info("No such role: %s", roleID)
-			http.Error(w, "Role Not Found", http.StatusNotFound)
+		if errors.Cause(err) == model.ErrNoSuchCustomRole || errors.Cause(err) == model.ErrCustomRoleValidateFailed {
+			logger.Info("Custom role %s is not found: %v", roleID, err)
+			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -220,9 +220,9 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchCustomRole {
-			logger.Info("No such role: %s", roleID)
-			http.Error(w, "CustomRole Not Found", http.StatusNotFound)
+		} else if errors.Cause(err) == model.ErrNoSuchCustomRole || errors.Cause(err) == model.ErrCustomRoleValidateFailed {
+			logger.Info("Custom role %s is not found: %v", roleID, err)
+			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to update role: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -235,8 +235,13 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().CustomRoleUpdate(role); err != nil {
-		logger.Error("Failed to update role: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if errors.Cause(err) == model.ErrCustomRoleValidateFailed {
+			logger.Error("Request validation failed: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		} else {
+			logger.Error("Failed to update role: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 

@@ -38,8 +38,8 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	users, err := db.GetInst().UserGetList(projectName, filter)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectName)
+		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get user: %+v", err)
@@ -51,13 +51,8 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Get all custom roles due to check all users
 	customRoles, err := db.GetInst().CustomRoleGetList(projectName, nil)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectName)
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else {
-			logger.Error("Failed to get custom role list: %+v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
+		logger.Error("Failed to get custom role list: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -133,7 +128,10 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().UserAdd(&user); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("user validation failed: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		} else if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrUserAlreadyExists {
@@ -186,20 +184,13 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Revoke All User Sessions
-	if err := db.GetInst().UserSessionsDelete(userID); err != nil {
-		logger.Error("Failed to revoke user session: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
 	// Delete User
 	if err := db.GetInst().UserDelete(userID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser {
-			logger.Info("No such user: %s", userID)
+		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("User %s is not found", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to delete user: %+v", err)
@@ -232,12 +223,12 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser {
-			logger.Info("No such user: %s", userID)
+		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("User %s is not found", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrUserValidateFailed {
 			logger.Info("Invalid User ID format: %v", err)
-			http.Error(w, "Invalid Request", http.StatusBadRequest)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to get user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -309,12 +300,12 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser {
-			logger.Info("No such user: %s", userID)
+		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
+			logger.Info("User %s is not found", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrUserValidateFailed {
 			logger.Info("Invalid User ID format: %v", err)
-			http.Error(w, "Invalid Request", http.StatusBadRequest)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to update user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -330,10 +321,9 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().UserUpdate(user); err != nil {
-		// TODO(check duplicate user name: Bad Request)
 		if errors.Cause(err) == model.ErrUserValidateFailed {
 			logger.Info("Invalid user request format: %v", err)
-			http.Error(w, "Invalid Request", http.StatusBadRequest)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to update user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -377,8 +367,13 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Role %s is already appended", roleID)
 			http.Error(w, "Role Already Appended", http.StatusConflict)
 		} else if errors.Cause(err) == model.ErrUserValidateFailed {
-			logger.Info("Invalid role was specified: %v", err)
-			http.Error(w, "Invalid Request", http.StatusBadRequest)
+			if !model.ValidateUserID(userID) {
+				logger.Info("UserID %s is invalid id format", userID)
+				http.Error(w, "User Not Found", http.StatusNotFound)
+			} else {
+				logger.Info("Invalid role was specified: %v", err)
+				http.Error(w, "Bad Request", http.StatusBadRequest)
+			}
 		} else {
 			logger.Error("Failed to add role to user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -417,8 +412,13 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("User %s do not have Role %s", userID, roleID)
 			http.Error(w, "No Such Role in User", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrUserValidateFailed {
-			logger.Info("Invalid ID was specified: %v", err)
-			http.Error(w, "Invalid Request", http.StatusBadRequest)
+			if !model.ValidateUserID(userID) {
+				logger.Info("UserID %s is invalid id format", userID)
+				http.Error(w, "User Not Found", http.StatusNotFound)
+			} else {
+				logger.Info("Invalid ID was specified: %v", err)
+				http.Error(w, "Bad Request", http.StatusBadRequest)
+			}
 		} else {
 			logger.Error("Failed to delete role from user: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -457,8 +457,13 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrUserValidateFailed {
-			logger.Info("Invalid request was specified: %v", err)
-			http.Error(w, "Invalid Request", http.StatusBadRequest)
+			if !model.ValidateUserID(userID) {
+				logger.Info("UserID %s is invalid id format", userID)
+				http.Error(w, "User Not Found", http.StatusNotFound)
+			} else {
+				logger.Info("Invalid password was specified: %v", err)
+				http.Error(w, "Bad Request", http.StatusBadRequest)
+			}
 		} else {
 			logger.Error("Failed to change user password: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)

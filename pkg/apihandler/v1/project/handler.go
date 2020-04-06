@@ -141,8 +141,8 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectName)
+		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrProjectValidateFailed {
+			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrDeleteBlockedProject {
 			logger.Info("Failed to delete blocked project: %v", err)
@@ -229,8 +229,8 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Project Info
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
-			logger.Info("No such project: %s", projectName)
+		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrProjectValidateFailed {
+			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
@@ -256,8 +256,13 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().ProjectUpdate(project); err != nil {
-		logger.Error("Failed to update project: %+v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if errors.Cause(err) == model.ErrProjectValidateFailed {
+			logger.Error("Project info validation failed: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
+		} else {
+			logger.Error("Failed to update project: %+v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 
