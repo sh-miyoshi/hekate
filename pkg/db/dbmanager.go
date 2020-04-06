@@ -109,7 +109,6 @@ func GetInst() *Manager {
 // ProjectAdd ...
 func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 	if err := ent.Validate(); err != nil {
-		logger.Info("Failed to validate project entry: %v", err)
 		return errors.Wrap(err, "Validate failed")
 	}
 
@@ -139,7 +138,7 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 // ProjectDelete ...
 func (m *Manager) ProjectDelete(name string) error {
 	if name == "" {
-		return errors.New("name of entry is empty")
+		return errors.Wrap(model.ErrProjectValidateFailed, "name of entry is empty")
 	}
 
 	return m.transaction.Transaction(func() error {
@@ -186,7 +185,7 @@ func (m *Manager) ProjectGetList() ([]*model.ProjectInfo, error) {
 // ProjectGet ...
 func (m *Manager) ProjectGet(name string) (*model.ProjectInfo, error) {
 	if name == "" {
-		return nil, errors.New("name of entry is empty")
+		return nil, errors.Wrap(model.ErrProjectValidateFailed, "name of entry is empty")
 	}
 
 	return m.project.Get(name)
@@ -195,7 +194,6 @@ func (m *Manager) ProjectGet(name string) (*model.ProjectInfo, error) {
 // ProjectUpdate ...
 func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
 	if err := ent.Validate(); err != nil {
-		logger.Info("Failed to validate project entry: %v", err)
 		return errors.Wrap(err, "Failed to validate")
 	}
 
