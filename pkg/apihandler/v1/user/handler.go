@@ -190,7 +190,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
-			logger.Info("User %s is not found", userID, err)
+			logger.Info("User %s is not found: %v", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to delete user: %+v", err)
@@ -224,7 +224,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
-			logger.Info("User %s is not found", userID, err)
+			logger.Info("User %s is not found: %v", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrUserValidateFailed {
 			logger.Info("Invalid User ID format: %v", err)
@@ -301,7 +301,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
-			logger.Info("User %s is not found", userID, err)
+			logger.Info("User %s is not found: %v", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Cause(err) == model.ErrUserValidateFailed {
 			logger.Info("Invalid User ID format: %v", err)
