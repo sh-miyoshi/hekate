@@ -331,6 +331,8 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 			}
 		}
 
+		// TODO(check duplicate user name: Bad Request)
+
 		if err := m.user.Update(ent); err != nil {
 			return errors.Wrap(err, "Failed to update user")
 		}
@@ -411,21 +413,6 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 		if err := m.user.DeleteRole(userID, roleID); err != nil {
 			return errors.Wrap(err, "Failed to delete role from user")
 		}
-		return nil
-	})
-}
-
-// UserSessionsDelete ...
-func (m *Manager) UserSessionsDelete(userID string) error {
-	if !model.ValidateUserID(userID) {
-		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
-	}
-
-	return m.transaction.Transaction(func() error {
-		if err := m.session.RevokeAll(userID); err != nil {
-			return errors.Wrap(err, "Revoke session failed")
-		}
-
 		return nil
 	})
 }
