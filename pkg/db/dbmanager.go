@@ -68,7 +68,6 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create session handler")
 		}
-		clientHandler := mongo.NewClientHandler(dbClient)
 		authCodeHandler, err := mongo.NewAuthCodeHandler(dbClient)
 		if err != nil {
 			return errors.Wrap(err, "Failed to create auth code handler")
@@ -86,7 +85,7 @@ func InitDBManager(dbType string, connStr string) error {
 			project:      prjHandler,
 			user:         userHandler,
 			session:      sessionHandler,
-			client:       clientHandler,
+			client:       mongo.NewClientHandler(dbClient),
 			authCode:     authCodeHandler,
 			customRole:   customRoleHandler,
 			loginSession: loginSessionHandler,
@@ -348,7 +347,14 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 			}
 		}
 
-		// TODO(check duplicate user name: Bad Request)
+		// check duplicate user name
+		users, err := m.user.GetList(ent.ProjectName, &model.UserFilter{Name: ent.Name})
+		if err != nil {
+			return errors.Wrap(err, "Failed to get user for checking name duplication")
+		}
+		if len(users) >= 2 || (len(users) == 1 && users[0].ID != ent.ID) {
+			return errors.Wrap(model.ErrUserAlreadyExists, "new user name is already used")
+		}
 
 		if err := m.user.Update(ent); err != nil {
 			return errors.Wrap(err, "Failed to update user")

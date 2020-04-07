@@ -321,7 +321,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().UserUpdate(user); err != nil {
-		if errors.Cause(err) == model.ErrUserValidateFailed {
+		if errors.Cause(err) == model.ErrUserValidateFailed || errors.Cause(err) == model.ErrUserAlreadyExists {
 			logger.Info("Invalid user request format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
