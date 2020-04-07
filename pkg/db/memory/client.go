@@ -6,28 +6,35 @@ import (
 
 // ClientInfoHandler implement db.ClientInfoHandler
 type ClientInfoHandler struct {
-	// clientList[clientID] = ClientInfo
-	clientList map[string]*model.ClientInfo
+	clientList []*model.ClientInfo
 }
 
 // NewClientHandler ...
 func NewClientHandler() *ClientInfoHandler {
-	res := &ClientInfoHandler{
-		clientList: make(map[string]*model.ClientInfo),
-	}
+	res := &ClientInfoHandler{}
 	return res
 }
 
 // Add ...
 func (h *ClientInfoHandler) Add(ent *model.ClientInfo) error {
-	h.clientList[ent.ID] = ent
+	h.clientList = append(h.clientList, ent)
 	return nil
 }
 
 // Delete ...
-func (h *ClientInfoHandler) Delete(clientID string) error {
-	if _, exists := h.clientList[clientID]; exists {
-		delete(h.clientList, clientID)
+func (h *ClientInfoHandler) Delete(projectName, clientID string) error {
+	newList := []*model.ClientInfo{}
+	found := false
+	for _, c := range h.clientList {
+		if c.ProjectName == projectName && c.ID == clientID {
+			found = true
+		} else {
+			newList = append(newList, c)
+		}
+	}
+
+	if found {
+		h.clientList = newList
 		return nil
 	}
 	return model.ErrNoSuchClient
@@ -47,32 +54,35 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, er
 }
 
 // Get ...
-func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
-	res, exists := h.clientList[clientID]
-	if !exists {
-		return nil, model.ErrNoSuchClient
+func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, error) {
+	for _, c := range h.clientList {
+		if c.ProjectName == projectName && c.ID == clientID {
+			return c, nil
+		}
 	}
 
-	return res, nil
+	return nil, model.ErrNoSuchClient
 }
 
 // Update ...
 func (h *ClientInfoHandler) Update(ent *model.ClientInfo) error {
-	if _, exists := h.clientList[ent.ID]; !exists {
-		return model.ErrNoSuchClient
+	for i, c := range h.clientList {
+		if c.ProjectName == ent.ProjectName && c.ID == ent.ID {
+			h.clientList[i] = ent
+			return nil
+		}
 	}
-
-	h.clientList[ent.ID] = ent
-
-	return nil
+	return model.ErrNoSuchClient
 }
 
 // DeleteAll ...
 func (h *ClientInfoHandler) DeleteAll(projectName string) error {
-	for _, client := range h.clientList {
-		if client.ProjectName == projectName {
-			delete(h.clientList, client.ID)
+	newList := []*model.ClientInfo{}
+	for _, c := range h.clientList {
+		if c.ProjectName != projectName {
+			newList = append(newList, c)
 		}
 	}
+	h.clientList = newList
 	return nil
 }

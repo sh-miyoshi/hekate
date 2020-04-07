@@ -84,7 +84,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		clientSecret = s
 	}
 
-	if err := oidc.ClientAuth(clientID, clientSecret); err != nil {
+	if err := oidc.ClientAuth(projectName, clientID, clientSecret); err != nil {
 		if errors.Cause(err) == oidc.ErrInvalidClient {
 			logger.Info("Failed to authenticate client: %s", clientID)
 			writeTokenErrorResponse(w, oidc.ErrInvalidClient, state)
@@ -98,7 +98,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var tkn *oidc.TokenResponse
 
 	if r.Form.Get("redirect_uri") != "" {
-		if err := client.CheckRedirectURL(clientID, r.Form.Get("redirect_uri")); err != nil {
+		if err := client.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
 			errMsg := ""
 			if errors.Cause(err) == client.ErrNoRedirectURL {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
@@ -224,7 +224,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check Redirect URL
-	if err := client.CheckRedirectURL(authReq.ClientID, authReq.RedirectURI); err != nil {
+	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
 		errMsg := ""
 		if errors.Cause(err) == client.ErrNoRedirectURL {
 			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)
@@ -275,7 +275,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check Redirect URL
-	if err := client.CheckRedirectURL(authReq.ClientID, authReq.RedirectURI); err != nil {
+	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
 		errMsg := ""
 		if errors.Cause(err) == client.ErrNoRedirectURL {
 			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)

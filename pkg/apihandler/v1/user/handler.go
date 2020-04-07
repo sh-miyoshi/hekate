@@ -439,7 +439,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	claims, err := jwthttp.ValidateAPIRequest(r)
-	if claims.Subject != userID {
+	if err != nil || claims.Subject != userID {
 		logger.Info("Failed to authorize user: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return

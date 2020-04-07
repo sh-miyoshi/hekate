@@ -31,9 +31,9 @@ var (
 // ClientInfoHandler ...
 type ClientInfoHandler interface {
 	Add(ent *ClientInfo) error
-	Delete(clientID string) error
+	Delete(projectName, clientID string) error
 	GetList(projectName string) ([]*ClientInfo, error)
-	Get(clientID string) (*ClientInfo, error)
+	Get(projectName, clientID string) (*ClientInfo, error)
 	Update(ent *ClientInfo) error
 	DeleteAll(projectName string) error
 }

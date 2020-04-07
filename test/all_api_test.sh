@@ -157,16 +157,16 @@ fi
 ## Get User Token
 token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=user1" \
+  -d "username=new-user" \
   -d "password=password" \
   -d "client_id=portal" \
   -d 'grant_type=password'`
 user_access_token=`echo $token_info | jq -r .access_token`
 ## Change Password
-result=`test_api "$URL/project/master/user/$userID/change-password" POST $user_access_token`
+result=`test_api "$URL/project/master/user/$userID/change-password" POST $user_access_token 'inputs/change-password.json'`
 echo $result
 if [ $result != "success" ]; then
-	echo "Failed to delete role from user"
+	echo "Failed to change password"
 	exit 1
 fi
 

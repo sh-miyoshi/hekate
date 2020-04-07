@@ -11,9 +11,9 @@ var (
 )
 
 // CheckRedirectURL ...
-func CheckRedirectURL(clientID, redirectURL string) error {
+func CheckRedirectURL(projectName, clientID, redirectURL string) error {
 	// Check Redirect URL
-	cli, err := db.GetInst().ClientGet(clientID)
+	cli, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
 		return err
 	}

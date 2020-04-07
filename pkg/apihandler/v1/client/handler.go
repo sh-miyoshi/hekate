@@ -127,7 +127,7 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.GetInst().ClientDelete(clientID); err != nil {
+	if err := db.GetInst().ClientDelete(projectName, clientID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -160,7 +160,7 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := db.GetInst().ClientGet(clientID)
+	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchClient || errors.Cause(err) == model.ErrClientValidateFailed {
 			logger.Info("No such client: %s", clientID)
@@ -209,7 +209,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous Client Info
-	client, err := db.GetInst().ClientGet(clientID)
+	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
 		// TODO check conflict
 		if errors.Cause(err) == model.ErrNoSuchProject {

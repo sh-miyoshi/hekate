@@ -158,7 +158,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 
 // ReqAuthByRClientCredentials ...
 func ReqAuthByRClientCredentials(project *model.ProjectInfo, clientID string, r *http.Request) (*TokenResponse, error) {
-	cli, err := db.GetInst().ClientGet(clientID)
+	cli, err := db.GetInst().ClientGet(project.Name, clientID)
 	if err != nil {
 		return nil, errors.Wrap(err, "Get client info failed")
 	}

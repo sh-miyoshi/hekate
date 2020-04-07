@@ -8,7 +8,6 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ClientInfoHandler implement db.ClientInfoHandler
@@ -17,26 +16,14 @@ type ClientInfoHandler struct {
 }
 
 // NewClientHandler ...
-func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, error) {
+func NewClientHandler(dbClient *mongo.Client) *ClientInfoHandler {
 	res := &ClientInfoHandler{
 		dbClient: dbClient,
 	}
 
-	// Create Index to Project Name
-	mod := mongo.IndexModel{
-		Keys: bson.M{
-			"id": 1, // index in ascending order
-		},
-		Options: options.Index().SetUnique(true),
-	}
+	// Client has no index
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	col := res.dbClient.Database(databaseName).Collection(clientCollectionName)
-	_, err := col.Indexes().CreateOne(ctx, mod)
-
-	return res, err
+	return res
 }
 
 // Add ...
@@ -64,9 +51,10 @@ func (h *ClientInfoHandler) Add(ent *model.ClientInfo) error {
 }
 
 // Delete ...
-func (h *ClientInfoHandler) Delete(clientID string) error {
+func (h *ClientInfoHandler) Delete(projectName, clientID string) error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: clientID},
 	}
 
@@ -117,9 +105,10 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, er
 }
 
 // Get ...
-func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
+func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, error) {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: clientID},
 	}
 
@@ -148,6 +137,7 @@ func (h *ClientInfoHandler) Get(clientID string) (*model.ClientInfo, error) {
 func (h *ClientInfoHandler) Update(ent *model.ClientInfo) error {
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: ent.ProjectName},
 		{Key: "id", Value: ent.ID},
 	}
 

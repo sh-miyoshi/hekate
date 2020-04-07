@@ -68,10 +68,7 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create session handler")
 		}
-		clientHandler, err := mongo.NewClientHandler(dbClient)
-		if err != nil {
-			return errors.Wrap(err, "Failed to create client handler")
-		}
+		clientHandler := mongo.NewClientHandler(dbClient)
 		authCodeHandler, err := mongo.NewAuthCodeHandler(dbClient)
 		if err != nil {
 			return errors.Wrap(err, "Failed to create auth code handler")
@@ -140,14 +137,14 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 			callbacks = append(callbacks, addr)
 		}
 		// add client for portal login
-		ent := &model.ClientInfo{
+		clientEnt := &model.ClientInfo{
 			ID:                  "portal",
 			ProjectName:         ent.Name,
 			AccessType:          "public",
 			CreatedAt:           ent.CreatedAt,
 			AllowedCallbackURLs: callbacks,
 		}
-		if err := m.client.Add(ent); err != nil {
+		if err := m.client.Add(clientEnt); err != nil {
 			return errors.Wrap(err, "Failed to add client for portal login")
 		}
 
@@ -538,7 +535,7 @@ func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		_, err := m.client.Get(ent.ID)
+		_, err := m.client.Get(ent.ProjectName, ent.ID)
 		if err != model.ErrNoSuchClient {
 			if err == nil {
 				return model.ErrClientAlreadyExists
@@ -554,7 +551,10 @@ func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
 }
 
 // ClientDelete ...
-func (m *Manager) ClientDelete(clientID string) error {
+func (m *Manager) ClientDelete(projectName, clientID string) error {
+	if !model.ValidateProjectName(projectName) {
+		return errors.Wrap(model.ErrClientValidateFailed, "Invalid project name format")
+	}
 	if !model.ValidateClientID(clientID) {
 		return errors.Wrap(model.ErrClientValidateFailed, "invalid client id format")
 	}
@@ -566,7 +566,7 @@ func (m *Manager) ClientDelete(clientID string) error {
 			return errors.Wrap(err, "Failed to delete login session of the client")
 		}
 
-		if err := m.client.Delete(clientID); err != nil {
+		if err := m.client.Delete(projectName, clientID); err != nil {
 			return errors.Wrap(err, "Failed to delete client")
 		}
 		return nil
@@ -583,12 +583,15 @@ func (m *Manager) ClientGetList(projectName string) ([]*model.ClientInfo, error)
 }
 
 // ClientGet ...
-func (m *Manager) ClientGet(clientID string) (*model.ClientInfo, error) {
+func (m *Manager) ClientGet(projectName, clientID string) (*model.ClientInfo, error) {
+	if !model.ValidateProjectName(projectName) {
+		return nil, errors.Wrap(model.ErrClientValidateFailed, "Invalid project name format")
+	}
 	if !model.ValidateClientID(clientID) {
 		return nil, errors.Wrap(model.ErrClientValidateFailed, "invalid client id format")
 	}
 
-	return m.client.Get(clientID)
+	return m.client.Get(projectName, clientID)
 }
 
 // ClientUpdate ...

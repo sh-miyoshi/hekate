@@ -7,8 +7,8 @@ import (
 )
 
 // ClientAuth ...
-func ClientAuth(clientID string, clientSecret string) error {
-	client, err := db.GetInst().ClientGet(clientID)
+func ClientAuth(projectName string, clientID string, clientSecret string) error {
+	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
 		e := errors.Cause(err)
 		if e == model.ErrNoSuchClient || e == model.ErrClientValidateFailed {
