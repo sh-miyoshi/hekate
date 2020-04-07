@@ -1,6 +1,6 @@
 import { AuthHandler } from '../plugins/auth.js'
 
-export default async function(context) {
+export default async function (context) {
   const expiresIn = window.localStorage.getItem('expires_in')
   if (!expiresIn) {
     context.redirect('/')
@@ -11,7 +11,7 @@ export default async function(context) {
   const res = await handler.GetToken()
   if (!res.ok) {
     if (res.statusCode >= 400 && res.statusCode < 500) {
-      context.redirect('/admin')
+      context.redirect('/')
     } else {
       context.error({
         message: res.message,
