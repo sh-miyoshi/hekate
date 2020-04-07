@@ -22,7 +22,7 @@ token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token 
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \
-  -d "client_id=admin-cli" \
+  -d "client_id=portal" \
   -d 'grant_type=password'`
 master_access_token=`echo $token_info | jq -r .access_token`
 # echo $master_access_token

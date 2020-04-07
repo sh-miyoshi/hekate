@@ -3,20 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
-	oidc "github.com/coreos/go-oidc"
-	"golang.org/x/oauth2"
 	"io/ioutil"
 	"net/http"
 	neturl "net/url"
 	"os"
 	"regexp"
 	"strings"
+
+	oidc "github.com/coreos/go-oidc"
+	"golang.org/x/oauth2"
 )
 
 func main() {
 	serverAddr := "http://localhost:8080"
 	issuer := serverAddr + "/api/v1/project/master"
-	clientID := "admin-cli"
+	clientID := "portal"
 	clientSecret := ""
 	state := "mystate"
 

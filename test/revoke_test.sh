@@ -7,7 +7,7 @@ token_info=`curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \
-  -d "client_id=admin-cli" \
+  -d "client_id=portal" \
   -d 'grant_type=password'`
 access_token=`echo $token_info | jq -r .access_token`
 refresh_token=`echo $token_info | jq -r .refresh_token`
@@ -26,7 +26,7 @@ echo "successfully get token"
 new_token_info=`curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "refresh_token=$refresh_token" \
-  -d "client_id=admin-cli" \
+  -d "client_id=portal" \
   -d 'grant_type=refresh_token'`
 
 new_access_token=`echo $new_token_info | jq -r .access_token`
@@ -46,7 +46,7 @@ echo "successfully get new token"
 status=`curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "refresh_token=$refresh_token" \
-  -d "client_id=admin-cli" \
+  -d "client_id=portal" \
   -d 'grant_type=refresh_token' \
   -o /dev/null -w '%{http_code}'`
 if [ $status -lt 300 ]; then
@@ -62,7 +62,7 @@ curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/revoke \
 status=`curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "refresh_token=$new_refresh_token" \
-  -d "client_id=admin-cli" \
+  -d "client_id=portal" \
   -d 'grant_type=refresh_token' \
   -o /dev/null -w '%{http_code}'`
 if [ $status -lt 300 ]; then

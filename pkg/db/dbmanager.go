@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/memory"
@@ -129,6 +130,25 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 
 		if err := m.project.Add(ent); err != nil {
 			return errors.Wrap(err, "Failed to add project")
+		}
+
+		callbacks := []string{
+			"http://localhost:3000/callback", // TODO(for debug)
+		}
+		if os.Getenv("HEKATE_PORTAL_ADDR") != "" {
+			addr := os.Getenv("HEKATE_PORTAL_ADDR") + "/callback"
+			callbacks = append(callbacks, addr)
+		}
+		// add client for portal login
+		ent := &model.ClientInfo{
+			ID:                  "portal",
+			ProjectName:         ent.Name,
+			AccessType:          "public",
+			CreatedAt:           ent.CreatedAt,
+			AllowedCallbackURLs: callbacks,
+		}
+		if err := m.client.Add(ent); err != nil {
+			return errors.Wrap(err, "Failed to add client for portal login")
 		}
 
 		return nil

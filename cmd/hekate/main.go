@@ -149,29 +149,6 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		}
 	}
 
-	callbacks := []string{
-		"http://localhost:3000/callback", // TODO(for debug)
-	}
-	if os.Getenv("HEKATE_PORTAL_ADDR") != "" {
-		addr := os.Getenv("HEKATE_PORTAL_ADDR") + "/callback"
-		callbacks = append(callbacks, addr)
-	}
-	err = db.GetInst().ClientAdd(&model.ClientInfo{
-		ID:                  "admin-cli",
-		ProjectName:         "master",
-		AccessType:          "public",
-		CreatedAt:           time.Now(),
-		AllowedCallbackURLs: callbacks,
-	})
-
-	if err != nil {
-		if errors.Cause(err) == model.ErrClientAlreadyExists {
-			logger.Info("admin-cli client is already exists.")
-		} else {
-			return errors.Wrap(err, "Failed to create admin-cli client")
-		}
-	}
-
 	return nil
 }
 
