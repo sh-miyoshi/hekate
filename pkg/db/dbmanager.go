@@ -466,8 +466,7 @@ func (m *Manager) UserChangePassword(userID string, password string) error {
 
 // LoginSessionAdd ...
 func (m *Manager) LoginSessionAdd(info *model.LoginSessionInfo) error {
-	// TODO(add validation)
-
+	// info create in internal only, so validation is not required
 	return m.transaction.Transaction(func() error {
 		if err := m.loginSession.Add(info); err != nil {
 			return errors.Wrap(err, "Failed to add login session")
