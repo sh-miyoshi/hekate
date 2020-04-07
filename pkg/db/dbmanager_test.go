@@ -11,6 +11,7 @@ import (
 
 func TestProjectAdd(t *testing.T) {
 	mgr := &Manager{
+		client:      memory.NewClientHandler(),
 		project:     memory.NewProjectHandler(),
 		transaction: memory.NewTransactionManager(),
 	}
