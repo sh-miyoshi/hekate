@@ -1,6 +1,6 @@
 import { AuthHandler } from '../plugins/auth.js'
 
-export default async function (context) {
+export default async function(context) {
   const expiresIn = window.localStorage.getItem('expires_in')
   if (!expiresIn) {
     context.redirect('/')
