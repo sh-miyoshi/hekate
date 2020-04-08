@@ -5,7 +5,7 @@ import jwtdecode from 'jwt-decode'
 export class AuthHandler {
   constructor(context) {
     this.context = context
-    this.client_id = 'admin-cli'
+    this.client_id = 'portal'
     this.project = 'master'
   }
 
