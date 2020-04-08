@@ -6,7 +6,6 @@ export class AuthHandler {
   constructor(context) {
     this.context = context
     this.client_id = 'portal'
-    this.project = 'master'
   }
 
   _encodeQuery(queryObject) {
@@ -36,7 +35,9 @@ export class AuthHandler {
     window.localStorage.setItem('user', data.preferred_username)
   }
 
-  Login() {
+  Login(project) {
+    window.localStorage.setItem('login_project', project)
+
     // TODO(consider state)
 
     let protcol = 'https'
@@ -60,7 +61,7 @@ export class AuthHandler {
     const url =
       process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
-      this.project +
+      project +
       '/openid-connect/auth?' +
       this._encodeQuery(opts)
 
@@ -73,10 +74,11 @@ export class AuthHandler {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
 
+    const project = window.localStorage.getItem('login_project')
     const url =
       process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
-      this.project +
+      project +
       '/openid-connect/token'
 
     const handler = axios.create({
@@ -197,6 +199,7 @@ export class AuthHandler {
     window.localStorage.removeItem('expires_in')
     window.localStorage.removeItem('refresh_expires_in')
     window.localStorage.removeItem('user')
+    window.localStorage.removeItem('login_project')
   }
 }
 
