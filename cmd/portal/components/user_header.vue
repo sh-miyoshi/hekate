@@ -1,0 +1,32 @@
+<template>
+  <header class="c-header">
+    <!-- logo start -->
+    <img src="~/assets/img/logo.png" class="logo" />
+    <!-- logo end -->
+
+    <div class="c-header-nav ml-auto mr-4">
+      <button class="btn btn-primary px-4 btn-block" @click="logout">
+        Logout
+      </button>
+    </div>
+  </header>
+</template>
+
+<script>
+export default {
+  methods: {
+    logout() {
+      // TODO(implement this)
+      // this.$auth.Logout()
+      // this.$router.push('/admin')
+    }
+  }
+}
+</script>
+
+<style scoped>
+.logo {
+  width: 120px;
+  padding-left: 10px;
+}
+</style>
