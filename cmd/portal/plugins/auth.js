@@ -109,6 +109,12 @@ export class AuthHandler {
   }
 
   async AuthCode(authCode) {
+    let redirect = '/admin/home'
+    const project = window.localStorage.getItem('login_project')
+    if (project && project !== 'master') {
+      redirect = '/user/project/' + project + '/home'
+    }
+
     // TODO(consider state)
     const opts = {
       grant_type: 'authorization_code',
@@ -121,10 +127,10 @@ export class AuthHandler {
       console.log('successfully got token: %o', res.data)
       this._setLoginUser(res.data.access_token)
       this._setToken(res.data)
-      this.context.redirect('/admin/home')
+      this.context.redirect(redirect)
     } else if (res.statusCode >= 400 && res.statusCode < 500) {
       // redirect to login page
-      this.context.redirect('/admin')
+      this.context.redirect(redirect)
     } else {
       this.context.error({
         message: res.message,
