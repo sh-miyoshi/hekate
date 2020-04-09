@@ -1,7 +1,7 @@
 <template>
   <header class="c-header">
     <!-- logo start -->
-    <nuxt-link to="/admin/home" class="c-header-nav">
+    <nuxt-link to="/admin" class="c-header-nav">
       <img src="~/assets/img/logo.png" class="logo" />
     </nuxt-link>
     <!-- logo end -->

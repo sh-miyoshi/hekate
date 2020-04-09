@@ -109,10 +109,10 @@ export class AuthHandler {
   }
 
   async AuthCode(authCode) {
-    let redirect = '/admin/home'
+    let redirect = '/admin'
     const project = window.localStorage.getItem('login_project')
     if (project && project !== 'master') {
-      redirect = '/user/project/' + project + '/home'
+      redirect = '/user/project/' + project
     }
 
     // TODO(consider state)

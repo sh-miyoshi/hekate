@@ -1,16 +1,13 @@
 <template>
   <div>
-    <p>redirecting ...</p>
+    <h4>Welcome to Hekate!</h4>
+    Please select item from menu bar
   </div>
 </template>
 
 <script>
 export default {
-  layout: 'user_default',
+  layout: 'user_default'
   // TODO middleware: 'auth',
-  mounted() {
-    const project = window.localStorage.getItem('login_project')
-    this.$router.replace('/user/project/' + project + '/home')
-  }
 }
 </script>

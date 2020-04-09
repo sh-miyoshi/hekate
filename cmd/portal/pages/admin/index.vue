@@ -1,14 +1,12 @@
 <template>
   <div>
-    <p>redirecting ...</p>
+    <h4>Welcome to Hekate!</h4>
+    Please select item from menu bar
   </div>
 </template>
 
 <script>
 export default {
-  middleware: 'auth',
-  created() {
-    this.$router.replace('/admin/home')
-  }
+  middleware: 'auth'
 }
 </script>
