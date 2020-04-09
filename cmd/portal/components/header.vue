@@ -19,7 +19,7 @@ export default {
   methods: {
     logout() {
       this.$auth.Logout()
-      this.$router.push('/admin')
+      this.$router.push('/')
     }
   }
 }
