@@ -205,7 +205,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserGetHandler ...
-//   require role: user-read
+//   require role: user-read, or <oneself>
 func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -213,9 +213,13 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResUser, role.TypeRead); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
+		claims, err := jwthttp.ValidateAPIRequest(r)
+		// Check if the requester is the user
+		if err != nil || claims.Subject != userID {
+			logger.Info("Failed to authorize header: %v", err)
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 	}
 
 	user, err := db.GetInst().UserGet(userID)
