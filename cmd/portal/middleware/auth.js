@@ -1,19 +1,25 @@
 import { AuthHandler } from '../plugins/auth.js'
 
 export default async function(context) {
-  let redirect = '/'
-  const project = window.localStorage.getItem('login_project')
-  if (project && project !== 'master') {
-    redirect = '/user/project/' + project
-  }
-
-  const expiresIn = window.localStorage.getItem('expires_in')
-  if (!expiresIn) {
-    context.redirect(redirect)
-    return
+  let project = 'master'
+  let redirect = '/admin'
+  if (context.route.path.includes('/user/project/')) {
+    const values = context.route.path.split('/')
+    if (values.length >= 4) {
+      // ignore extra path
+      project = values[3]
+      redirect = '/user/project/' + project
+    }
   }
 
   const handler = new AuthHandler(context)
+
+  const loginProject = window.localStorage.getItem('login_project')
+  if (!loginProject || project !== loginProject) {
+    handler.Login(project)
+    return
+  }
+
   const res = await handler.GetToken()
   if (!res.ok) {
     if (res.statusCode >= 400 && res.statusCode < 500) {

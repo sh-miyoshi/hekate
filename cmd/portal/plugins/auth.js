@@ -35,6 +35,15 @@ export class AuthHandler {
     window.localStorage.setItem('user', data.preferred_username)
   }
 
+  RemoveAllData() {
+    window.localStorage.removeItem('access_token')
+    window.localStorage.removeItem('refresh_token')
+    window.localStorage.removeItem('expires_in')
+    window.localStorage.removeItem('refresh_expires_in')
+    window.localStorage.removeItem('user')
+    window.localStorage.removeItem('login_project')
+  }
+
   Login(project) {
     window.localStorage.setItem('login_project', project)
 
@@ -74,7 +83,10 @@ export class AuthHandler {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
 
-    const project = window.localStorage.getItem('login_project')
+    let project = window.localStorage.getItem('login_project')
+    if (!project || project === '') {
+      project = 'master'
+    }
     const url =
       process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
@@ -111,7 +123,7 @@ export class AuthHandler {
   async AuthCode(authCode) {
     let redirect = '/admin'
     const project = window.localStorage.getItem('login_project')
-    if (project && project !== 'master') {
+    if (project && project !== '') {
       redirect = '/user/project/' + project
     }
 
@@ -200,12 +212,7 @@ export class AuthHandler {
         console.log(error)
       }
     }
-    window.localStorage.removeItem('access_token')
-    window.localStorage.removeItem('refresh_token')
-    window.localStorage.removeItem('expires_in')
-    window.localStorage.removeItem('refresh_expires_in')
-    window.localStorage.removeItem('user')
-    window.localStorage.removeItem('login_project')
+    this.RemoveAllData()
   }
 }
 

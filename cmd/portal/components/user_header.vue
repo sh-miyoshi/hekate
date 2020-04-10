@@ -15,10 +15,16 @@
 <script>
 export default {
   methods: {
-    logout() {
-      // TODO(implement this)
-      // this.$auth.Logout()
-      // this.$router.push('/admin')
+    async logout() {
+      const project = window.localStorage.getItem('login_project')
+      await this.$auth.Logout()
+
+      const to = '/user/project/' + project
+      if (this.$router.currentRoute.path === to) {
+        window.location.reload(true)
+      } else {
+        this.$router.push(to)
+      }
     }
   }
 }

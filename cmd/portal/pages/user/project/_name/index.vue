@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  layout: 'user_default'
-  // TODO middleware: 'auth',
+  layout: 'user_default',
+  middleware: 'auth'
 }
 </script>
