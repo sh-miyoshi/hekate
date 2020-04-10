@@ -76,6 +76,16 @@
 
 ## Portal(Admin Console) enhancement
 
+- Userページの作成
+  - 決めること
+    - Login URL: `http://localhost:3000/xxx(user)/project/<project-name>`
+    - Page URL
+  - Redirect先テスト
+  - Userアカウント設定ページ
+    - Account Setting(/account)
+    - Password(/password)
+    - Sessions(/sessions)
+    - Audit Log(/logs)
 - 各ページの作成
   - User
     - Login Sessionの表示
@@ -99,6 +109,7 @@
 
 ## CLI tool(hctl) enhancement
 
+- いろいろ修正が必要
 - configファイルの扱い
   - `no such file or directory`のとき、新規作成
   - permission: 0700, 0600
