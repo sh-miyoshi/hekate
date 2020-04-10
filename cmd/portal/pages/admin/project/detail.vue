@@ -28,6 +28,20 @@
 
       <div class="form-group row">
         <label for="accessTokenLifeSpan" class="col-sm-4 control-label">
+          User Login URL
+        </label>
+        <div class="col-sm-7">
+          <input
+            v-model="loginURL"
+            type="text"
+            disabled="disabled"
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="accessTokenLifeSpan" class="col-sm-4 control-label">
           Access Token Life Span
         </label>
         <div class="col-sm-3">
@@ -130,6 +144,7 @@ export default {
     return {
       units: ['sec', 'minutes', 'hours', 'days'],
       error: '',
+      loginURL: '',
       accessTokenLifeSpan: 0,
       accessTokenUnit: 'sec',
       refreshTokenLifeSpan: 0,
@@ -162,6 +177,19 @@ export default {
   },
   mounted() {
     this.setProjectInfo()
+
+    let protcol = 'https'
+    if (!process.env.https) {
+      protcol = 'http'
+    }
+    this.loginURL =
+      protcol +
+      '://' +
+      process.env.HEKATE_PORTAL_HOST +
+      ':' +
+      process.env.HEKATE_PORTAL_PORT +
+      '/user/project/' +
+      this.$store.state.current_project
   },
   methods: {
     deleteProjectConfirm() {
