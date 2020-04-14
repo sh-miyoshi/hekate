@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: JWT Server
-  description: API specification for JWT Server
+  title: Hekate Server
+  description: API specification for Hekate Server
   version: '1.0'
   license:
     name: 'Apache 2.0'
@@ -71,7 +71,7 @@ paths:
           in: query
           schema:
             type: string
-        - name: code_verifier
+        - name: state
           in: query
           schema:
             type: string
@@ -242,6 +242,10 @@ paths:
         - name: password
           in: query
           required: true
+          schema:
+            type: string
+        - name: state
+          in: query
           schema:
             type: string
       responses:
