@@ -52,15 +52,15 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
-	state := r.Form.Get("state")
 
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, state)
+		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
 		return
 	}
 
 	logger.Debug("Form: %v", r.Form)
+	state := r.Form.Get("state")
 
 	// Get Project Info for Token Config
 	project, err := db.GetInst().ProjectGet(projectName)
