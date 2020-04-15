@@ -8,6 +8,8 @@ TODO
 
 ## 前準備
 
+### Hekateのインストール
+
 README.mdを参考にHekateをインストールしてください。
 
 以降では、Hekateには以下のアドレスでアクセスできるものとして説明します。
@@ -15,8 +17,6 @@ README.mdを参考にHekateをインストールしてください。
 
 - Portal: [http://localhost:3000](http://localhost:3000)
 - Server: [http://localhost:8080](http://localhost:8080)
-
-## 手順
 
 ### アクセスを制御したいサーバの準備
 
@@ -27,10 +27,28 @@ README.mdを参考にHekateをインストールしてください。
 docker run --name test-server -p 10000:10000 -d smiyoshi/test-server
 ```
 
-### Access Proxy用のOpenID Connect Clientの登録
+## 手順
+
+### プロジェクトの準備
 
 - Portal([http://localhost:3000](http://localhost:3000))にアクセス
 - Adminユーザの名前とパスワードを入力し、ログイン
+- 左枠のメニューからmasterを選択
+- Add New Projectボタンを押下
+- Nameを入力し、Createボタンを押下
+  - ここでは、name: `sample`とする
+- Project一覧から`sample`を選択
+  - 左上が`master`から`sample`に変わっていることを確認
+
+### ユーザーの追加
+
+- 左枠のメニューからUserを選択
+- Add New Userボタンを押下
+- NameとPasswordを入力し、Createボタンを押下
+  - ここではName: `admin`とする
+
+### Access Proxy用のOpenID Connect Clientの登録
+
 - 左枠のメニューからClientを選択
 - Add New Clinetボタンを押下
 - Client IDを入力し、Createボタンを押下
@@ -40,7 +58,7 @@ docker run --name test-server -p 10000:10000 -d smiyoshi/test-server
 
 ### アクセス用のロールを作成・ユーザーに付与
 
-- Potalにログイン後、左枠のメニューからRoleを選択
+- 左枠のメニューからRoleを選択
 - Add New Roleボタンを押下
 - Nameを入力し、Createボタンを押下
   - ここではName: `hello-access`とする
