@@ -46,6 +46,9 @@ export class AuthHandler {
 
   Login(project) {
     window.localStorage.setItem('login_project', project)
+    if (project === '') {
+      project = 'master'
+    }
 
     // TODO(consider state)
 

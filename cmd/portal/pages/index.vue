@@ -49,7 +49,7 @@ export default {
   layout: 'index',
   methods: {
     login() {
-      this.$auth.Login('master')
+      this.$auth.Login('')
     }
   }
 }

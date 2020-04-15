@@ -15,7 +15,10 @@ export default async function(context) {
   const handler = new AuthHandler(context)
 
   const loginProject = window.localStorage.getItem('login_project')
-  if (!loginProject || project !== loginProject) {
+  if (
+    loginProject == null ||
+    (loginProject !== '' && project !== loginProject)
+  ) {
     handler.Login(project)
     return
   }
