@@ -5,16 +5,16 @@
   <title>Login</title>
 
   <!-- for debug -->
-  <!-- 
+
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/coreui.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
-  -->
+
 
   <!-- for production -->
-  <link href="{{.CSSResourcePath}}/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="{{.CSSResourcePath}}/bootstrap.min.css" rel="stylesheet">
   <link href="{{.CSSResourcePath}}/coreui.min.css" rel="stylesheet">
-  <link href="{{.CSSResourcePath}}/style.css" rel="stylesheet">
+  <link href="{{.CSSResourcePath}}/style.css" rel="stylesheet"> -->
 </head>
 
 <body>
@@ -27,25 +27,26 @@
           </div>
           <div class="card-body">
             <div class="form-group row">
-              <label for="username" class="col-sm-4 control-label">
+              <label for="username" class="col-sm-3 control-label">
                 Name
               </label>
               <div class="col-sm-6">
-                <input type="text" class="form-control" name="username" placeholder="user name(e.g. admin)" autofocus />
+                <input type="text" class="form-control input" name="username" placeholder="user name(e.g. admin)"
+                  autofocus />
               </div>
             </div>
             <div class="form-group row">
-              <label for="password" class="col-sm-4 control-label">
+              <label for="password" class="col-sm-3 control-label">
                 Password
               </label>
               <div class="col-sm-6">
-                <input type="password" class="form-control" name="password" placeholder="password" />
+                <input type="password" class="form-control input" name="password" placeholder="password" />
               </div>
             </div>
             <div class="card-footer">
               <div class="error-msg">{{.Error}}</div>
               <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg">LOGIN</button>
+                <button type="submit" class="btn btn-primary btn-lg input">Login</button>
               </div>
             </div>
           </div>
