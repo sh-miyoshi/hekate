@@ -31,6 +31,8 @@ docker run --name test-server -p 10000:10000 -d smiyoshi/test-server
 
 ### プロジェクトの準備
 
+※新規プロジェクトを作成せずmasterプロジェクトでの操作も可能ですが、masterは管理者用プロジェクトなのでユーザー用の別プロジェクトを作成することをお勧めします
+
 - Portal([http://localhost:3000](http://localhost:3000))にアクセス
 - Adminユーザの名前とパスワードを入力し、ログイン
 - 左枠のメニューからmasterを選択
@@ -92,7 +94,9 @@ resources:
 EOF
 
 # keycloak-gatekeeperの起動
-# docker run -it --rm quay.io/keycloak/keycloak-gatekeeper
-
-# アクセス
+docker run --name gatekeeper -p 5000:5000 -d -v .:/mnt/conf \
+  quay.io/keycloak/keycloak-gatekeeper \
+  /opt/keycloak-gatekeeper --config=/mnt/conf/config.yaml
 ```
+
+### アクセス
