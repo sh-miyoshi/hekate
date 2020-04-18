@@ -97,6 +97,23 @@ func (h *SessionHandler) DeleteAll(userID string) error {
 	return nil
 }
 
+// DeleteAllInProject ...
+func (h *SessionHandler) DeleteAllInProject(projectName string) error {
+	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete session from mongodb")
+	}
+	return nil
+}
+
 // Get ...
 func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)

@@ -22,6 +22,7 @@ type SessionHandler interface {
 	Add(ent *Session) error
 	Delete(sessionID string) error
 	DeleteAll(userID string) error
+	DeleteAllInProject(projectName string) error
 	Get(sessionID string) (*Session, error)
 	GetList(userID string) ([]*Session, error)
 }

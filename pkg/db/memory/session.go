@@ -46,6 +46,18 @@ func (h *SessionHandler) DeleteAll(userID string) error {
 	return nil
 }
 
+// DeleteAllInProject ...
+func (h *SessionHandler) DeleteAllInProject(projectName string) error {
+	newList := make(map[string]*model.Session)
+	for _, s := range h.sessionList {
+		if s.ProjectName != projectName {
+			newList[s.SessionID] = s
+		}
+	}
+	h.sessionList = newList
+	return nil
+}
+
 // Get ...
 func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 	if _, exists := h.sessionList[sessionID]; !exists {
