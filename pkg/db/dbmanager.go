@@ -572,7 +572,7 @@ func (m *Manager) ClientDelete(projectName, clientID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		// TODO(delete oidc_code, session)
+		// TODO(delete oidc_code)
 
 		if err := m.loginSession.DeleteAll(clientID); err != nil {
 			return errors.Wrap(err, "Failed to delete login session of the client")
@@ -633,6 +633,10 @@ func (m *Manager) AuthCodeAdd(ent *model.AuthCode) error {
 
 // AuthCodeDelete ...
 func (m *Manager) AuthCodeDelete(codeID string) error {
+	if !model.ValidateAuthCodeID(codeID) {
+		return model.ErrCodeValidateFailed
+	}
+
 	// TODO(validate codeID)
 	return m.transaction.Transaction(func() error {
 		if err := m.authCode.Delete(codeID); err != nil {
@@ -644,7 +648,10 @@ func (m *Manager) AuthCodeDelete(codeID string) error {
 
 // AuthCodeGet ...
 func (m *Manager) AuthCodeGet(codeID string) (*model.AuthCode, error) {
-	// TODO(validate codeID)
+	if !model.ValidateAuthCodeID(codeID) {
+		return nil, model.ErrCodeValidateFailed
+	}
+
 	return m.authCode.Get(codeID)
 }
 
