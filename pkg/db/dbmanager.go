@@ -713,9 +713,17 @@ func (m *Manager) CustomRoleUpdate(ent *model.CustomRole) error {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
-	// TODO(validate name uniquness in project)
-
 	return m.transaction.Transaction(func() error {
+		r, err := m.customRole.GetList(ent.ProjectName, &model.CustomRoleFilter{Name: ent.Name})
+		if err != nil {
+			return errors.Wrap(err, "Failed to get role list")
+		}
+
+		// check name uniquness in project
+		if len(r) > 0 && r[0].ID != ent.ID {
+			return model.ErrCustomRoleAlreadyExists
+		}
+
 		if err := m.customRole.Update(ent); err != nil {
 			return errors.Wrap(err, "Failed to update client")
 		}

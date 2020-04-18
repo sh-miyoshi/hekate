@@ -235,7 +235,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().CustomRoleUpdate(role); err != nil {
-		if errors.Cause(err) == model.ErrCustomRoleValidateFailed {
+		if errors.Cause(err) == model.ErrCustomRoleValidateFailed || errors.Cause(err) == model.ErrCustomRoleAlreadyExists {
 			logger.Error("Request validation failed: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
