@@ -42,11 +42,12 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
 // New ...
 func (h *SessionHandler) New(s *model.Session) error {
 	v := &session{
-		UserID:    s.UserID,
-		SessionID: s.SessionID,
-		CreatedAt: s.CreatedAt,
-		ExpiresIn: s.ExpiresIn,
-		FromIP:    s.FromIP,
+		UserID:      s.UserID,
+		ProjectName: s.ProjectName,
+		SessionID:   s.SessionID,
+		CreatedAt:   s.CreatedAt,
+		ExpiresIn:   s.ExpiresIn,
+		FromIP:      s.FromIP,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
@@ -141,11 +142,12 @@ func (h *SessionHandler) GetList(userID string) ([]*model.Session, error) {
 	res := []*model.Session{}
 	for _, s := range sessions {
 		res = append(res, &model.Session{
-			UserID:    s.UserID,
-			SessionID: s.SessionID,
-			CreatedAt: s.CreatedAt,
-			ExpiresIn: s.ExpiresIn,
-			FromIP:    s.FromIP,
+			UserID:      s.UserID,
+			ProjectName: s.ProjectName,
+			SessionID:   s.SessionID,
+			CreatedAt:   s.CreatedAt,
+			ExpiresIn:   s.ExpiresIn,
+			FromIP:      s.FromIP,
 		})
 	}
 

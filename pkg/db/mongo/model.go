@@ -21,11 +21,12 @@ type projectInfo struct {
 }
 
 type session struct {
-	UserID    string    `bson:"userID"`
-	SessionID string    `bson:"sessionID"`
-	CreatedAt time.Time `bson:"createdAt"`
-	ExpiresIn uint      `bson:"expiresIn"`
-	FromIP    string    `bson:"fromIP"`
+	UserID      string    `bson:"userID"`
+	ProjectName string    `bson:"projectName"`
+	SessionID   string    `bson:"sessionID"`
+	CreatedAt   time.Time `bson:"createdAt"`
+	ExpiresIn   uint      `bson:"expiresIn"`
+	FromIP      string    `bson:"fromIP"`
 }
 
 type loginSessionInfo struct {

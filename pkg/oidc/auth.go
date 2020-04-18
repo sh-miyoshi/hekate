@@ -54,11 +54,12 @@ func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, 
 			return nil, errors.Wrap(err, "Failed to get IP")
 		}
 		ent := &model.Session{
-			UserID:    userID,
-			SessionID: sessionID,
-			CreatedAt: time.Now(),
-			ExpiresIn: res.RefreshExpiresIn,
-			FromIP:    ip,
+			UserID:      userID,
+			ProjectName: project.Name,
+			SessionID:   sessionID,
+			CreatedAt:   time.Now(),
+			ExpiresIn:   res.RefreshExpiresIn,
+			FromIP:      ip,
 		}
 
 		if err := db.GetInst().SessionAdd(ent); err != nil {

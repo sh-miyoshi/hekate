@@ -9,11 +9,12 @@ import (
 
 // Session ...
 type Session struct {
-	UserID    string
-	SessionID string
-	CreatedAt time.Time
-	ExpiresIn uint
-	FromIP    string // Used to identify the user using this session
+	UserID      string
+	ProjectName string
+	SessionID   string
+	CreatedAt   time.Time
+	ExpiresIn   uint
+	FromIP      string // Used to identify the user using this session
 }
 
 // SessionHandler ...
@@ -41,6 +42,10 @@ func (s *Session) Validate() error {
 	// Check Session ID
 	if !ValidateSessionID(s.SessionID) {
 		return errors.Wrap(ErrSessionValidateFailed, "Invalid session ID format")
+	}
+
+	if !ValidateProjectName(s.ProjectName) {
+		return errors.Wrap(ErrUserValidateFailed, "Invalid project Name format")
 	}
 
 	// Check User ID
