@@ -488,7 +488,10 @@ func (m *Manager) LoginSessionDelete(code string) error {
 
 // LoginSessionGet ...
 func (m *Manager) LoginSessionGet(code string) (*model.LoginSessionInfo, error) {
-	//TODO(add code validation)
+	if !model.ValidateVerifyCode(code) {
+		return nil, model.ErrLoginSessionValidationFailed
+	}
+
 	return m.loginSession.Get(code)
 }
 

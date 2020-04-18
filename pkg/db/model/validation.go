@@ -88,3 +88,8 @@ func ValidateCustomRoleName(name string) bool {
 	}
 	return true
 }
+
+// ValidateVerifyCode ...
+func ValidateVerifyCode(code string) bool {
+	return govalidator.IsUUID(code)
+}
