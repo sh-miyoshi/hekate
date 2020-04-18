@@ -18,14 +18,14 @@ func NewSessionHandler() *SessionHandler {
 	return res
 }
 
-// New ...
-func (h *SessionHandler) New(session *model.Session) error {
+// Add ...
+func (h *SessionHandler) Add(session *model.Session) error {
 	h.sessionList[session.SessionID] = session
 	return nil
 }
 
-// Revoke ...
-func (h *SessionHandler) Revoke(sessionID string) error {
+// Delete ...
+func (h *SessionHandler) Delete(sessionID string) error {
 	if _, exists := h.sessionList[sessionID]; exists {
 		delete(h.sessionList, sessionID)
 		return nil
@@ -34,8 +34,8 @@ func (h *SessionHandler) Revoke(sessionID string) error {
 	return model.ErrNoSuchSession
 }
 
-// RevokeAll ...
-func (h *SessionHandler) RevokeAll(userID string) error {
+// DeleteAll ...
+func (h *SessionHandler) DeleteAll(userID string) error {
 	newList := make(map[string]*model.Session)
 	for _, s := range h.sessionList {
 		if s.UserID != userID {

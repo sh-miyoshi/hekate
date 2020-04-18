@@ -39,8 +39,8 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
 	return res, err
 }
 
-// New ...
-func (h *SessionHandler) New(s *model.Session) error {
+// Add ...
+func (h *SessionHandler) Add(s *model.Session) error {
 	v := &session{
 		UserID:      s.UserID,
 		ProjectName: s.ProjectName,
@@ -63,8 +63,8 @@ func (h *SessionHandler) New(s *model.Session) error {
 	return nil
 }
 
-// Revoke ...
-func (h *SessionHandler) Revoke(sessionID string) error {
+// Delete ...
+func (h *SessionHandler) Delete(sessionID string) error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
 		{Key: "sessionID", Value: sessionID},
@@ -80,8 +80,8 @@ func (h *SessionHandler) Revoke(sessionID string) error {
 	return nil
 }
 
-// RevokeAll ...
-func (h *SessionHandler) RevokeAll(userID string) error {
+// DeleteAll ...
+func (h *SessionHandler) DeleteAll(userID string) error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
 		{Key: "userID", Value: userID},

@@ -39,8 +39,8 @@ func NewAuthCodeHandler(dbClient *mongo.Client) (*AuthCodeHandler, error) {
 	return res, err
 }
 
-// New ...
-func (h *AuthCodeHandler) New(code *model.AuthCode) error {
+// Add ...
+func (h *AuthCodeHandler) Add(code *model.AuthCode) error {
 	v := &authCode{
 		CodeID:      code.CodeID,
 		ExpiresIn:   code.ExpiresIn,

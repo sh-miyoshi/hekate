@@ -19,9 +19,9 @@ type Session struct {
 
 // SessionHandler ...
 type SessionHandler interface {
-	New(ent *Session) error
-	Revoke(sessionID string) error
-	RevokeAll(userID string) error
+	Add(ent *Session) error
+	Delete(sessionID string) error
+	DeleteAll(userID string) error
 	Get(sessionID string) (*Session, error)
 	GetList(userID string) ([]*Session, error)
 }

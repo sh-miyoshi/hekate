@@ -287,7 +287,7 @@ func (m *Manager) UserDelete(userID string) error {
 			return errors.Wrap(err, "Delete authoriation code failed")
 		}
 
-		if err := m.session.RevokeAll(userID); err != nil {
+		if err := m.session.DeleteAll(userID); err != nil {
 			return errors.Wrap(err, "Delete user session failed")
 		}
 
@@ -506,7 +506,7 @@ func (m *Manager) SessionAdd(ent *model.Session) error {
 			return model.ErrSessionAlreadyExists
 		}
 
-		if err := m.session.New(ent); err != nil {
+		if err := m.session.Add(ent); err != nil {
 			return errors.Wrap(err, "Failed to add session")
 		}
 		return nil
@@ -520,7 +520,7 @@ func (m *Manager) SessionDelete(sessionID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		if err := m.session.Revoke(sessionID); err != nil {
+		if err := m.session.Delete(sessionID); err != nil {
 			return errors.Wrap(err, "Failed to revoke session")
 		}
 		return nil
@@ -620,7 +620,7 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 func (m *Manager) AuthCodeAdd(ent *model.AuthCode) error {
 	// TODO(validate ent, identify by clientID and redirectURL)
 	return m.transaction.Transaction(func() error {
-		if err := m.authCode.New(ent); err != nil {
+		if err := m.authCode.Add(ent); err != nil {
 			return errors.Wrap(err, "Failed to add auth code")
 		}
 		return nil

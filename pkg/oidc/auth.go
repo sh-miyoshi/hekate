@@ -148,7 +148,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 		return nil, errors.Wrap(ErrInvalidClient, "refresh token is not for the client")
 	}
 
-	// Revoke previous token
+	// Delete previous token
 	if err := db.GetInst().SessionDelete(claims.SessionID); err != nil {
 		return nil, errors.Wrap(err, "Failed to revoke previous token")
 	}

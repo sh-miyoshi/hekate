@@ -17,8 +17,8 @@ func NewAuthCodeHandler() *AuthCodeHandler {
 	return res
 }
 
-// New ...
-func (h *AuthCodeHandler) New(code *model.AuthCode) error {
+// Add ...
+func (h *AuthCodeHandler) Add(code *model.AuthCode) error {
 	h.authCodeList[code.CodeID] = code
 	return nil
 }
