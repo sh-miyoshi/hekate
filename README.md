@@ -43,7 +43,7 @@
 
   - [http://localhost:3000](http://localhost:3000)へアクセス
 
-- その他
+- Production環境の構築
   - TODO
 
 ## 開発環境
