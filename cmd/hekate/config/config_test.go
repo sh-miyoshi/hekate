@@ -12,7 +12,7 @@ func TestInitConfig(t *testing.T) {
 
 	tmpFile.WriteString(`admin_name: admin
 admin_password: password
-server_port: 8080
+server_port: 18443
 server_bind_address: "0.0.0.0"
 logfile: ''
 debug_mode: true

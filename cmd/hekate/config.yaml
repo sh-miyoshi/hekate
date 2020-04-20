@@ -7,7 +7,7 @@ admin_name: admin
 admin_password: password
 
 # Listen Port of Server
-server_port: 8080
+server_port: 18443
 
 # Binding Address to Server
 server_bind_address: "0.0.0.0"

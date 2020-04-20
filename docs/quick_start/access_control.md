@@ -16,7 +16,7 @@ README.mdを参考にHekateをインストールしてください。
 他の場合は適宜読み替えてください。
 
 - Portal: [http://localhost:3000](http://localhost:3000)
-- Server: [http://localhost:8080](http://localhost:8080)
+- Server: [http://localhost:18443](http://localhost:18443)
 
 ### アクセスを制御したいサーバの準備
 
@@ -78,7 +78,7 @@ docker run --name test-server -p 10000:10000 -d smiyoshi/test-server
 cat << EOF > config.yaml
 client-id: sample-gw
 client-secret: <確認したSecret>
-discovery-url: http://localhost:8080/api/v1/project/master # Hekateサーバのアドレスとプロジェクトを変更した場合は適宜修正してください
+discovery-url: http://localhost:18443/api/v1/project/master # Hekateサーバのアドレスとプロジェクトを変更した場合は適宜修正してください
 enable-default-deny: true
 skip-openid-provider-tls-verify: true
 encryption_key: secret

@@ -637,7 +637,6 @@ func (m *Manager) AuthCodeDelete(codeID string) error {
 		return model.ErrCodeValidateFailed
 	}
 
-	// TODO(validate codeID)
 	return m.transaction.Transaction(func() error {
 		if err := m.authCode.Delete(codeID); err != nil {
 			return errors.Wrap(err, "Failed to delete auth code")

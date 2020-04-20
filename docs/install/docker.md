@@ -16,7 +16,7 @@ export ADMIN_NAME=admin
 export ADMIN_PASSWORD=password
 
 docker run -d --name hekate \
-  -p 3000:3000 -p 8080:8080 \
+  -p 3000:3000 -p 18443:18443 \
   -e SERVER_ADDR=$SERVER_ADDR \
   -e HEKATE_ADMIN_NAME=$ADMIN_NAME \
   -e HEKATE_ADMIN_PASSWORD=$ADMIN_PASSWORD \

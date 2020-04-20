@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	serverAddr := "http://localhost:8080"
+	serverAddr := "http://localhost:18443"
 	issuer := serverAddr + "/api/v1/project/master"
 	clientID := "portal"
 	clientSecret := ""

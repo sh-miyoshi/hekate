@@ -85,7 +85,7 @@ export default {
 
   env: {
     HEKATE_SERVER_ADDR:
-      process.env.HEKATE_SERVER_ADDR || 'http://localhost:8080',
+      process.env.HEKATE_SERVER_ADDR || 'http://localhost:18443',
     HEKATE_PORTAL_HOST: process.env.HEKATE_PORTAL_HOST || 'localhost',
     HEKATE_PORTAL_PORT: process.env.HEKATE_PORTAL_PORT || '3000',
     // https: {}, // TODO(set params if run as https)

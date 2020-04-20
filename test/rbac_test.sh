@@ -2,7 +2,7 @@
 
 CLI_DIR="../cmd/hctl"
 
-curl localhost:8080/healthz -s -o /dev/null
+curl localhost:18443/healthz -s -o /dev/null
 if [ $? != 0 ]; then
   echo "Before test, please run a server"
   exit 1

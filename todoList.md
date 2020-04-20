@@ -113,7 +113,7 @@
 - configファイルの扱い
   - `no such file or directory`のとき、新規作成
   - permission: 0700, 0600
-  - デフォルト値(localhost:8080, master)
+  - デフォルト値(localhost:18443, master)
 - 各APIへの対応
   - project
     - create
