@@ -15,9 +15,8 @@
 
 ## インストール方法
 
-- Dockerを使用する場合
+- Test環境(All In One)の構築
   - server, portalを起動
-    - ※現在設定ファイル的な理由で3000, 8080番以外のポートをport bindingできません。
 
   ```bash
   # SERVER_ADDRはアクセスしたい場所からアクセスできるアドレスにしてください。
@@ -27,11 +26,18 @@
   export ADMIN_NAME=admin
   export ADMIN_PASSWORD=password
 
+  # デフォルトのport番号以外をbindingする際は、以下の値もdocker起動時に環境変数で指定する必要があります
+  #  SERVER_PORT <- API_SERVER側のポート番号を変更したい場合
+  #  PORTAL_PORT <- PORTAL側のポート番号を変更したい場合
+  # 例として以下ではportalのポート番号を指定します
+  export PORTAL_PORT=3000
+
   docker run -d --name hekate \
-    -p 3000:3000 -p 18443:18443 \
+    -p $PORTAL_PORT:3000 -p 18443:18443 \
     -e SERVER_ADDR=$SERVER_ADDR \
     -e HEKATE_ADMIN_NAME=$ADMIN_NAME \
     -e HEKATE_ADMIN_PASSWORD=$ADMIN_PASSWORD \
+    -e PORTAL_PORT=$PORTAL_PORT \
     smiyoshi/hekate:all-in-one
   ```
 
