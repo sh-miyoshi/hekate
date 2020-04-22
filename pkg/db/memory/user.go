@@ -147,6 +147,27 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 	return model.ErrNoSuchRoleInUser
 }
 
+// DeleteAllCustomRole ...
+func (h *UserInfoHandler) DeleteAllCustomRole(roleID string) error {
+	for id, user := range h.userList {
+		deleted := false
+		roles := []string{}
+
+		for _, r := range user.CustomRoles {
+			if roleID == r {
+				deleted = true
+			} else {
+				roles = append(roles, r)
+			}
+		}
+
+		if deleted {
+			h.userList[id].CustomRoles = roles
+		}
+	}
+	return nil
+}
+
 func filterUserList(data []*model.UserInfo, filter *model.UserFilter) []*model.UserInfo {
 	if filter == nil {
 		return data

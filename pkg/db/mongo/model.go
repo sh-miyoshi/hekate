@@ -73,3 +73,9 @@ type customRole struct {
 	CreatedAt   time.Time `bson:"createdAt"`
 	ProjectName string    `bson:"projectName"`
 }
+
+type customRoleInUser struct {
+	ProjectName  string `bson:"projectName"`
+	UserID       string `bson:"userID"`
+	CustomRoleID string `bson:"customRoleID"`
+}

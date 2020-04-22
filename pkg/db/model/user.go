@@ -61,6 +61,7 @@ type UserInfoHandler interface {
 	DeleteAll(projectName string) error
 	AddRole(userID string, roleType RoleType, roleID string) error
 	DeleteRole(userID string, roleID string) error
+	DeleteAllCustomRole(roleID string) error
 }
 
 // Validate ...

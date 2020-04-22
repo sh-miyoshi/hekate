@@ -2,14 +2,15 @@ package mongo
 
 import (
 	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 const (
-	databaseName               = "jwtserver"
+	databaseName               = "hekate"
 	projectCollectionName      = "project"
 	userCollectionName         = "user"
 	clientCollectionName       = "client"
@@ -17,6 +18,7 @@ const (
 	authCodeCollectionName     = "code"
 	roleCollectionName         = "customrole"
 	loginSessionCollectionName = "loginsession"
+	roleInUserCollectionName   = "customroleinuser"
 
 	timeoutSecond = 5
 )

@@ -683,7 +683,9 @@ func (m *Manager) CustomRoleDelete(customRoleID string) error {
 	// TODO(validate customRoleID)
 
 	return m.transaction.Transaction(func() error {
-		// TODO(delete role from user)
+		if err := m.user.DeleteAllCustomRole(customRoleID); err != nil {
+			return errors.Wrap(err, "Failed to delete custom role from user")
+		}
 
 		if err := m.customRole.Delete(customRoleID); err != nil {
 			return errors.Wrap(err, "Failed to delete customRole")
