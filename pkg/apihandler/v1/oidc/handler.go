@@ -64,8 +64,13 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Project Info for Token Config
 	project, err := db.GetInst().ProjectGet(projectName)
-	if errors.Cause(err) == model.ErrNoSuchProject {
-		http.Error(w, "Project Not Found", http.StatusNotFound)
+	if err != nil {
+		if errors.Cause(err) == model.ErrNoSuchProject {
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else {
+			logger.Error("Failed to get project info: %+v", err)
+			writeTokenErrorResponse(w, oidc.ErrServerError, state)
+		}
 		return
 	}
 
