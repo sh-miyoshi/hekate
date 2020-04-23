@@ -3,12 +3,10 @@
 ## Bugs(?)
 
 - userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
-- custom role削除時にユーザからremoveしなくてよい？
 - 別projectのリソースを変更できないか要確認
 
 ## server application enhancement
 
-- リソース削除時に紐づくリソースも削除
 - db manager validationの追加
 - Custom RoleにDescriptionを追加
   - API docの修正

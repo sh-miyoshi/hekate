@@ -574,7 +574,7 @@ func (m *Manager) ClientDelete(projectName, clientID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		// TODO(delete oidc_code)
+		// do not need to delete oidc_code because the code cannot exchange to token without client
 
 		if err := m.loginSession.DeleteAll(clientID); err != nil {
 			return errors.Wrap(err, "Failed to delete login session of the client")
