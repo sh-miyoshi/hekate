@@ -167,7 +167,9 @@ func (m *Manager) ProjectDelete(name string) error {
 			return errors.Wrap(model.ErrDeleteBlockedProject, "the project can not delete")
 		}
 
-		// TODO(delete loginsession)
+		if err := m.loginSession.DeleteAllInProject(name); err != nil {
+			return errors.Wrap(err, "Failed to delete login session data")
+		}
 
 		if err := m.session.DeleteAllInProject(name); err != nil {
 			return errors.Wrap(err, "Failed to delete session data")

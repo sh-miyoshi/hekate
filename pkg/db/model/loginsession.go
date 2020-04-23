@@ -15,6 +15,7 @@ type LoginSessionInfo struct {
 	ClientID     string
 	RedirectURI  string
 	Nonce        string
+	ProjectName  string
 }
 
 var (
@@ -32,4 +33,5 @@ type LoginSessionHandler interface {
 	Delete(code string) error
 	Get(code string) (*LoginSessionInfo, error)
 	DeleteAll(clientID string) error
+	DeleteAllInProject(projectName string) error
 }

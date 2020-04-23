@@ -49,6 +49,7 @@ func (h *LoginSessionHandler) Add(info *model.LoginSessionInfo) error {
 		ClientID:     info.ClientID,
 		RedirectURI:  info.RedirectURI,
 		Nonce:        info.Nonce,
+		ProjectName:  info.ProjectName,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
@@ -107,6 +108,7 @@ func (h *LoginSessionHandler) Get(code string) (*model.LoginSessionInfo, error) 
 		ClientID:     res.ClientID,
 		RedirectURI:  res.RedirectURI,
 		Nonce:        res.Nonce,
+		ProjectName:  res.ProjectName,
 	}, nil
 }
 
@@ -115,6 +117,23 @@ func (h *LoginSessionHandler) DeleteAll(clientID string) error {
 	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
 	filter := bson.D{
 		{Key: "clientID", Value: clientID},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.Wrap(err, "Failed to delete login session from mongodb")
+	}
+	return nil
+}
+
+// DeleteAllInProject ...
+func (h *LoginSessionHandler) DeleteAllInProject(projectName string) error {
+	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
+	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)

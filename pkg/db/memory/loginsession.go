@@ -62,3 +62,16 @@ func (h *LoginSessionHandler) DeleteAll(clientID string) error {
 
 	return nil
 }
+
+// DeleteAllInProject ...
+func (h *LoginSessionHandler) DeleteAllInProject(projectName string) error {
+	newList := make(map[string]*model.LoginSessionInfo)
+	for _, s := range h.sessionList {
+		if s.ProjectName != projectName {
+			newList[s.VerifyCode] = s
+		}
+	}
+
+	h.sessionList = newList
+	return nil
+}

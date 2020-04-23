@@ -246,7 +246,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return end user auth prompt
-	code, err := oidc.RegisterUserLoginSession(authReq)
+	code, err := oidc.RegisterUserLoginSession(projectName, authReq)
 	if err != nil {
 		logger.Error("Failed to register login session %+v", err)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
@@ -297,7 +297,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// return end user auth prompt
-	code, err := oidc.RegisterUserLoginSession(authReq)
+	code, err := oidc.RegisterUserLoginSession(projectName, authReq)
 	if err != nil {
 		logger.Error("Failed to register login session %+v", err)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
@@ -347,7 +347,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				RedirectURI:  info.RedirectURI,
 				State:        state,
 			}
-			code, err := oidc.RegisterUserLoginSession(req)
+			code, err := oidc.RegisterUserLoginSession(projectName, req)
 			if err != nil {
 				logger.Error("Failed to register login session %+v", err)
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)

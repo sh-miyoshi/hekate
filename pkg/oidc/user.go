@@ -58,7 +58,7 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 }
 
 // RegisterUserLoginSession ...
-func RegisterUserLoginSession(req *AuthRequest) (string, error) {
+func RegisterUserLoginSession(projectName string, req *AuthRequest) (string, error) {
 	code := uuid.New().String()
 
 	s := &model.LoginSessionInfo{
@@ -67,6 +67,7 @@ func RegisterUserLoginSession(req *AuthRequest) (string, error) {
 		ClientID:    req.ClientID,
 		RedirectURI: req.RedirectURI,
 		Nonce:       req.Nonce,
+		ProjectName: projectName,
 	}
 
 	if err := db.GetInst().LoginSessionAdd(s); err != nil {

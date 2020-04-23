@@ -37,6 +37,7 @@ type loginSessionInfo struct {
 	ClientID     string    `bson:"clientID"`
 	RedirectURI  string    `bson:"redirectURI"`
 	Nonce        string    `bson:"nonce"`
+	ProjectName  string    `bson:"projectName"`
 }
 
 type userInfo struct {
