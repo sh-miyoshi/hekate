@@ -124,7 +124,7 @@ func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &model.Session{}
+	res := &session{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchSession
@@ -132,7 +132,14 @@ func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 		return nil, errors.Wrap(err, "Failed to get session from mongodb")
 	}
 
-	return res, nil
+	return &model.Session{
+		UserID:      res.UserID,
+		ProjectName: res.ProjectName,
+		SessionID:   res.SessionID,
+		CreatedAt:   res.CreatedAt,
+		ExpiresIn:   res.ExpiresIn,
+		FromIP:      res.FromIP,
+	}, nil
 }
 
 // GetList ...

@@ -139,14 +139,31 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &model.ProjectInfo{}
-	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
+	project := &projectInfo{}
+	if err := col.FindOne(ctx, filter).Decode(project); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchProject
 		}
 		return nil, errors.Wrap(err, "Failed to get project from mongodb")
 	}
-	logger.Debug("Get project %s data: %v", name, res)
+	logger.Debug("Get project %s data: %v", name, project)
+
+	res := &model.ProjectInfo{
+		Name:         project.Name,
+		CreatedAt:    project.CreatedAt,
+		PermitDelete: project.PermitDelete,
+		TokenConfig: &model.TokenConfig{
+			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
+			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
+			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
+			SignPublicKey:        project.TokenConfig.SignPublicKey,
+			SignSecretKey:        project.TokenConfig.SignSecretKey,
+		},
+	}
+	for _, t := range project.AllowGrantTypes {
+		typ, _ := model.GetGrantType(t)
+		res.AllowGrantTypes = append(res.AllowGrantTypes, typ)
+	}
 
 	return res, nil
 }
