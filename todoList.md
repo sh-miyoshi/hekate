@@ -7,6 +7,8 @@
 
 ## server application enhancement
 
+- 設定項目の追加
+  - パスワードポリシー
 - db manager validationの追加
 - Custom RoleにDescriptionを追加
   - API docの修正
@@ -28,9 +30,6 @@
   - success or failed
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
-- 設定項目の追加
-  - パスワードポリシー
-  - encrypt_type(signing_method)
 - SQL DBの追加
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する

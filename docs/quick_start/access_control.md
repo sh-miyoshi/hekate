@@ -10,7 +10,7 @@ TODO
 
 ### Hekateのインストール
 
-README.mdを参考にHekateをインストールしてください。
+[README.md](../../README.md)を参考にHekateをインストールしてください。
 
 以降では、Hekateには以下のアドレスでアクセスできるものとして説明します。
 他の場合は適宜読み替えてください。
@@ -21,10 +21,10 @@ README.mdを参考にHekateをインストールしてください。
 ### アクセスを制御したいサーバの準備
 
 アクセスを制御したい対象のサーバを起動します。
-この例では[test-server](https://github.com/sh-miyoshi/test-server)を使用します。
+この例ではnginxを使用します。
 
 ```bash
-docker run --name test-server -p 10000:10000 -d smiyoshi/test-server
+docker run --name nginx -p 80:80 -d nginx
 ```
 
 ## 手順
@@ -83,10 +83,10 @@ enable-default-deny: true
 skip-openid-provider-tls-verify: true
 encryption_key: secret
 listen: 0.0.0.0:5000
-upstream-url: http://localhost:10000 # アクセスを制御したいサーバのアドレス
+upstream-url: http://localhost # アクセスを制御したいサーバのアドレス
 secure-cookie: false
 resources:
-  - uri: /hello
+  - uri: /
     methods:
     - GET
     roles:
@@ -94,9 +94,16 @@ resources:
 EOF
 
 # keycloak-gatekeeperの起動
-docker run --name gatekeeper -p 5000:5000 -d -v .:/mnt/conf \
+docker run --name gatekeeper -p 5000:5000 -d -v $PWD:/mnt/conf \
   quay.io/keycloak/keycloak-gatekeeper \
   /opt/keycloak-gatekeeper --config=/mnt/conf/config.yaml
 ```
 
 ### アクセス
+
+ブラウザから[http://localhost:5000](http://localhost:5000)にアクセス
+TODO
+
+### 後始末
+
+TODO
