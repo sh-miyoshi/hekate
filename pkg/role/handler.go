@@ -71,7 +71,7 @@ func (h *Handler) GetList() []string {
 	return res
 }
 
-// Parse ...
+// Parse method parse role id string into resource and type
 func (h *Handler) Parse(role string) (*Resource, *Type, bool) {
 	for _, r := range h.roleList {
 		if r.ID == role {
