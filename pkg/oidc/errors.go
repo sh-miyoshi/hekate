@@ -212,4 +212,14 @@ var (
 		Name: "unsupported_token_type",
 		Code: http.StatusBadRequest,
 	}
+
+	//-------------------------------------
+	// Define in Open ID Connect
+	//-------------------------------------
+
+	// ErrAccountSelectionRequired ...
+	ErrAccountSelectionRequired = &Error{
+		Name: "account_selection_required",
+		Code: http.StatusBadRequest,
+	}
 )

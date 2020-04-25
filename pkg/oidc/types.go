@@ -18,12 +18,12 @@ type AuthRequest struct {
 	State string
 
 	// Optional
-	Nonce string
+	Nonce  string
+	Prompt string
 
 	// TODO(implement this)
 	// ResponseMode string // response_mode(OPTIONAL)
 	// Display string // display(OPTIONAL)
-	// Prompt string // prompt(OPTIONAL)
 	// MaxAge string // max_age(OPTIONAL)
 	// UILocales string // ui_locales(OPTIONAL)
 	// IDTokenHint string // id_token_hint(OPTIONAL)
@@ -38,6 +38,28 @@ type UserLoginInfo struct {
 	ClientID     string
 	RedirectURI  string
 	Nonce        string
+}
+
+func validatePrompt(prompts string) error {
+	v := strings.Split(prompts, " ")
+	if strings.Contains(prompts, "none") && len(v) != 1 {
+		return ErrInvalidRequest
+	}
+
+	for _, prompt := range v {
+		switch prompt {
+		case "login":
+			// login is supported
+		case "consent":
+			return ErrConsentRequired
+		case "select_account":
+			return ErrAccountSelectionRequired
+		default:
+			return ErrInvalidRequest
+		}
+	}
+
+	return nil
 }
 
 // Validate ...
@@ -59,6 +81,13 @@ FOR_LABEL:
 	}
 	if !ok {
 		return ErrUnsupportedResponseType
+	}
+
+	// Check prompt
+	if r.Prompt != "" {
+		if err := validatePrompt(r.Prompt); err != nil {
+			return err
+		}
 	}
 
 	// TODO(add more validation)
