@@ -15,7 +15,7 @@ type AuthCode struct {
 	RedirectURL string
 	UserID      string
 	Nonce       string
-	MaxAge      int
+	MaxAge      uint
 }
 
 // AuthCodeHandler ...

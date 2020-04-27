@@ -19,13 +19,13 @@ type option struct {
 	genRefreshToken bool
 	genIDToken      bool
 	nonce           string
-	maxAge          int
+	maxAge          uint
 }
 
 func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*TokenResponse, error) {
 	accessLifeSpan := project.TokenConfig.AccessTokenLifeSpan
-	if opt.maxAge > 0 && uint(opt.maxAge) < accessLifeSpan {
-		accessLifeSpan = uint(opt.maxAge)
+	if opt.maxAge > 0 && opt.maxAge < accessLifeSpan {
+		accessLifeSpan = opt.maxAge
 	}
 
 	// Generate JWT Token
@@ -57,7 +57,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 	if opt.genRefreshToken {
 		res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
 		if opt.maxAge > 0 {
-			res.RefreshExpiresIn = uint(opt.maxAge)
+			res.RefreshExpiresIn = opt.maxAge
 		}
 
 		refreshTokenReq := token.Request{
@@ -94,9 +94,9 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	if opt.genIDToken {
 		lifeSpan := project.TokenConfig.AccessTokenLifeSpan
-		var maxAge *int
+		var maxAge *uint
 		if opt.maxAge > 0 {
-			lifeSpan = uint(opt.maxAge)
+			lifeSpan = opt.maxAge
 			maxAge = &opt.maxAge
 		}
 

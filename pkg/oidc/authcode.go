@@ -23,7 +23,7 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 		State:        values.Get("state"),
 		Nonce:        values.Get("nonce"),
 		Prompt:       values.Get("prompt"),
-		MaxAge:       maxAge,
+		MaxAge:       uint(maxAge),
 	}
 }
 

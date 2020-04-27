@@ -38,7 +38,7 @@ type loginSessionInfo struct {
 	RedirectURI  string    `bson:"redirectURI"`
 	Nonce        string    `bson:"nonce"`
 	ProjectName  string    `bson:"projectName"`
-	MaxAge       int       `bson:"maxAge"`
+	MaxAge       uint      `bson:"maxAge"`
 }
 
 type userInfo struct {
@@ -67,7 +67,7 @@ type authCode struct {
 	RedirectURL string    `bson:"redirectURL"`
 	UserID      string    `bson:"userID"`
 	Nonce       string    `bson:"nonce"`
-	MaxAge      int       `bson:"maxAge"`
+	MaxAge      uint      `bson:"maxAge"`
 }
 
 type customRole struct {

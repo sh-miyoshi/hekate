@@ -20,7 +20,7 @@ type AuthRequest struct {
 	// Optional
 	Nonce  string
 	Prompt string
-	MaxAge int
+	MaxAge uint
 
 	// TODO(implement this)
 	// ResponseMode string // response_mode(OPTIONAL)
@@ -38,7 +38,7 @@ type UserLoginInfo struct {
 	ClientID     string
 	RedirectURI  string
 	Nonce        string
-	MaxAge       int
+	MaxAge       uint
 }
 
 func validatePrompt(prompts string) error {
@@ -47,19 +47,19 @@ func validatePrompt(prompts string) error {
 		return ErrInvalidRequest
 	}
 
-	// TODO change response
-	for _, prompt := range v {
-		switch prompt {
-		case "login":
-			// login is supported
-		case "consent":
-			return ErrConsentRequired
-		case "select_account":
-			return ErrAccountSelectionRequired
-		default:
-			return ErrInvalidRequest
-		}
-	}
+	// // TODO change response
+	// for _, prompt := range v {
+	// 	switch prompt {
+	// 	case "login":
+	// 		// login is supported
+	// 	case "consent":
+	// 		return ErrConsentRequired
+	// 	case "select_account":
+	// 		return ErrAccountSelectionRequired
+	// 	default:
+	// 		return ErrInvalidRequest
+	// 	}
+	// }
 
 	return nil
 }
@@ -90,10 +90,6 @@ FOR_LABEL:
 		if err := validatePrompt(r.Prompt); err != nil {
 			return err
 		}
-	}
-
-	if r.MaxAge < 1 {
-		return ErrInvalidRequest
 	}
 
 	// TODO(add more validation)
