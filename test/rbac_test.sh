@@ -25,7 +25,7 @@ function test_command_failed() {
 }
 
 #----------------------------------
-# Prepare
+# Prepare and Test cluster role
 #----------------------------------
 cd $CLI_DIR
 go build
@@ -50,15 +50,9 @@ test_command_failed client add --project rbac-test --id test-client-2 --accessTy
 test_command client get --project rbac-test
 
 #----------------------------------
-# Test cluster role
-#----------------------------------
-
-# TODO
-
-#----------------------------------
 # Test access to other project
 #----------------------------------
 
-# TODO
+test_command_failed client get --project rbac-test-2
 
 echo "Successfully finished"
