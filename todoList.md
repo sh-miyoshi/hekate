@@ -34,9 +34,13 @@
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
 - テストの追加
-  - ロジック部分のunit test
-  - API部分のテスト
-    - エラー処理回り
+  - unit test
+    - pkg/apiclient
+    - pkg/apihandler
+    - pkg/client
+    - pkg/db
+    - pkg/oidc
+  - 結合テスト
 - OpenID Connect部分のエンハンス
   - openid connect APIの実装
     - implicit flow
@@ -74,9 +78,6 @@
 ## Portal(Admin Console) enhancement
 
 - Userページの作成
-  - 決めること
-    - Login URL: `http://localhost:3000/xxx(user)/project/<project-name>`
-    - Page URL
   - Redirect先テスト
   - Userアカウント設定ページ
     - Account Setting(/account)
@@ -153,3 +154,4 @@
 
 - 初期allowed callback urlの初期化
 - CLIのinsecure, timeoutの設定見直し
+- Benchmark
