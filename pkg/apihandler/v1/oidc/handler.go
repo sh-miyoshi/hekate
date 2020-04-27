@@ -220,40 +220,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	queries := r.URL.Query()
 	logger.Debug("Query: %v", queries)
 
-	authReq := oidc.NewAuthRequest(queries)
-	if err := authReq.Validate(); err != nil {
-		logger.Info("Failed to validate request: %v", err)
-		errMsg := "Request failed. " + err.Error()
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	// Check Redirect URL
-	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
-		errMsg := ""
-		if errors.Cause(err) == client.ErrNoRedirectURL {
-			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)
-			errMsg = "Request failed. the redirect url is not allowed"
-		} else if errors.Cause(err) == model.ErrNoSuchClient {
-			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
-			errMsg = "Request faild. no such client"
-		} else {
-			logger.Error("Failed to get allowed callback urls in client: %+v", err)
-			errMsg = "Request faild. internal server error occured"
-		}
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	// return end user auth prompt
-	code, err := oidc.RegisterUserLoginSession(projectName, authReq)
-	if err != nil {
-		logger.Error("Failed to register login session %+v", err)
-		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-		return
-	}
-
-	oidc.WriteUserLoginPage(projectName, code, "", authReq.State, w)
+	authHandler(w, projectName, queries)
 }
 
 // AuthPOSTHandler ...
@@ -270,41 +237,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug("Form: %v", r.Form)
-
-	authReq := oidc.NewAuthRequest(r.Form)
-	if err := authReq.Validate(); err != nil {
-		logger.Info("Failed to validate request: %v", err)
-		errMsg := "Request failed. " + err.Error()
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	// Check Redirect URL
-	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
-		errMsg := ""
-		if errors.Cause(err) == client.ErrNoRedirectURL {
-			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)
-			errMsg = "Request failed. the redirect url is not allowed"
-		} else if errors.Cause(err) == model.ErrNoSuchClient {
-			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
-			errMsg = "Request faild. no such client"
-		} else {
-			logger.Error("Failed to get allowed callback urls in client: %+v", err)
-			errMsg = "Request faild. internal server error occured"
-		}
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	// return end user auth prompt
-	code, err := oidc.RegisterUserLoginSession(projectName, authReq)
-	if err != nil {
-		logger.Error("Failed to register login session %+v", err)
-		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-		return
-	}
-
-	oidc.WriteUserLoginPage(projectName, code, "", authReq.State, w)
+	authHandler(w, projectName, r.Form)
 }
 
 // UserLoginHandler ...
@@ -450,4 +383,41 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
 	}
+}
+
+func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
+	authReq := oidc.NewAuthRequest(req)
+	if err := authReq.Validate(); err != nil {
+		logger.Info("Failed to validate request: %v", err)
+		errMsg := "Request failed. " + err.Error()
+		oidc.WriteErrorPage(errMsg, w)
+		return
+	}
+
+	// Check Redirect URL
+	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
+		errMsg := ""
+		if errors.Cause(err) == client.ErrNoRedirectURL {
+			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)
+			errMsg = "Request failed. the redirect url is not allowed"
+		} else if errors.Cause(err) == model.ErrNoSuchClient {
+			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
+			errMsg = "Request faild. no such client"
+		} else {
+			logger.Error("Failed to get allowed callback urls in client: %+v", err)
+			errMsg = "Request faild. internal server error occured"
+		}
+		oidc.WriteErrorPage(errMsg, w)
+		return
+	}
+
+	// return end user auth prompt
+	code, err := oidc.RegisterUserLoginSession(projectName, authReq)
+	if err != nil {
+		logger.Error("Failed to register login session %+v", err)
+		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+		return
+	}
+
+	oidc.WriteUserLoginPage(projectName, code, "", authReq.State, w)
 }
