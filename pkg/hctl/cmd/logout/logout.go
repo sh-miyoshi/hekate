@@ -13,13 +13,13 @@ var logoutCmd = &cobra.Command{
 	Long:  `Logout from the system`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := config.Get()
-		token, err := config.GetRefreshToken()
+		secret, err := config.GetSecret()
 		if err != nil {
 			print.Debug("Failed to get token: %v", err)
 			return
 		}
 
-		if err := logout.Logout(cfg.ServerAddr, cfg.ProjectName, token); err != nil {
+		if err := logout.Logout(cfg.ServerAddr, secret.ProjectName, secret.RefreshToken); err != nil {
 			print.Fatal("Logout failed: %v", err)
 		}
 

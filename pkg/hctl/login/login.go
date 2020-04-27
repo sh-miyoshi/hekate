@@ -36,14 +36,18 @@ func tokenRequest(req *http.Request) (*oidcapi.TokenResponse, error) {
 }
 
 // Do ...
-func Do(serverAddr string, projectName string, userName string, password string) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, projectName)
+func Do(serverAddr string, info Info) (*oidcapi.TokenResponse, error) {
+	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, info.ProjectName)
 
 	form := url.Values{}
-	form.Add("username", userName)
-	form.Add("password", password)
+	form.Add("username", info.UserName)
+	form.Add("password", info.Password)
 	form.Add("grant_type", "password")
-	form.Add("client_id", "admin-cli")
+	form.Add("client_id", info.ClientID)
+	if info.ClientSecret != "" {
+		form.Add("client_secret", info.ClientSecret)
+	}
+
 	body := strings.NewReader(form.Encode())
 	httpReq, err := http.NewRequest("POST", u, body)
 	if err != nil {
@@ -55,13 +59,17 @@ func Do(serverAddr string, projectName string, userName string, password string)
 }
 
 // DoWithRefresh ...
-func DoWithRefresh(serverAddr string, projectName string, refreshToken string) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, projectName)
+func DoWithRefresh(serverAddr string, info Info) (*oidcapi.TokenResponse, error) {
+	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, info.ProjectName)
 
 	form := url.Values{}
-	form.Add("refresh_token", refreshToken)
+	form.Add("refresh_token", info.RefreshToken)
 	form.Add("grant_type", "refresh_token")
-	form.Add("client_id", "admin-cli")
+	form.Add("client_id", info.ClientID)
+	if info.ClientSecret != "" {
+		form.Add("client_secret", info.ClientSecret)
+	}
+
 	body := strings.NewReader(form.Encode())
 	httpReq, err := http.NewRequest("POST", u, body)
 	if err != nil {

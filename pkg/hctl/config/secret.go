@@ -12,7 +12,9 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/hctl/login"
 )
 
-type secret struct {
+// Secret ...
+type Secret struct {
+	ProjectName             string    `json:"projectName"`
 	UserName                string    `json:"userName"`
 	AccessToken             string    `json:"accessToken"`
 	AccessTokenExpiresTime  time.Time `json:"accessTokenExpiresTime"`
@@ -21,10 +23,11 @@ type secret struct {
 }
 
 // SetSecret ...
-func SetSecret(userName string, token *oidcapi.TokenResponse) {
+func SetSecret(projectName string, userName string, token *oidcapi.TokenResponse) {
 	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
 
-	v := secret{
+	v := Secret{
+		ProjectName:             projectName,
 		UserName:                userName,
 		AccessToken:             token.AccessToken,
 		AccessTokenExpiresTime:  time.Now().Add(time.Second * time.Duration(token.ExpiresIn)),
@@ -36,17 +39,26 @@ func SetSecret(userName string, token *oidcapi.TokenResponse) {
 	ioutil.WriteFile(secretFile, bytes, os.ModePerm)
 }
 
-// GetAccessToken ...
-func GetAccessToken() (string, error) {
+// GetSecret ...
+func GetSecret() (*Secret, error) {
 	// Get Secret Info
 	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
 	buf, err := ioutil.ReadFile(secretFile)
 	if err != nil {
-		return "", fmt.Errorf("Failed to read secret file: %v\nYou need to `hctl login` at first", err)
+		return nil, fmt.Errorf("Failed to read secret file: %v\nYou need to `hctl login` at first", err)
 	}
 
-	var s secret
+	var s Secret
 	json.Unmarshal(buf, &s)
+	return &s, nil
+}
+
+// GetAccessToken ...
+func GetAccessToken() (string, error) {
+	s, err := GetSecret()
+	if err != nil {
+		return "", err
+	}
 
 	if time.Now().After(s.RefreshTokenExpiresTime) {
 		return "", fmt.Errorf("Token is expired\nPlease run `hctl login`")
@@ -54,35 +66,21 @@ func GetAccessToken() (string, error) {
 
 	if time.Now().After(s.AccessTokenExpiresTime) {
 		// Refresh token by using refresh-token
-		res, err := login.DoWithRefresh(sysConf.ServerAddr, sysConf.ProjectName, s.RefreshToken)
+		res, err := login.DoWithRefresh(sysConf.ServerAddr, login.Info{
+			ProjectName:  s.ProjectName,
+			RefreshToken: s.RefreshToken,
+			ClientID:     sysConf.ClientID,
+			ClientSecret: sysConf.ClientSecret,
+		})
 		if err != nil {
 			return "", err
 		}
 
-		SetSecret(s.UserName, res)
+		SetSecret(s.ProjectName, s.UserName, res)
 		s.AccessToken = res.AccessToken
 	}
 
 	return s.AccessToken, nil
-}
-
-// GetRefreshToken ...
-func GetRefreshToken() (string, error) {
-	// Get Secret Info
-	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
-	buf, err := ioutil.ReadFile(secretFile)
-	if err != nil {
-		return "", fmt.Errorf("Failed to read secret file: %v", err)
-	}
-
-	var s secret
-	json.Unmarshal(buf, &s)
-
-	if time.Now().After(s.RefreshTokenExpiresTime) {
-		return "", fmt.Errorf("Refresh token was already expired")
-	}
-
-	return s.RefreshToken, nil
 }
 
 // RemoveSecretFile ...

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/client"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/login"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/logout"
@@ -67,7 +65,7 @@ var rootCmd = &cobra.Command{
 // Execute method run root command
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Printf("[ERROR] %v\n", err)
+		print.Error("Failed to execute command: %v\n", err)
 		os.Exit(1)
 	}
 }

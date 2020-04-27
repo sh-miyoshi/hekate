@@ -23,8 +23,8 @@ var loginCmd = &cobra.Command{
 
 		// TODO(support authorization code flow)
 
-		if projectName != "" {
-			config.SetProjectName(projectName)
+		if projectName == "" {
+			projectName = config.Get().DefaultProject
 		}
 
 		if userName == "" {
@@ -45,12 +45,18 @@ var loginCmd = &cobra.Command{
 			}
 		}
 
-		res, err := login.Do(config.Get().ServerAddr, config.Get().ProjectName, userName, password)
+		res, err := login.Do(config.Get().ServerAddr, login.Info{
+			ProjectName:  projectName,
+			ClientID:     config.Get().ClientID,
+			ClientSecret: config.Get().ClientSecret,
+			UserName:     userName,
+			Password:     password,
+		})
 		if err != nil {
 			print.Fatal("Failed to login: %v", err)
 		}
 
-		config.SetSecret(userName, res)
+		config.SetSecret(projectName, userName, res)
 		print.Print("Successfully logged in")
 	},
 }

@@ -9,10 +9,12 @@ import (
 
 // SystemConfig ...
 type SystemConfig struct {
-	ConfigDir   string
-	EnableDebug bool
-	ServerAddr  string `yaml:"server_addr"`
-	ProjectName string `yaml:"default_project"`
+	ConfigDir      string
+	EnableDebug    bool
+	ServerAddr     string `yaml:"server_addr"`
+	DefaultProject string `yaml:"default_project"`
+	ClientID       string `yaml:"client_id"`
+	ClientSecret   string `yaml:"client_secret"`
 }
 
 var sysConf SystemConfig
@@ -39,11 +41,6 @@ func InitConfig(confDir string) error {
 // EnableDebugMode ...
 func EnableDebugMode() {
 	sysConf.EnableDebug = true
-}
-
-// SetProjectName ...
-func SetProjectName(name string) {
-	sysConf.ProjectName = name
 }
 
 // Get ...
