@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,6 +14,7 @@ import (
 
 // NewAuthRequest ...
 func NewAuthRequest(values url.Values) *AuthRequest {
+	maxAge, _ := strconv.Atoi(values.Get("max_age"))
 	return &AuthRequest{
 		Scope:        values.Get("scope"),
 		ResponseType: values.Get("response_type"),
@@ -20,18 +22,21 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 		RedirectURI:  values.Get("redirect_uri"),
 		State:        values.Get("state"),
 		Nonce:        values.Get("nonce"),
+		Prompt:       values.Get("prompt"),
+		MaxAge:       maxAge,
 	}
 }
 
 // GenerateAuthCode ...
-func GenerateAuthCode(clientID string, redirectURL string, userID string, nonce string) (string, error) {
+func GenerateAuthCode(userID string, authReq AuthRequest) (string, error) {
 	code := &model.AuthCode{
 		CodeID:      uuid.New().String(),
-		ClientID:    clientID,
-		RedirectURL: redirectURL,
+		ClientID:    authReq.ClientID,
+		RedirectURL: authReq.RedirectURI,
 		ExpiresIn:   time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
 		UserID:      userID,
-		Nonce:       nonce,
+		Nonce:       authReq.Nonce,
+		MaxAge:      authReq.MaxAge,
 	}
 
 	err := db.GetInst().AuthCodeAdd(code)
@@ -48,7 +53,7 @@ func verifyAuthCode(codeID string) (*model.AuthCode, error) {
 		}
 		return nil, err
 	}
-	logger.Debug("Code: %v", code)
+	logger.Debug("Authorization Code: %v", code)
 
 	if time.Now().Unix() >= code.ExpiresIn.Unix() {
 		return nil, errors.Wrap(ErrInvalidRequest, "code is already expired")

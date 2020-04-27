@@ -48,6 +48,7 @@ func (h *AuthCodeHandler) Add(code *model.AuthCode) error {
 		RedirectURL: code.RedirectURL,
 		UserID:      code.UserID,
 		Nonce:       code.Nonce,
+		MaxAge:      code.MaxAge,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)
@@ -122,5 +123,6 @@ func (h *AuthCodeHandler) Get(codeID string) (*model.AuthCode, error) {
 		RedirectURL: res.RedirectURL,
 		UserID:      res.UserID,
 		Nonce:       res.Nonce,
+		MaxAge:      res.MaxAge,
 	}, nil
 }

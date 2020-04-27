@@ -68,6 +68,7 @@ func RegisterUserLoginSession(projectName string, req *AuthRequest) (string, err
 		RedirectURI: req.RedirectURI,
 		Nonce:       req.Nonce,
 		ProjectName: projectName,
+		MaxAge:      req.MaxAge,
 	}
 
 	if err := db.GetInst().LoginSessionAdd(s); err != nil {
@@ -97,5 +98,6 @@ func UserLoginVerify(code string) (*UserLoginInfo, error) {
 		ClientID:     s.ClientID,
 		RedirectURI:  s.RedirectURI,
 		Nonce:        s.Nonce,
+		MaxAge:       s.MaxAge,
 	}, nil
 }

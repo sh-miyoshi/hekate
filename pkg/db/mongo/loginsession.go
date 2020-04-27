@@ -50,6 +50,7 @@ func (h *LoginSessionHandler) Add(info *model.LoginSessionInfo) error {
 		RedirectURI:  info.RedirectURI,
 		Nonce:        info.Nonce,
 		ProjectName:  info.ProjectName,
+		MaxAge:       info.MaxAge,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
@@ -109,6 +110,7 @@ func (h *LoginSessionHandler) Get(code string) (*model.LoginSessionInfo, error) 
 		RedirectURI:  res.RedirectURI,
 		Nonce:        res.Nonce,
 		ProjectName:  res.ProjectName,
+		MaxAge:       res.MaxAge,
 	}, nil
 }
 

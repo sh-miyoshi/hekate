@@ -14,7 +14,20 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/user"
 )
 
-func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, r *http.Request, genRefresh, genIDToken bool, nonce string) (*TokenResponse, error) {
+type option struct {
+	audiences       []string
+	genRefreshToken bool
+	genIDToken      bool
+	nonce           string
+	maxAge          int
+}
+
+func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*TokenResponse, error) {
+	accessLifeSpan := project.TokenConfig.AccessTokenLifeSpan
+	if opt.maxAge > 0 && uint(opt.maxAge) < accessLifeSpan {
+		accessLifeSpan = uint(opt.maxAge)
+	}
+
 	// Generate JWT Token
 	res := TokenResponse{
 		TokenType: "Bearer",
@@ -23,9 +36,16 @@ func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, 
 
 	accessTokenReq := token.Request{
 		Issuer:      token.GetFullIssuer(r),
-		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+		ExpiredTime: time.Second * time.Duration(accessLifeSpan),
 		ProjectName: project.Name,
 		UserID:      userID,
+	}
+
+	audiences := []string{
+		userID,
+	}
+	if len(opt.audiences) > 0 {
+		audiences = opt.audiences
 	}
 
 	var err error
@@ -34,11 +54,15 @@ func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, 
 		return nil, errors.Wrap(err, "Failed to generate access token")
 	}
 
-	if genRefresh {
+	if opt.genRefreshToken {
 		res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
+		if opt.maxAge > 0 {
+			res.RefreshExpiresIn = uint(opt.maxAge)
+		}
+
 		refreshTokenReq := token.Request{
 			Issuer:      token.GetFullIssuer(r),
-			ExpiredTime: time.Second * time.Duration(project.TokenConfig.RefreshTokenLifeSpan),
+			ExpiredTime: time.Second * time.Duration(res.RefreshExpiresIn),
 			ProjectName: project.Name,
 			UserID:      userID,
 		}
@@ -68,13 +92,21 @@ func genTokenRes(audiences []string, userID string, project *model.ProjectInfo, 
 
 	}
 
-	if genIDToken {
+	if opt.genIDToken {
+		lifeSpan := project.TokenConfig.AccessTokenLifeSpan
+		var maxAge *int
+		if opt.maxAge > 0 {
+			lifeSpan = uint(opt.maxAge)
+			maxAge = &opt.maxAge
+		}
+
 		idTokenReq := token.Request{
 			Issuer:      token.GetFullIssuer(r),
-			ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+			ExpiredTime: time.Second * time.Duration(lifeSpan),
 			ProjectName: project.Name,
 			UserID:      userID,
-			Nonce:       nonce,
+			Nonce:       opt.nonce,
+			MaxAge:      maxAge,
 		}
 		res.IDToken, err = token.GenerateIDToken("", audiences, idTokenReq)
 		if err != nil {
@@ -101,7 +133,10 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 		audiences = append(audiences, clientID)
 	}
 
-	return genTokenRes(audiences, usr.ID, project, r, true, false, "")
+	return genTokenRes(usr.ID, project, r, option{
+		audiences:       audiences,
+		genRefreshToken: true,
+	})
 }
 
 // ReqAuthByCode ...
@@ -125,7 +160,13 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, codeID string, r
 		code.ClientID,
 	}
 
-	return genTokenRes(audiences, code.UserID, project, r, true, true, code.Nonce)
+	return genTokenRes(code.UserID, project, r, option{
+		audiences:       audiences,
+		genRefreshToken: true,
+		genIDToken:      true,
+		nonce:           code.Nonce,
+		maxAge:          code.MaxAge,
+	})
 }
 
 // ReqAuthByRefreshToken ...
@@ -153,8 +194,10 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 		return nil, errors.Wrap(err, "Failed to revoke previous token")
 	}
 
-	userID := claims.Subject
-	return genTokenRes(claims.Audience, userID, project, r, true, false, "")
+	return genTokenRes(claims.Subject, project, r, option{
+		audiences:       claims.Audience,
+		genRefreshToken: true,
+	})
 }
 
 // ReqAuthByRClientCredentials ...
@@ -170,5 +213,7 @@ func ReqAuthByRClientCredentials(project *model.ProjectInfo, clientID string, r 
 	audiences := []string{
 		clientID,
 	}
-	return genTokenRes(audiences, "", project, r, false, false, "")
+	return genTokenRes("", project, r, option{
+		audiences: audiences,
+	})
 }

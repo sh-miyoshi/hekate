@@ -127,6 +127,7 @@ func GenerateIDToken(sessionID string, audiences []string, request Request) (str
 		},
 		audiences,
 		request.Nonce,
+		request.MaxAge,
 	}
 
 	return signToken(request.ProjectName, claims)

@@ -265,6 +265,18 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(consider state)
+
+	authReq := &oidc.AuthRequest{
+		Scope:        info.Scope,
+		ResponseType: info.ResponseType,
+		ClientID:     info.ClientID,
+		RedirectURI:  info.RedirectURI,
+		State:        state,
+		Nonce:        info.Nonce,
+		MaxAge:       info.MaxAge,
+	}
+
 	// Verify user
 	uname := r.Form.Get("username")
 	passwd := r.Form.Get("password")
@@ -273,14 +285,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Cause(err) == user.ErrAuthFailed {
 			logger.Info("Failed to authenticate user %s: %v", uname, err)
 			// create new code for relogin
-			req := &oidc.AuthRequest{
-				Scope:        info.Scope,
-				ResponseType: info.ResponseType,
-				ClientID:     info.ClientID,
-				RedirectURI:  info.RedirectURI,
-				State:        state,
-			}
-			code, err := oidc.RegisterUserLoginSession(projectName, req)
+			code, err := oidc.RegisterUserLoginSession(projectName, authReq)
 			if err != nil {
 				logger.Error("Failed to register login session %+v", err)
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
@@ -295,7 +300,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, _ := oidc.GenerateAuthCode(info.ClientID, info.RedirectURI, usr.ID, info.Nonce)
+	code, _ := oidc.GenerateAuthCode(usr.ID, *authReq)
 	values := url.Values{}
 	values.Set("code", code)
 	if state != "" {

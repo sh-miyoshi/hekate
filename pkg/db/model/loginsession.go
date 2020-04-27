@@ -16,6 +16,7 @@ type LoginSessionInfo struct {
 	RedirectURI  string
 	Nonce        string
 	ProjectName  string
+	MaxAge       int
 }
 
 var (
