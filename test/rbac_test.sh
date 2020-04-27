@@ -41,11 +41,11 @@ go build
 # Test read/write role
 #----------------------------------
 
-./htcl login --name editor --password password
+./hctl login --project rbac-test --name editor --password password
 test_command client add --project rbac-test --id test-client --accessType public
 test_command client get --project rbac-test
 
-./htcl login --name viewer --password password
+./hctl login --project rbac-test --name viewer --password password
 test_command_failed client add --project rbac-test --id test-client-2 --accessType public
 test_command client get --project rbac-test
 
