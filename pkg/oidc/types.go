@@ -47,7 +47,6 @@ func validatePrompt(prompts string) error {
 		return ErrInvalidRequest
 	}
 
-	// TODO change response
 	for _, prompt := range v {
 		switch prompt {
 		case "login", "select_account":
