@@ -47,19 +47,19 @@ func validatePrompt(prompts string) error {
 		return ErrInvalidRequest
 	}
 
-	// // TODO change response
-	// for _, prompt := range v {
-	// 	switch prompt {
-	// 	case "login":
-	// 		// login is supported
-	// 	case "consent":
-	// 		return ErrConsentRequired
-	// 	case "select_account":
-	// 		return ErrAccountSelectionRequired
-	// 	default:
-	// 		return ErrInvalidRequest
-	// 	}
-	// }
+	// TODO change response
+	for _, prompt := range v {
+		switch prompt {
+		case "login", "select_account":
+			// login is supported
+		case "consent":
+			return ErrConsentRequired
+		case "none":
+			return ErrInteractionRequired
+		default:
+			return ErrInvalidRequest
+		}
+	}
 
 	return nil
 }
