@@ -1,6 +1,7 @@
 #!/bin/bash
 
-URL="http://localhost:18443/api/v1"
+SERVER_ADDR="http://localhost:18843"
+URL=$SERVER_ADDR+"/api/v1"
 
 function test_api() {
 	url=$1
@@ -53,6 +54,12 @@ function test_api_return_json() {
 		echo $result
 	fi
 }
+
+curl $SERVER_ADDR/healthz -s -o /dev/null
+if [ $? != 0 ]; then
+  echo "Before test, please run a server"
+  exit 1
+fi
 
 # Get Master Token
 token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
