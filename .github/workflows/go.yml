@@ -33,6 +33,11 @@ jobs:
         cd test
         ./all_api_test.sh
 
+    - name: CLI Tool Test
+      run: |
+        cd test
+        ./all_api_test_by_cli.sh
+
     - name: OIDC Test
       run: |
         cd test/oidc
