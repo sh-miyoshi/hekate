@@ -36,6 +36,7 @@ jobs:
     - name: CLI Tool Test
       run: |
         cd test
+        chmod 755 all_api_test_by_cli.sh
         ./all_api_test_by_cli.sh
 
     - name: OIDC Test
