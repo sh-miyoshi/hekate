@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVER_ADDR="http://localhost:18843"
+SERVER_ADDR="http://localhost:18443"
 URL=$SERVER_ADDR+"/api/v1"
 
 function test_api() {
