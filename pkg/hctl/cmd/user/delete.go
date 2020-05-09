@@ -15,7 +15,7 @@ var deleteUserCmd = &cobra.Command{
 	Long:  "Delete User",
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName, _ := cmd.Flags().GetString("project")
-		userName, _ := cmd.Flags().GetString("user")
+		userName, _ := cmd.Flags().GetString("name")
 
 		token, err := config.GetAccessToken()
 		if err != nil {

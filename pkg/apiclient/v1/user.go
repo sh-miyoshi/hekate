@@ -127,7 +127,7 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
 	}
 
-	roleID := ""
+	roleID := roleName
 	if roleType == model.RoleCustom {
 		role, err := h.RoleGetList(projectName, roleName)
 		if err != nil {
