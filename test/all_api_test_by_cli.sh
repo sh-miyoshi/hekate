@@ -33,33 +33,64 @@ test_command login --project master --name admin --password password
 test_command project add --file $TEST_DIR/inputs/project_create.json
 
 ## get all
+test_command project get
+
 ## get
-## update
+test_command project get --name new-project
+
+## TODO(update)
+
 ## delete
+test_command project delete --name new-project
 
 # user
 ## create
+test_command user add --project master --file $TEST_DIR/inputs/user_create.json
+
 ## get all
+test_command user get --project master
+
 ## get
-## update
+test_command user get --project master --name user1
+
+## TODO(update)
+
 ## add user role
-## delete user role
-## password change
+test_command user role add --project master --user user1 --role read-project
+
+## TODO(delete user role)
+
+## TODO(password change)
+
 ## delete
+test_command user delete --project master --name user1
 
 # client
 ## create
+test_command client add --project master --file $TEST_DIR/inputs/client_create.json
+
 ## get all
+test_command client get --project master
+
 ## get
-## update
+test_command client get --project master --id oidc-client
+
+## TODO(update)
+
 ## delete
+test_command client delete --project master --id oidc-client
 
 # role
 ## create
-## get all
-## get
-## update
-## delete
+test_command role add --project master --name viewer
+
+## TODO(get all)
+
+## TODO(get)
+
+## TODO(update)
+
+## TODO(delete)
 
 # logout
 test_command logout
