@@ -38,6 +38,8 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 		}
 
 		return &res, nil
+	case 409:
+		return nil, fmt.Errorf("User %s is already exists", req.Name)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
