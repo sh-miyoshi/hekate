@@ -16,7 +16,7 @@ var getClientCmd = &cobra.Command{
 	Long:  "Get Clients in the cluster",
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName, _ := cmd.Flags().GetString("project")
-		clientName, _ := cmd.Flags().GetString("name")
+		clientID, _ := cmd.Flags().GetString("id")
 
 		token, err := config.GetAccessToken()
 		if err != nil {
@@ -26,10 +26,10 @@ var getClientCmd = &cobra.Command{
 
 		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
 
-		if clientName != "" {
-			res, err := handler.ClientGet(projectName, clientName)
+		if clientID != "" {
+			res, err := handler.ClientGet(projectName, clientID)
 			if err != nil {
-				print.Fatal("Failed to get client %s: %v", clientName, err)
+				print.Fatal("Failed to get client %s: %v", clientID, err)
 			}
 
 			format := output.NewClientInfoFormat(res)
@@ -49,6 +49,6 @@ var getClientCmd = &cobra.Command{
 
 func init() {
 	getClientCmd.Flags().String("project", "", "[Required] name of the project to which the client belongs")
-	getClientCmd.Flags().StringP("name", "n", "", "name of new client")
+	getClientCmd.Flags().String("id", "", "id of the client")
 	getClientCmd.MarkFlagRequired("project")
 }

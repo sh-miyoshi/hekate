@@ -90,8 +90,8 @@ func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetRespo
 }
 
 // ClientGet ...
-func (h *Handler) ClientGet(projectName, clientName string) (*clientapi.ClientGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientName)
+func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetResponse, error) {
+	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
