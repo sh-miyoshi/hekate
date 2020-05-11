@@ -3,7 +3,6 @@
 ## Bugs(?)
 
 - userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
-- 別projectのリソースを変更できないか要確認
 
 ## server application enhancement
 
