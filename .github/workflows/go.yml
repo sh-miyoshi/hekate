@@ -43,3 +43,9 @@ jobs:
       run: |
         cd test/oidc
         go run authorization_code_flow.go
+
+    - name: RBAC Test
+      run: |
+        cd test
+        chmod 755 rbac_test.sh
+        ./rbac_test.sh
