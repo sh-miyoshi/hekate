@@ -32,8 +32,8 @@ go build
 
 ./hctl login --name admin --password password
 ./hctl project add --name rbac-test --grantTypes password
-./hctl user add --project rbac-test --name viewer --password password --systemRoles "read-client"
-./hctl user add --project rbac-test --name editor --password password --systemRoles "read-client,write-client"
+./hctl user add --project rbac-test --name viewer --password password --systemRoles "read-project"
+./hctl user add --project rbac-test --name editor --password password --systemRoles "read-project,write-project"
 ./hctl project add --name rbac-test-2 --grantTypes password
 ./hctl client add --project rbac-test-2 --id test-client-2 --accessType public
 
