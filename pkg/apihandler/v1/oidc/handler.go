@@ -128,7 +128,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		writeTokenErrorResponse(w, oidc.ErrInvalidGrant, state)
 		return
 	}
-	if ok := slice.Contains(project.AllowGrantTypes, model.GrantTypeClientCredentials); !ok {
+	if ok := slice.Contains(project.AllowGrantTypes, gt); !ok {
 		logger.Info("Grant Type %s is not in allowed list %v", gtStr, project.AllowGrantTypes)
 		writeTokenErrorResponse(w, oidc.ErrUnsupportedGrantType, state)
 	}
