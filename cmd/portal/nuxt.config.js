@@ -93,15 +93,7 @@ export default {
       'read-cluster',
       'write-cluster',
       'read-project',
-      'write-project',
-      'read-role',
-      'write-role',
-      'read-user',
-      'write-user',
-      'read-client',
-      'write-client',
-      'read-customrole',
-      'write-customrole'
+      'write-project'
     ]
   }
 }

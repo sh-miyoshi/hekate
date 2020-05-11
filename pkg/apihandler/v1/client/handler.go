@@ -15,7 +15,7 @@ import (
 )
 
 // AllClientGetHandler ...
-//   require role: project-read
+//   require role: read-project
 func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -54,7 +54,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClientCreateHandler ...
-//   require role: project-write
+//   require role: write-project
 func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -114,7 +114,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClientDeleteHandler ...
-//   require role: project-write
+//   require role: write-project
 func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -147,14 +147,14 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClientGetHandler ...
-//   require role: client-read
+//   require role: read-client
 func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	clientID := vars["clientID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResClient, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -187,14 +187,14 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClientUpdateHandler ...
-//   require role: client-write
+//   require role: write-client
 func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	clientID := vars["clientID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResClient, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return

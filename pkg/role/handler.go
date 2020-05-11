@@ -27,14 +27,6 @@ func InitHandler() error {
 	inst.createRole(ResCluster, TypeWrite)
 	inst.createRole(ResProject, TypeRead)
 	inst.createRole(ResProject, TypeWrite)
-	inst.createRole(ResRole, TypeRead)
-	inst.createRole(ResRole, TypeWrite)
-	inst.createRole(ResUser, TypeRead)
-	inst.createRole(ResUser, TypeWrite)
-	inst.createRole(ResClient, TypeRead)
-	inst.createRole(ResClient, TypeWrite)
-	inst.createRole(ResCustomRole, TypeRead)
-	inst.createRole(ResCustomRole, TypeWrite)
 
 	roles := []string{}
 	for _, role := range inst.roleList {

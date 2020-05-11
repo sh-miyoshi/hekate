@@ -15,7 +15,7 @@ import (
 )
 
 // AllProjectGetHandler ...
-//   require role: cluster-read
+//   require role: read-cluster
 func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeRead); err != nil {
@@ -55,7 +55,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectCreateHandler ...
-//   require role: cluster-write
+//   require role: write-cluster
 func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeWrite); err != nil {
@@ -128,7 +128,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectDeleteHandler ...
-//   require role: cluster-write
+//   require role: write-cluster
 func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -160,7 +160,7 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectGetHandler ...
-//   require role: project-read
+//   require role: read-project
 func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -206,7 +206,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProjectUpdateHandler ...
-//   require role: project-write
+//   require role: write-project
 func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]

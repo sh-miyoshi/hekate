@@ -16,7 +16,7 @@ import (
 )
 
 // AllRoleGetHandler ...
-//   require role: project-read
+//   require role: read-project
 func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -62,13 +62,13 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleCreateHandler ...
-//   require role: customrole-write
+//   require role: write-role
 func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -120,14 +120,14 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleDeleteHandler ...
-//   require role: role-write
+//   require role: write-role
 func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	roleID := vars["roleID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -153,14 +153,14 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleGetHandler ...
-//   require role: role-read
+//   require role: read-role
 func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	roleID := vars["roleID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -192,14 +192,14 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleUpdateHandler ...
-//   require role: role-write
+//   require role: write-role
 func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	roleID := vars["roleID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResCustomRole, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return

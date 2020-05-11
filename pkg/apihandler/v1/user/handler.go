@@ -17,7 +17,7 @@ import (
 )
 
 // AllUserGetHandler ...
-//   require role: project-read
+//   require role: read-project
 func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -96,7 +96,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserCreateHandler ...
-//   require role: project-write
+//   require role: write-project
 func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -171,7 +171,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserDeleteHandler ...
-//   require role: project-write
+//   require role: write-project
 func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -205,14 +205,14 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserGetHandler ...
-//   require role: user-read, or <oneself>
+//   require role: read-project, or <oneself>
 func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResUser, role.TypeRead); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		claims, err := jwthttp.ValidateAPIRequest(r)
 		// Check if the requester is the user
 		if err != nil || claims.Subject != userID {
@@ -277,14 +277,14 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserUpdateHandler ...
-//   require role: user-write
+//   require role: write-project
 func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResUser, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -340,7 +340,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserRoleAddHandler ...
-//   require role: user-write
+//   require role: write-project
 func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -348,7 +348,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := vars["roleID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResUser, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -390,7 +390,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserRoleDeleteHandler ...
-//   require role: user-write
+//   require role: write-project
 func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -398,7 +398,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	roleID := vars["roleID"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResUser, role.TypeWrite); err != nil {
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		logger.Info("Failed to authorize header: %v", err)
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
