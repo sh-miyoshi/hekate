@@ -63,5 +63,6 @@ func init() {
 	addProjectCmd.Flags().UintVar(&project.TokenConfig.AccessTokenLifeSpan, "accessExpires", 5*60, "access token life span [sec]")
 	addProjectCmd.Flags().UintVar(&project.TokenConfig.RefreshTokenLifeSpan, "refreshExpires", 14*24*60*60, "refresh token life span [sec]")
 	addProjectCmd.Flags().StringVar(&project.TokenConfig.SigningAlgorithm, "signAlg", "RS256", "token sigining algorithm, one of RS256, ")
+	addProjectCmd.Flags().StringArrayVar(&project.AllowGrantTypes, "grantTypes", []string{}, "allowed grant type list")
 	addProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
 }
