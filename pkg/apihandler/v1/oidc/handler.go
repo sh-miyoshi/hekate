@@ -43,6 +43,10 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 			"iat",
 			"nbf",
 		},
+		ResponseModesSupported: []string{
+			"query",
+			"fragment",
+		},
 	}
 
 	jwthttp.ResponseWrite(w, "ConfigGetHandler", &res)
