@@ -271,6 +271,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO(consider state)
 
+	// TODO(set prompt value)
 	authReq := &oidc.AuthRequest{
 		Scope:        info.Scope,
 		ResponseType: info.ResponseType,
@@ -279,6 +280,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		State:        state,
 		Nonce:        info.Nonce,
 		MaxAge:       info.MaxAge,
+		ResponseMode: info.ResponseMode,
 	}
 
 	// Verify user
@@ -303,6 +305,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	// TODO(check response type)
 
 	code, _ := oidc.GenerateAuthCode(usr.ID, *authReq)
 

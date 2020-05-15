@@ -33,7 +33,7 @@ type loginSessionInfo struct {
 	VerifyCode   string    `bson:"verifyCode"`
 	ExpiresIn    time.Time `bson:"expiresIn"`
 	Scope        string    `bson:"scope"`
-	ResponseType string    `bson:"responseType"`
+	ResponseType []string  `bson:"responseType"`
 	ClientID     string    `bson:"clientID"`
 	RedirectURI  string    `bson:"redirectURI"`
 	Nonce        string    `bson:"nonce"`

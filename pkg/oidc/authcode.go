@@ -3,6 +3,7 @@ package oidc
 import (
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,7 +18,7 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 	maxAge, _ := strconv.Atoi(values.Get("max_age"))
 	return &AuthRequest{
 		Scope:        values.Get("scope"),
-		ResponseType: values.Get("response_type"),
+		ResponseType: strings.Split(values.Get("response_type"), " "),
 		ClientID:     values.Get("client_id"),
 		RedirectURI:  values.Get("redirect_uri"),
 		State:        values.Get("state"),

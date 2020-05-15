@@ -63,10 +63,11 @@ func RegisterUserLoginSession(projectName string, req *AuthRequest) (string, err
 
 	resMode := req.ResponseMode
 	if resMode == "" {
-		if req.ResponseType == "code" || req.ResponseType == "none" {
-			resMode = "query"
-		} else {
-			resMode = "fragment"
+		resMode = "fragment"
+		if len(req.ResponseType) == 1 {
+			if req.ResponseType[0] == "code" || req.ResponseType[0] == "none" {
+				resMode = "query"
+			}
 		}
 	}
 

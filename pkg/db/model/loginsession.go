@@ -11,7 +11,7 @@ type LoginSessionInfo struct {
 	VerifyCode   string
 	ExpiresIn    time.Time
 	Scope        string
-	ResponseType string
+	ResponseType []string
 	ClientID     string
 	RedirectURI  string
 	Nonce        string

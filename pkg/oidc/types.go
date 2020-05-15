@@ -9,10 +9,10 @@ import (
 // AuthRequest ...
 type AuthRequest struct {
 	// Required
-	Scope        string `validate:"required"`
-	ResponseType string `validate:"required"`
-	ClientID     string `validate:"required"`
-	RedirectURI  string `validate:"required,url"`
+	Scope        string   `validate:"required"`
+	ResponseType []string `validate:"required"`
+	ClientID     string   `validate:"required"`
+	RedirectURI  string   `validate:"required,url"`
 
 	// Recommend
 	State string
@@ -34,7 +34,7 @@ type AuthRequest struct {
 // UserLoginInfo ...
 type UserLoginInfo struct {
 	Scope        string
-	ResponseType string
+	ResponseType []string
 	ClientID     string
 	RedirectURI  string
 	Nonce        string
@@ -73,7 +73,7 @@ func (r *AuthRequest) Validate() error {
 	// Check Response Type
 	ok := false
 FOR_LABEL:
-	for _, typ := range strings.Split(r.ResponseType, " ") {
+	for _, typ := range r.ResponseType {
 		for _, support := range GetSupportedResponseType() {
 			if typ == support {
 				ok = true
