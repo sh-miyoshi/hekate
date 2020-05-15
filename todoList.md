@@ -1,11 +1,10 @@
 # TODO List
 
-## Bugs(?)
-
-- userが削除された場合のaccess tokenが無効化されない(この仕様はok?)
-
 ## server application enhancement
 
+- OIDC response_typeの追加
+  - id_token
+  - token id_token
 - 設定項目の追加
   - パスワードポリシー
 - db manager validationの追加
@@ -45,10 +44,7 @@
     - implicit flow
     - hybrid flow
   - AuthRequestに他のパラメータを追加
-    - response_mode
     - display
-    - prompt
-    - max_age
     - ui_locales
     - id_token_hint
     - login_hint
