@@ -18,12 +18,12 @@ type AuthRequest struct {
 	State string
 
 	// Optional
-	Nonce  string
-	Prompt string
-	MaxAge uint
+	Nonce        string
+	Prompt       string
+	MaxAge       uint
+	ResponseMode string
 
 	// TODO(implement this)
-	// ResponseMode string // response_mode(OPTIONAL)
 	// Display string // display(OPTIONAL)
 	// UILocales string // ui_locales(OPTIONAL)
 	// IDTokenHint string // id_token_hint(OPTIONAL)
@@ -39,6 +39,7 @@ type UserLoginInfo struct {
 	RedirectURI  string
 	Nonce        string
 	MaxAge       uint
+	ResponseMode string
 }
 
 func validatePrompt(prompts string) error {
@@ -88,6 +89,25 @@ FOR_LABEL:
 	if r.Prompt != "" {
 		if err := validatePrompt(r.Prompt); err != nil {
 			return err
+		}
+	}
+
+	// Check Response mode
+	if r.ResponseMode != "" {
+		// TODO(add support form_post)
+		modes := []string{"query", "fragment"}
+		ok := false
+		for _, m := range modes {
+			if r.ResponseMode == m {
+				ok = true
+				break
+			}
+		}
+
+		// TODO return err when query && response_type is not none or code
+
+		if !ok {
+			return ErrInvalidRequest
 		}
 	}
 

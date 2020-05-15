@@ -301,6 +301,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code, _ := oidc.GenerateAuthCode(usr.ID, *authReq)
+
 	values := url.Values{}
 	values.Set("code", code)
 	if state != "" {
@@ -315,7 +316,17 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.URL.RawQuery = values.Encode()
+
+	if info.ResponseMode == "query" {
+		req.URL.RawQuery = values.Encode()
+	} else if info.ResponseMode == "fragment" {
+		req.URL.Fragment = values.Encode()
+	} else {
+		logger.Error("Invalid response mode %s is specified.", info.ResponseMode)
+		errMsg := "Request failed. internal server error occuerd"
+		oidc.WriteErrorPage(errMsg, w)
+		return
+	}
 
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }

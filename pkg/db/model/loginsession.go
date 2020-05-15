@@ -17,6 +17,7 @@ type LoginSessionInfo struct {
 	Nonce        string
 	ProjectName  string
 	MaxAge       uint
+	ResponseMode string
 }
 
 var (

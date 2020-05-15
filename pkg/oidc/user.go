@@ -61,14 +61,25 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 func RegisterUserLoginSession(projectName string, req *AuthRequest) (string, error) {
 	code := uuid.New().String()
 
+	resMode := req.ResponseMode
+	if resMode == "" {
+		if req.ResponseType == "code" || req.ResponseType == "none" {
+			resMode = "query"
+		} else {
+			resMode = "fragment"
+		}
+	}
+
 	s := &model.LoginSessionInfo{
-		VerifyCode:  code,
-		ExpiresIn:   time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
-		ClientID:    req.ClientID,
-		RedirectURI: req.RedirectURI,
-		Nonce:       req.Nonce,
-		ProjectName: projectName,
-		MaxAge:      req.MaxAge,
+		VerifyCode:   code,
+		ExpiresIn:    time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
+		ClientID:     req.ClientID,
+		RedirectURI:  req.RedirectURI,
+		Nonce:        req.Nonce,
+		ProjectName:  projectName,
+		MaxAge:       req.MaxAge,
+		ResponseMode: resMode,
+		ResponseType: req.ResponseType,
 	}
 
 	if err := db.GetInst().LoginSessionAdd(s); err != nil {

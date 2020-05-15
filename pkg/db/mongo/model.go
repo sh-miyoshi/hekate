@@ -39,6 +39,7 @@ type loginSessionInfo struct {
 	Nonce        string    `bson:"nonce"`
 	ProjectName  string    `bson:"projectName"`
 	MaxAge       uint      `bson:"maxAge"`
+	ResponseMode string    `bson:"loginSession"`
 }
 
 type userInfo struct {

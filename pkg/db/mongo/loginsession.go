@@ -51,6 +51,7 @@ func (h *LoginSessionHandler) Add(info *model.LoginSessionInfo) error {
 		Nonce:        info.Nonce,
 		ProjectName:  info.ProjectName,
 		MaxAge:       info.MaxAge,
+		ResponseMode: info.ResponseMode,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(loginSessionCollectionName)
@@ -111,6 +112,7 @@ func (h *LoginSessionHandler) Get(code string) (*model.LoginSessionInfo, error) 
 		Nonce:        res.Nonce,
 		ProjectName:  res.ProjectName,
 		MaxAge:       res.MaxAge,
+		ResponseMode: res.ResponseMode,
 	}, nil
 }
 
