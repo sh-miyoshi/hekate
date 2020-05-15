@@ -23,5 +23,6 @@ func InitConfig(authCodeExpiresTimeSec uint64, loginResDir string, resourcePath 
 func GetSupportedResponseType() []string {
 	return []string{
 		"code",
+		// TODO(must be supported 'id_token', 'token id_token')
 	}
 }
