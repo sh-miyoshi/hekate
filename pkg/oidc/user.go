@@ -111,5 +111,6 @@ func UserLoginVerify(code string) (*UserLoginInfo, error) {
 		RedirectURI:  s.RedirectURI,
 		Nonce:        s.Nonce,
 		MaxAge:       s.MaxAge,
+		ResponseMode: s.ResponseMode,
 	}, nil
 }
