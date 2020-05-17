@@ -44,6 +44,8 @@ jobs:
         cd test/oidc
         cd authorization_code_flow
         go run main.go
+        cd ../implicit_flow
+        go run main.go
 
     - name: RBAC Test
       run: |
