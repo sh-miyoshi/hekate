@@ -3,6 +3,7 @@ package oidc
 import (
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
@@ -306,14 +307,48 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(check response type)
-
-	code, _ := oidc.GenerateAuthCode(usr.ID, *authReq)
-
 	values := url.Values{}
-	values.Set("code", code)
 	if state != "" {
 		values.Set("state", state)
+	}
+
+	for _, typ := range info.ResponseType {
+		switch typ {
+		case "code":
+			code, _ := oidc.GenerateAuthCode(usr.ID, *authReq)
+			values.Set("code", code)
+		case "id_token":
+			prj, err := db.GetInst().ProjectGet(projectName)
+			if err != nil {
+				logger.Error("Failed to get token lifespan in project: %+v", err)
+				errMsg := "Request failed. internal server error occuerd"
+				oidc.WriteErrorPage(errMsg, w)
+				return
+			}
+
+			audiences := []string{usr.ID, authReq.ClientID}
+			tokenReq := token.Request{
+				Issuer:      token.GetFullIssuer(r),
+				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
+				ProjectName: projectName,
+				UserID:      usr.ID,
+				Nonce:       info.Nonce,
+				MaxAge:      &info.MaxAge,
+			}
+			tkn, err := token.GenerateIDToken(audiences, tokenReq)
+			if err != nil {
+				logger.Error("Failed to generate id token: %+v", err)
+				errMsg := "Request failed. internal server error occuerd"
+				oidc.WriteErrorPage(errMsg, w)
+				return
+			}
+			values.Set("id_token", tkn)
+		default:
+			logger.Error("Unknown response type: %s", typ)
+			errMsg := "Request failed. internal server error occuerd"
+			oidc.WriteErrorPage(errMsg, w)
+			return
+		}
 	}
 
 	req, err := http.NewRequest("GET", info.RedirectURI, nil)

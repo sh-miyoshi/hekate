@@ -108,7 +108,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 			Nonce:       opt.nonce,
 			MaxAge:      maxAge,
 		}
-		res.IDToken, err = token.GenerateIDToken("", audiences, idTokenReq)
+		res.IDToken, err = token.GenerateIDToken(audiences, idTokenReq)
 		if err != nil {
 			return nil, errors.Wrap(err, "Failed to generate id token")
 		}

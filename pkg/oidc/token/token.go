@@ -112,7 +112,7 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 }
 
 // GenerateIDToken ...
-func GenerateIDToken(sessionID string, audiences []string, request Request) (string, error) {
+func GenerateIDToken(audiences []string, request Request) (string, error) {
 	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
 
 	now := time.Now()

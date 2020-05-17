@@ -64,6 +64,18 @@ func validatePrompt(prompts string) error {
 	return nil
 }
 
+func validateResponseType(types []string) error {
+	for _, typ := range types {
+		// TODO(refactoring checking support type)
+		for _, support := range GetSupportedResponseType() {
+			if typ == support {
+				return nil
+			}
+		}
+	}
+	return ErrUnsupportedResponseType
+}
+
 // Validate ...
 func (r *AuthRequest) Validate() error {
 	if err := validator.New().Struct(r); err != nil {
@@ -71,18 +83,8 @@ func (r *AuthRequest) Validate() error {
 	}
 
 	// Check Response Type
-	ok := false
-FOR_LABEL:
-	for _, typ := range r.ResponseType {
-		for _, support := range GetSupportedResponseType() {
-			if typ == support {
-				ok = true
-				break FOR_LABEL
-			}
-		}
-	}
-	if !ok {
-		return ErrUnsupportedResponseType
+	if err := validateResponseType(r.ResponseType); err != nil {
+		return err
 	}
 
 	// Check prompt
