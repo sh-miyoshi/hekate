@@ -3,15 +3,8 @@
 ## Overview
 
 `Hekate`はGo言語で記述されたOpenID Connectに対応したシンプルな認証・認可サーバです。  
-ユーザー管理と認証・認可処理を実行できます。
-
-## Hekateでできること
-
-- APIレベルでのアクセス制御
-  - 自身のサーバのアクセスをHekateの認証・認可機能と組み合わせて柔軟に制御できます
-  - Quick Start: [docs/quick_start/access_control.md](docs/quick_start/access_control.md)
-- ユーザーの認証・認可
-  - TODO(機能概要・Quick Start)
+ユーザー管理と認証・認可処理を実行できます。  
+OpenID Connectのことを知らなくても簡単に認証・認可を行えるシステムを目指しています。
 
 ## インストール方法
 
@@ -46,6 +39,14 @@
 - Production環境の構築
   - TODO
 
+## Hekateでできること
+
+- APIレベルでのアクセス制御
+  - 自身のサーバのアクセスをHekateの認証・認可機能と組み合わせて柔軟に制御できます
+  - Quick Start: [docs/quick_start/access_control.md](docs/quick_start/access_control.md)
+- ユーザーの認証・認可
+  - TODO(機能概要・Quick Start)
+
 ## 開発環境
 
 - golang v1.12以上
@@ -53,13 +54,7 @@
 
 ## All APIs
 
-[api/api.html](api/api.html)、もしくは[test/all_api_test.sh](test/all_api_test.sh)を参照してください。
-
-## 注意事項
-
-Hekateは現在開発途中であり、Open ID Connectの一部パラメータが有効になっていません。
-そのため、Production環境ではまだ使用しないでください。
-なお、詳細は以下のRoad Mapを参照してください。
+[api/api.html](api/api.html)を参照してください。
 
 ## Road Map
 
