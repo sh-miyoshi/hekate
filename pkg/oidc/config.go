@@ -24,6 +24,11 @@ func GetSupportedResponseType() []string {
 	return []string{
 		"code",
 		"id_token",
-		// TODO(must be supported 'token id_token')
+		"token",
+		"code id_token",
+		"code token",
+		"id_token token",
+		"code id_token token",
+		// TODO(support type "none")
 	}
 }

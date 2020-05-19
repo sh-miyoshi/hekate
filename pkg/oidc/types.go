@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"sort"
 	"strings"
 
 	validator "github.com/go-playground/validator/v10"
@@ -50,10 +51,8 @@ func validatePrompt(prompts string) error {
 
 	for _, prompt := range v {
 		switch prompt {
-		case "login", "select_account":
-			// login is supported
-		case "consent":
-			return ErrConsentRequired
+		case "login", "select_account", "consent":
+			// TODO(implement this)
 		case "none":
 			return ErrInteractionRequired
 		default:
@@ -64,13 +63,23 @@ func validatePrompt(prompts string) error {
 	return nil
 }
 
-func validateResponseType(types []string) error {
+func validateResponseType(types, supportedTypes []string) error {
+	// sort types
+	sort.Slice(types, func(i, j int) bool {
+		return types[i] < types[j]
+	})
+
+	// make string
+	s := ""
 	for _, typ := range types {
-		// TODO(refactoring checking support type)
-		for _, support := range GetSupportedResponseType() {
-			if typ == support {
-				return nil
-			}
+		s += typ + " "
+	}
+	s = strings.TrimSuffix(s, " ")
+
+	// include check
+	for _, support := range supportedTypes {
+		if s == support {
+			return nil
 		}
 	}
 	return ErrUnsupportedResponseType
@@ -83,7 +92,8 @@ func (r *AuthRequest) Validate() error {
 	}
 
 	// Check Response Type
-	if err := validateResponseType(r.ResponseType); err != nil {
+	supportedTypes := GetSupportedResponseType()
+	if err := validateResponseType(r.ResponseType, supportedTypes); err != nil {
 		return err
 	}
 

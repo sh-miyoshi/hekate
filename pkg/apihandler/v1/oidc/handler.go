@@ -343,6 +343,30 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			values.Set("id_token", tkn)
+		case "token":
+			prj, err := db.GetInst().ProjectGet(projectName)
+			if err != nil {
+				logger.Error("Failed to get token lifespan in project: %+v", err)
+				errMsg := "Request failed. internal server error occuerd"
+				oidc.WriteErrorPage(errMsg, w)
+				return
+			}
+
+			audiences := []string{usr.ID, authReq.ClientID}
+			tokenReq := token.Request{
+				Issuer:      token.GetFullIssuer(r),
+				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
+				ProjectName: projectName,
+				UserID:      usr.ID,
+			}
+			tkn, err := token.GenerateAccessToken(audiences, tokenReq)
+			if err != nil {
+				logger.Error("Failed to generate access token: %+v", err)
+				errMsg := "Request failed. internal server error occuerd"
+				oidc.WriteErrorPage(errMsg, w)
+				return
+			}
+			values.Set("access_token", tkn)
 		default:
 			logger.Error("Unknown response type: %s", typ)
 			errMsg := "Request failed. internal server error occuerd"
