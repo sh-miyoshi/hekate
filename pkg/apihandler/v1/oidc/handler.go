@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -307,91 +308,11 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	values := url.Values{}
-	if state != "" {
-		values.Set("state", state)
-	}
-
-	for _, typ := range info.ResponseType {
-		switch typ {
-		case "code":
-			code, _ := oidc.GenerateAuthCode(usr.ID, *authReq)
-			values.Set("code", code)
-		case "id_token":
-			prj, err := db.GetInst().ProjectGet(projectName)
-			if err != nil {
-				logger.Error("Failed to get token lifespan in project: %+v", err)
-				errMsg := "Request failed. internal server error occuerd"
-				oidc.WriteErrorPage(errMsg, w)
-				return
-			}
-
-			audiences := []string{usr.ID, authReq.ClientID}
-			tokenReq := token.Request{
-				Issuer:      token.GetFullIssuer(r),
-				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
-				ProjectName: projectName,
-				UserID:      usr.ID,
-				Nonce:       info.Nonce,
-				MaxAge:      &info.MaxAge,
-			}
-			tkn, err := token.GenerateIDToken(audiences, tokenReq)
-			if err != nil {
-				logger.Error("Failed to generate id token: %+v", err)
-				errMsg := "Request failed. internal server error occuerd"
-				oidc.WriteErrorPage(errMsg, w)
-				return
-			}
-			values.Set("id_token", tkn)
-		case "token":
-			prj, err := db.GetInst().ProjectGet(projectName)
-			if err != nil {
-				logger.Error("Failed to get token lifespan in project: %+v", err)
-				errMsg := "Request failed. internal server error occuerd"
-				oidc.WriteErrorPage(errMsg, w)
-				return
-			}
-
-			audiences := []string{usr.ID, authReq.ClientID}
-			tokenReq := token.Request{
-				Issuer:      token.GetFullIssuer(r),
-				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
-				ProjectName: projectName,
-				UserID:      usr.ID,
-			}
-			tkn, err := token.GenerateAccessToken(audiences, tokenReq)
-			if err != nil {
-				logger.Error("Failed to generate access token: %+v", err)
-				errMsg := "Request failed. internal server error occuerd"
-				oidc.WriteErrorPage(errMsg, w)
-				return
-			}
-			values.Set("access_token", tkn)
-		default:
-			logger.Error("Unknown response type: %s", typ)
-			errMsg := "Request failed. internal server error occuerd"
-			oidc.WriteErrorPage(errMsg, w)
-			return
-		}
-	}
-
-	req, err := http.NewRequest("GET", info.RedirectURI, nil)
-	if err != nil {
-		logger.Error("Failed to create response: %v", err)
-		errMsg := "Request failed. internal server error occuerd"
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	if info.ResponseMode == "query" {
-		req.URL.RawQuery = values.Encode()
-	} else if info.ResponseMode == "fragment" {
-		req.URL.Fragment = values.Encode()
-	} else {
-		logger.Error("Invalid response mode %s is specified.", info.ResponseMode)
-		errMsg := "Request failed. internal server error occuerd"
-		oidc.WriteErrorPage(errMsg, w)
+	issuer := token.GetFullIssuer(r)
+	req, errMsg := createLoginRedirectInfo(projectName, usr.ID, issuer, *authReq, info, state)
+	if errMsg != "" {
+		logger.Error(errMsg)
+		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
 
@@ -508,4 +429,75 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	}
 
 	oidc.WriteUserLoginPage(projectName, code, "", authReq.State, w)
+}
+
+func createLoginRedirectInfo(projectName string, userID string, tokenIssuer string, authReq oidc.AuthRequest, info *oidc.UserLoginInfo, state string) (*http.Request, string) {
+	values := url.Values{}
+	if state != "" {
+		values.Set("state", state)
+	}
+
+	for _, typ := range info.ResponseType {
+		switch typ {
+		case "code":
+			code, _ := oidc.GenerateAuthCode(userID, authReq)
+			values.Set("code", code)
+		case "id_token":
+			prj, err := db.GetInst().ProjectGet(projectName)
+			if err != nil {
+				return nil, fmt.Sprintf("Failed to get token lifespan in project: %+v", err)
+			}
+
+			audiences := []string{userID, authReq.ClientID}
+			tokenReq := token.Request{
+				Issuer:      tokenIssuer,
+				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
+				ProjectName: projectName,
+				UserID:      userID,
+				Nonce:       info.Nonce,
+				MaxAge:      &info.MaxAge,
+			}
+			tkn, err := token.GenerateIDToken(audiences, tokenReq)
+			if err != nil {
+				return nil, fmt.Sprintf("Failed to generate id token: %+v", err)
+			}
+			values.Set("id_token", tkn)
+		case "token":
+			prj, err := db.GetInst().ProjectGet(projectName)
+			if err != nil {
+				return nil, fmt.Sprintf("Failed to get token lifespan in project: %+v", err)
+			}
+
+			audiences := []string{userID, authReq.ClientID}
+			tokenReq := token.Request{
+				Issuer:      tokenIssuer,
+				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
+				ProjectName: projectName,
+				UserID:      userID,
+			}
+			tkn, err := token.GenerateAccessToken(audiences, tokenReq)
+			if err != nil {
+				return nil, fmt.Sprintf("Failed to generate access token: %+v", err)
+			}
+			values.Set("access_token", tkn)
+		default:
+			return nil, fmt.Sprintf("Unknown response type: %s", typ)
+		}
+	}
+
+	req, err := http.NewRequest("GET", info.RedirectURI, nil)
+	if err != nil {
+		return nil, fmt.Sprintf("Failed to create response: %v", err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	if info.ResponseMode == "query" {
+		req.URL.RawQuery = values.Encode()
+	} else if info.ResponseMode == "fragment" {
+		req.URL.Fragment = values.Encode()
+	} else {
+		return nil, fmt.Sprintf("Invalid response mode %s is specified.", info.ResponseMode)
+	}
+
+	return req, ""
 }
