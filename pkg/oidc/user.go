@@ -81,6 +81,7 @@ func RegisterUserLoginSession(projectName string, req *AuthRequest) (string, err
 		MaxAge:       req.MaxAge,
 		ResponseMode: resMode,
 		ResponseType: req.ResponseType,
+		Prompt:       req.Prompt,
 	}
 
 	if err := db.GetInst().LoginSessionAdd(s); err != nil {
@@ -112,5 +113,6 @@ func UserLoginVerify(code string) (*UserLoginInfo, error) {
 		Nonce:        s.Nonce,
 		MaxAge:       s.MaxAge,
 		ResponseMode: s.ResponseMode,
+		Prompt:       s.Prompt,
 	}, nil
 }

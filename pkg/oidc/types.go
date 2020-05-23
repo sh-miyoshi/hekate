@@ -41,6 +41,7 @@ type UserLoginInfo struct {
 	Nonce        string
 	MaxAge       uint
 	ResponseMode string
+	Prompt       string
 }
 
 func validatePrompt(prompts string) error {
