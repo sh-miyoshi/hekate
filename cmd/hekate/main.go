@@ -50,6 +50,7 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/userinfo", oidcapiv1.UserInfoHandler).Methods("GET", "POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", oidcapiv1.RevokeHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/login", oidcapiv1.UserLoginHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/consent", oidcapiv1.ConsentHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")

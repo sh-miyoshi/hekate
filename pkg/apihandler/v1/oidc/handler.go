@@ -398,6 +398,11 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
+// ConsentHandler ...
+func ConsentHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO(implement this)
+}
+
 // UserInfoHandler ...
 func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	claims, err := jwthttp.ValidateAPIRequest(r)

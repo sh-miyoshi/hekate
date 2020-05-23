@@ -1,0 +1,49 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+
+  <!-- for debug -->
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/coreui.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+
+
+  <!-- for production -->
+  <!-- <link href="{{.CSSResourcePath}}/bootstrap.min.css" rel="stylesheet">
+	<link href="{{.CSSResourcePath}}/coreui.min.css" rel="stylesheet">
+	<link href="{{.CSSResourcePath}}/style.css" rel="stylesheet"> -->
+</head>
+
+<body>
+
+  <div class="c-wrapper">
+    <div class="c-body login-form">
+      <div class="card">
+        <form method="POST" action="{{.URL}}">
+          <div class="card-header">
+            <h1>Grant Access to ClinetID</h1>
+          </div>
+          <div class="card-body">
+            <p>Do you grant these access privileges?</p>
+            <ul>
+              <li>User Profile</li>
+              <li>User Roles</li>
+            </ul>
+          </div>
+          <div class="card-footer">
+            <div class="error-msg">{{.Error}}</div>
+            <div class="text-center">
+              <button type="submit" name="yes" class="btn btn-secondary btn-lg input">No</button>
+              <button type="submit" name="no" class="btn btn-primary btn-lg input">Yes</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
