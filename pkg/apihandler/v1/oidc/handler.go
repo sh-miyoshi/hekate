@@ -273,7 +273,6 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO(consider state)
 
-	// TODO(set prompt value)
 	authReq := &oidc.AuthRequest{
 		Scope:        info.Scope,
 		ResponseType: info.ResponseType,
@@ -283,6 +282,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		Nonce:        info.Nonce,
 		MaxAge:       info.MaxAge,
 		ResponseMode: info.ResponseMode,
+		Prompt:       info.Prompt,
 	}
 
 	// Verify user
@@ -316,12 +316,31 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if info.Prompt == "consent" {
+		// show consent page
+		return
+	}
+
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
 // ConsentHandler ...
 func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO(implement this)
+	/*
+		vars := mux.Vars(r)
+		projectName := vars["projectName"]
+
+		issuer := token.GetFullIssuer(r)
+		userID : = ...
+		req, errMsg := createLoginRedirectInfo(projectName, userID, issuer, *authReq, info, state)
+		if errMsg != "" {
+			logger.Error(errMsg)
+			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+			return
+		}
+		http.Redirect(w, req, req.URL.String(), http.StatusFound)
+	*/
 }
 
 // UserInfoHandler ...
