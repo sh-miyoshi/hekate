@@ -57,6 +57,27 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 	tpl.Execute(w, d)
 }
 
+// WriteConsentPage ...
+func WriteConsentPage(w http.ResponseWriter) {
+	tpl, err := template.ParseFiles(userConsentHTML)
+	if err != nil {
+		logger.Error("Failed to parse template: %v", err)
+		http.Error(w, "User Consent Page maybe broken", http.StatusInternalServerError)
+		return
+	}
+
+	// TODO(set this)
+	url := ""
+	d := map[string]string{
+		"CSSResourcePath": userLoginResPath + "/css",
+		"IMGResourcePath": userLoginResPath + "/img",
+		"URL":             url,
+	}
+
+	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
+	tpl.Execute(w, d)
+}
+
 // RegisterUserLoginSession ...
 func RegisterUserLoginSession(projectName string, req *AuthRequest) (string, error) {
 	code := uuid.New().String()
