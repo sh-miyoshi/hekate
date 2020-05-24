@@ -2,9 +2,6 @@
 
 ## server application enhancement
 
-- OIDC response_typeの追加
-  - id_token
-  - token id_token
 - 設定項目の追加
   - パスワードポリシー
 - db manager validationの追加
@@ -40,9 +37,6 @@
     - pkg/oidc
   - 結合テスト
 - OpenID Connect部分のエンハンス
-  - openid connect APIの実装
-    - implicit flow
-    - hybrid flow
   - AuthRequestに他のパラメータを追加
     - display
     - ui_locales
