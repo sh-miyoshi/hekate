@@ -135,7 +135,7 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 
 // Update ...
 func (h *ClientInfoHandler) Update(ent *model.ClientInfo) error {
-	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
+	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: ent.ProjectName},
 		{Key: "id", Value: ent.ID},

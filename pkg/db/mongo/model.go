@@ -29,8 +29,9 @@ type session struct {
 	FromIP      string    `bson:"fromIP"`
 }
 
-type loginSessionInfo struct {
-	VerifyCode   string    `bson:"verifyCode"`
+type authCodeSession struct {
+	SessionID    string    `bson:"sessionID"`
+	Code         string    `bson:"code"`
 	ExpiresIn    time.Time `bson:"expiresIn"`
 	Scope        string    `bson:"scope"`
 	ResponseType []string  `bson:"responseType"`

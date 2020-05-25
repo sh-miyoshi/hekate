@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/client"
@@ -141,7 +142,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch gt {
 	case model.GrantTypeClientCredentials:
-		tkn, err = oidc.ReqAuthByRClientCredentials(project, clientID, r)
+		tkn, err = oidc.ReqAuthByClientCredentials(project, clientID, r)
 	case model.GrantTypePassword:
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")
@@ -156,8 +157,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case model.GrantTypeAuthorizationCode:
-		codeID := r.Form.Get("code")
-		tkn, err = oidc.ReqAuthByCode(project, clientID, codeID, r)
+		code := r.Form.Get("code")
+		tkn, err = oidc.ReqAuthByCode(project, clientID, code, r)
 	default:
 		logger.Info("Unexpected grant type got: %s", gt.String())
 		writeTokenErrorResponse(w, oidc.ErrServerError, state)
@@ -214,6 +215,8 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Add("Cache-Control", "no-store")
+	w.Header().Add("Pragma", "no-cache")
 	jwthttp.ResponseWrite(w, "CertsHandler", res)
 }
 
@@ -251,6 +254,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
+	var err error
+
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
@@ -262,28 +267,28 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Debug("Form: %v", r.Form)
 	state := r.Form.Get("state")
 
+	sessionID := r.Form.Get("login_session_id")
+
+	// delete session if login failed
+	defer func() {
+		if err != nil {
+			db.GetInst().AuthCodeSessionDelete(sessionID)
+		}
+	}()
+
 	// Verify user login session code
-	info, err := oidc.UserLoginVerify(r.Form.Get("login_verify_code"))
+	s, err := oidc.VerifySession(sessionID)
 	if err != nil {
 		logger.Info("Failed to verify user login session: %v", err)
-		errMsg := "Request failed. failed to verify login code"
+		errMsg := "Request failed. internal server error occured."
+		if errors.Cause(err) == oidc.ErrSessionExpired {
+			errMsg = "Request failed. the session was already expired."
+		}
 		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
 	// TODO(consider state)
-
-	authReq := &oidc.AuthRequest{
-		Scope:        info.Scope,
-		ResponseType: info.ResponseType,
-		ClientID:     info.ClientID,
-		RedirectURI:  info.RedirectURI,
-		State:        state,
-		Nonce:        info.Nonce,
-		MaxAge:       info.MaxAge,
-		ResponseMode: info.ResponseMode,
-		Prompt:       info.Prompt,
-	}
 
 	// Verify user
 	uname := r.Form.Get("username")
@@ -292,14 +297,34 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Cause(err) == user.ErrAuthFailed {
 			logger.Info("Failed to authenticate user %s: %v", uname, err)
-			// create new code for relogin
-			code, err := oidc.RegisterUserLoginSession(projectName, authReq)
+
+			// delete old session and create new code for relogin
+			if err := db.GetInst().AuthCodeSessionDelete(sessionID); err != nil {
+				logger.Error("Failed to delete previous login session %+v", err)
+				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+				return
+			}
+
+			authReq := &oidc.AuthRequest{
+				Scope:        s.Scope,
+				ResponseType: s.ResponseType,
+				ClientID:     s.ClientID,
+				RedirectURI:  s.RedirectURI,
+				State:        state,
+				Nonce:        s.Nonce,
+				MaxAge:       s.MaxAge,
+				ResponseMode: s.ResponseMode,
+				Prompt:       s.Prompt,
+			}
+
+			code, err := oidc.StartLoginSession(projectName, authReq)
 			if err != nil {
 				logger.Error("Failed to register login session %+v", err)
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 				return
 			}
 			oidc.WriteUserLoginPage(projectName, code, "invalid user name or password", state, w)
+			err = nil // do not dlete session in defer function
 		} else {
 			logger.Error("Failed to verify user: %+v", err)
 			errMsg := "Request failed. internal server error occuerd"
@@ -308,18 +333,27 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	s.UserID = usr.ID
 	issuer := token.GetFullIssuer(r)
-	req, errMsg := createLoginRedirectInfo(projectName, usr.ID, issuer, *authReq, info, state)
+	req, errMsg := createLoginRedirectInfo(s, state, issuer)
 	if errMsg != "" {
 		logger.Error(errMsg)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
 
-	if info.Prompt == "consent" {
-		// show consent page
+	// Update auth code session info
+	if err := db.GetInst().AuthCodeSessionUpdate(s); err != nil {
+		logger.Error("Failed to update auth code session: %+v", err)
+		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
+
+	// // TODO(implement this)
+	// if s.Prompt == "consent" {
+	// 	// show consent page
+	// 	return
+	// }
 
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
@@ -365,6 +399,8 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		UserName: user.Name,
 	}
 
+	w.Header().Add("Cache-Control", "no-store")
+	w.Header().Add("Pragma", "no-cache")
 	jwthttp.ResponseWrite(w, "UserInfoHandler", res)
 }
 
@@ -439,42 +475,47 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 		return
 	}
 
-	// return end user auth prompt
-	code, err := oidc.RegisterUserLoginSession(projectName, authReq)
+	// TODO(if already logined (check by login_hint, prompt), redirect to callback)
+
+	// Start session for authorization code flow
+	sessionID, err := oidc.StartLoginSession(projectName, authReq)
 	if err != nil {
-		logger.Error("Failed to register login session %+v", err)
+		logger.Error("Failed to register auth code session %+v", err)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
 
-	oidc.WriteUserLoginPage(projectName, code, "", authReq.State, w)
+	oidc.WriteUserLoginPage(projectName, sessionID, "", authReq.State, w)
 }
 
-func createLoginRedirectInfo(projectName string, userID string, tokenIssuer string, authReq oidc.AuthRequest, info *oidc.UserLoginInfo, state string) (*http.Request, string) {
+func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer string) (*http.Request, string) {
 	values := url.Values{}
 	if state != "" {
 		values.Set("state", state)
 	}
 
-	for _, typ := range info.ResponseType {
+	cont := false
+	for _, typ := range session.ResponseType {
 		switch typ {
 		case "code":
-			code, _ := oidc.GenerateAuthCode(userID, authReq)
+			code := uuid.New().String() // TODO(use more secure value)
+			session.Code = code
 			values.Set("code", code)
+			cont = true
 		case "id_token":
-			prj, err := db.GetInst().ProjectGet(projectName)
+			prj, err := db.GetInst().ProjectGet(session.ProjectName)
 			if err != nil {
 				return nil, fmt.Sprintf("Failed to get token lifespan in project: %+v", err)
 			}
 
-			audiences := []string{userID, authReq.ClientID}
+			audiences := []string{session.UserID, session.ClientID}
 			tokenReq := token.Request{
 				Issuer:      tokenIssuer,
 				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
-				ProjectName: projectName,
-				UserID:      userID,
-				Nonce:       info.Nonce,
-				MaxAge:      &info.MaxAge,
+				ProjectName: session.ProjectName,
+				UserID:      session.UserID,
+				Nonce:       session.Nonce,
+				MaxAge:      &session.MaxAge,
 			}
 			tkn, err := token.GenerateIDToken(audiences, tokenReq)
 			if err != nil {
@@ -482,17 +523,17 @@ func createLoginRedirectInfo(projectName string, userID string, tokenIssuer stri
 			}
 			values.Set("id_token", tkn)
 		case "token":
-			prj, err := db.GetInst().ProjectGet(projectName)
+			prj, err := db.GetInst().ProjectGet(session.ProjectName)
 			if err != nil {
 				return nil, fmt.Sprintf("Failed to get token lifespan in project: %+v", err)
 			}
 
-			audiences := []string{userID, authReq.ClientID}
+			audiences := []string{session.UserID, session.ClientID}
 			tokenReq := token.Request{
 				Issuer:      tokenIssuer,
 				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
-				ProjectName: projectName,
-				UserID:      userID,
+				ProjectName: session.ProjectName,
+				UserID:      session.UserID,
 			}
 			tkn, err := token.GenerateAccessToken(audiences, tokenReq)
 			if err != nil {
@@ -504,18 +545,23 @@ func createLoginRedirectInfo(projectName string, userID string, tokenIssuer stri
 		}
 	}
 
-	req, err := http.NewRequest("GET", info.RedirectURI, nil)
+	if !cont {
+		// delete login session
+		// TODO
+	}
+
+	req, err := http.NewRequest("GET", session.RedirectURI, nil)
 	if err != nil {
 		return nil, fmt.Sprintf("Failed to create response: %v", err)
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	if info.ResponseMode == "query" {
+	if session.ResponseMode == "query" {
 		req.URL.RawQuery = values.Encode()
-	} else if info.ResponseMode == "fragment" {
+	} else if session.ResponseMode == "fragment" {
 		req.URL.Fragment = values.Encode()
 	} else {
-		return nil, fmt.Sprintf("Invalid response mode %s is specified.", info.ResponseMode)
+		return nil, fmt.Sprintf("Invalid response mode %s is specified.", session.ResponseMode)
 	}
 
 	return req, ""

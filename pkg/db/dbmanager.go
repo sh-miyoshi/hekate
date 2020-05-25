@@ -18,14 +18,13 @@ import (
 
 // Manager ...
 type Manager struct {
-	project      model.ProjectInfoHandler
-	user         model.UserInfoHandler
-	session      model.SessionHandler
-	client       model.ClientInfoHandler
-	authCode     model.AuthCodeHandler
-	customRole   model.CustomRoleHandler
-	loginSession model.LoginSessionHandler
-	transaction  model.TransactionManager
+	project         model.ProjectInfoHandler
+	user            model.UserInfoHandler
+	session         model.SessionHandler
+	client          model.ClientInfoHandler
+	customRole      model.CustomRoleHandler
+	authCodeSession model.AuthCodeSessionHandler
+	transaction     model.TransactionManager
 }
 
 var inst *Manager
@@ -40,14 +39,13 @@ func InitDBManager(dbType string, connStr string) error {
 	case "memory":
 		logger.Info("Initialize with local memory DB")
 		inst = &Manager{
-			project:      memory.NewProjectHandler(),
-			user:         memory.NewUserHandler(),
-			session:      memory.NewSessionHandler(),
-			client:       memory.NewClientHandler(),
-			authCode:     memory.NewAuthCodeHandler(),
-			customRole:   memory.NewCustomRoleHandler(),
-			loginSession: memory.NewLoginSessionHandler(),
-			transaction:  memory.NewTransactionManager(),
+			project:         memory.NewProjectHandler(),
+			user:            memory.NewUserHandler(),
+			session:         memory.NewSessionHandler(),
+			client:          memory.NewClientHandler(),
+			customRole:      memory.NewCustomRoleHandler(),
+			authCodeSession: memory.NewAuthCodeSessionHandler(),
+			transaction:     memory.NewTransactionManager(),
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -68,28 +66,23 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create session handler")
 		}
-		authCodeHandler, err := mongo.NewAuthCodeHandler(dbClient)
-		if err != nil {
-			return errors.Wrap(err, "Failed to create auth code handler")
-		}
 		customRoleHandler, err := mongo.NewCustomRoleHandler(dbClient)
 		if err != nil {
 			return errors.Wrap(err, "Failed to create custom role handler")
 		}
-		loginSessionHandler, err := mongo.NewLoginSessionHandler(dbClient)
+		authCodeSessionHandler, err := mongo.NewAuthCodeSessionHandler(dbClient)
 		if err != nil {
 			return errors.Wrap(err, "Failed to create login session handler")
 		}
 
 		inst = &Manager{
-			project:      prjHandler,
-			user:         userHandler,
-			session:      sessionHandler,
-			client:       mongo.NewClientHandler(dbClient),
-			authCode:     authCodeHandler,
-			customRole:   customRoleHandler,
-			loginSession: loginSessionHandler,
-			transaction:  mongo.NewTransactionManager(dbClient),
+			project:         prjHandler,
+			user:            userHandler,
+			session:         sessionHandler,
+			client:          mongo.NewClientHandler(dbClient),
+			customRole:      customRoleHandler,
+			authCodeSession: authCodeSessionHandler,
+			transaction:     mongo.NewTransactionManager(dbClient),
 		}
 	default:
 		return errors.New(fmt.Sprintf("Database Type %s is not implemented yet", dbType))
@@ -167,16 +160,12 @@ func (m *Manager) ProjectDelete(name string) error {
 			return errors.Wrap(model.ErrDeleteBlockedProject, "the project can not delete")
 		}
 
-		if err := m.loginSession.DeleteAllInProject(name); err != nil {
+		if err := m.authCodeSession.DeleteAllInProject(name); err != nil {
 			return errors.Wrap(err, "Failed to delete login session data")
 		}
 
 		if err := m.session.DeleteAllInProject(name); err != nil {
 			return errors.Wrap(err, "Failed to delete session data")
-		}
-
-		if err := m.authCode.DeleteAll(name); err != nil {
-			return errors.Wrap(err, "Failed to delete oidc code data")
 		}
 
 		if err := m.customRole.DeleteAll(name); err != nil {
@@ -289,7 +278,7 @@ func (m *Manager) UserDelete(userID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		if err := m.authCode.DeleteAll(userID); err != nil {
+		if err := m.authCodeSession.DeleteAllInUser(userID); err != nil {
 			return errors.Wrap(err, "Delete authoriation code failed")
 		}
 
@@ -470,35 +459,47 @@ func (m *Manager) UserChangePassword(userID string, password string) error {
 	})
 }
 
-// LoginSessionAdd ...
-func (m *Manager) LoginSessionAdd(info *model.LoginSessionInfo) error {
-	// info create in internal only, so validation is not required
+// AuthCodeSessionAdd ...
+func (m *Manager) AuthCodeSessionAdd(ent *model.AuthCodeSession) error {
+	// create session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() error {
-		if err := m.loginSession.Add(info); err != nil {
-			return errors.Wrap(err, "Failed to add login session")
+		if err := m.authCodeSession.Add(ent); err != nil {
+			return errors.Wrap(err, "Failed to add auth code session")
 		}
 		return nil
 	})
 }
 
-// LoginSessionDelete ...
-func (m *Manager) LoginSessionDelete(code string) error {
+// AuthCodeSessionUpdate ...
+func (m *Manager) AuthCodeSessionUpdate(ent *model.AuthCodeSession) error {
+	// update session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() error {
-		if err := m.loginSession.Delete(code); err != nil {
-			return errors.Wrap(err, "Failed to delete login session")
+		if err := m.authCodeSession.Update(ent); err != nil {
+			return errors.Wrap(err, "Failed to update auth code session")
+		}
+		return nil
+	})
+}
+
+// AuthCodeSessionDelete ...
+func (m *Manager) AuthCodeSessionDelete(sessionID string) error {
+	return m.transaction.Transaction(func() error {
+		if err := m.authCodeSession.Delete(sessionID); err != nil {
+			return errors.Wrap(err, "Failed to delete auth code session")
 		}
 
 		return nil
 	})
 }
 
-// LoginSessionGet ...
-func (m *Manager) LoginSessionGet(code string) (*model.LoginSessionInfo, error) {
-	if !model.ValidateVerifyCode(code) {
-		return nil, model.ErrLoginSessionValidationFailed
-	}
+// AuthCodeSessionGet ...
+func (m *Manager) AuthCodeSessionGet(sessionID string) (*model.AuthCodeSession, error) {
+	return m.authCodeSession.Get(sessionID)
+}
 
-	return m.loginSession.Get(code)
+// AuthCodeSessionGetByCode ...
+func (m *Manager) AuthCodeSessionGetByCode(code string) (*model.AuthCodeSession, error) {
+	return m.authCodeSession.GetByCode(code)
 }
 
 // SessionAdd ...
@@ -574,9 +575,7 @@ func (m *Manager) ClientDelete(projectName, clientID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		// do not need to delete oidc_code because the code cannot exchange to token without client
-
-		if err := m.loginSession.DeleteAll(clientID); err != nil {
+		if err := m.authCodeSession.DeleteAllInClient(clientID); err != nil {
 			return errors.Wrap(err, "Failed to delete login session of the client")
 		}
 
@@ -620,40 +619,6 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 		}
 		return nil
 	})
-}
-
-// AuthCodeAdd ...
-func (m *Manager) AuthCodeAdd(ent *model.AuthCode) error {
-	// TODO(validate ent, identify by clientID and redirectURL)
-	return m.transaction.Transaction(func() error {
-		if err := m.authCode.Add(ent); err != nil {
-			return errors.Wrap(err, "Failed to add auth code")
-		}
-		return nil
-	})
-}
-
-// AuthCodeDelete ...
-func (m *Manager) AuthCodeDelete(codeID string) error {
-	if !model.ValidateAuthCodeID(codeID) {
-		return model.ErrCodeValidateFailed
-	}
-
-	return m.transaction.Transaction(func() error {
-		if err := m.authCode.Delete(codeID); err != nil {
-			return errors.Wrap(err, "Failed to delete auth code")
-		}
-		return nil
-	})
-}
-
-// AuthCodeGet ...
-func (m *Manager) AuthCodeGet(codeID string) (*model.AuthCode, error) {
-	if !model.ValidateAuthCodeID(codeID) {
-		return nil, model.ErrCodeValidateFailed
-	}
-
-	return m.authCode.Get(codeID)
 }
 
 // CustomRoleAdd ...

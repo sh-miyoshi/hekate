@@ -32,8 +32,8 @@ type AuthRequest struct {
 	// ACRValues string // acr_values(OPTIONAL)
 }
 
-// UserLoginInfo ...
-type UserLoginInfo struct {
+// AuthCodeSession ...
+type AuthCodeSession struct {
 	Scope        string
 	ResponseType []string
 	ClientID     string

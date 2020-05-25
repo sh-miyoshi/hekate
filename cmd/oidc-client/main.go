@@ -45,7 +45,7 @@ func setAPI(r *mux.Router) {
 
 		fmt.Printf("Request: %v\n", r)
 
-		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"))
+		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"), oauth2.ApprovalForce)
 		if err != nil {
 			msg := fmt.Sprintf("Can't get access token: %v", err)
 			http.Error(w, msg, http.StatusInternalServerError)
