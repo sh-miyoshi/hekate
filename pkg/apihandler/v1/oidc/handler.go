@@ -324,7 +324,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			oidc.WriteUserLoginPage(projectName, code, "invalid user name or password", state, w)
-			err = nil // do not dlete session in defer function
+			err = nil // do not delete session in defer function
 		} else {
 			logger.Error("Failed to verify user: %+v", err)
 			errMsg := "Request failed. internal server error occuerd"
