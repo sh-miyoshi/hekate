@@ -10,15 +10,15 @@ import (
 )
 
 const (
-	databaseName               = "hekate"
-	projectCollectionName      = "project"
-	userCollectionName         = "user"
-	clientCollectionName       = "client"
-	sessionCollectionName      = "session"
-	authCodeCollectionName     = "code"
-	roleCollectionName         = "customrole"
-	loginSessionCollectionName = "loginsession"
-	roleInUserCollectionName   = "customroleinuser"
+	databaseName                  = "hekate"
+	projectCollectionName         = "project"
+	userCollectionName            = "user"
+	clientCollectionName          = "client"
+	sessionCollectionName         = "session"
+	authCodeCollectionName        = "code"
+	roleCollectionName            = "customrole"
+	authcodeSessionCollectionName = "authcodesession"
+	roleInUserCollectionName      = "customroleinuser"
 
 	timeoutSecond = 5
 )

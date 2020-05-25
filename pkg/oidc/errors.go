@@ -222,4 +222,14 @@ var (
 		Name: "account_selection_required",
 		Code: http.StatusBadRequest,
 	}
+
+	//-------------------------------------
+	// Original
+	//-------------------------------------
+
+	// ErrSessionExpired ...
+	ErrSessionExpired = &Error{
+		Name: "already_session_expired",
+		Code: http.StatusBadRequest,
+	}
 )

@@ -74,15 +74,15 @@ func main() {
 
 	fmt.Printf("redirect url: %s\n", url)
 	u, _ := neturl.Parse(url)
-	code := u.Query().Get("login_verify_code")
+	code := u.Query().Get("login_session_id")
 	fmt.Printf("code: %s\n", code)
 
 	req, _ = http.NewRequest("POST", url, nil)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	values = neturl.Values{
-		"username":          []string{"admin"},
-		"password":          []string{"password"},
-		"login_verify_code": []string{code},
+		"username":         []string{"admin"},
+		"password":         []string{"password"},
+		"login_session_id": []string{code},
 	}
 	req.URL.RawQuery = values.Encode()
 

@@ -36,7 +36,7 @@ func TestFilterUserList(t *testing.T) {
 
 	for _, tc := range tt {
 		data := []*model.UserInfo{
-			&model.UserInfo{
+			{
 				Name: tc.UserName,
 			},
 		}
