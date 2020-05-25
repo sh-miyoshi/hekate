@@ -85,7 +85,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 	}
 
 	// Remove Authorized code
-	if err := db.GetInst().AuthCodeSessionDelete(code); err != nil {
+	if err := db.GetInst().AuthCodeSessionDelete(s.SessionID); err != nil {
 		return nil, errors.Wrap(err, "Failed to delete auth code")
 	}
 
