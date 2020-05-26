@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	validator "github.com/go-playground/validator/v10"
+	"github.com/stretchr/stew/slice"
 )
 
 // AuthRequest ...
@@ -74,14 +75,11 @@ func validateResponseType(types, supportedTypes []string) error {
 	}
 	s = strings.TrimSuffix(s, " ")
 
-	// TODO(use slice.Contains method)
-	// include check
-	for _, support := range supportedTypes {
-		if s == support {
-			return nil
-		}
+	if ok := slice.Contains(supportedTypes, s); !ok {
+		return ErrUnsupportedResponseType
 	}
-	return ErrUnsupportedResponseType
+
+	return nil
 }
 
 // Validate ...

@@ -19,9 +19,9 @@ func CheckRedirectURL(projectName, clientID, redirectURL string) error {
 		return err
 	}
 
-	if ok := slice.Contains(cli.AllowedCallbackURLs, redirectURL); ok {
-		return nil
+	if ok := slice.Contains(cli.AllowedCallbackURLs, redirectURL); !ok {
+		return ErrNoRedirectURL
 	}
 
-	return ErrNoRedirectURL
+	return nil
 }
