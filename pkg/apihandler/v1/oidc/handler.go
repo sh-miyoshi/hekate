@@ -333,24 +333,29 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(consider session delete)
-
 	s.UserID = usr.ID
 	issuer := token.GetFullIssuer(r)
 	req, errMsg := createLoginRedirectInfo(s, state, issuer)
 	if errMsg != "" {
+		err = errors.New(errMsg)
 		logger.Error(errMsg)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
 
-	// Update auth code session info
-	if err := db.GetInst().AuthCodeSessionUpdate(s); err != nil {
-		logger.Error("Failed to update auth code session: %+v", err)
-		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-		return
+	if ok := slice.Contains(s.ResponseType, "code"); !ok {
+		// delete session
+		err = errors.New("session end")
+	} else {
+		// Update auth code session info
+		if err = db.GetInst().AuthCodeSessionUpdate(s); err != nil {
+			logger.Error("Failed to update auth code session: %+v", err)
+			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+			return
+		}
 	}
 
+	// TODO(implement this)
 	// if s.Prompt == "consent" {
 	// 	// show consent page
 	// 	oidc.WriteConsentPage(projectName, sessionID, state, w)
@@ -423,7 +428,6 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch tokenType {
 	case "access_token":
-		// TODO(implement revocation of access token)
 		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
 	case "refresh_token":
 		refreshToken := r.Form.Get("token")
@@ -488,15 +492,13 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 
 	// TODO(if already logined (check by login_hint, prompt), redirect to callback)
 
-	// Start session for authorization code flow
+	// Start session for login flow
 	sessionID, err := oidc.StartLoginSession(projectName, authReq)
 	if err != nil {
 		logger.Error("Failed to register auth code session %+v", err)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
-
-	// TODO(check prompt)
 
 	oidc.WriteUserLoginPage(projectName, sessionID, "", authReq.State, w)
 }
