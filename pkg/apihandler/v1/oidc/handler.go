@@ -333,6 +333,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO(consider session delete)
+
 	s.UserID = usr.ID
 	issuer := token.GetFullIssuer(r)
 	req, errMsg := createLoginRedirectInfo(s, state, issuer)
@@ -505,14 +507,12 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 		values.Set("state", state)
 	}
 
-	cont := false
 	for _, typ := range session.ResponseType {
 		switch typ {
 		case "code":
 			code := uuid.New().String()
 			session.Code = code
 			values.Set("code", code)
-			cont = true
 		case "id_token":
 			prj, err := db.GetInst().ProjectGet(session.ProjectName)
 			if err != nil {
@@ -554,11 +554,6 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 		default:
 			return nil, fmt.Sprintf("Unknown response type: %s", typ)
 		}
-	}
-
-	if !cont {
-		// delete login session
-		db.GetInst().AuthCodeSessionDelete(session.SessionID)
 	}
 
 	req, err := http.NewRequest("GET", session.RedirectURI, nil)
