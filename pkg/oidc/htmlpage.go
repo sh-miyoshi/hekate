@@ -52,7 +52,7 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 }
 
 // WriteConsentPage ...
-func WriteConsentPage(w http.ResponseWriter) {
+func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWriter) {
 	tpl, err := template.ParseFiles(userConsentHTML)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
@@ -60,8 +60,11 @@ func WriteConsentPage(w http.ResponseWriter) {
 		return
 	}
 
-	// TODO(set this)
-	url := ""
+	url := "/api/v1/project/" + projectName + "/openid-connect/consent?login_session_id=" + sessionID
+	if state != "" {
+		url += "&state=" + state
+	}
+
 	d := map[string]string{
 		"CSSResourcePath": userLoginResPath + "/css",
 		"IMGResourcePath": userLoginResPath + "/img",
