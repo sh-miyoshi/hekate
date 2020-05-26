@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	validator "github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -82,32 +83,13 @@ func validateResponseType(types, supportedTypes []string) error {
 	return nil
 }
 
-// Validate ...
-func (r *AuthRequest) Validate() error {
-	if err := validator.New().Struct(r); err != nil {
-		return ErrInvalidRequest
-	}
-
-	// Check Response Type
-	supportedTypes := GetSupportedResponseType()
-	if err := validateResponseType(r.ResponseType, supportedTypes); err != nil {
-		return err
-	}
-
-	// Check prompt
-	if len(r.Prompt) > 0 {
-		if err := validatePrompt(r.Prompt); err != nil {
-			return err
-		}
-	}
-
-	// Check Response mode
-	if r.ResponseMode != "" {
+func validateResponseMode(mode string) error {
+	if mode != "" {
 		// TODO(add support form_post)
 		modes := []string{"query", "fragment"}
 		ok := false
 		for _, m := range modes {
-			if r.ResponseMode == m {
+			if mode == m {
 				ok = true
 				break
 			}
@@ -118,6 +100,30 @@ func (r *AuthRequest) Validate() error {
 		if !ok {
 			return ErrInvalidRequest
 		}
+	}
+	return nil
+}
+
+// Validate ...
+func (r *AuthRequest) Validate() error {
+	if err := validator.New().Struct(r); err != nil {
+		return errors.Wrap(ErrInvalidRequest, err.Error())
+	}
+
+	// Check Response Type
+	supportedTypes := GetSupportedResponseType()
+	if err := validateResponseType(r.ResponseType, supportedTypes); err != nil {
+		return errors.Wrapf(err, "Failed to validate response type %v", r.ResponseType)
+	}
+
+	// Check prompt
+	if err := validatePrompt(r.Prompt); err != nil {
+		return errors.Wrapf(err, "Failed to validate prompt %v", r.Prompt)
+	}
+
+	// Check Response mode
+	if err := validateResponseMode(r.ResponseMode); err != nil {
+		return errors.Wrapf(err, "Failed to validate response mode %s", r.ResponseMode)
 	}
 
 	// TODO(add more validation)

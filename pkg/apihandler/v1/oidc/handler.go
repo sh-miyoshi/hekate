@@ -349,9 +349,9 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// // TODO(implement this)
 	// if s.Prompt == "consent" {
 	// 	// show consent page
+	// 	oidc.WriteConsentPage(projectName, sessionID, state, w)
 	// 	return
 	// }
 
@@ -360,6 +360,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // ConsentHandler ...
 func ConsentHandler(w http.ResponseWriter, r *http.Request) {
+	logger.Debug("call me")
 	// TODO(implement this)
 	/*
 		vars := mux.Vars(r)
@@ -451,9 +452,17 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 
 func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	authReq := oidc.NewAuthRequest(req)
+	logger.Debug("Auth Request: %v", authReq)
+
 	if err := authReq.Validate(); err != nil {
 		logger.Info("Failed to validate request: %v", err)
-		errMsg := "Request failed. " + err.Error()
+		e, ok := errors.Cause(err).(*oidc.Error)
+		errMsg := "Request failed. "
+		if !ok {
+			errMsg += "internal server error occured."
+		} else {
+			errMsg += e.Error()
+		}
 		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
@@ -485,6 +494,8 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 		return
 	}
 
+	// TODO(check prompt)
+
 	oidc.WriteUserLoginPage(projectName, sessionID, "", authReq.State, w)
 }
 
@@ -498,7 +509,7 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 	for _, typ := range session.ResponseType {
 		switch typ {
 		case "code":
-			code := uuid.New().String() // TODO(use more secure value)
+			code := uuid.New().String()
 			session.Code = code
 			values.Set("code", code)
 			cont = true
@@ -547,7 +558,7 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 
 	if !cont {
 		// delete login session
-		// TODO
+		db.GetInst().AuthCodeSessionDelete(session.SessionID)
 	}
 
 	req, err := http.NewRequest("GET", session.RedirectURI, nil)
