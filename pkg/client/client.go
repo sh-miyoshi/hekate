@@ -3,6 +3,7 @@ package client
 import (
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
+	"github.com/stretchr/stew/slice"
 )
 
 var (
@@ -18,10 +19,8 @@ func CheckRedirectURL(projectName, clientID, redirectURL string) error {
 		return err
 	}
 
-	for _, u := range cli.AllowedCallbackURLs {
-		if u == redirectURL {
-			return nil // found
-		}
+	if ok := slice.Contains(cli.AllowedCallbackURLs, redirectURL); ok {
+		return nil
 	}
 
 	return ErrNoRedirectURL
