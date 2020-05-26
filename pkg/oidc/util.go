@@ -16,7 +16,7 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 		RedirectURI:  values.Get("redirect_uri"),
 		State:        values.Get("state"),
 		Nonce:        values.Get("nonce"),
-		Prompt:       values.Get("prompt"),
+		Prompt:       strings.Split(values.Get("prompt"), " "),
 		MaxAge:       uint(maxAge),
 	}
 }

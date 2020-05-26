@@ -41,7 +41,7 @@ type authCodeSession struct {
 	ProjectName  string    `bson:"projectName"`
 	MaxAge       uint      `bson:"maxAge"`
 	ResponseMode string    `bson:"responseMode"`
-	Prompt       string    `bson:"prompt"`
+	Prompt       []string  `bson:"prompt"`
 }
 
 type userInfo struct {

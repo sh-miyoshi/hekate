@@ -20,7 +20,7 @@ type AuthRequest struct {
 
 	// Optional
 	Nonce        string
-	Prompt       string
+	Prompt       []string
 	MaxAge       uint
 	ResponseMode string
 
@@ -41,21 +41,18 @@ type AuthCodeSession struct {
 	Nonce        string
 	MaxAge       uint
 	ResponseMode string
-	Prompt       string
+	Prompt       []string
 }
 
-func validatePrompt(prompts string) error {
-	v := strings.Split(prompts, " ")
-	if strings.Contains(prompts, "none") && len(v) != 1 {
-		return ErrInvalidRequest
-	}
-
-	for _, prompt := range v {
+func validatePrompt(prompts []string) error {
+	for _, prompt := range prompts {
 		switch prompt {
 		case "login", "select_account", "consent":
-			// TODO(implement this)
+			// correct values
 		case "none":
-			return ErrInteractionRequired
+			if len(prompts) != 1 {
+				return ErrInvalidRequest
+			}
 		default:
 			return ErrInvalidRequest
 		}
@@ -77,6 +74,7 @@ func validateResponseType(types, supportedTypes []string) error {
 	}
 	s = strings.TrimSuffix(s, " ")
 
+	// TODO(use slice.Contains method)
 	// include check
 	for _, support := range supportedTypes {
 		if s == support {
@@ -99,7 +97,7 @@ func (r *AuthRequest) Validate() error {
 	}
 
 	// Check prompt
-	if r.Prompt != "" {
+	if len(r.Prompt) > 0 {
 		if err := validatePrompt(r.Prompt); err != nil {
 			return err
 		}
