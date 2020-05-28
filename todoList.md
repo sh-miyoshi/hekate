@@ -2,6 +2,8 @@
 
 ## server application enhancement
 
+- Consentページの追加
+  - TokenHandlerからconsent処理
 - 設定項目の追加
   - パスワードポリシー
 - db manager validationの追加
