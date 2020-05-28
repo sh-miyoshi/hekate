@@ -62,7 +62,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
+		writeErrorResponse(w, oidc.ErrInvalidRequestObject, "")
 		return
 	}
 
@@ -76,7 +76,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project info: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, state)
+			writeErrorResponse(w, oidc.ErrServerError, state)
 		}
 		return
 	}
@@ -89,7 +89,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		i, s, ok := r.BasicAuth()
 		if !ok {
 			logger.Info("Failed to get client ID from request, Request header: %v", r.Header)
-			writeTokenErrorResponse(w, oidc.ErrInvalidClient, state)
+			writeErrorResponse(w, oidc.ErrInvalidClient, state)
 			return
 		}
 		clientID = i
@@ -99,10 +99,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if err := oidc.ClientAuth(projectName, clientID, clientSecret); err != nil {
 		if errors.Cause(err) == oidc.ErrInvalidClient {
 			logger.Info("Failed to authenticate client: %s", clientID)
-			writeTokenErrorResponse(w, oidc.ErrInvalidClient, state)
+			writeErrorResponse(w, oidc.ErrInvalidClient, state)
 		} else {
 			logger.Error("Failed to authenticate client: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, state)
+			writeErrorResponse(w, oidc.ErrServerError, state)
 		}
 		return
 	}
@@ -111,18 +111,16 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Form.Get("redirect_uri") != "" {
 		if err := client.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
-			errMsg := ""
 			if errors.Cause(err) == client.ErrNoRedirectURL {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
-				errMsg = "Request failed. the redirect url is not allowed"
+				writeErrorResponse(w, oidc.ErrInvalidRequestURI, state)
 			} else if errors.Cause(err) == model.ErrNoSuchClient {
 				logger.Info("Failed to get allowed callback urls: No such client %s", clientID)
-				errMsg = "Request faild. no such client"
+				writeErrorResponse(w, oidc.ErrInvalidClient, state)
 			} else {
 				logger.Error("Failed to get allowed callback urls in client: %+v", err)
-				errMsg = "Request faild. internal server error occured"
+				writeErrorResponse(w, oidc.ErrServerError, state)
 			}
-			oidc.WriteErrorPage(errMsg, w)
 			return
 		}
 	}
@@ -132,12 +130,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	gt, err := model.GetGrantType(gtStr)
 	if err != nil {
 		logger.Info("No such Grant Type: %s", gtStr)
-		writeTokenErrorResponse(w, oidc.ErrInvalidGrant, state)
+		writeErrorResponse(w, oidc.ErrInvalidGrant, state)
 		return
 	}
 	if ok := slice.Contains(project.AllowGrantTypes, gt); !ok {
 		logger.Info("Grant Type %s is not in allowed list %v", gtStr, project.AllowGrantTypes)
-		writeTokenErrorResponse(w, oidc.ErrUnsupportedGrantType, state)
+		writeErrorResponse(w, oidc.ErrUnsupportedGrantType, state)
 	}
 
 	switch gt {
@@ -153,7 +151,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil && errors.Cause(err) == model.ErrNoSuchSession {
 			logger.Info("Refresh token is already revoked")
-			writeTokenErrorResponse(w, oidc.ErrInvalidRequest, state)
+			writeErrorResponse(w, oidc.ErrInvalidRequest, state)
 			return
 		}
 	case model.GrantTypeAuthorizationCode:
@@ -161,7 +159,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		tkn, err = oidc.ReqAuthByCode(project, clientID, code, r)
 	default:
 		logger.Info("Unexpected grant type got: %s", gt.String())
-		writeTokenErrorResponse(w, oidc.ErrServerError, state)
+		writeErrorResponse(w, oidc.ErrServerError, state)
 		return
 	}
 
@@ -169,10 +167,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		e, ok := errors.Cause(err).(*oidc.Error)
 		if ok {
 			logger.Info("Failed to verify request: %v", err)
-			writeTokenErrorResponse(w, e, state)
+			writeErrorResponse(w, e, state)
 		} else {
 			logger.Error("Failed to verify request: %v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, state)
+			writeErrorResponse(w, oidc.ErrServerError, state)
 		}
 		return
 	}
@@ -203,7 +201,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			logger.Error("Failed to get project: %+v", err)
-			writeTokenErrorResponse(w, oidc.ErrServerError, "")
+			writeErrorResponse(w, oidc.ErrServerError, "")
 		}
 		return
 	}
@@ -211,7 +209,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 	res, err := oidc.GenerateJWKSet(project.TokenConfig.SigningAlgorithm, project.TokenConfig.SignPublicKey)
 	if err != nil {
 		logger.Error("Failed to generate JWT set: %+v", err)
-		writeTokenErrorResponse(w, oidc.ErrServerError, "")
+		writeErrorResponse(w, oidc.ErrServerError, "")
 		return
 	}
 
@@ -334,6 +332,20 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.UserID = usr.ID
+
+	if ok := slice.Contains(s.Prompt, "consent"); ok {
+		// save user id to session info
+		if err = db.GetInst().AuthCodeSessionUpdate(s); err != nil {
+			logger.Error("Failed to update auth code session: %+v", err)
+			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+			return
+		}
+
+		// show consent page
+		oidc.WriteConsentPage(projectName, sessionID, state, w)
+		return
+	}
+
 	issuer := token.GetFullIssuer(r)
 	req, errMsg := createLoginRedirectInfo(s, state, issuer)
 	if errMsg != "" {
@@ -355,33 +367,64 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// TODO(implement this)
-	// if s.Prompt == "consent" {
-	// 	// show consent page
-	// 	oidc.WriteConsentPage(projectName, sessionID, state, w)
-	// 	return
-	// }
-
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
 // ConsentHandler ...
 func ConsentHandler(w http.ResponseWriter, r *http.Request) {
-	logger.Debug("call me")
-	// TODO(implement this)
-	/*
-		vars := mux.Vars(r)
-		projectName := vars["projectName"]
+	sel := r.FormValue("select")
+	logger.Info("Consent select: %s", sel)
+
+	// Get data form Form
+	if err := r.ParseForm(); err != nil {
+		logger.Info("Failed to parse form: %v", err)
+		errMsg := "Request failed. invalid form value"
+		oidc.WriteErrorPage(errMsg, w)
+		return
+	}
+
+	logger.Debug("Form: %v", r.Form)
+	state := r.Form.Get("state")
+
+	switch sel {
+	case "yes":
+		sessionID := r.Form.Get("login_session_id")
+		s, err := oidc.VerifySession(sessionID)
+		if err != nil {
+			logger.Info("Failed to verify user login session: %v", err)
+			errMsg := "Request failed. internal server error occured."
+			if errors.Cause(err) == oidc.ErrSessionExpired {
+				errMsg = "Request failed. the session was already expired."
+			}
+			oidc.WriteErrorPage(errMsg, w)
+			return
+		}
 
 		issuer := token.GetFullIssuer(r)
-		userID : = ...
-		req, errMsg := createLoginRedirectInfo(projectName, userID, issuer, *authReq, info, state)
+		req, errMsg := createLoginRedirectInfo(s, state, issuer)
 		if errMsg != "" {
 			logger.Error(errMsg)
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
 		}
+
 		http.Redirect(w, req, req.URL.String(), http.StatusFound)
+	case "no":
+		writeErrorResponse(w, oidc.ErrConsentRequired, state)
+	default:
+		logger.Info("Invalid select type %s. consent page maybe broken.", sel)
+		writeErrorResponse(w, oidc.ErrServerError, state)
+	}
+
+	// TODO(implement this)
+	/*
+		get yes, or no
+		if no {
+			return err
+		}
+
+		// yes
+		createLoginRedirectInfo
 	*/
 }
 
@@ -390,7 +433,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	claims, err := jwthttp.ValidateAPIRequest(r)
 	if err != nil {
 		logger.Info("Failed to validate header: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrRequestUnauthorized, "")
+		writeErrorResponse(w, oidc.ErrRequestUnauthorized, "")
 		return
 	}
 
@@ -398,7 +441,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If token validate accepted, user absolutely exists
 		logger.Error("Failed to get user: %+v", err)
-		writeTokenErrorResponse(w, oidc.ErrServerError, "")
+		writeErrorResponse(w, oidc.ErrServerError, "")
 		return
 	}
 
@@ -417,7 +460,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		writeTokenErrorResponse(w, oidc.ErrInvalidRequestObject, "")
+		writeErrorResponse(w, oidc.ErrInvalidRequestObject, "")
 		return
 	}
 
@@ -428,7 +471,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch tokenType {
 	case "access_token":
-		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
+		writeErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
 	case "refresh_token":
 		refreshToken := r.Form.Get("token")
 		claims := &token.RefreshTokenClaims{}
@@ -446,13 +489,13 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			} else {
 				logger.Error("Failed to revoke session: %+v", err)
-				writeTokenErrorResponse(w, oidc.ErrServerError, r.Form.Get("state"))
+				writeErrorResponse(w, oidc.ErrServerError, r.Form.Get("state"))
 			}
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 	default:
-		writeTokenErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
+		writeErrorResponse(w, oidc.ErrUnsupportedTokenType, r.Form.Get("state"))
 	}
 }
 

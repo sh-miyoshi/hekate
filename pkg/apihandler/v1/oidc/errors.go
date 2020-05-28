@@ -2,12 +2,13 @@ package oidc
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/oidc"
-	"net/http"
 )
 
-func writeTokenErrorResponse(w http.ResponseWriter, err *oidc.Error, state string) {
+func writeErrorResponse(w http.ResponseWriter, err *oidc.Error, state string) {
 	res := ErrorResponse{
 		ErrorCode:   err.Name,
 		Description: err.Description,
