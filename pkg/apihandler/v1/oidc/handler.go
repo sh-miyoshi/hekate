@@ -286,8 +286,6 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(consider state)
-
 	// Verify user
 	uname := r.Form.Get("username")
 	passwd := r.Form.Get("password")
@@ -415,17 +413,6 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Info("Invalid select type %s. consent page maybe broken.", sel)
 		writeErrorResponse(w, oidc.ErrServerError, state)
 	}
-
-	// TODO(implement this)
-	/*
-		get yes, or no
-		if no {
-			return err
-		}
-
-		// yes
-		createLoginRedirectInfo
-	*/
 }
 
 // UserInfoHandler ...
