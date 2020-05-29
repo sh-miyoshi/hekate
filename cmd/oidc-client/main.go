@@ -18,6 +18,7 @@ type secretInfo struct {
 	ClientID     string `yaml:"client-id"`
 	ClientSecret string `yaml:"client-secret"`
 	RedirectURL  string `yaml:"redirect-url"`
+	State        string `yaml:"state"`
 }
 
 var secret secretInfo
@@ -25,15 +26,9 @@ var secret secretInfo
 func setAPI(r *mux.Router) {
 	// Main API ( require auth )
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// This is test code, so check bearer token in cookie
-		if _, err := r.Cookie("Authorization"); err != nil {
-			config, _ := getOIDCConfig()
-			url := config.AuthCodeURL("", oidc.Nonce("jhgrgw3iohgor4jioh"))
-			http.Redirect(w, r, url, http.StatusFound)
-			return
-		}
-
-		w.Write([]byte("login success"))
+		config, _ := getOIDCConfig()
+		url := config.AuthCodeURL(secret.State)
+		http.Redirect(w, r, url, http.StatusFound)
 	}).Methods("GET")
 
 	r.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +40,7 @@ func setAPI(r *mux.Router) {
 
 		fmt.Printf("Request: %v\n", r)
 
-		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"), oauth2.ApprovalForce)
+		accessToken, err := config.Exchange(context.Background(), r.Form.Get("code"))
 		if err != nil {
 			msg := fmt.Sprintf("Can't get access token: %v", err)
 			http.Error(w, msg, http.StatusInternalServerError)
@@ -82,7 +77,8 @@ func setAPI(r *mux.Router) {
 			Value: "Bearer " + rawIDToken,
 			Path:  "/",
 		})
-		http.Redirect(w, r, "/", http.StatusFound)
+
+		w.Write([]byte("login success"))
 	}).Methods("GET")
 }
 
