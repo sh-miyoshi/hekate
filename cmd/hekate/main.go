@@ -157,6 +157,7 @@ func main() {
 	// Read command line args
 	const defaultConfigFilePath = "./config.yaml"
 	configFilePath := flag.String("config", defaultConfigFilePath, "file name of config.yaml")
+	logFilePath := flag.String("logfile", "", "file name of log")
 	flag.Parse()
 
 	// Read configure
@@ -164,6 +165,10 @@ func main() {
 	if err != nil {
 		fmt.Printf("Failed to set config: %v", err)
 		os.Exit(1)
+	}
+
+	if *logFilePath != "" {
+		cfg.LogFile = *logFilePath
 	}
 
 	// Initialize logger
