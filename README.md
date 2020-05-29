@@ -8,7 +8,7 @@ OpenID Connectのことを知らなくても簡単に認証・認可を行える
 
 ## インストール方法
 
-- Test環境(All In One)の構築
+- All In One環境の構築
   - server, portalを起動
 
   ```bash
@@ -36,15 +36,15 @@ OpenID Connectのことを知らなくても簡単に認証・認可を行える
 
   - [http://localhost:3000](http://localhost:3000)へアクセス
 
-- Production環境の構築
+- コンポーネントごとにインストール
   - TODO
 
 ## Hekateでできること
 
 - APIレベルでのアクセス制御
   - 自身のサーバのアクセスをHekateの認証・認可機能と組み合わせて柔軟に制御できます
-  - Quick Start: [docs/quick_start/access_control.md](docs/quick_start/access_control.md)
-- ユーザーの認証・認可
+  - 3 minutes Quick Start: [docs/quick_start/access_control.md](docs/quick_start/access_control.md)
+- ユーザー管理
   - TODO(機能概要・Quick Start)
 
 ## 開発環境
@@ -59,3 +59,7 @@ OpenID Connectのことを知らなくても簡単に認証・認可を行える
 ## Road Map
 
 [TODO List](./todoList.md)を参照してください。
+
+## Author
+
+Shunsuke Miyoshi
