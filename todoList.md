@@ -4,6 +4,10 @@
 
 - Consentページの追加
   - TokenHandlerからconsent処理
+- パスワード以外でのユーザーのログイン
+  - 証明書
+  - ワンタイムパスワード
+  - デバイス認証
 - 設定項目の追加
   - パスワードポリシー
 - db manager validationの追加
