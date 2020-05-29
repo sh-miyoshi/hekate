@@ -6,7 +6,7 @@ echo "building server binary ..."
 go build
 
 echo "start server in background"
-start hekate.exe -logfile hekate.log
+start hekate.exe
 
 rem run portal
 cd ../portal
