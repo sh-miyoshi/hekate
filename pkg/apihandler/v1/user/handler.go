@@ -12,6 +12,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/pwpol"
 	"github.com/sh-miyoshi/hekate/pkg/role"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
@@ -112,6 +113,20 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var request UserCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.Info("Failed to decode user create request: %v", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	// validate password
+	project, err := db.GetInst().ProjectGet(projectName)
+	if err != nil {
+		logger.Error("Failed to get project: %+v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	if err := pwpol.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
+		logger.Info("The password %s does not much the policy: %v", request.Password, err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
@@ -468,10 +483,14 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("Invalid password was specified: %v", err)
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
+		} else if errors.Cause(err) == pwpol.ErrPasswordPolicyFailed {
+			logger.Info("Invalid password was specified: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to change user password: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

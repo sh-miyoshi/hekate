@@ -913,6 +913,8 @@ components:
           type: string
         tokenConfig:
           $ref: '#/components/schemas/TokenConfig'
+        passwordPolicy:
+          $ref: '#/components/schemas/PasswordPolicy' 
         allowGrantTypes:
           type: array
           items:
@@ -927,6 +929,8 @@ components:
           format: date
         tokenConfig:
           $ref: '#/components/schemas/TokenConfig'
+        passwordPolicy:
+          $ref: '#/components/schemas/PasswordPolicy' 
         allowGrantTypes:
           type: array
           items:
@@ -936,6 +940,8 @@ components:
       properties:
         tokenConfig:
           $ref: '#/components/schemas/TokenConfig'
+        passwordPolicy:
+          $ref: '#/components/schemas/PasswordPolicy' 
         allowGrantTypes:
           type: array
           items:
@@ -947,6 +953,25 @@ components:
           type: integer
         refreshTokenLifeSpan:
           type: integer
+    PasswordPolicy:
+      type: object
+      properties:
+        length:
+          type: integer
+          description: 'Minimum length of password'
+        notUserName:
+          type: boolean
+        blackList:
+          type: array
+          items:
+            type: string
+        useCharacter:
+          type: string
+          enum: [lower, upper, both, either]
+        useDigit:
+          type: boolean
+        useSpecialCharacter:
+          type: boolean
     UserCreateRequest:
       type: object
       properties:

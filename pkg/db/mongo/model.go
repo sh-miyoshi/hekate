@@ -12,12 +12,22 @@ type tokenConfig struct {
 	SignSecretKey        []byte `bson:"signSecretKey"`
 }
 
+type passwordPolicy struct {
+	MinimumLength       uint     `bson:"length"`
+	NotUserName         bool     `bson:"notUserName"`
+	BlackList           []string `bson:"blackList"`
+	UseCharacter        string   `bson:"useCharacter"`
+	UseDigit            bool     `bson:"useDigit"`
+	UseSpecialCharacter bool     `bson:"useSpecialCharacter"`
+}
+
 type projectInfo struct {
-	Name            string       `bson:"name"`
-	CreatedAt       time.Time    `bson:"createAt"`
-	TokenConfig     *tokenConfig `bson:"tokenConfig"`
-	PermitDelete    bool         `bson:"permitDelete"`
-	AllowGrantTypes []string     `bson:"allowGrantTypes"`
+	Name            string         `bson:"name"`
+	CreatedAt       time.Time      `bson:"createAt"`
+	TokenConfig     *tokenConfig   `bson:"tokenConfig"`
+	PermitDelete    bool           `bson:"permitDelete"`
+	AllowGrantTypes []string       `bson:"allowGrantTypes"`
+	PasswordPolicy  passwordPolicy `bson:"passwordPolicy"`
 }
 
 type session struct {

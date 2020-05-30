@@ -53,6 +53,14 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
 			SignPublicKey:        ent.TokenConfig.SignPublicKey,
 			SignSecretKey:        ent.TokenConfig.SignSecretKey,
 		},
+		PasswordPolicy: passwordPolicy{
+			MinimumLength:       ent.PasswordPolicy.MinimumLength,
+			NotUserName:         ent.PasswordPolicy.NotUserName,
+			BlackList:           ent.PasswordPolicy.BlackList,
+			UseCharacter:        string(ent.PasswordPolicy.UseCharacter),
+			UseDigit:            ent.PasswordPolicy.UseDigit,
+			UseSpecialCharacter: ent.PasswordPolicy.UseSpecialCharacter,
+		},
 	}
 	for _, t := range ent.AllowGrantTypes {
 		v.AllowGrantTypes = append(v.AllowGrantTypes, t.String())
@@ -118,6 +126,14 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
 				SignPublicKey:        prj.TokenConfig.SignPublicKey,
 				SignSecretKey:        prj.TokenConfig.SignSecretKey,
 			},
+			PasswordPolicy: model.PasswordPolicy{
+				MinimumLength:       prj.PasswordPolicy.MinimumLength,
+				NotUserName:         prj.PasswordPolicy.NotUserName,
+				BlackList:           prj.PasswordPolicy.BlackList,
+				UseCharacter:        model.CharacterType(prj.PasswordPolicy.UseCharacter),
+				UseDigit:            prj.PasswordPolicy.UseDigit,
+				UseSpecialCharacter: prj.PasswordPolicy.UseSpecialCharacter,
+			},
 		}
 		for _, t := range prj.AllowGrantTypes {
 			typ, _ := model.GetGrantType(t)
@@ -159,6 +175,14 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
 			SignPublicKey:        project.TokenConfig.SignPublicKey,
 			SignSecretKey:        project.TokenConfig.SignSecretKey,
 		},
+		PasswordPolicy: model.PasswordPolicy{
+			MinimumLength:       project.PasswordPolicy.MinimumLength,
+			NotUserName:         project.PasswordPolicy.NotUserName,
+			BlackList:           project.PasswordPolicy.BlackList,
+			UseCharacter:        model.CharacterType(project.PasswordPolicy.UseCharacter),
+			UseDigit:            project.PasswordPolicy.UseDigit,
+			UseSpecialCharacter: project.PasswordPolicy.UseSpecialCharacter,
+		},
 	}
 	for _, t := range project.AllowGrantTypes {
 		typ, _ := model.GetGrantType(t)
@@ -185,6 +209,14 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
 			SigningAlgorithm:     ent.TokenConfig.SigningAlgorithm,
 			SignPublicKey:        ent.TokenConfig.SignPublicKey,
 			SignSecretKey:        ent.TokenConfig.SignSecretKey,
+		},
+		PasswordPolicy: passwordPolicy{
+			MinimumLength:       ent.PasswordPolicy.MinimumLength,
+			NotUserName:         ent.PasswordPolicy.NotUserName,
+			BlackList:           ent.PasswordPolicy.BlackList,
+			UseCharacter:        string(ent.PasswordPolicy.UseCharacter),
+			UseDigit:            ent.PasswordPolicy.UseDigit,
+			UseSpecialCharacter: ent.PasswordPolicy.UseSpecialCharacter,
 		},
 	}
 	for _, t := range ent.AllowGrantTypes {

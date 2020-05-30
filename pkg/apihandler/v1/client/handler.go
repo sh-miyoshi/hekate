@@ -211,7 +211,6 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Client Info
 	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
-		// TODO check conflict
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)

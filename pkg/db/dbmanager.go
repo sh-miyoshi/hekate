@@ -12,6 +12,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/db/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/pwpol"
 	"github.com/sh-miyoshi/hekate/pkg/role"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
@@ -441,12 +442,19 @@ func (m *Manager) UserChangePassword(userID string, password string) error {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
-	// TODO(validate password)
-
 	return m.transaction.Transaction(func() error {
 		usr, err := m.user.Get(userID)
 		if err != nil {
 			return errors.Wrap(err, "Failed to get user of change password")
+		}
+
+		prj, err := m.project.Get(usr.ProjectName)
+		if err != nil {
+			return errors.Wrap(err, "Failed to get project associated with the user")
+		}
+
+		if err := pwpol.CheckPassword(usr.Name, password, prj.PasswordPolicy); err != nil {
+			return errors.Wrap(err, "Failed to check password")
 		}
 
 		usr.PasswordHash = util.CreateHash(password)

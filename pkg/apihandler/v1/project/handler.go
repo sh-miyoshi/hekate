@@ -46,6 +46,14 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
 				SigningAlgorithm:     prj.TokenConfig.SigningAlgorithm,
 			},
+			PasswordPolicy: PasswordPolicy{
+				MinimumLength:       prj.PasswordPolicy.MinimumLength,
+				NotUserName:         prj.PasswordPolicy.NotUserName,
+				BlackList:           prj.PasswordPolicy.BlackList,
+				UseCharacter:        string(prj.PasswordPolicy.UseCharacter),
+				UseDigit:            prj.PasswordPolicy.UseDigit,
+				UseSpecialCharacter: prj.PasswordPolicy.UseSpecialCharacter,
+			},
 			AllowGrantTypes: grantTypes,
 		})
 	}
@@ -94,6 +102,14 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshTokenLifeSpan: request.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     request.TokenConfig.SigningAlgorithm,
 		},
+		PasswordPolicy: model.PasswordPolicy{
+			MinimumLength:       request.PasswordPolicy.MinimumLength,
+			NotUserName:         request.PasswordPolicy.NotUserName,
+			BlackList:           request.PasswordPolicy.BlackList,
+			UseCharacter:        model.CharacterType(request.PasswordPolicy.UseCharacter),
+			UseDigit:            request.PasswordPolicy.UseDigit,
+			UseSpecialCharacter: request.PasswordPolicy.UseSpecialCharacter,
+		},
 		AllowGrantTypes: grantTypes,
 	}
 
@@ -120,6 +136,14 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
+		},
+		PasswordPolicy: PasswordPolicy{
+			MinimumLength:       project.PasswordPolicy.MinimumLength,
+			NotUserName:         project.PasswordPolicy.NotUserName,
+			BlackList:           project.PasswordPolicy.BlackList,
+			UseCharacter:        string(project.PasswordPolicy.UseCharacter),
+			UseDigit:            project.PasswordPolicy.UseDigit,
+			UseSpecialCharacter: project.PasswordPolicy.UseSpecialCharacter,
 		},
 		AllowGrantTypes: request.AllowGrantTypes,
 	}
@@ -199,6 +223,14 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
 			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
 		},
+		PasswordPolicy: PasswordPolicy{
+			MinimumLength:       project.PasswordPolicy.MinimumLength,
+			NotUserName:         project.PasswordPolicy.NotUserName,
+			BlackList:           project.PasswordPolicy.BlackList,
+			UseCharacter:        string(project.PasswordPolicy.UseCharacter),
+			UseDigit:            project.PasswordPolicy.UseDigit,
+			UseSpecialCharacter: project.PasswordPolicy.UseSpecialCharacter,
+		},
 		AllowGrantTypes: grantTypes,
 	}
 
@@ -243,6 +275,12 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	project.TokenConfig.AccessTokenLifeSpan = request.TokenConfig.AccessTokenLifeSpan
 	project.TokenConfig.RefreshTokenLifeSpan = request.TokenConfig.RefreshTokenLifeSpan
 	project.TokenConfig.SigningAlgorithm = request.TokenConfig.SigningAlgorithm
+	project.PasswordPolicy.MinimumLength = request.PasswordPolicy.MinimumLength
+	project.PasswordPolicy.NotUserName = request.PasswordPolicy.NotUserName
+	project.PasswordPolicy.BlackList = request.PasswordPolicy.BlackList
+	project.PasswordPolicy.UseCharacter = model.CharacterType(request.PasswordPolicy.UseCharacter)
+	project.PasswordPolicy.UseDigit = request.PasswordPolicy.UseDigit
+	project.PasswordPolicy.UseSpecialCharacter = request.PasswordPolicy.UseSpecialCharacter
 	project.AllowGrantTypes = []model.GrantType{}
 	for _, t := range request.AllowGrantTypes {
 		v, err := model.GetGrantType(t)
