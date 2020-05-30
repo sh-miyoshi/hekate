@@ -41,19 +41,19 @@
       </div>
 
       <div class="form-group row">
-        <label for="accessTokenLifeSpan" class="col-sm-4 control-label">
+        <label class="col-sm-4 control-label">
           Access Token Life Span
         </label>
         <div class="col-sm-3">
           <input
-            v-model.number="accessTokenLifeSpan"
+            v-model.number="tokenConfig.accessTokenLifeSpan"
             type="number"
             class="form-control"
           />
         </div>
         <div class="col-sm-2">
           <select
-            v-model="accessTokenUnit"
+            v-model="tokenConfig.accessTokenUnit"
             name="accessUnit"
             class="form-control"
           >
@@ -65,19 +65,19 @@
       </div>
 
       <div class="form-group row">
-        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
+        <label class="col-sm-4 control-label">
           Refresh Token Life Span
         </label>
         <div class="col-sm-3">
           <input
-            v-model.number="refreshTokenLifeSpan"
+            v-model.number="tokenConfig.refreshTokenLifeSpan"
             type="number"
             class="form-control"
           />
         </div>
         <div class="col-sm-2">
           <select
-            v-model="refreshTokenUnit"
+            v-model="tokenConfig.refreshTokenUnit"
             name="refreshUnit"
             class="form-control"
           >
@@ -94,7 +94,7 @@
         </label>
         <div class="col-sm-3">
           <select
-            v-model="signingAlgorithm"
+            v-model="tokenConfig.signingAlgorithm"
             name="signingAlgorithm"
             class="form-control"
           >
@@ -143,14 +143,16 @@ export default {
   data() {
     return {
       units: ['sec', 'minutes', 'hours', 'days'],
+      algs: ['RS256'],
       error: '',
       loginURL: '',
-      accessTokenLifeSpan: 0,
-      accessTokenUnit: 'sec',
-      refreshTokenLifeSpan: 0,
-      refreshTokenUnit: 'sec',
-      signingAlgorithm: 'RS256',
-      algs: ['RS256'],
+      tokenConfig: {
+        accessTokenLifeSpan: 0,
+        accessTokenUnit: 'sec',
+        refreshTokenLifeSpan: 0,
+        refreshTokenUnit: 'sec',
+        signingAlgorithm: 'RS256'
+      },
       grantTypes: [
         {
           name: 'Authorization Code',
@@ -221,14 +223,14 @@ export default {
       const data = {
         tokenConfig: {
           accessTokenLifeSpan: this.getSpan(
-            this.accessTokenLifeSpan,
-            this.accessTokenUnit
+            this.tokenConfig.accessTokenLifeSpan,
+            this.tokenConfig.accessTokenUnit
           ),
           refreshTokenLifeSpan: this.getSpan(
-            this.refreshTokenLifeSpan,
-            this.refreshTokenUnit
+            this.tokenConfig.refreshTokenLifeSpan,
+            this.tokenConfig.refreshTokenUnit
           ),
-          signingAlgorithm: this.signingAlgorithm
+          signingAlgorithm: this.tokenConfig.signingAlgorithm
         },
         allowGrantTypes: grantTypes
       }
@@ -254,12 +256,12 @@ export default {
       }
 
       let t = this.setUnit(res.data.tokenConfig.accessTokenLifeSpan)
-      this.accessTokenLifeSpan = t.span
-      this.accessTokenUnit = t.unit
+      this.tokenConfig.accessTokenLifeSpan = t.span
+      this.tokenConfig.accessTokenUnit = t.unit
       t = this.setUnit(res.data.tokenConfig.refreshTokenLifeSpan)
-      this.refreshTokenLifeSpan = t.span
-      this.refreshTokenUnit = t.unit
-      this.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
+      this.tokenConfig.refreshTokenLifeSpan = t.span
+      this.tokenConfig.refreshTokenUnit = t.unit
+      this.tokenConfig.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
 
       // set allow grant types
       for (const type of res.data.allowGrantTypes) {
