@@ -40,68 +40,78 @@
         </div>
       </div>
 
-      <div class="form-group row">
-        <label class="col-sm-4 control-label">
-          Access Token Life Span
-        </label>
-        <div class="col-sm-3">
-          <input
-            v-model.number="tokenConfig.accessTokenLifeSpan"
-            type="number"
-            class="form-control"
-          />
-        </div>
-        <div class="col-sm-2">
-          <select
-            v-model="tokenConfig.accessTokenUnit"
-            name="accessUnit"
-            class="form-control"
-          >
-            <option v-for="unit in units" :key="unit" :value="unit">
-              {{ unit }}
-            </option>
-          </select>
-        </div>
-      </div>
+      <div class="form-group">
+        <button
+          class="btn btn-link dropdown-toggle h5 ml-n2"
+          @click="showTokenConfig = !showTokenConfig"
+        >
+          Token Config
+        </button>
+        <div v-if="showTokenConfig" class="card-body">
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Access Token Life Span
+            </label>
+            <div class="col-sm-3">
+              <input
+                v-model.number="tokenConfig.accessTokenLifeSpan"
+                type="number"
+                class="form-control"
+              />
+            </div>
+            <div class="col-sm-2">
+              <select
+                v-model="tokenConfig.accessTokenUnit"
+                name="accessUnit"
+                class="form-control"
+              >
+                <option v-for="unit in units" :key="unit" :value="unit">
+                  {{ unit }}
+                </option>
+              </select>
+            </div>
+          </div>
 
-      <div class="form-group row">
-        <label class="col-sm-4 control-label">
-          Refresh Token Life Span
-        </label>
-        <div class="col-sm-3">
-          <input
-            v-model.number="tokenConfig.refreshTokenLifeSpan"
-            type="number"
-            class="form-control"
-          />
-        </div>
-        <div class="col-sm-2">
-          <select
-            v-model="tokenConfig.refreshTokenUnit"
-            name="refreshUnit"
-            class="form-control"
-          >
-            <option v-for="unit in units" :key="unit" :value="unit">
-              {{ unit }}
-            </option>
-          </select>
-        </div>
-      </div>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Refresh Token Life Span
+            </label>
+            <div class="col-sm-3">
+              <input
+                v-model.number="tokenConfig.refreshTokenLifeSpan"
+                type="number"
+                class="form-control"
+              />
+            </div>
+            <div class="col-sm-2">
+              <select
+                v-model="tokenConfig.refreshTokenUnit"
+                name="refreshUnit"
+                class="form-control"
+              >
+                <option v-for="unit in units" :key="unit" :value="unit">
+                  {{ unit }}
+                </option>
+              </select>
+            </div>
+          </div>
 
-      <div class="form-group row">
-        <label class="col-sm-4 control-label">
-          Token Signing Algorithm
-        </label>
-        <div class="col-sm-3">
-          <select
-            v-model="tokenConfig.signingAlgorithm"
-            name="signingAlgorithm"
-            class="form-control"
-          >
-            <option v-for="alg in algs" :key="alg" :value="alg">
-              {{ alg }}
-            </option>
-          </select>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Token Signing Algorithm
+            </label>
+            <div class="col-sm-3">
+              <select
+                v-model="tokenConfig.signingAlgorithm"
+                name="signingAlgorithm"
+                class="form-control"
+              >
+                <option v-for="alg in algs" :key="alg" :value="alg">
+                  {{ alg }}
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -146,6 +156,7 @@ export default {
       algs: ['RS256'],
       error: '',
       loginURL: '',
+      showTokenConfig: true,
       tokenConfig: {
         accessTokenLifeSpan: 0,
         accessTokenUnit: 'sec',
