@@ -27,7 +27,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="accessTokenLifeSpan" class="col-sm-4 control-label">
+        <label class="col-sm-4 control-label">
           User Login URL
         </label>
         <div class="col-sm-7">
@@ -89,7 +89,7 @@
       </div>
 
       <div class="form-group row">
-        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
+        <label class="col-sm-4 control-label">
           Token Signing Algorithm
         </label>
         <div class="col-sm-3">
