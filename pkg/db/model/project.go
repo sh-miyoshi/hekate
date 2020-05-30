@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/stretchr/stew/slice"
 )
 
 // GrantType ...
@@ -89,6 +90,8 @@ var (
 	CharacterTypeBoth = CharacterType("both")
 	// CharacterTypeEither ...
 	CharacterTypeEither = CharacterType("either")
+	// AllCharacterTypes ...
+	AllCharacterTypes = []CharacterType{CharacterTypeLower, CharacterTypeUpper, CharacterTypeBoth, CharacterTypeEither}
 )
 
 // ProjectInfoHandler ...
@@ -101,6 +104,13 @@ type ProjectInfoHandler interface {
 	// Update method updates existing project
 	// It must return error if project is not found
 	Update(ent *ProjectInfo) error
+}
+
+func (p *PasswordPolicy) validate() error {
+	if ok := slice.Contains(AllCharacterTypes, p.UseCharacter); !ok {
+		return errors.Wrap(ErrProjectValidateFailed, "Invalid Character type")
+	}
+	return nil
 }
 
 // Validate ...
@@ -121,7 +131,9 @@ func (p *ProjectInfo) Validate() error {
 		return errors.Wrap(ErrProjectValidateFailed, "Refresh Token Life Span must >= 1")
 	}
 
-	// TODO(add validation for password policy)
+	if err := p.PasswordPolicy.validate(); err != nil {
+		return err
+	}
 
 	return nil
 }
