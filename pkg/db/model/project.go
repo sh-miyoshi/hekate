@@ -107,7 +107,7 @@ type ProjectInfoHandler interface {
 }
 
 func (p *PasswordPolicy) validate() error {
-	if ok := slice.Contains(AllCharacterTypes, p.UseCharacter); !ok {
+	if p.UseCharacter != "" && !slice.Contains(AllCharacterTypes, p.UseCharacter) {
 		return errors.Wrap(ErrProjectValidateFailed, "Invalid Character type")
 	}
 	return nil

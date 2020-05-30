@@ -9,6 +9,7 @@ func TestValidatePasswordPolicy(t *testing.T) {
 		charType      string
 		expectSuccess bool
 	}{
+		{"", true},
 		{"lower", true},
 		{"upper", true},
 		{"both", true},
@@ -54,9 +55,6 @@ func TestValidate(t *testing.T) {
 				AccessTokenLifeSpan:  target.accessTokenLifeSpan,
 				RefreshTokenLifeSpan: target.refreshTokenLifeSpan,
 				SigningAlgorithm:     target.tokenSigningAlg,
-			},
-			PasswordPolicy: PasswordPolicy{
-				UseCharacter: CharacterTypeBoth,
 			},
 		}
 		err := prjInfo.Validate()
