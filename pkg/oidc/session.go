@@ -56,5 +56,3 @@ func VerifySession(sessionID string) (*model.AuthCodeSession, error) {
 
 	return s, nil
 }
-
-// TODO(DeleteSession)
