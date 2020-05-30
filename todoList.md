@@ -4,20 +4,6 @@
 
 - Consentページの追加
   - TokenHandlerからconsent処理
-- パスワード以外でのユーザーのログイン
-  - 証明書
-  - ワンタイムパスワード
-  - デバイス認証
-- 設定項目の追加
-  - パスワードポリシー
-- db manager validationの追加
-- Custom RoleにDescriptionを追加
-  - API docの修正
-  - DBの修正
-  - Validationの追加
-  - APIの修正
-- PUT APIの修正
-  - フィールドがない or nullの場合は更新しない
 - ユーザーパスワードロック
   - Project Infoに追加
   - APIの修正
@@ -31,6 +17,18 @@
   - success or failed
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
+- db manager validationの追加
+- Custom RoleにDescriptionを追加
+  - API docの修正
+  - DBの修正
+  - Validationの追加
+  - APIの修正
+- パスワード以外でのユーザーのログイン
+  - 証明書
+  - ワンタイムパスワード
+  - デバイス認証
+- PUT APIの修正
+  - フィールドがない or nullの場合は更新しない
 - SQL DBの追加
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
@@ -57,8 +55,6 @@
 - (project/user) enabledの有効化
 - API responseのtime formatの見直し
 - projectのimport/export
-- 各種APIの実装
-  - sessionの詳細取得(引数: project, userID, sessionID)
 - Client Secretに証明書を追加できるようにする
 - filterの追加(user, role)
 - SAML対応
