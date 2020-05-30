@@ -483,10 +483,14 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("Invalid password was specified: %v", err)
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
+		} else if errors.Cause(err) == pwpol.ErrPasswordPolicyFailed {
+			logger.Info("Invalid password was specified: %v", err)
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			logger.Error("Failed to change user password: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
