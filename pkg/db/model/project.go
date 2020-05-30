@@ -16,6 +16,9 @@ func (t GrantType) String() string {
 	return t.value
 }
 
+// CharacterType ...
+type CharacterType string
+
 // TokenConfig ...
 type TokenConfig struct {
 	AccessTokenLifeSpan  uint
@@ -25,6 +28,16 @@ type TokenConfig struct {
 	SignSecretKey        []byte
 }
 
+// PasswordPolicy ...
+type PasswordPolicy struct {
+	MinimumLength       uint
+	NotUserName         bool
+	BlackList           []string
+	UseCharacter        CharacterType
+	UseDigit            bool
+	UseSpecialCharacter bool
+}
+
 // ProjectInfo ...
 type ProjectInfo struct {
 	Name            string
@@ -32,6 +45,7 @@ type ProjectInfo struct {
 	TokenConfig     *TokenConfig
 	PermitDelete    bool
 	AllowGrantTypes []GrantType
+	PasswordPolicy  PasswordPolicy
 }
 
 const (
@@ -64,6 +78,17 @@ var (
 	GrantTypeRefreshToken = GrantType{"refresh_token"}
 	// GrantTypePassword ...
 	GrantTypePassword = GrantType{"password"}
+
+	// Character Types
+
+	// CharacterTypeLower ...
+	CharacterTypeLower = CharacterType("lower")
+	// CharacterTypeUpper ...
+	CharacterTypeUpper = CharacterType("upper")
+	// CharacterTypeBoth ...
+	CharacterTypeBoth = CharacterType("both")
+	// CharacterTypeEither ...
+	CharacterTypeEither = CharacterType("either")
 )
 
 // ProjectInfoHandler ...
@@ -95,6 +120,8 @@ func (p *ProjectInfo) Validate() error {
 	if !ValidateLifeSpan(p.TokenConfig.RefreshTokenLifeSpan) {
 		return errors.Wrap(ErrProjectValidateFailed, "Refresh Token Life Span must >= 1")
 	}
+
+	// TODO(add validation for password policy)
 
 	return nil
 }
