@@ -1,7 +1,7 @@
 import { AuthHandler } from '../plugins/auth.js'
 
 export default async function(context) {
-  let project = 'master'
+  let project = ''
   let redirect = '/admin'
   if (context.route.path.includes('/user/project/')) {
     const values = context.route.path.split('/')
@@ -15,10 +15,7 @@ export default async function(context) {
   const handler = new AuthHandler(context)
 
   const loginProject = window.localStorage.getItem('login_project')
-  if (
-    loginProject == null ||
-    (loginProject !== '' && project !== loginProject)
-  ) {
+  if (loginProject == null || project !== loginProject) {
     handler.Login(project)
     return
   }
