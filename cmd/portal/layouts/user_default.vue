@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Sidebar />
     <div class="c-wrapper">
       <Header />
       <div class="c-body main">
@@ -12,10 +13,12 @@
 
 <script>
 import Header from '@/components/user_header.vue'
+import Sidebar from '@/components/user_sidebar.vue'
 
 export default {
   components: {
-    Header
+    Header,
+    Sidebar
   }
 }
 </script>
