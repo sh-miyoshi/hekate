@@ -115,6 +115,139 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <button
+          class="btn btn-link dropdown-toggle h5 ml-n3"
+          @click="showPasswordPolicy = !showPasswordPolicy"
+        >
+          Password Policy
+        </button>
+        <div v-if="showPasswordPolicy" class="card-body">
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Minimum Length
+            </label>
+            <div class="col-sm-3">
+              <input
+                v-model.number="passwordPolicy.minimumLength"
+                type="number"
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Not User Name
+            </label>
+            <div class="col-sm-3">
+              <label
+                class="c-switch c-switch-label c-switch-pill c-switch-primary"
+              >
+                <input
+                  class="c-switch-input"
+                  type="checkbox"
+                  :checked="passwordPolicy.notUserName"
+                />
+                <span
+                  class="c-switch-slider"
+                  data-checked="On"
+                  data-unchecked="Off"
+                ></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              BlackList
+            </label>
+            <div class="col-sm-3">value</div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Includes
+            </label>
+            <div class="col-md-7 col-form-label">
+              <div
+                v-if="
+                  !passwordPolicy.includes.lower.checked &&
+                    !passwordPolicy.includes.upper.checked
+                "
+                class="form-check checkbox"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="passwordPolicy.includes.caseInsensitive.checked"
+                  @change="
+                    passwordPolicy.includes.caseInsensitive.checked = !passwordPolicy
+                      .includes.caseInsensitive.checked
+                  "
+                />
+                <label class="form-check-label">
+                  {{ passwordPolicy.includes.caseInsensitive.name }}
+                </label>
+              </div>
+              <div class="form-check checkbox">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="passwordPolicy.includes.lower.checked"
+                  @change="
+                    passwordPolicy.includes.lower.checked = !passwordPolicy
+                      .includes.lower.checked
+                  "
+                />
+                <label class="form-check-label">
+                  {{ passwordPolicy.includes.lower.name }}
+                </label>
+              </div>
+              <div class="form-check checkbox">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="passwordPolicy.includes.upper.checked"
+                  @change="
+                    passwordPolicy.includes.upper.checked = !passwordPolicy
+                      .includes.upper.checked
+                  "
+                />
+                <label class="form-check-label">
+                  {{ passwordPolicy.includes.upper.name }}
+                </label>
+              </div>
+              <div class="form-check checkbox">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="passwordPolicy.includes.digit.checked"
+                  @change="
+                    passwordPolicy.includes.digit.checked = !passwordPolicy
+                      .includes.digit.checked
+                  "
+                />
+                <label class="form-check-label">
+                  {{ passwordPolicy.includes.digit.name }}
+                </label>
+              </div>
+              <div class="form-check checkbox">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="passwordPolicy.includes.special.checked"
+                  @change="
+                    passwordPolicy.includes.special.checked = !passwordPolicy
+                      .includes.special.checked
+                  "
+                />
+                <label class="form-check-label">
+                  {{ passwordPolicy.includes.special.name }}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group row">
         <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
           Allow Grant Types
@@ -163,6 +296,22 @@ export default {
         refreshTokenLifeSpan: 0,
         refreshTokenUnit: 'sec',
         signingAlgorithm: 'RS256'
+      },
+      showPasswordPolicy: true,
+      passwordPolicy: {
+        minimumLength: 0,
+        notUserName: false,
+        blackList: [],
+        includes: {
+          caseInsensitive: {
+            name: 'Characters (case-insensitive)',
+            checked: false
+          },
+          lower: { name: 'Lowercase Characters', checked: false },
+          upper: { name: 'Uppercase Characters', checked: false },
+          digit: { name: 'Digits', checked: false },
+          special: { name: 'Special Characters', checked: false }
+        }
       },
       grantTypes: [
         {
@@ -231,6 +380,8 @@ export default {
         }
       }
 
+      // TODO(set password policy)
+
       const data = {
         tokenConfig: {
           accessTokenLifeSpan: this.getSpan(
@@ -273,6 +424,8 @@ export default {
       this.tokenConfig.refreshTokenLifeSpan = t.span
       this.tokenConfig.refreshTokenUnit = t.unit
       this.tokenConfig.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
+
+      // TODO(set password policy)
 
       // set allow grant types
       for (const type of res.data.allowGrantTypes) {
