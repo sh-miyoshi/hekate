@@ -380,8 +380,6 @@ export default {
         }
       }
 
-      // TODO(set password policy)
-
       const data = {
         tokenConfig: {
           accessTokenLifeSpan: this.getSpan(
@@ -393,6 +391,14 @@ export default {
             this.tokenConfig.refreshTokenUnit
           ),
           signingAlgorithm: this.tokenConfig.signingAlgorithm
+        },
+        passwordPolicy: {
+          length: this.passwordPolicy.minimumLength,
+          notUserName: this.passwordPolicy.notUserName,
+          blackList: this.passwordPolicy.blackList,
+          useCharacter: this.getPasswordPolicyCharacter(),
+          useDigit: this.passwordPolicy.includes.digit.checked,
+          useSpecialCharacter: this.passwordPolicy.includes.special.checked
         },
         allowGrantTypes: grantTypes
       }
@@ -425,7 +431,28 @@ export default {
       this.tokenConfig.refreshTokenUnit = t.unit
       this.tokenConfig.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
 
-      // TODO(set password policy)
+      this.passwordPolicy.minimumLength = res.data.passwordPolicy.length
+      this.passwordPolicy.notUserName = res.data.passwordPolicy.notUserName
+      this.passwordPolicy.blackList = res.data.passwordPolicy.blackList
+      this.passwordPolicy.includes.digit.checked =
+        res.data.passwordPolicy.useDigit
+      this.passwordPolicy.includes.special.checked =
+        res.data.passwordPolicy.useSpecial
+      switch (res.data.passwordPolicy.useCharacter) {
+        case 'either':
+          this.passwordPolicy.includes.caseInsensitive.checked = true
+          break
+        case 'lower':
+          this.passwordPolicy.includes.lower.checked = true
+          break
+        case 'upper':
+          this.passwordPolicy.includes.upper.checked = true
+          break
+        case 'both':
+          this.passwordPolicy.includes.lower.checked = true
+          this.passwordPolicy.includes.upper.checked = true
+          break
+      }
 
       // set allow grant types
       for (const type of res.data.allowGrantTypes) {
@@ -485,6 +512,27 @@ export default {
           break
       }
       return span
+    },
+    getPasswordPolicyCharacter() {
+      let res = ''
+
+      if (this.passwordPolicy.includes.caseInsensitive.checked) {
+        res = 'either'
+      }
+
+      if (this.passwordPolicy.includes.lower.checked) {
+        res = 'lower'
+      }
+
+      if (this.passwordPolicy.includes.upper.checked) {
+        if (res === 'lower') {
+          res = 'both'
+        } else {
+          res = 'upper'
+        }
+      }
+
+      return res
     }
   }
 }
