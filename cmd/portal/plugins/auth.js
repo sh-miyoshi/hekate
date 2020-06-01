@@ -44,11 +44,9 @@ export class AuthHandler {
     window.localStorage.removeItem('login_project')
   }
 
-  Login(project) {
+  Login() {
+    const project = 'master'
     window.localStorage.setItem('login_project', project)
-    if (project === '') {
-      project = 'master'
-    }
 
     // TODO(consider state)
 
@@ -86,10 +84,7 @@ export class AuthHandler {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
 
-    let project = window.localStorage.getItem('login_project')
-    if (!project || project === '') {
-      project = 'master'
-    }
+    const project = window.localStorage.getItem('login_project')
     const url =
       process.env.HEKATE_SERVER_ADDR +
       '/api/v1/project/' +
@@ -124,11 +119,7 @@ export class AuthHandler {
   }
 
   async AuthCode(authCode) {
-    let redirect = '/admin'
-    const project = window.localStorage.getItem('login_project')
-    if (project && project !== '') {
-      redirect = '/user/project/' + project
-    }
+    const redirect = '/admin'
 
     // TODO(consider state)
     const opts = {

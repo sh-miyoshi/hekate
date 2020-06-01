@@ -68,13 +68,6 @@
 
 ## Portal(Admin Console) enhancement
 
-- Userページの作成
-  - Redirect先テスト
-  - Userアカウント設定ページ
-    - Account Setting(/account)
-    - Password(/password)
-    - Sessions(/sessions)
-    - Audit Log(/logs)
 - 各ページの作成
   - User
     - Login Sessionの表示
