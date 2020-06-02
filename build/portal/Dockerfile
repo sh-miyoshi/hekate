@@ -1,22 +1,17 @@
-FROM node as builder
+FROM node:13.10 as builder
 
-WORKDIR /myapp
+WORKDIR /hekate
 COPY . .
-WORKDIR /myapp/cmd/portal
+WORKDIR /hekate/cmd/portal
 RUN npm install
-RUN npm run build
 
 FROM node:13-alpine
 
-WORKDIR /myapp
-ENV HOST=0.0.0.0
-
-ADD cmd/portal/package.json ./
-ADD cmd/portal/nuxt.config.js ./
-
-COPY --from=builder /myapp/cmd/portal/node_modules ./node_modules/
-COPY --from=builder /myapp/cmd/portal/.nuxt ./.nuxt/
-COPY --from=builder /myapp/cmd/portal/static ./static/
-
 EXPOSE 3000
+WORKDIR /hekate
+
+COPY ./cmd/portal /hekate/portal/
+COPY --from=builder /hekate/cmd/portal/node_modules /hekate/portal/node_modules
+
+RUN npm run build
 CMD ["npm", "run", "start"]

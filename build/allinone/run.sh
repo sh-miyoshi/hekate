@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function ExecPortal() {
-  cd /myapp/portal
+  cd /hekate/portal
   npm run build
   npm run start > portal.log 2>&1
 }
@@ -35,5 +35,5 @@ env | grep HEKATE
 ExecPortal &
 
 # Run server
-cd /myapp/server
+cd /hekate/server
 ./hekate-server --config=./config.yaml

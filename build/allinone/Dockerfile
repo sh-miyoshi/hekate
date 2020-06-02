@@ -1,35 +1,35 @@
 FROM golang:1.13 as server-builder
 
-WORKDIR /myapp
+WORKDIR /hekate
 COPY go.mod .
 COPY go.sum .
 COPY pkg ./pkg
 COPY cmd/hekate ./cmd/hekate
-WORKDIR /myapp/cmd/hekate
+WORKDIR /hekate/cmd/hekate
 RUN go build -o hekate-server
 
 
 FROM node:13.10 as front-builder
 
-WORKDIR /myapp
+WORKDIR /hekate
 COPY ./cmd/portal ./cmd/portal
-WORKDIR /myapp/cmd/portal
+WORKDIR /hekate/cmd/portal
 RUN npm install
 
 
 FROM ubuntu:18.04
 
 RUN apt update -y && apt install -y nodejs npm
-WORKDIR /myapp
+WORKDIR /hekate
 RUN mkdir -p server && mkdir -p portal
 
-COPY --from=server-builder /myapp/cmd/hekate/hekate-server /myapp/server/hekate-server
-COPY build/allinone/config.yaml /myapp/server/config.yaml
-COPY cmd/hekate/_data/testcerts /myapp/server/secret
-COPY cmd/hekate/_data/login /myapp/server/login
+COPY --from=server-builder /hekate/cmd/hekate/hekate-server /hekate/server/hekate-server
+COPY build/allinone/config.yaml /hekate/server/config.yaml
+COPY cmd/hekate/_data/testcerts /hekate/server/secret
+COPY cmd/hekate/_data/login /hekate/server/login
 
-COPY ./cmd/portal /myapp/portal/
-COPY --from=front-builder /myapp/cmd/portal/node_modules /myapp/portal/node_modules
+COPY ./cmd/portal /hekate/portal/
+COPY --from=front-builder /hekate/cmd/portal/node_modules /hekate/portal/node_modules
 
 COPY build/allinone/run.sh .
 

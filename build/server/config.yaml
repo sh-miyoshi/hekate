@@ -2,12 +2,12 @@ server_port: 18443
 server_bind_address: "0.0.0.0"
 https:
   enabled: true
-  cert-file: "/myapp/server/secret/tls.crt"
-  key-file: "/myapp/server/secret/tls.key"
+  cert-file: "/etc/hekate/tls.crt"
+  key-file: "/etc/hekate/tls.key"
 db:
   type: "memory"
   connection_string: ""
 
-  # Expires Time of Authorization code in OpenID Connect [sec]
+# Expires Time of Authorization code in OpenID Connect [sec]
 oidc_auth_code_expires_time: 300
-oidc_user_login_page_res: "/myapp/server/login"
+oidc_user_login_page_res: "/etc/hekate/login"
