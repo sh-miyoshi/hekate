@@ -26,6 +26,7 @@ type Manager struct {
 	customRole      model.CustomRoleHandler
 	authCodeSession model.AuthCodeSessionHandler
 	transaction     model.TransactionManager
+	ping            model.PingHandler
 }
 
 var inst *Manager
@@ -47,6 +48,7 @@ func InitDBManager(dbType string, connStr string) error {
 			customRole:      memory.NewCustomRoleHandler(),
 			authCodeSession: memory.NewAuthCodeSessionHandler(),
 			transaction:     memory.NewTransactionManager(),
+			ping:            memory.NewPingHandler(),
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -84,6 +86,7 @@ func InitDBManager(dbType string, connStr string) error {
 			customRole:      customRoleHandler,
 			authCodeSession: authCodeSessionHandler,
 			transaction:     mongo.NewTransactionManager(dbClient),
+			ping:            mongo.NewPingHandler(dbClient),
 		}
 	default:
 		return errors.New(fmt.Sprintf("Database Type %s is not implemented yet", dbType))
@@ -95,6 +98,11 @@ func InitDBManager(dbType string, connStr string) error {
 // GetInst returns an instance of DB Manager
 func GetInst() *Manager {
 	return inst
+}
+
+// Ping ...
+func (m *Manager) Ping() error {
+	return m.ping.Ping()
 }
 
 // ProjectAdd ...

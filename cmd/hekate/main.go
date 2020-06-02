@@ -85,6 +85,10 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		if err := db.GetInst().Ping(); err != nil {
+			http.Error(w, "DB Ping Failed", http.StatusInternalServerError)
+			return
+		}
 		w.Write([]byte("ok"))
 	}).Methods("GET")
 
