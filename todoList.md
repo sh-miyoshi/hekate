@@ -85,10 +85,6 @@
 - alert画面のcss修正
 - headerにユーザー名を表示
 
-- 各ユーザーのアカウント管理画面
-  - user名変更
-  - パスワード変更
-
 ## CLI tool(hctl) enhancement
 
 - いろいろ修正が必要

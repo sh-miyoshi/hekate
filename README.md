@@ -45,7 +45,8 @@ OpenID Connectのことを知らなくても簡単に認証・認可を行える
   - 自身のサーバのアクセスをHekateの認証・認可機能と組み合わせて柔軟に制御できます
   - 3 minutes Quick Start: [docs/quick_start/access_control.md](docs/quick_start/access_control.md)
 - ユーザー管理
-  - TODO(機能概要・Quick Start)
+  - Hekateの認証機能と組み合わせて、自身のアプリケーションにおけるユーザーの新規追加・ログイン処理を簡単に実装できます
+  - TODO(Quick Start)
 
 ## 開発環境
 
