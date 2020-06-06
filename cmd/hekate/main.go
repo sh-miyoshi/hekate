@@ -17,6 +17,7 @@ import (
 	roleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
 	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
 	projectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
+	sessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/session"
 	userapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
@@ -82,6 +83,10 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", roleapiv1.RoleDeleteHandler).Methods("DELETE")
 	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", roleapiv1.RoleGetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", roleapiv1.RoleUpdateHandler).Methods("PUT")
+
+	// Session API
+	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", sessionapiv1.SessionDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", sessionapiv1.SessionGetHandler).Methods("GET")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
