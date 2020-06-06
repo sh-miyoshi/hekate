@@ -107,14 +107,21 @@
         </div>
       </div>
 
-      <div class="form-group row">
-        <label class="col-sm-2 control-label">
+      <div class="form-group">
+        <button
+          class="btn btn-link dropdown-toggle ml-n3"
+          @click="loadLoginSessions()"
+        >
           Login Sessions
-        </label>
-        <div v-if="user" class="col-sm-5">
-          <ul>
-            <li v-for="item in user.sessions" :key="item">{{ item }}</li>
-          </ul>
+        </button>
+        <div v-if="showLoginSessions" class="card-body">
+          <div class="form-group row">
+            <div v-if="user">
+              <ul>
+                <li v-for="item in user.sessions" :key="item">{{ item }}</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -138,7 +145,8 @@ export default {
       error: '',
       assignedSystemRole: null,
       assignedCustomRole: null,
-      customRoleCandidates: []
+      customRoleCandidates: [],
+      showLoginSessions: false
     }
   },
   async mounted() {
@@ -276,6 +284,14 @@ export default {
           this.assignedCustomRole = null
           return
         }
+      }
+    },
+    loadLoginSessions() {
+      this.showLoginSessions = !this.showLoginSessions
+
+      // load sessions when open dropdown
+      if (this.showLoginSessions) {
+        // TODO
       }
     }
   }
