@@ -61,6 +61,10 @@ func InitDBManager(dbType string, connStr string) error {
 		if err != nil {
 			return errors.Wrap(err, "Failed to create project handler")
 		}
+		clientHandler, err := mongo.NewClientHandler(dbClient)
+		if err != nil {
+			return errors.Wrap(err, "Failed to create client handler")
+		}
 		userHandler, err := mongo.NewUserHandler(dbClient)
 		if err != nil {
 			return errors.Wrap(err, "Failed to create user handler")
@@ -82,7 +86,7 @@ func InitDBManager(dbType string, connStr string) error {
 			project:         prjHandler,
 			user:            userHandler,
 			session:         sessionHandler,
-			client:          mongo.NewClientHandler(dbClient),
+			client:          clientHandler,
 			customRole:      customRoleHandler,
 			authCodeSession: authCodeSessionHandler,
 			transaction:     mongo.NewTransactionManager(dbClient),
@@ -145,7 +149,7 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 			CreatedAt:           ent.CreatedAt,
 			AllowedCallbackURLs: callbacks,
 		}
-		if err := m.client.Add(clientEnt); err != nil {
+		if err := m.client.Add(ent.Name, clientEnt); err != nil {
 			return errors.Wrap(err, "Failed to add client for portal login")
 		}
 
@@ -226,7 +230,7 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) error {
 }
 
 // UserAdd ...
-func (m *Manager) UserAdd(ent *model.UserInfo) error {
+func (m *Manager) UserAdd(projectName string, ent *model.UserInfo) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
@@ -248,7 +252,7 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 
 	return m.transaction.Transaction(func() error {
 		for _, r := range ent.CustomRoles {
-			if _, err := m.customRole.Get(r); err != nil {
+			if _, err := m.customRole.Get(projectName, r); err != nil {
 				if errors.Cause(err) == model.ErrNoSuchCustomRole {
 					return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
 				}
@@ -256,7 +260,7 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 			}
 		}
 
-		_, err := m.user.Get(ent.ID)
+		_, err := m.user.Get(projectName, ent.ID)
 		if err != model.ErrNoSuchUser {
 			if err == nil {
 				return model.ErrUserAlreadyExists
@@ -273,7 +277,7 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 			return model.ErrUserAlreadyExists
 		}
 
-		if err := m.user.Add(ent); err != nil {
+		if err := m.user.Add(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to add user")
 		}
 		return nil
@@ -281,21 +285,21 @@ func (m *Manager) UserAdd(ent *model.UserInfo) error {
 }
 
 // UserDelete ...
-func (m *Manager) UserDelete(userID string) error {
+func (m *Manager) UserDelete(projectName string, userID string) error {
 	if !model.ValidateUserID(userID) {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
 	return m.transaction.Transaction(func() error {
-		if err := m.authCodeSession.DeleteAllInUser(userID); err != nil {
+		if err := m.authCodeSession.DeleteAllInUser(projectName, userID); err != nil {
 			return errors.Wrap(err, "Delete authoriation code failed")
 		}
 
-		if err := m.session.DeleteAll(userID); err != nil {
+		if err := m.session.DeleteAll(projectName, userID); err != nil {
 			return errors.Wrap(err, "Delete user session failed")
 		}
 
-		if err := m.user.Delete(userID); err != nil {
+		if err := m.user.Delete(projectName, userID); err != nil {
 			return errors.Wrap(err, "Failed to delete user")
 		}
 		return nil
@@ -312,16 +316,16 @@ func (m *Manager) UserGetList(projectName string, filter *model.UserFilter) ([]*
 }
 
 // UserGet ...
-func (m *Manager) UserGet(userID string) (*model.UserInfo, error) {
+func (m *Manager) UserGet(projectName string, userID string) (*model.UserInfo, error) {
 	if !model.ValidateUserID(userID) {
 		return nil, errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
-	return m.user.Get(userID)
+	return m.user.Get(projectName, userID)
 }
 
 // UserUpdate ...
-func (m *Manager) UserUpdate(ent *model.UserInfo) error {
+func (m *Manager) UserUpdate(projectName string, ent *model.UserInfo) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
@@ -343,7 +347,7 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 
 	return m.transaction.Transaction(func() error {
 		for _, r := range ent.CustomRoles {
-			if _, err := m.customRole.Get(r); err != nil {
+			if _, err := m.customRole.Get(projectName, r); err != nil {
 				if errors.Cause(err) == model.ErrNoSuchCustomRole {
 					return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
 				}
@@ -360,7 +364,7 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 			return errors.Wrap(model.ErrUserAlreadyExists, "new user name is already used")
 		}
 
-		if err := m.user.Update(ent); err != nil {
+		if err := m.user.Update(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to update user")
 		}
 		return nil
@@ -368,7 +372,7 @@ func (m *Manager) UserUpdate(ent *model.UserInfo) error {
 }
 
 // UserAddRole ...
-func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID string) error {
+func (m *Manager) UserAddRole(projectName string, userID string, roleType model.RoleType, roleID string) error {
 	if !model.ValidateUserID(userID) {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
@@ -381,7 +385,7 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 				return errors.Wrap(model.ErrUserValidateFailed, "Invalid system role")
 			}
 
-			usr, err := m.user.Get(userID)
+			usr, err := m.user.Get(projectName, userID)
 
 			if *res == role.ResCluster && usr.ProjectName != "master" {
 				return errors.Wrap(model.ErrUserValidateFailed, "Resource cluster can add to master project user")
@@ -399,7 +403,7 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 				}
 			}
 		} else if roleType == model.RoleCustom {
-			if _, err := m.customRole.Get(roleID); err != nil {
+			if _, err := m.customRole.Get(projectName, roleID); err != nil {
 				if errors.Cause(err) == model.ErrNoSuchCustomRole {
 					return errors.Wrap(model.ErrUserValidateFailed, "Invalid custom role")
 				}
@@ -407,7 +411,7 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 			}
 		}
 
-		if err := m.user.AddRole(userID, roleType, roleID); err != nil {
+		if err := m.user.AddRole(projectName, userID, roleType, roleID); err != nil {
 			return errors.Wrap(err, "Failed to add role to user")
 		}
 		return nil
@@ -415,13 +419,13 @@ func (m *Manager) UserAddRole(userID string, roleType model.RoleType, roleID str
 }
 
 // UserDeleteRole ...
-func (m *Manager) UserDeleteRole(userID string, roleID string) error {
+func (m *Manager) UserDeleteRole(projectName string, userID string, roleID string) error {
 	if !model.ValidateUserID(userID) {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
 	return m.transaction.Transaction(func() error {
-		usr, err := m.user.Get(userID)
+		usr, err := m.user.Get(projectName, userID)
 		if err != nil {
 			return errors.Wrap(err, "Failed to get user system roles")
 		}
@@ -437,7 +441,7 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 		}
 		// If not ok, roleID maybe Custom Role
 
-		if err := m.user.DeleteRole(userID, roleID); err != nil {
+		if err := m.user.DeleteRole(projectName, userID, roleID); err != nil {
 			return errors.Wrap(err, "Failed to delete role from user")
 		}
 		return nil
@@ -445,18 +449,18 @@ func (m *Manager) UserDeleteRole(userID string, roleID string) error {
 }
 
 // UserChangePassword ...
-func (m *Manager) UserChangePassword(userID string, password string) error {
+func (m *Manager) UserChangePassword(projectName string, userID string, password string) error {
 	if !model.ValidateUserID(userID) {
 		return errors.Wrap(model.ErrUserValidateFailed, "invalid user id format")
 	}
 
 	return m.transaction.Transaction(func() error {
-		usr, err := m.user.Get(userID)
+		usr, err := m.user.Get(projectName, userID)
 		if err != nil {
 			return errors.Wrap(err, "Failed to get user of change password")
 		}
 
-		prj, err := m.project.Get(usr.ProjectName)
+		prj, err := m.project.Get(projectName)
 		if err != nil {
 			return errors.Wrap(err, "Failed to get project associated with the user")
 		}
@@ -467,7 +471,7 @@ func (m *Manager) UserChangePassword(userID string, password string) error {
 
 		usr.PasswordHash = util.CreateHash(password)
 
-		if err := m.user.Update(usr); err != nil {
+		if err := m.user.Update(projectName, usr); err != nil {
 			return errors.Wrap(err, "Failed to update user password")
 		}
 
@@ -476,10 +480,10 @@ func (m *Manager) UserChangePassword(userID string, password string) error {
 }
 
 // AuthCodeSessionAdd ...
-func (m *Manager) AuthCodeSessionAdd(ent *model.AuthCodeSession) error {
+func (m *Manager) AuthCodeSessionAdd(projectName string, ent *model.AuthCodeSession) error {
 	// create session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() error {
-		if err := m.authCodeSession.Add(ent); err != nil {
+		if err := m.authCodeSession.Add(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to add auth code session")
 		}
 		return nil
@@ -487,10 +491,10 @@ func (m *Manager) AuthCodeSessionAdd(ent *model.AuthCodeSession) error {
 }
 
 // AuthCodeSessionUpdate ...
-func (m *Manager) AuthCodeSessionUpdate(ent *model.AuthCodeSession) error {
+func (m *Manager) AuthCodeSessionUpdate(projectName string, ent *model.AuthCodeSession) error {
 	// update session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() error {
-		if err := m.authCodeSession.Update(ent); err != nil {
+		if err := m.authCodeSession.Update(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to update auth code session")
 		}
 		return nil
@@ -498,9 +502,9 @@ func (m *Manager) AuthCodeSessionUpdate(ent *model.AuthCodeSession) error {
 }
 
 // AuthCodeSessionDelete ...
-func (m *Manager) AuthCodeSessionDelete(sessionID string) error {
+func (m *Manager) AuthCodeSessionDelete(projectName string, sessionID string) error {
 	return m.transaction.Transaction(func() error {
-		if err := m.authCodeSession.Delete(sessionID); err != nil {
+		if err := m.authCodeSession.Delete(projectName, sessionID); err != nil {
 			return errors.Wrap(err, "Failed to delete auth code session")
 		}
 
@@ -509,41 +513,47 @@ func (m *Manager) AuthCodeSessionDelete(sessionID string) error {
 }
 
 // AuthCodeSessionGet ...
-func (m *Manager) AuthCodeSessionGet(sessionID string) (*model.AuthCodeSession, error) {
-	return m.authCodeSession.Get(sessionID)
+func (m *Manager) AuthCodeSessionGet(projectName string, sessionID string) (*model.AuthCodeSession, error) {
+	return m.authCodeSession.Get(projectName, sessionID)
 }
 
 // AuthCodeSessionGetByCode ...
-func (m *Manager) AuthCodeSessionGetByCode(code string) (*model.AuthCodeSession, error) {
-	return m.authCodeSession.GetByCode(code)
+func (m *Manager) AuthCodeSessionGetByCode(projectName string, code string) (*model.AuthCodeSession, error) {
+	return m.authCodeSession.GetByCode(projectName, code)
 }
 
 // SessionAdd ...
-func (m *Manager) SessionAdd(ent *model.Session) error {
+func (m *Manager) SessionAdd(projectName string, ent *model.Session) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
 	return m.transaction.Transaction(func() error {
-		if _, err := m.session.Get(ent.SessionID); err != model.ErrNoSuchSession {
+		if _, err := m.session.Get(projectName, ent.SessionID); err != model.ErrNoSuchSession {
 			return model.ErrSessionAlreadyExists
 		}
 
-		if err := m.session.Add(ent); err != nil {
+		if err := m.session.Add(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to add session")
 		}
 		return nil
 	})
 }
 
+// SessionGet ..
+func (m *Manager) SessionGet(projectName string, sessionID string) (*model.Session, error) {
+	// TODO(add validation)
+	return m.session.Get(projectName, sessionID)
+}
+
 // SessionDelete ...
-func (m *Manager) SessionDelete(sessionID string) error {
+func (m *Manager) SessionDelete(projectName string, sessionID string) error {
 	if !model.ValidateSessionID(sessionID) {
 		return errors.Wrap(model.ErrSessionValidateFailed, "invalid session id format")
 	}
 
 	return m.transaction.Transaction(func() error {
-		if err := m.session.Delete(sessionID); err != nil {
+		if err := m.session.Delete(projectName, sessionID); err != nil {
 			return errors.Wrap(err, "Failed to revoke session")
 		}
 		return nil
@@ -551,16 +561,16 @@ func (m *Manager) SessionDelete(sessionID string) error {
 }
 
 // SessionGetList ...
-func (m *Manager) SessionGetList(userID string) ([]*model.Session, error) {
+func (m *Manager) SessionGetList(projectName string, userID string) ([]*model.Session, error) {
 	if !model.ValidateUserID(userID) {
 		return nil, errors.Wrap(model.ErrSessionValidateFailed, "invalid user id format")
 	}
 
-	return m.session.GetList(userID)
+	return m.session.GetList(projectName, userID)
 }
 
 // ClientAdd ...
-func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
+func (m *Manager) ClientAdd(projectName string, ent *model.ClientInfo) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
@@ -574,7 +584,7 @@ func (m *Manager) ClientAdd(ent *model.ClientInfo) error {
 			return errors.Wrap(err, "Failed to get client info")
 		}
 
-		if err := m.client.Add(ent); err != nil {
+		if err := m.client.Add(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to add client")
 		}
 		return nil
@@ -591,7 +601,7 @@ func (m *Manager) ClientDelete(projectName, clientID string) error {
 	}
 
 	return m.transaction.Transaction(func() error {
-		if err := m.authCodeSession.DeleteAllInClient(clientID); err != nil {
+		if err := m.authCodeSession.DeleteAllInClient(projectName, clientID); err != nil {
 			return errors.Wrap(err, "Failed to delete login session of the client")
 		}
 
@@ -624,13 +634,13 @@ func (m *Manager) ClientGet(projectName, clientID string) (*model.ClientInfo, er
 }
 
 // ClientUpdate ...
-func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
+func (m *Manager) ClientUpdate(projectName string, ent *model.ClientInfo) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
 
 	return m.transaction.Transaction(func() error {
-		if err := m.client.Update(ent); err != nil {
+		if err := m.client.Update(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to update client")
 		}
 		return nil
@@ -638,7 +648,7 @@ func (m *Manager) ClientUpdate(ent *model.ClientInfo) error {
 }
 
 // CustomRoleAdd ...
-func (m *Manager) CustomRoleAdd(ent *model.CustomRole) error {
+func (m *Manager) CustomRoleAdd(projectName string, ent *model.CustomRole) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
@@ -646,7 +656,7 @@ func (m *Manager) CustomRoleAdd(ent *model.CustomRole) error {
 	// TODO(validate name uniquness in project)
 
 	return m.transaction.Transaction(func() error {
-		_, err := m.customRole.Get(ent.ID)
+		_, err := m.customRole.Get(projectName, ent.ID)
 		if err != model.ErrNoSuchCustomRole {
 			if err == nil {
 				return model.ErrCustomRoleAlreadyExists
@@ -654,7 +664,7 @@ func (m *Manager) CustomRoleAdd(ent *model.CustomRole) error {
 			return errors.Wrap(err, "Failed to get customRole info")
 		}
 
-		if err := m.customRole.Add(ent); err != nil {
+		if err := m.customRole.Add(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to add customRole")
 		}
 		return nil
@@ -662,15 +672,15 @@ func (m *Manager) CustomRoleAdd(ent *model.CustomRole) error {
 }
 
 // CustomRoleDelete ...
-func (m *Manager) CustomRoleDelete(customRoleID string) error {
+func (m *Manager) CustomRoleDelete(projectName string, customRoleID string) error {
 	// TODO(validate customRoleID)
 
 	return m.transaction.Transaction(func() error {
-		if err := m.user.DeleteAllCustomRole(customRoleID); err != nil {
+		if err := m.user.DeleteAllCustomRole(projectName, customRoleID); err != nil {
 			return errors.Wrap(err, "Failed to delete custom role from user")
 		}
 
-		if err := m.customRole.Delete(customRoleID); err != nil {
+		if err := m.customRole.Delete(projectName, customRoleID); err != nil {
 			return errors.Wrap(err, "Failed to delete customRole")
 		}
 		return nil
@@ -686,13 +696,13 @@ func (m *Manager) CustomRoleGetList(projectName string, filter *model.CustomRole
 }
 
 // CustomRoleGet ...
-func (m *Manager) CustomRoleGet(customRoleID string) (*model.CustomRole, error) {
+func (m *Manager) CustomRoleGet(projectName string, customRoleID string) (*model.CustomRole, error) {
 	// TODO(validate customRoleID)
-	return m.customRole.Get(customRoleID)
+	return m.customRole.Get(projectName, customRoleID)
 }
 
 // CustomRoleUpdate ...
-func (m *Manager) CustomRoleUpdate(ent *model.CustomRole) error {
+func (m *Manager) CustomRoleUpdate(projectName string, ent *model.CustomRole) error {
 	if err := ent.Validate(); err != nil {
 		return errors.Wrap(err, "Failed to validate entry")
 	}
@@ -708,7 +718,7 @@ func (m *Manager) CustomRoleUpdate(ent *model.CustomRole) error {
 			return model.ErrCustomRoleAlreadyExists
 		}
 
-		if err := m.customRole.Update(ent); err != nil {
+		if err := m.customRole.Update(projectName, ent); err != nil {
 			return errors.Wrap(err, "Failed to update client")
 		}
 		return nil

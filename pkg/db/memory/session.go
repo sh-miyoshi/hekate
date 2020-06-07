@@ -19,26 +19,30 @@ func NewSessionHandler() *SessionHandler {
 }
 
 // Add ...
-func (h *SessionHandler) Add(session *model.Session) error {
+func (h *SessionHandler) Add(projectName string, session *model.Session) error {
 	h.sessionList[session.SessionID] = session
 	return nil
 }
 
 // Delete ...
-func (h *SessionHandler) Delete(sessionID string) error {
-	if _, exists := h.sessionList[sessionID]; exists {
-		delete(h.sessionList, sessionID)
-		return nil
+func (h *SessionHandler) Delete(projectName string, sessionID string) error {
+	if res, exists := h.sessionList[sessionID]; exists {
+		if res.ProjectName == projectName {
+			delete(h.sessionList, sessionID)
+			return nil
+		}
 	}
 
 	return model.ErrNoSuchSession
 }
 
 // DeleteAll ...
-func (h *SessionHandler) DeleteAll(userID string) error {
+func (h *SessionHandler) DeleteAll(projectName string, userID string) error {
 	newList := make(map[string]*model.Session)
 	for _, s := range h.sessionList {
-		if s.UserID != userID {
+		if s.ProjectName != projectName {
+			newList[s.SessionID] = s
+		} else if s.UserID != userID {
 			newList[s.SessionID] = s
 		}
 	}
@@ -59,19 +63,20 @@ func (h *SessionHandler) DeleteAllInProject(projectName string) error {
 }
 
 // Get ...
-func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
-	if _, exists := h.sessionList[sessionID]; !exists {
+func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Session, error) {
+	res, exists := h.sessionList[sessionID]
+	if !exists || res.ProjectName != projectName {
 		return nil, model.ErrNoSuchSession
 	}
-	return h.sessionList[sessionID], nil
+	return res, nil
 }
 
 // GetList ...
-func (h *SessionHandler) GetList(userID string) ([]*model.Session, error) {
+func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Session, error) {
 	res := []*model.Session{}
 
 	for _, s := range h.sessionList {
-		if s.UserID == userID {
+		if s.ProjectName == projectName && s.UserID == userID {
 			res = append(res, s)
 		}
 	}

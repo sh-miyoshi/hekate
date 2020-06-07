@@ -53,15 +53,15 @@ var (
 
 // UserInfoHandler ...
 type UserInfoHandler interface {
-	Add(ent *UserInfo) error
-	Delete(userID string) error
+	Add(projectName string, ent *UserInfo) error
+	Delete(projectName string, userID string) error
 	GetList(projectName string, filter *UserFilter) ([]*UserInfo, error)
-	Get(userID string) (*UserInfo, error)
-	Update(ent *UserInfo) error
+	Get(projectName string, userID string) (*UserInfo, error)
+	Update(projectName string, ent *UserInfo) error
 	DeleteAll(projectName string) error
-	AddRole(userID string, roleType RoleType, roleID string) error
-	DeleteRole(userID string, roleID string) error
-	DeleteAllCustomRole(roleID string) error
+	AddRole(projectName string, userID string, roleType RoleType, roleID string) error
+	DeleteRole(projectName string, userID string, roleID string) error
+	DeleteAllCustomRole(projectName string, roleID string) error
 }
 
 // Validate ...

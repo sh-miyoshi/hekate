@@ -19,12 +19,12 @@ type Session struct {
 
 // SessionHandler ...
 type SessionHandler interface {
-	Add(ent *Session) error
-	Delete(sessionID string) error
-	DeleteAll(userID string) error
+	Add(projectName string, ent *Session) error
+	Delete(projectName string, sessionID string) error
+	DeleteAll(projectName string, userID string) error
 	DeleteAllInProject(projectName string) error
-	Get(sessionID string) (*Session, error)
-	GetList(userID string) ([]*Session, error)
+	Get(projectName string, sessionID string) (*Session, error)
+	GetList(projectName string, userID string) ([]*Session, error)
 }
 
 var (

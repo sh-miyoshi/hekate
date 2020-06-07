@@ -84,7 +84,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 		AllowedCallbackURLs: request.AllowedCallbackURLs,
 	}
 
-	if err := db.GetInst().ClientAdd(&client); err != nil {
+	if err := db.GetInst().ClientAdd(projectName, &client); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -230,7 +230,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	client.AllowedCallbackURLs = request.AllowedCallbackURLs
 
 	// Update DB
-	if err := db.GetInst().ClientUpdate(client); err != nil {
+	if err := db.GetInst().ClientUpdate(projectName, client); err != nil {
 		if errors.Cause(err) == model.ErrClientValidateFailed {
 			logger.Info("Bad Request: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)

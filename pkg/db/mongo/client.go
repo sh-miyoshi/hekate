@@ -8,6 +8,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // ClientInfoHandler implement db.ClientInfoHandler
@@ -16,18 +17,31 @@ type ClientInfoHandler struct {
 }
 
 // NewClientHandler ...
-func NewClientHandler(dbClient *mongo.Client) *ClientInfoHandler {
+func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, error) {
 	res := &ClientInfoHandler{
 		dbClient: dbClient,
 	}
 
-	// Client has no index
+	// Create Index to Project Name and Client ID
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			"projectName": 1, // index in ascending order
+			"id":          1, // index in ascending order
+		},
+		Options: options.Index().SetUnique(true),
+	}
 
-	return res
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	col := res.dbClient.Database(databaseName).Collection(clientCollectionName)
+	_, err := col.Indexes().CreateOne(ctx, mod)
+
+	return res, err
 }
 
 // Add ...
-func (h *ClientInfoHandler) Add(ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) error {
 	v := &clientInfo{
 		ID:                  ent.ID,
 		ProjectName:         ent.ProjectName,
@@ -134,10 +148,10 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 }
 
 // Update ...
-func (h *ClientInfoHandler) Update(ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: ent.ProjectName},
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: ent.ID},
 	}
 

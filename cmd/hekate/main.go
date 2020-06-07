@@ -138,7 +138,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		}
 	}
 
-	err = db.GetInst().UserAdd(&model.UserInfo{
+	err = db.GetInst().UserAdd("master", &model.UserInfo{
 		ID:           uuid.New().String(),
 		ProjectName:  "master",
 		Name:         adminName,

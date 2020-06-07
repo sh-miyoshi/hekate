@@ -66,7 +66,7 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 
 // ReqAuthByCode ...
 func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *http.Request) (*TokenResponse, error) {
-	s, err := db.GetInst().AuthCodeSessionGetByCode(code)
+	s, err := db.GetInst().AuthCodeSessionGetByCode(project.Name, code)
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchAuthCodeSession {
 			// TODO(revoke all token in code.UserID) <- SHOULD
@@ -85,7 +85,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 	}
 
 	// Remove Authorized code
-	if err := db.GetInst().AuthCodeSessionDelete(s.SessionID); err != nil {
+	if err := db.GetInst().AuthCodeSessionDelete(project.Name, s.SessionID); err != nil {
 		return nil, errors.Wrap(err, "Failed to delete auth code")
 	}
 
@@ -124,7 +124,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	}
 
 	// Delete previous token
-	if err := db.GetInst().SessionDelete(claims.SessionID); err != nil {
+	if err := db.GetInst().SessionDelete(project.Name, claims.SessionID); err != nil {
 		return nil, errors.Wrap(err, "Failed to revoke previous token")
 	}
 
@@ -216,7 +216,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 			FromIP:      ip,
 		}
 
-		if err := db.GetInst().SessionAdd(ent); err != nil {
+		if err := db.GetInst().SessionAdd(project.Name, ent); err != nil {
 			return nil, errors.Wrap(err, "Failed to register session")
 		}
 

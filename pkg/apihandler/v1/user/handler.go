@@ -79,7 +79,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 			SystemRoles: user.SystemRoles,
 			CustomRoles: roles,
 		}
-		sessions, err := db.GetInst().SessionGetList(user.ID)
+		sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
 		if err != nil {
 			logger.Error("Failed to get session list: %+v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -142,7 +142,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		CustomRoles:  request.CustomRoles,
 	}
 
-	if err := db.GetInst().UserAdd(&user); err != nil {
+	if err := db.GetInst().UserAdd(projectName, &user); err != nil {
 		if errors.Cause(err) == model.ErrUserValidateFailed {
 			logger.Info("user validation failed: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -161,7 +161,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	roles := []CustomRole{}
 	for _, rid := range user.CustomRoles {
-		r, err := db.GetInst().CustomRoleGet(rid)
+		r, err := db.GetInst().CustomRoleGet(projectName, rid)
 		if err != nil {
 			logger.Error("Failed to get user %s custom role %s info: %+v", user.ID, r.ID, err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -200,7 +200,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Delete User
-	if err := db.GetInst().UserDelete(userID); err != nil {
+	if err := db.GetInst().UserDelete(projectName, userID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -237,7 +237,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	user, err := db.GetInst().UserGet(userID)
+	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
@@ -257,7 +257,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	roles := []CustomRole{}
 	for _, rid := range user.CustomRoles {
-		r, err := db.GetInst().CustomRoleGet(rid)
+		r, err := db.GetInst().CustomRoleGet(projectName, rid)
 		if err != nil {
 			logger.Error("Failed to get user %s custom role %s info: %+v", user.ID, r.ID, err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -277,7 +277,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		CustomRoles: roles,
 	}
 
-	sessions, err := db.GetInst().SessionGetList(user.ID)
+	sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
 	if err != nil {
 		logger.Error("Failed to get session list: %+v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -314,7 +314,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous User Info
-	user, err := db.GetInst().UserGet(userID)
+	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
@@ -339,7 +339,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	user.CustomRoles = request.CustomRoles
 
 	// Update DB
-	if err := db.GetInst().UserUpdate(user); err != nil {
+	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
 		if errors.Cause(err) == model.ErrUserValidateFailed || errors.Cause(err) == model.ErrUserAlreadyExists {
 			logger.Info("Invalid user request format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -375,7 +375,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous User Info
-	if err := db.GetInst().UserAddRole(userID, roleType, roleID); err != nil {
+	if err := db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -420,7 +420,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous User Info
-	if err := db.GetInst().UserDeleteRole(userID, roleID); err != nil {
+	if err := db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -453,7 +453,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 //   require role: <oneself>
 func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	// projectName := vars["projectName"]
+	projectName := vars["projectName"]
 	userID := vars["userID"]
 
 	// Authorize API Request
@@ -471,7 +471,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.GetInst().UserChangePassword(userID, req.Password); err != nil {
+	if err := db.GetInst().UserChangePassword(projectName, userID, req.Password); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchUser {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)

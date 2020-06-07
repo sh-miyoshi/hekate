@@ -15,15 +15,15 @@ func NewAuthCodeSessionHandler() *AuthCodeSessionHandler {
 }
 
 // Add ...
-func (h *AuthCodeSessionHandler) Add(ent *model.AuthCodeSession) error {
+func (h *AuthCodeSessionHandler) Add(projectName string, ent *model.AuthCodeSession) error {
 	h.sessionList = append(h.sessionList, ent)
 	return nil
 }
 
 // Update ...
-func (h *AuthCodeSessionHandler) Update(ent *model.AuthCodeSession) error {
+func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeSession) error {
 	for i, s := range h.sessionList {
-		if s.SessionID == ent.SessionID {
+		if s.ProjectName == projectName && s.SessionID == ent.SessionID {
 			h.sessionList[i] = ent
 			return nil
 		}
@@ -32,11 +32,11 @@ func (h *AuthCodeSessionHandler) Update(ent *model.AuthCodeSession) error {
 }
 
 // Delete ...
-func (h *AuthCodeSessionHandler) Delete(sessionID string) error {
+func (h *AuthCodeSessionHandler) Delete(projectName string, sessionID string) error {
 	newList := []*model.AuthCodeSession{}
 	ok := false
 	for _, s := range h.sessionList {
-		if s.SessionID == sessionID {
+		if s.ProjectName == projectName && s.SessionID == sessionID {
 			ok = true
 		} else {
 			newList = append(newList, s)
@@ -52,9 +52,9 @@ func (h *AuthCodeSessionHandler) Delete(sessionID string) error {
 }
 
 // GetByCode ...
-func (h *AuthCodeSessionHandler) GetByCode(code string) (*model.AuthCodeSession, error) {
+func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*model.AuthCodeSession, error) {
 	for _, s := range h.sessionList {
-		if s.Code == code {
+		if s.ProjectName == projectName && s.Code == code {
 			return s, nil
 		}
 	}
@@ -63,9 +63,9 @@ func (h *AuthCodeSessionHandler) GetByCode(code string) (*model.AuthCodeSession,
 }
 
 // Get ...
-func (h *AuthCodeSessionHandler) Get(id string) (*model.AuthCodeSession, error) {
+func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.AuthCodeSession, error) {
 	for _, s := range h.sessionList {
-		if s.SessionID == id {
+		if s.ProjectName == projectName && s.SessionID == id {
 			return s, nil
 		}
 	}
@@ -74,10 +74,12 @@ func (h *AuthCodeSessionHandler) Get(id string) (*model.AuthCodeSession, error) 
 }
 
 // DeleteAllInClient ...
-func (h *AuthCodeSessionHandler) DeleteAllInClient(clientID string) error {
+func (h *AuthCodeSessionHandler) DeleteAllInClient(projectName string, clientID string) error {
 	newList := []*model.AuthCodeSession{}
 	for _, s := range h.sessionList {
-		if s.ClientID != clientID {
+		if s.ProjectName != projectName {
+			newList = append(newList, s)
+		} else if s.ClientID != clientID {
 			newList = append(newList, s)
 		}
 	}
@@ -87,10 +89,12 @@ func (h *AuthCodeSessionHandler) DeleteAllInClient(clientID string) error {
 }
 
 // DeleteAllInUser ...
-func (h *AuthCodeSessionHandler) DeleteAllInUser(userID string) error {
+func (h *AuthCodeSessionHandler) DeleteAllInUser(projectName string, userID string) error {
 	newList := []*model.AuthCodeSession{}
 	for _, s := range h.sessionList {
-		if s.UserID != userID {
+		if s.ProjectName != projectName {
+			newList = append(newList, s)
+		} else if s.UserID != userID {
 			newList = append(newList, s)
 		}
 	}

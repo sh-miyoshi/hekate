@@ -16,7 +16,7 @@ func NewClientHandler() *ClientInfoHandler {
 }
 
 // Add ...
-func (h *ClientInfoHandler) Add(ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) error {
 	h.clientList = append(h.clientList, ent)
 	return nil
 }
@@ -65,9 +65,9 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 }
 
 // Update ...
-func (h *ClientInfoHandler) Update(ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) error {
 	for i, c := range h.clientList {
-		if c.ProjectName == ent.ProjectName && c.ID == ent.ID {
+		if c.ProjectName == projectName && c.ID == ent.ID {
 			h.clientList[i] = ent
 			return nil
 		}

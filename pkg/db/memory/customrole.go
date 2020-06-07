@@ -19,16 +19,18 @@ func NewCustomRoleHandler() *CustomRoleHandler {
 }
 
 // Add ...
-func (h *CustomRoleHandler) Add(ent *model.CustomRole) error {
+func (h *CustomRoleHandler) Add(projectName string, ent *model.CustomRole) error {
 	h.roleList[ent.ID] = ent
 	return nil
 }
 
 // Delete ...
-func (h *CustomRoleHandler) Delete(roleID string) error {
+func (h *CustomRoleHandler) Delete(projectName string, roleID string) error {
 	if _, exists := h.roleList[roleID]; exists {
-		delete(h.roleList, roleID)
-		return nil
+		if h.roleList[roleID].ProjectName == projectName {
+			delete(h.roleList, roleID)
+			return nil
+		}
 	}
 	return model.ErrNoSuchCustomRole
 }
@@ -51,9 +53,9 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 }
 
 // Get ...
-func (h *CustomRoleHandler) Get(roleID string) (*model.CustomRole, error) {
+func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.CustomRole, error) {
 	res, exists := h.roleList[roleID]
-	if !exists {
+	if !exists || res.ProjectName != projectName {
 		return nil, model.ErrNoSuchCustomRole
 	}
 
@@ -61,8 +63,8 @@ func (h *CustomRoleHandler) Get(roleID string) (*model.CustomRole, error) {
 }
 
 // Update ...
-func (h *CustomRoleHandler) Update(ent *model.CustomRole) error {
-	if _, exists := h.roleList[ent.ID]; !exists {
+func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) error {
+	if res, exists := h.roleList[ent.ID]; !exists || res.ProjectName != projectName {
 		return model.ErrNoSuchCustomRole
 	}
 

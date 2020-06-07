@@ -22,10 +22,11 @@ func NewCustomRoleHandler(dbClient *mongo.Client) (*CustomRoleHandler, error) {
 		dbClient: dbClient,
 	}
 
-	// Create Index to Project Name
+	// Create Index to Project Name and Custom Role ID
 	mod := mongo.IndexModel{
 		Keys: bson.M{
-			"id": 1, // index in ascending order
+			"projectName": 1, // index in ascending order
+			"id":          1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -40,7 +41,7 @@ func NewCustomRoleHandler(dbClient *mongo.Client) (*CustomRoleHandler, error) {
 }
 
 // Add ...
-func (h *CustomRoleHandler) Add(ent *model.CustomRole) error {
+func (h *CustomRoleHandler) Add(projectName string, ent *model.CustomRole) error {
 	v := &customRole{
 		ID:          ent.ID,
 		ProjectName: ent.ProjectName,
@@ -62,9 +63,10 @@ func (h *CustomRoleHandler) Add(ent *model.CustomRole) error {
 }
 
 // Delete ...
-func (h *CustomRoleHandler) Delete(roleID string) error {
+func (h *CustomRoleHandler) Delete(projectName string, roleID string) error {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: roleID},
 	}
 
@@ -119,9 +121,10 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 }
 
 // Get ...
-func (h *CustomRoleHandler) Get(roleID string) (*model.CustomRole, error) {
+func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.CustomRole, error) {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: roleID},
 	}
 
@@ -145,9 +148,10 @@ func (h *CustomRoleHandler) Get(roleID string) (*model.CustomRole, error) {
 }
 
 // Update ...
-func (h *CustomRoleHandler) Update(ent *model.CustomRole) error {
+func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) error {
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: ent.ID},
 	}
 

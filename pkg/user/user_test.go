@@ -15,7 +15,7 @@ func TestVerify(t *testing.T) {
 
 	// Initialize test DB
 	db.InitDBManager("memory", "")
-	db.GetInst().UserAdd(&model.UserInfo{
+	db.GetInst().UserAdd("master", &model.UserInfo{
 		ID:           uuid.New().String(),
 		ProjectName:  "master",
 		Name:         userName,
