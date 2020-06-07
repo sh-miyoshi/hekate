@@ -22,10 +22,11 @@ func NewUserHandler(dbClient *mongo.Client) (*UserInfoHandler, error) {
 		dbClient: dbClient,
 	}
 
-	// Create Index to Project Name
+	// Create Index to Project Name and User ID
 	mod := mongo.IndexModel{
 		Keys: bson.M{
-			"id": 1, // index in ascending order
+			"projectName": 1, // index in ascending order
+			"id":          1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -40,7 +41,7 @@ func NewUserHandler(dbClient *mongo.Client) (*UserInfoHandler, error) {
 }
 
 // Add ...
-func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
+func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) error {
 	usr := &userInfo{
 		ID:           ent.ID,
 		ProjectName:  ent.ProjectName,
@@ -81,9 +82,10 @@ func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
 }
 
 // Delete ...
-func (h *UserInfoHandler) Delete(userID string) error {
+func (h *UserInfoHandler) Delete(projectName string, userID string) error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -150,9 +152,10 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 }
 
 // Get ...
-func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
+func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, error) {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -179,9 +182,10 @@ func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 }
 
 // Update ...
-func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
+func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: ent.ID},
 	}
 
@@ -254,9 +258,10 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 }
 
 // AddRole ...
-func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID string) error {
+func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType model.RoleType, roleID string) error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -311,9 +316,10 @@ func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID
 }
 
 // DeleteRole ...
-func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
+func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -378,9 +384,10 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 }
 
 // DeleteAllCustomRole ...
-func (h *UserInfoHandler) DeleteAllCustomRole(roleID string) error {
+func (h *UserInfoHandler) DeleteAllCustomRole(projectName string, roleID string) error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "customRoleID", Value: roleID},
 	}
 
@@ -398,7 +405,7 @@ func (h *UserInfoHandler) DeleteAllCustomRole(roleID string) error {
 	}
 
 	for _, r := range roles {
-		h.DeleteRole(r.UserID, roleID)
+		h.DeleteRole(projectName, r.UserID, roleID)
 	}
 
 	return nil

@@ -19,16 +19,18 @@ func NewUserHandler() *UserInfoHandler {
 }
 
 // Add ...
-func (h *UserInfoHandler) Add(ent *model.UserInfo) error {
+func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) error {
 	h.userList[ent.ID] = ent
 	return nil
 }
 
 // Delete ...
-func (h *UserInfoHandler) Delete(userID string) error {
-	if _, exists := h.userList[userID]; exists {
-		delete(h.userList, userID)
-		return nil
+func (h *UserInfoHandler) Delete(projectName string, userID string) error {
+	if res, exists := h.userList[userID]; exists {
+		if res.ProjectName == projectName {
+			delete(h.userList, userID)
+			return nil
+		}
 	}
 	return model.ErrNoSuchUser
 }
@@ -51,9 +53,9 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 }
 
 // Get ...
-func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
+func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, error) {
 	res, exists := h.userList[userID]
-	if !exists {
+	if !exists || res.ProjectName != projectName {
 		return nil, model.ErrNoSuchUser
 	}
 
@@ -61,8 +63,8 @@ func (h *UserInfoHandler) Get(userID string) (*model.UserInfo, error) {
 }
 
 // Update ...
-func (h *UserInfoHandler) Update(ent *model.UserInfo) error {
-	if _, exists := h.userList[ent.ID]; !exists {
+func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) error {
+	if res, exists := h.userList[ent.ID]; !exists || res.ProjectName != projectName {
 		return model.ErrNoSuchUser
 	}
 
@@ -82,8 +84,8 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 }
 
 // AddRole ...
-func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID string) error {
-	if _, exists := h.userList[userID]; !exists {
+func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType model.RoleType, roleID string) error {
+	if res, exists := h.userList[userID]; !exists || res.ProjectName != projectName {
 		return model.ErrNoSuchUser
 	}
 
@@ -109,8 +111,8 @@ func (h *UserInfoHandler) AddRole(userID string, roleType model.RoleType, roleID
 }
 
 // DeleteRole ....
-func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
-	if _, exists := h.userList[userID]; !exists {
+func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
+	if res, exists := h.userList[userID]; !exists || res.ProjectName != projectName {
 		return model.ErrNoSuchUser
 	}
 
@@ -148,8 +150,12 @@ func (h *UserInfoHandler) DeleteRole(userID string, roleID string) error {
 }
 
 // DeleteAllCustomRole ...
-func (h *UserInfoHandler) DeleteAllCustomRole(roleID string) error {
+func (h *UserInfoHandler) DeleteAllCustomRole(projectName string, roleID string) error {
 	for id, user := range h.userList {
+		if user.ProjectName != projectName {
+			continue
+		}
+
 		deleted := false
 		roles := []string{}
 

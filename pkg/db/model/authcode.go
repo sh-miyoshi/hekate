@@ -30,12 +30,12 @@ var (
 
 // AuthCodeSessionHandler ...
 type AuthCodeSessionHandler interface {
-	Add(ent *AuthCodeSession) error
-	Update(ent *AuthCodeSession) error
-	Delete(sessionID string) error
-	GetByCode(code string) (*AuthCodeSession, error)
-	Get(sessionID string) (*AuthCodeSession, error)
-	DeleteAllInClient(clientID string) error
-	DeleteAllInUser(userID string) error
+	Add(projectName string, ent *AuthCodeSession) error
+	Update(projectName string, ent *AuthCodeSession) error
+	Delete(projectName string, sessionID string) error
+	GetByCode(projectName string, code string) (*AuthCodeSession, error)
+	Get(projectName string, sessionID string) (*AuthCodeSession, error)
+	DeleteAllInClient(projectName string, clientID string) error
+	DeleteAllInUser(projectName string, userID string) error
 	DeleteAllInProject(projectName string) error
 }

@@ -33,11 +33,11 @@ var (
 
 // CustomRoleHandler ...
 type CustomRoleHandler interface {
-	Add(ent *CustomRole) error
-	Delete(roleID string) error
-	Get(roleID string) (*CustomRole, error)
+	Add(projectName string, ent *CustomRole) error
+	Delete(projectName string, roleID string) error
+	Get(projectName string, roleID string) (*CustomRole, error)
 	GetList(projectName string, filter *CustomRoleFilter) ([]*CustomRole, error)
-	Update(ent *CustomRole) error
+	Update(projectName string, ent *CustomRole) error
 	DeleteAll(projectName string) error
 }
 

@@ -904,6 +904,57 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/session/{sessionID}':
+    get:
+      tags:
+        - session
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: sessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully get session'
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionGetResponse'
+        '404':
+          description: 'Session or Project Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    delete:
+      tags:
+        - session
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: sessionID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Deleted'
+        '404':
+          description: 'Session or Project Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
 components:
   schemas:
     ProjectCreateRequest:
@@ -1096,6 +1147,18 @@ components:
       type: object
       properties:
         name:
+          type: string
+    SessionGetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        created_at:
+          type: string
+          format: date
+        expires_in:
+          type: integer
+        from_ip:
           type: string
     TokenResponse:
       type: object

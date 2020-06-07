@@ -90,7 +90,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:   time.Now(),
 	}
 
-	if err := db.GetInst().CustomRoleAdd(&role); err != nil {
+	if err := db.GetInst().CustomRoleAdd(projectName, &role); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -133,7 +133,7 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := db.GetInst().CustomRoleDelete(roleID); err != nil {
+	if err := db.GetInst().CustomRoleDelete(projectName, roleID); err != nil {
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
@@ -166,7 +166,7 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	role, err := db.GetInst().CustomRoleGet(roleID)
+	role, err := db.GetInst().CustomRoleGet(projectName, roleID)
 	if err != nil {
 		if errors.Cause(err) == model.ErrNoSuchCustomRole || errors.Cause(err) == model.ErrCustomRoleValidateFailed {
 			logger.Info("Custom role %s is not found: %v", roleID, err)
@@ -214,7 +214,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get Previous CustomRole Info
-	role, err := db.GetInst().CustomRoleGet(roleID)
+	role, err := db.GetInst().CustomRoleGet(projectName, roleID)
 	if err != nil {
 		// TODO(check duplicate role name)
 		if errors.Cause(err) == model.ErrNoSuchProject {
@@ -234,7 +234,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	role.Name = request.Name
 
 	// Update DB
-	if err := db.GetInst().CustomRoleUpdate(role); err != nil {
+	if err := db.GetInst().CustomRoleUpdate(projectName, role); err != nil {
 		if errors.Cause(err) == model.ErrCustomRoleValidateFailed || errors.Cause(err) == model.ErrCustomRoleAlreadyExists {
 			logger.Error("Request validation failed: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)

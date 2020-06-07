@@ -22,10 +22,11 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
 		dbClient: dbClient,
 	}
 
-	// Create Index to SessionID
+	// Create Index to ProjectName and SessionID
 	mod := mongo.IndexModel{
 		Keys: bson.M{
-			"sessionID": 1, // index in ascending order
+			"projectName": 1, // index in ascending order
+			"sessionID":   1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -40,7 +41,7 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
 }
 
 // Add ...
-func (h *SessionHandler) Add(s *model.Session) error {
+func (h *SessionHandler) Add(projectName string, s *model.Session) error {
 	v := &session{
 		UserID:      s.UserID,
 		ProjectName: s.ProjectName,
@@ -64,9 +65,10 @@ func (h *SessionHandler) Add(s *model.Session) error {
 }
 
 // Delete ...
-func (h *SessionHandler) Delete(sessionID string) error {
+func (h *SessionHandler) Delete(projectName string, sessionID string) error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "sessionID", Value: sessionID},
 	}
 
@@ -81,9 +83,10 @@ func (h *SessionHandler) Delete(sessionID string) error {
 }
 
 // DeleteAll ...
-func (h *SessionHandler) DeleteAll(userID string) error {
+func (h *SessionHandler) DeleteAll(projectName string, userID string) error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "userID", Value: userID},
 	}
 
@@ -115,9 +118,10 @@ func (h *SessionHandler) DeleteAllInProject(projectName string) error {
 }
 
 // Get ...
-func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
+func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Session, error) {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "sessionID", Value: sessionID},
 	}
 
@@ -143,10 +147,11 @@ func (h *SessionHandler) Get(sessionID string) (*model.Session, error) {
 }
 
 // GetList ...
-func (h *SessionHandler) GetList(userID string) ([]*model.Session, error) {
+func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Session, error) {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "userID", Value: userID},
 	}
 

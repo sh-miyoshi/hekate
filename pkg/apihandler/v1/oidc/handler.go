@@ -270,12 +270,12 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// delete session if login failed
 	defer func() {
 		if err != nil {
-			db.GetInst().AuthCodeSessionDelete(sessionID)
+			db.GetInst().AuthCodeSessionDelete(projectName, sessionID)
 		}
 	}()
 
 	// Verify user login session code
-	s, err := oidc.VerifySession(sessionID)
+	s, err := oidc.VerifySession(projectName, sessionID)
 	if err != nil {
 		logger.Info("Failed to verify user login session: %v", err)
 		errMsg := "Request failed. internal server error occured."
@@ -295,7 +295,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Failed to authenticate user %s: %v", uname, err)
 
 			// delete old session and create new code for relogin
-			if err := db.GetInst().AuthCodeSessionDelete(sessionID); err != nil {
+			if err := db.GetInst().AuthCodeSessionDelete(projectName, sessionID); err != nil {
 				logger.Error("Failed to delete previous login session %+v", err)
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 				return
@@ -333,7 +333,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if ok := slice.Contains(s.Prompt, "consent"); ok {
 		// save user id to session info
-		if err = db.GetInst().AuthCodeSessionUpdate(s); err != nil {
+		if err = db.GetInst().AuthCodeSessionUpdate(projectName, s); err != nil {
 			logger.Error("Failed to update auth code session: %+v", err)
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
@@ -358,7 +358,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		err = errors.New("session end")
 	} else {
 		// Update auth code session info
-		if err = db.GetInst().AuthCodeSessionUpdate(s); err != nil {
+		if err = db.GetInst().AuthCodeSessionUpdate(projectName, s); err != nil {
 			logger.Error("Failed to update auth code session: %+v", err)
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
@@ -370,6 +370,9 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // ConsentHandler ...
 func ConsentHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	sel := r.FormValue("select")
 	logger.Info("Consent select: %s", sel)
 
@@ -387,7 +390,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 	switch sel {
 	case "yes":
 		sessionID := r.Form.Get("login_session_id")
-		s, err := oidc.VerifySession(sessionID)
+		s, err := oidc.VerifySession(projectName, sessionID)
 		if err != nil {
 			logger.Info("Failed to verify user login session: %v", err)
 			errMsg := "Request failed. internal server error occured."
@@ -417,6 +420,9 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 
 // UserInfoHandler ...
 func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	claims, err := jwthttp.ValidateAPIRequest(r)
 	if err != nil {
 		logger.Info("Failed to validate header: %v", err)
@@ -424,7 +430,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := db.GetInst().UserGet(claims.Subject)
+	user, err := db.GetInst().UserGet(projectName, claims.Subject)
 	if err != nil {
 		// If token validate accepted, user absolutely exists
 		logger.Error("Failed to get user: %+v", err)
@@ -444,6 +450,9 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 // RevokeHandler ...
 func RevokeHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
@@ -469,9 +478,9 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := db.GetInst().SessionDelete(claims.SessionID); err != nil {
+		if err := db.GetInst().SessionDelete(projectName, claims.SessionID); err != nil {
 			e := errors.Cause(err)
-			if e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
+			if e == model.ErrNoSuchProject || e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
 				logger.Info("Failed to revoke session: %v", err)
 				w.WriteHeader(http.StatusOK)
 			} else {

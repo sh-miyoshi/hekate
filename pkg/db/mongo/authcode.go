@@ -22,10 +22,11 @@ func NewAuthCodeSessionHandler(dbClient *mongo.Client) (*AuthCodeSessionHandler,
 		dbClient: dbClient,
 	}
 
-	// Create Index to Project Name
+	// Create Index to Project Name and Session ID
 	mod := mongo.IndexModel{
 		Keys: bson.M{
-			"sessionID": 1, // index in ascending order
+			"projectName": 1, // index in ascending order
+			"sessionID":   1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -40,7 +41,7 @@ func NewAuthCodeSessionHandler(dbClient *mongo.Client) (*AuthCodeSessionHandler,
 }
 
 // Add ...
-func (h *AuthCodeSessionHandler) Add(ent *model.AuthCodeSession) error {
+func (h *AuthCodeSessionHandler) Add(projectName string, ent *model.AuthCodeSession) error {
 	v := &authCodeSession{
 		SessionID:    ent.SessionID,
 		Code:         ent.Code,
@@ -70,10 +71,10 @@ func (h *AuthCodeSessionHandler) Add(ent *model.AuthCodeSession) error {
 }
 
 // Update ...
-func (h *AuthCodeSessionHandler) Update(ent *model.AuthCodeSession) error {
+func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeSession) error {
 	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: ent.ProjectName},
+		{Key: "projectName", Value: projectName},
 		{Key: "sessionID", Value: ent.SessionID},
 	}
 
@@ -107,9 +108,10 @@ func (h *AuthCodeSessionHandler) Update(ent *model.AuthCodeSession) error {
 }
 
 // Delete ...
-func (h *AuthCodeSessionHandler) Delete(sessionID string) error {
+func (h *AuthCodeSessionHandler) Delete(projectName string, sessionID string) error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "sessionID", Value: sessionID},
 	}
 
@@ -124,9 +126,10 @@ func (h *AuthCodeSessionHandler) Delete(sessionID string) error {
 }
 
 // GetByCode ...
-func (h *AuthCodeSessionHandler) GetByCode(code string) (*model.AuthCodeSession, error) {
+func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*model.AuthCodeSession, error) {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "code", Value: code},
 	}
 
@@ -158,9 +161,10 @@ func (h *AuthCodeSessionHandler) GetByCode(code string) (*model.AuthCodeSession,
 }
 
 // Get ...
-func (h *AuthCodeSessionHandler) Get(id string) (*model.AuthCodeSession, error) {
+func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.AuthCodeSession, error) {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "sessionID", Value: id},
 	}
 
@@ -192,9 +196,10 @@ func (h *AuthCodeSessionHandler) Get(id string) (*model.AuthCodeSession, error) 
 }
 
 // DeleteAllInClient ...
-func (h *AuthCodeSessionHandler) DeleteAllInClient(clientID string) error {
+func (h *AuthCodeSessionHandler) DeleteAllInClient(projectName string, clientID string) error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "clientID", Value: clientID},
 	}
 
@@ -209,9 +214,10 @@ func (h *AuthCodeSessionHandler) DeleteAllInClient(clientID string) error {
 }
 
 // DeleteAllInUser ...
-func (h *AuthCodeSessionHandler) DeleteAllInUser(userID string) error {
+func (h *AuthCodeSessionHandler) DeleteAllInUser(projectName string, userID string) error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
+		{Key: "projectName", Value: projectName},
 		{Key: "userID", Value: userID},
 	}
 
