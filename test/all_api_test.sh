@@ -90,6 +90,23 @@ echo "success to project update"
 test_api "$URL/project/new-project" DELETE $master_access_token
 echo "success to project delete"
 
+# Custom Role Create
+test_api_return_json "$URL/project/master/role" POST $master_access_token 'inputs/role_create.json'
+echo "success to custom role create"
+roleID=`echo $result | jq -r .id`
+
+# All Custom Role Get
+test_api "$URL/project/master/role" GET $master_access_token
+echo "success to all custom role get"
+
+# Custom Role Get
+test_api "$URL/project/master/role/$roleID" GET $master_access_token
+echo "success to custom role get"
+
+# Custom Role Update
+test_api "$URL/project/master/role/$roleID" PUT $master_access_token 'inputs/role_update.json'
+echo "success to custom role update"
+
 # User Create
 test_api_return_json "$URL/project/master/user" POST $master_access_token 'inputs/user_create.json'
 echo "success to user create"
@@ -115,6 +132,9 @@ echo "success to add user role"
 test_api "$URL/project/master/user/$userID/role/read-project" DELETE $master_access_token
 echo "success to delete user role"
 
+# Add Custom Role to User
+test_api "$URL/project/master/user/$userID/role/$roleID" POST $master_access_token
+
 # User Password Change
 ## Get User Token
 token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
@@ -131,6 +151,10 @@ echo "success to change password"
 # User Delete
 test_api "$URL/project/master/user/$userID" DELETE $master_access_token 'inputs/user_change_password.json'
 echo "success to user delete"
+
+# Custom Role Delete
+test_api "$URL/project/master/role/$roleID" DELETE $master_access_token
+echo "success to custom role delete"
 
 # Client Create
 test_api "$URL/project/master/client" POST $master_access_token 'inputs/client_create.json'
@@ -152,24 +176,3 @@ echo "success to client update"
 # Client Delete
 test_api "$URL/project/master/client/$clientID" DELETE $master_access_token
 echo "success to client delete"
-
-# Custom Role Create
-test_api_return_json "$URL/project/master/role" POST $master_access_token 'inputs/role_create.json'
-echo "success to custom role create"
-roleID=`echo $result | jq -r .id`
-
-# All Custom Role Get
-test_api "$URL/project/master/role" GET $master_access_token
-echo "success to all custom role get"
-
-# Custom Role Get
-test_api "$URL/project/master/role/$roleID" GET $master_access_token
-echo "success to custom role get"
-
-# Custom Role Update
-test_api "$URL/project/master/role/$roleID" PUT $master_access_token 'inputs/role_update.json'
-echo "success to custom role update"
-
-# Custom Role Delete
-test_api "$URL/project/master/role/$roleID" DELETE $master_access_token
-echo "success to custom role delete"
