@@ -91,7 +91,7 @@ test_api "$URL/project/new-project" DELETE $master_access_token
 echo "success to project delete"
 
 # Custom Role Create
-test_api_return_json "$URL/project/master/role" POST $master_access_token 'inputs/role_create.json'
+result=`test_api_return_json "$URL/project/master/role" POST $master_access_token 'inputs/role_create.json'`
 echo "success to custom role create"
 roleID=`echo $result | jq -r .id`
 
@@ -108,17 +108,27 @@ test_api "$URL/project/master/role/$roleID" PUT $master_access_token 'inputs/rol
 echo "success to custom role update"
 
 # User Create
-test_api_return_json "$URL/project/master/user" POST $master_access_token 'inputs/user_create.json'
+result=`test_api_return_json "$URL/project/master/user" POST $master_access_token 'inputs/user_create.json'`
 echo "success to user create"
 userID=`echo $result | jq -r .id`
+
+# Get User Token
+token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=user1" \
+  -d "password=password" \
+  -d "client_id=portal" \
+  -d 'grant_type=password'`
+user_access_token=`echo $token_info | jq -r .access_token`
 
 # All User Get
 test_api "$URL/project/master/user" GET $master_access_token
 echo "success to all user get"
 
 # User Get
-test_api "$URL/project/master/user/$userID" GET $master_access_token
+result=`test_api_return_json "$URL/project/master/user/$userID" GET $master_access_token`
 echo "success to user get"
+sessionID=`echo $result | jq -r .sessions[0]`
 
 # User Update
 test_api "$URL/project/master/user/$userID" PUT $master_access_token 'inputs/user_update.json'
@@ -136,17 +146,16 @@ echo "success to delete user role"
 test_api "$URL/project/master/user/$userID/role/$roleID" POST $master_access_token
 
 # User Password Change
-## Get User Token
-token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=new-user" \
-  -d "password=password" \
-  -d "client_id=portal" \
-  -d 'grant_type=password'`
-user_access_token=`echo $token_info | jq -r .access_token`
-## Change Password
 test_api "$URL/project/master/user/$userID/change-password" POST $user_access_token 'inputs/change-password.json'
 echo "success to change password"
+
+# Get Session
+test_api "$URL/project/master/session/$sessionID" GET $master_access_token
+echo "success to get session"
+
+# Delete Session
+test_api "$URL/project/master/session/$sessionID" DELETE $master_access_token
+echo "success to delete session"
 
 # User Delete
 test_api "$URL/project/master/user/$userID" DELETE $master_access_token 'inputs/user_change_password.json'
