@@ -480,7 +480,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err := db.GetInst().SessionDelete(projectName, claims.SessionID); err != nil {
 			e := errors.Cause(err)
-			if e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
+			if e == model.ErrNoSuchProject || e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
 				logger.Info("Failed to revoke session: %v", err)
 				w.WriteHeader(http.StatusOK)
 			} else {
