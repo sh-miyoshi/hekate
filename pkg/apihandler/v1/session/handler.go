@@ -9,16 +9,22 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/role"
 )
 
 // SessionDeleteHandler ...
-//   require role: read-project
+//   require role: write-project
 func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	sessionID := vars["sessionID"]
 
-	// TODO(RBAC)
+	// Authorize API Request
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
 
 	if err := db.GetInst().SessionDelete(projectName, sessionID); err != nil {
 		e := errors.Cause(err)
@@ -44,7 +50,12 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	sessionID := vars["sessionID"]
 
-	// TODO(RBAC)
+	// Authorize API Request
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
+		logger.Info("Failed to authorize header: %v", err)
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
 
 	s, err := db.GetInst().SessionGet(projectName, sessionID)
 	if err != nil {
