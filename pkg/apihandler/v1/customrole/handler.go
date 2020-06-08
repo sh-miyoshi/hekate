@@ -62,7 +62,7 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleCreateHandler ...
-//   require role: write-role
+//   require role: write-project
 func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -120,7 +120,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleDeleteHandler ...
-//   require role: write-role
+//   require role: write-project
 func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -153,7 +153,7 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleGetHandler ...
-//   require role: read-role
+//   require role: read-project
 func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -192,7 +192,7 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // RoleUpdateHandler ...
-//   require role: write-role
+//   require role: write-project
 func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]

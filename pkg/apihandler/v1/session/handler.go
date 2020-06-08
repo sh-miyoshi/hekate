@@ -12,10 +12,13 @@ import (
 )
 
 // SessionDeleteHandler ...
+//   require role: read-project
 func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	sessionID := vars["sessionID"]
+
+	// TODO(RBAC)
 
 	if err := db.GetInst().SessionDelete(projectName, sessionID); err != nil {
 		e := errors.Cause(err)
@@ -35,10 +38,13 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // SessionGetHandler ...
+//   require role: read-project
 func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	sessionID := vars["sessionID"]
+
+	// TODO(RBAC)
 
 	s, err := db.GetInst().SessionGet(projectName, sessionID)
 	if err != nil {

@@ -147,7 +147,7 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClientGetHandler ...
-//   require role: read-client
+//   require role: read-project
 func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -187,7 +187,7 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClientUpdateHandler ...
-//   require role: write-client
+//   require role: write-project
 func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
