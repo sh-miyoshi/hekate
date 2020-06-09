@@ -13,8 +13,8 @@ FROM ubuntu:18.04
 
 COPY --from=builder /hekate/cmd/hekate/hekate-server /bin/hekate-server
 RUN mkdir -p /etc/hekate
-COPY build/server/config.yaml /etc/hekate/config.yaml
+COPY build/server/config.yaml /etc/hekate/config/default.yaml
 COPY cmd/hekate/_data/testcerts /etc/hekate/secret
 COPY cmd/hekate/_data/login /etc/hekate/login
 
-CMD ["hekate-server", "--config", "/etc/hekate/config.yaml"]
+CMD ["hekate-server", "--config", "/etc/hekate/config/default.yaml"]
