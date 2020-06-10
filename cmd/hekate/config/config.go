@@ -30,6 +30,8 @@ func InitConfig(filePath string) (*GlobalConfig, error) {
 
 	setEnvVar("HEKATE_ADMIN_NAME", &res.AdminName)
 	setEnvVar("HEKATE_ADMIN_PASSWORD", &res.AdminPassword)
+	setEnvVar("HEKATE_DB_TYPE", &res.DB.Type)
+	setEnvVar("HEKATE_DB_CONNECT_STRING", &res.DB.ConnectionString)
 
 	return res, nil
 }
