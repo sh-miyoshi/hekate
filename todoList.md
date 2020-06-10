@@ -125,10 +125,9 @@
 ## operation enhancement
 
 - add kubernetes yaml file
-- write usage to README.md
 - add release pipeline
-  - create public docker image
   - create binary files
+- login pageの修正方法
 
 ## For production
 
