@@ -4,7 +4,7 @@
 
 ## 全体像
 
-TODO
+![イメージ図](../assets/access_ctrl_image.png)
 
 ## 前準備
 
