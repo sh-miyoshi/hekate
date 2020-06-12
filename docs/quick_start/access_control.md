@@ -74,11 +74,12 @@ docker run --name nginx -p 80:80 -d nginx
 今回はAccess Proxyとして[keycloak-gatekeeper](https://github.com/keycloak/keycloak-gatekeeper)を使用します。
 
 ```bash
+export CLIENT_SECRET="<確認したSecret>"
 # configファイルの用意
 cat << EOF > config.yaml
 client-id: sample-gw
-client-secret: <確認したSecret>
-discovery-url: http://localhost:18443/api/v1/project/master # Hekateサーバのアドレスとプロジェクトを変更した場合は適宜修正してください
+client-secret: $CLIENT_SECRET
+discovery-url: http://localhost:18443/api/v1/project/sample # Hekateサーバのアドレスとプロジェクトを変更した場合は適宜修正してください
 enable-default-deny: true
 skip-openid-provider-tls-verify: true
 encryption_key: secret

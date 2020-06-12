@@ -2,8 +2,6 @@
 
 ## server application enhancement
 
-- Consentページの追加
-  - TokenHandlerからconsent処理
 - ユーザーパスワードロック
   - Project Infoに追加
   - APIの修正
@@ -27,8 +25,6 @@
   - 証明書
   - ワンタイムパスワード
   - デバイス認証
-- PUT APIの修正
-  - フィールドがない or nullの場合は更新しない
 - SQL DBの追加
 - DBGCの追加
   - Expiredしたsessionなどを一定期間ごとに削除する
@@ -41,6 +37,8 @@
     - pkg/oidc
   - 結合テスト
 - OpenID Connect部分のエンハンス
+  - Consentページの追加
+    - TokenHandlerからconsent処理
   - AuthRequestに他のパラメータを追加
     - display
     - ui_locales
