@@ -1,6 +1,7 @@
 #!/bin/bash
 
 function ExecPortal() {
+  echo "Start Portal"
   cd /hekate/portal
   npm run build
   npm run start > portal.log 2>&1
