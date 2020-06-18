@@ -22,10 +22,9 @@ var (
 )
 
 func init() {
-	const defaultConfigDir = "./.config" // TODO(set correct path)
 	cobra.OnInitialize(initOutput)
 
-	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", defaultConfigDir, "Directory of hctl config")
+	rootCmd.PersistentFlags().StringVar(&configDir, "conf-dir", "", "Directory of hctl config")
 	rootCmd.PersistentFlags().BoolVar(&debugMode, "debug", false, "Output debug message")
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "text", "Set output format: json, text")
 
