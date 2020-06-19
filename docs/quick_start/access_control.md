@@ -18,7 +18,7 @@
 - Portal: [http://localhost:3000](http://localhost:3000)
 - Server: [http://localhost:18443](http://localhost:18443)
 
-### アクセスを制御したいサーバの準備
+### アクセスを制御したいサーバ(リソースサーバ)の準備
 
 アクセスを制御したい対象のサーバを起動します。
 この例ではnginxを使用します。
@@ -54,8 +54,8 @@ docker run --name nginx -p 80:80 -d nginx
 - 左枠のメニューからClientを選択
 - Add New Clinetボタンを押下
 - Client IDを入力し、Createボタンを押下
-  - ここではClient ID: `sample-gw`とする
-- Client一覧画面から`sample-gw`のEditボタンを押下
+  - ここではClient ID: `sample-proxy`とする
+- Client一覧画面から`sample-proxy`のEditボタンを押下
 - 表示されているSecretを記憶する
 
 ### アクセス用のロールを作成・ユーザーに付与
@@ -73,21 +73,26 @@ docker run --name nginx -p 80:80 -d nginx
 
 今回はAccess Proxyとして[keycloak-gatekeeper](https://github.com/keycloak/keycloak-gatekeeper)を使用します。
 
+#### dockerコンテナを使用する場合
+
 ```bash
 export CLIENT_SECRET="<確認したSecret>"
+export HEKATE_SERVER="http://hekate:18443"
+export RESOURCE_SERVER="http://nginx" # アクセスを制御したいサーバのアドレス
+
 # configファイルの用意
 cat << EOF > config.yaml
-client-id: sample-gw
+client-id: sample-proxy
 client-secret: $CLIENT_SECRET
-discovery-url: http://localhost:18443/api/v1/project/sample # Hekateサーバのアドレスとプロジェクトを変更した場合は適宜修正してください
+discovery-url: $HEKATE_SERVER/api/v1/project/sample # プロジェクトを変更した場合は適宜修正してください
 enable-default-deny: true
 skip-openid-provider-tls-verify: true
 encryption_key: secret
 listen: 0.0.0.0:5000
-upstream-url: http://localhost # アクセスを制御したいサーバのアドレス
+upstream-url: $RESOURCE_SERVER
 secure-cookie: false
 resources:
-  - uri: /
+  - uri: /*
     methods:
     - GET
     roles:
@@ -95,10 +100,12 @@ resources:
 EOF
 
 # keycloak-gatekeeperの起動
-docker run --name gatekeeper -p 5000:5000 -d -v $PWD:/mnt/conf \
+docker run --name gatekeeper -p 5000:5000 -d --network host -v $PWD:/mnt/conf \
   quay.io/keycloak/keycloak-gatekeeper \
-  /opt/keycloak-gatekeeper --config=/mnt/conf/config.yaml
+  --config=/mnt/conf/config.yaml
 ```
+
+#### kuberentesを使用する場合
 
 ### アクセス
 
