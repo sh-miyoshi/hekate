@@ -42,10 +42,6 @@ func initOutput() {
 		os.Exit(1)
 	}
 
-	if debugMode {
-		config.EnableDebugMode()
-	}
-
 	print.Init(debugMode)
 
 	if err := output.Init(outputFormat); err != nil {

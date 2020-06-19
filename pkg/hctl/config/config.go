@@ -10,23 +10,25 @@ import (
 
 // SystemConfig ...
 type SystemConfig struct {
-	EnableDebug    bool `yaml:"debug_mode"`
 	ServerAddr     string `yaml:"server_addr"`
 	DefaultProject string `yaml:"default_project"`
 	ClientID       string `yaml:"client_id"`
 	ClientSecret   string `yaml:"client_secret"`
+	Insecure       bool   `yaml:"insecure"`
+	RequestTimeout uint   `yaml:"timeout"`
 }
 
 var (
 	configDir string
-	sysConf SystemConfig
+	sysConf   SystemConfig
 )
 
 func setDefaultParams() {
-	sysConf.EnableDebug = false
 	sysConf.ServerAddr = "http://localhost:18443"
 	sysConf.DefaultProject = "master"
 	sysConf.ClientID = "portal"
+	sysConf.Insecure = true
+	sysConf.RequestTimeout = 10 // 10[sec]
 }
 
 // InitConfig ...
@@ -69,11 +71,6 @@ func InitConfig(confDir string) error {
 	}
 
 	return nil
-}
-
-// EnableDebugMode ...
-func EnableDebugMode() {
-	sysConf.EnableDebug = true
 }
 
 // Get ...
