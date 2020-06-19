@@ -24,7 +24,7 @@ var (
 )
 
 func setDefaultParams() {
-	sysConf.ServerAddr = "http://localhost:18443"
+	sysConf.ServerAddr = "https://localhost:18443"
 	sysConf.DefaultProject = "master"
 	sysConf.ClientID = "portal"
 	sysConf.Insecure = true

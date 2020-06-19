@@ -1,17 +1,45 @@
 package login
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
-func tokenRequest(req *http.Request) (*oidcapi.TokenResponse, error) {
-	client := &http.Client{}
+func createClient(serverName string, insecure bool, timeout time.Duration) *http.Client {
+	print.Debug("request server name: %s, insecure: %v, timeout: %v", serverName, insecure, timeout)
+	tlsConfig := tls.Config{
+		ServerName: serverName,
+	}
+
+	if insecure {
+		tlsConfig.InsecureSkipVerify = true
+	}
+
+	tr := &http.Transport{
+		Proxy:           http.ProxyFromEnvironment,
+		TLSClientConfig: &tlsConfig,
+	}
+
+	client := &http.Client{
+		Transport: tr,
+		Timeout:   timeout,
+	}
+	return client
+}
+
+func tokenRequest(req *http.Request, insecure bool, timeout uint) (*oidcapi.TokenResponse, error) {
+	print.Debug("token request to %s", req.URL.String())
+
+	client := createClient(req.Host, insecure, time.Duration(timeout)*time.Second)
 	httpRes, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to request server: %v", err)
@@ -31,12 +59,13 @@ func tokenRequest(req *http.Request) (*oidcapi.TokenResponse, error) {
 	case 500:
 		return nil, fmt.Errorf("Internal Server Error is occured\nPlease contact to your server administrator")
 	default:
-		return nil, fmt.Errorf("<Program Bug> Unexpected http response code: %d", httpRes.StatusCode)
+		b, _ := ioutil.ReadAll(httpRes.Body)
+		return nil, fmt.Errorf("<Program Bug> Unexpected http response code: %d, message: %s", httpRes.StatusCode, b)
 	}
 }
 
 // Do ...
-func Do(serverAddr string, info Info) (*oidcapi.TokenResponse, error) {
+func Do(serverAddr string, info Info, insecure bool, timeout uint) (*oidcapi.TokenResponse, error) {
 	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, info.ProjectName)
 
 	form := url.Values{}
@@ -55,11 +84,11 @@ func Do(serverAddr string, info Info) (*oidcapi.TokenResponse, error) {
 	}
 	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	return tokenRequest(httpReq)
+	return tokenRequest(httpReq, insecure, timeout)
 }
 
 // DoWithRefresh ...
-func DoWithRefresh(serverAddr string, info Info) (*oidcapi.TokenResponse, error) {
+func DoWithRefresh(serverAddr string, info Info, insecure bool, timeout uint) (*oidcapi.TokenResponse, error) {
 	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", serverAddr, info.ProjectName)
 
 	form := url.Values{}
@@ -77,5 +106,5 @@ func DoWithRefresh(serverAddr string, info Info) (*oidcapi.TokenResponse, error)
 	}
 	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	return tokenRequest(httpReq)
+	return tokenRequest(httpReq, insecure, timeout)
 }

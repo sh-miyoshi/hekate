@@ -72,7 +72,7 @@ func GetAccessToken() (string, error) {
 			RefreshToken: s.RefreshToken,
 			ClientID:     sysConf.ClientID,
 			ClientSecret: sysConf.ClientSecret,
-		})
+		}, sysConf.Insecure, sysConf.RequestTimeout)
 		if err != nil {
 			return "", err
 		}
