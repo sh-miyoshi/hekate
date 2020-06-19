@@ -10,17 +10,20 @@ import (
 
 // SystemConfig ...
 type SystemConfig struct {
-	ConfigDir      string
-	EnableDebug    bool
+	EnableDebug    bool `yaml:"debug_mode"`
 	ServerAddr     string `yaml:"server_addr"`
 	DefaultProject string `yaml:"default_project"`
 	ClientID       string `yaml:"client_id"`
 	ClientSecret   string `yaml:"client_secret"`
 }
 
-var sysConf SystemConfig
+var (
+	configDir string
+	sysConf SystemConfig
+)
 
 func setDefaultParams() {
+	sysConf.EnableDebug = false
 	sysConf.ServerAddr = "http://localhost:18443"
 	sysConf.DefaultProject = "master"
 	sysConf.ClientID = "portal"
@@ -28,17 +31,26 @@ func setDefaultParams() {
 
 // InitConfig ...
 func InitConfig(confDir string) error {
-	if confDir == "" {
+	configDir = confDir
+	if configDir == "" {
 		// set default path
 		conf, err := os.UserConfigDir()
 		if err != nil {
 			return err
 		}
-		confDir = filepath.Join(conf, "hekate")
+		configDir = filepath.Join(conf, "hekate")
+	}
+
+	// mkdir -p configDir
+	if _, err := os.Stat(configDir); err != nil {
+		err = os.MkdirAll(configDir, 0700)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Read Config File
-	fname := filepath.Join(confDir, "config.yaml")
+	fname := filepath.Join(configDir, "config.yaml")
 	buf, err := ioutil.ReadFile(fname)
 	if err != nil {
 		// if error is no such file, create file with default params
@@ -50,14 +62,11 @@ func InitConfig(confDir string) error {
 		} else {
 			return err
 		}
+	} else {
+		if err := yaml.Unmarshal(buf, &sysConf); err != nil {
+			return err
+		}
 	}
-
-	if err = yaml.Unmarshal(buf, &sysConf); err != nil {
-		return err
-	}
-
-	sysConf.ConfigDir = confDir
-	sysConf.EnableDebug = false
 
 	return nil
 }
@@ -74,6 +83,11 @@ func Get() *SystemConfig {
 
 // SaveToFile ...
 func SaveToFile() error {
-	// TODO(implement this)
-	return nil
+	fname := filepath.Join(configDir, "config.yaml")
+	data, err := yaml.Marshal(sysConf)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(fname, data, 0600)
 }

@@ -24,7 +24,7 @@ type Secret struct {
 
 // SetSecret ...
 func SetSecret(projectName string, userName string, token *oidcapi.TokenResponse) {
-	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
+	secretFile := filepath.Join(configDir, "secret")
 
 	v := Secret{
 		ProjectName:             projectName,
@@ -42,7 +42,7 @@ func SetSecret(projectName string, userName string, token *oidcapi.TokenResponse
 // GetSecret ...
 func GetSecret() (*Secret, error) {
 	// Get Secret Info
-	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
+	secretFile := filepath.Join(configDir, "secret")
 	buf, err := ioutil.ReadFile(secretFile)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read secret file: %v\nYou need to `hctl login` at first", err)
@@ -85,6 +85,6 @@ func GetAccessToken() (string, error) {
 
 // RemoveSecretFile ...
 func RemoveSecretFile() error {
-	secretFile := filepath.Join(sysConf.ConfigDir, "secret")
+	secretFile := filepath.Join(configDir, "secret")
 	return os.Remove(secretFile)
 }
