@@ -23,8 +23,8 @@ var deleteClientCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
-
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 		if err := handler.ClientDelete(projectName, id); err != nil {
 			print.Fatal("Failed to delete the client %s to %s: %v", id, projectName, err)
 		}

@@ -15,17 +15,13 @@ type Handler struct {
 }
 
 // NewHandler ...
-func NewHandler(serverAddr string, accessToken string) *Handler {
+func NewHandler(serverAddr string, accessToken string, insecure bool, timeout uint) *Handler {
 	h := &Handler{
 		serverAddr:  serverAddr,
 		accessToken: accessToken,
 	}
 
-	// TODO(set correct params)
-	insecure := true
-	timeout := time.Duration(10 * time.Second)
-
-	h.client = createClient(serverAddr, insecure, timeout)
+	h.client = createClient(serverAddr, insecure, time.Duration(timeout)*time.Second)
 
 	return h
 }

@@ -68,7 +68,8 @@ var addUserCmd = &cobra.Command{
 			req.SystemRoles, _ = cmd.Flags().GetStringSlice("systemRoles")
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 
 		res, err := handler.UserAdd(projectName, req)
 		if err != nil {

@@ -22,7 +22,8 @@ var deleteProjectCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 		if err := handler.ProjectDelete(projectName); err != nil {
 			print.Fatal("Failed to delete project %s: %v", projectName, err)
 		}

@@ -25,7 +25,8 @@ var addRoleCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 
 		req := &roleapi.CustomRoleCreateRequest{
 			Name: roleName,

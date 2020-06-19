@@ -49,7 +49,8 @@ var addRoleCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 		if err := handler.UserRoleAdd(projectName, userName, roleName, roleType); err != nil {
 			print.Fatal("Failed to add role %s to user %s in %s: %v", roleName, userName, projectName, err)
 		}

@@ -23,7 +23,8 @@ var deleteUserCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 		if err := handler.UserDelete(projectName, userName); err != nil {
 			print.Fatal("Failed to delete user %s: %v", userName, err)
 		}

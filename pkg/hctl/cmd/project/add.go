@@ -47,7 +47,8 @@ var addProjectCmd = &cobra.Command{
 			}
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 		res, err := handler.ProjectAdd(req)
 		if err != nil {
 			print.Fatal("Failed to add project %s: %v", project.Name, err)

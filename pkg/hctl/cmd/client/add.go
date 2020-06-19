@@ -64,8 +64,8 @@ var addClientCmd = &cobra.Command{
 			req.AllowedCallbackURLs, _ = cmd.Flags().GetStringSlice("callbacks")
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
-
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 		res, err := handler.ClientAdd(projectName, req)
 		if err != nil {
 			print.Fatal("Failed to add new client %s to %s: %v", req.ID, projectName, err)

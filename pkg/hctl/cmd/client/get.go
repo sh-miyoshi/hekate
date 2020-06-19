@@ -24,7 +24,8 @@ var getClientCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		handler := apiclient.NewHandler(config.Get().ServerAddr, token)
+		c := config.Get()
+		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 
 		if clientID != "" {
 			res, err := handler.ClientGet(projectName, clientID)
