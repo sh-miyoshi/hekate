@@ -10,6 +10,7 @@ import (
 
 	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/login"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 // Secret ...
@@ -86,5 +87,6 @@ func GetAccessToken() (string, error) {
 // RemoveSecretFile ...
 func RemoveSecretFile() error {
 	secretFile := filepath.Join(configDir, "secret")
+	print.Debug("Removing secret file: %s", secretFile)
 	return os.Remove(secretFile)
 }

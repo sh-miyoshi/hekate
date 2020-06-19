@@ -46,6 +46,8 @@ func initOutput() {
 		config.EnableDebugMode()
 	}
 
+	print.Init(debugMode)
+
 	if err := output.Init(outputFormat); err != nil {
 		print.Error("Failed to set output option: %v\n", err)
 		os.Exit(1)

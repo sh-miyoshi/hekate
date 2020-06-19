@@ -3,13 +3,20 @@ package print
 import (
 	"fmt"
 	"os"
-
-	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 )
+
+var (
+	debugMode = false
+)
+
+// Init ...
+func Init(debug bool) {
+	debugMode = debug
+}
 
 // Debug method output debug message is run as debug mode
 func Debug(format string, a ...interface{}) {
-	if config.Get().EnableDebug {
+	if debugMode {
 		msg := fmt.Sprintf(format, a...)
 		fmt.Printf("%s\n", msg)
 	}
