@@ -3,8 +3,8 @@
 function ExecPortal() {
   echo "Start Portal"
   cd /hekate/portal
-  npm run build
-  npm run start > portal.log 2>&1
+  npm run build > portal.log 2>&1
+  npm run start >> portal.log 2>&1
 }
 
 if [ "x$SERVER_ADDR" = "x" ]; then
