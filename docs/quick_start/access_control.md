@@ -77,8 +77,8 @@ docker run --name nginx -p 80:80 -d nginx
 
 ```bash
 export CLIENT_SECRET="<確認したSecret>"
-export HEKATE_SERVER="http://hekate:18443"
-export RESOURCE_SERVER="http://nginx" # アクセスを制御したいサーバのアドレス
+export HEKATE_SERVER="http://localhost:18443"
+export RESOURCE_SERVER="http://localhost" # アクセスを制御したいサーバのアドレス
 
 # configファイルの用意
 cat << EOF > config.yaml
@@ -100,7 +100,7 @@ resources:
 EOF
 
 # keycloak-gatekeeperの起動
-docker run --name gatekeeper -p 5000:5000 -d --network host -v $PWD:/mnt/conf \
+docker run --name gatekeeper -d --network host -v $PWD:/mnt/conf \
   quay.io/keycloak/keycloak-gatekeeper \
   --config=/mnt/conf/config.yaml
 ```
@@ -110,6 +110,8 @@ docker run --name gatekeeper -p 5000:5000 -d --network host -v $PWD:/mnt/conf \
 ### アクセス
 
 ブラウザから[http://localhost:5000](http://localhost:5000)にアクセス
+
+TODO(dockerを使用している際にkeycloak-gatekeeperにアクセスできないとき)
 TODO
 
 ### 後始末

@@ -85,11 +85,6 @@
 
 ## CLI tool(hctl) enhancement
 
-- いろいろ修正が必要
-- configファイルの扱い
-  - `no such file or directory`のとき、新規作成
-  - permission: 0700, 0600
-  - デフォルト値(localhost:18443, master)
 - 各APIへの対応
   - project
     - create
@@ -109,7 +104,6 @@
   - error出力の方法
   - debug出力
   - error messageの内容
-- default config pathの修正
 - configコマンドの作成・修正
 - Production向け実行ファイルの作成
 - support authorization code flow
