@@ -78,6 +78,11 @@ func Get() *SystemConfig {
 	return &sysConf
 }
 
+// Set ...
+func Set(conf *SystemConfig) {
+	sysConf = *conf
+}
+
 // SaveToFile ...
 func SaveToFile() error {
 	fname := filepath.Join(configDir, "config.yaml")

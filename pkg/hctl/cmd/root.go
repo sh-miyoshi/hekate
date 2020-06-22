@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/client"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/login"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/logout"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/project"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/role"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/user"
-	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
+	globalconfig "github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
@@ -34,10 +35,11 @@ func init() {
 	rootCmd.AddCommand(user.GetCommand())
 	rootCmd.AddCommand(client.GetCommand())
 	rootCmd.AddCommand(role.GetCommand())
+	rootCmd.AddCommand(config.GetCommand())
 }
 
 func initOutput() {
-	if err := config.InitConfig(configDir); err != nil {
+	if err := globalconfig.InitConfig(configDir); err != nil {
 		print.Error("Failed to initialize config: %v\n", err)
 		os.Exit(1)
 	}
