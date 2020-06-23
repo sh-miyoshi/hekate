@@ -24,7 +24,9 @@ go build
 # config
 ## set
 test_command config set --server $SERVER_ADDR --project master --timeout 10
-## TODO(get)
+
+## get
+test_command config get
 
 # login
 test_command login --project master --name admin --password password
