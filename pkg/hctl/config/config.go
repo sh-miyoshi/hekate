@@ -10,12 +10,12 @@ import (
 
 // SystemConfig ...
 type SystemConfig struct {
-	ServerAddr     string `yaml:"server_addr"`
-	DefaultProject string `yaml:"default_project"`
-	ClientID       string `yaml:"client_id"`
-	ClientSecret   string `yaml:"client_secret"`
-	Insecure       bool   `yaml:"insecure"`
-	RequestTimeout uint   `yaml:"timeout"`
+	ServerAddr     string `yaml:"server_addr" json:"server_addr"`
+	DefaultProject string `yaml:"default_project" json:"default_project"`
+	ClientID       string `yaml:"client_id" json:"client_id"`
+	ClientSecret   string `yaml:"client_secret" json:"client_secret"`
+	Insecure       bool   `yaml:"insecure" json:"insecure"`
+	RequestTimeout uint   `yaml:"timeout" json:"timeout"`
 }
 
 var (
