@@ -87,13 +87,11 @@
 
 - 各APIへの対応
   - project
-    - create
-      - Allow Grant Typeへの対応
     - update
   - user
     - update
-    - role delete
     - session revoke
+    - password change
   - client
     - update
   - customrole
@@ -104,7 +102,6 @@
   - error出力の方法
   - debug出力
   - error messageの内容
-- configコマンドの作成・修正
 - Production向け実行ファイルの作成
 - support authorization code flow
 
