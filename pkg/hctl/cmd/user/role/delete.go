@@ -23,8 +23,8 @@ func init() {
 
 var deleteRoleCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete rol from the user",
-	Long:  "Delete rol from the user",
+	Short: "Delete role from the user",
+	Long:  "Delete role from the user",
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName, _ := cmd.Flags().GetString("project")
 		userName, _ := cmd.Flags().GetString("user")

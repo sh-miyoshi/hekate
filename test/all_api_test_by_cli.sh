@@ -62,7 +62,7 @@ test_command user get --project master --name user1
 test_command user role add --project master --user user1 --role read-project
 
 ## delete user role
-test_command user role delete --project master --user user1 --role read-prooject
+test_command user role delete --project master --user user1 --role read-project
 
 ## TODO(password change)
 
