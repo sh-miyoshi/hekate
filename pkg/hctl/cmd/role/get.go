@@ -9,6 +9,7 @@ var getRoleCmd = &cobra.Command{
 	Short: "Get Roles in the cluster",
 	Long:  "Get Roles in the cluster",
 	Run: func(cmd *cobra.Command, args []string) {
+		// TODO(implement this)
 	},
 }
 

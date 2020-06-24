@@ -48,5 +48,5 @@ var getProjectCmd = &cobra.Command{
 }
 
 func init() {
-	getProjectCmd.Flags().StringP("name", "n", "", "name of new project")
+	getProjectCmd.Flags().StringP("name", "n", "", "name of project")
 }

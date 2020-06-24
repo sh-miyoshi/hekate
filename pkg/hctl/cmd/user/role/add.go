@@ -13,8 +13,8 @@ import (
 
 func init() {
 	addRoleCmd.Flags().String("project", "", "[Required] name of the project to which the user belongs")
-	addRoleCmd.Flags().String("user", "", "name of user")
-	addRoleCmd.Flags().StringP("role", "r", "", "role name to add to the user")
+	addRoleCmd.Flags().String("user", "", "[Required] name of user")
+	addRoleCmd.Flags().StringP("role", "r", "", "[Required] role name to add to the user")
 	addRoleCmd.Flags().String("type", "system", "role type (system or custom)")
 
 	addRoleCmd.MarkFlagRequired("project")

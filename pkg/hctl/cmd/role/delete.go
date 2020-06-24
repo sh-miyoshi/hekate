@@ -9,6 +9,7 @@ var deleteRoleCmd = &cobra.Command{
 	Short: "Delete Role",
 	Long:  "Delete role from the project",
 	Run: func(cmd *cobra.Command, args []string) {
+		// TODO(implement this)
 	},
 }
 

@@ -12,8 +12,8 @@ import (
 
 func init() {
 	deleteRoleCmd.Flags().String("project", "", "[Required] name of the project to which the user belongs")
-	deleteRoleCmd.Flags().String("user", "", "name of user")
-	deleteRoleCmd.Flags().StringP("role", "r", "", "role name to add to the user")
+	deleteRoleCmd.Flags().String("user", "", "[Required] name of user")
+	deleteRoleCmd.Flags().StringP("role", "r", "", "[Required] role name to add to the user")
 	deleteRoleCmd.Flags().String("type", "system", "role type (system or custom)")
 
 	deleteRoleCmd.MarkFlagRequired("project")
