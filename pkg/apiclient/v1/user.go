@@ -163,3 +163,53 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
+
+// UserRoleDelete ...
+func (h *Handler) UserRoleDelete(projectName string, userName string, roleName string, roleType model.RoleType) error {
+	user, err := h.UserGetList(projectName, userName)
+	if err != nil {
+		return err
+	}
+	if len(user) != 1 {
+		if len(user) == 0 {
+			return fmt.Errorf("No such user")
+		}
+		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
+	}
+
+	roleID := roleName
+	if roleType == model.RoleCustom {
+		role, err := h.RoleGetList(projectName, roleName)
+		if err != nil {
+			return err
+		}
+		if len(role) != 1 {
+			if len(role) == 0 {
+				return fmt.Errorf("No such role")
+			}
+			return fmt.Errorf("Unexpect the number of role %s, expect 1, but got %d", roleName, len(role))
+		}
+
+		roleID = role[0].ID
+	}
+
+	userID := user[0].ID
+	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
+	httpReq, err := http.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return err
+	}
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 200:
+		return nil
+	}
+	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+}

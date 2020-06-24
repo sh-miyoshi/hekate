@@ -7,6 +7,7 @@ import (
 
 func init() {
 	roleCmd.AddCommand(addRoleCmd)
+	roleCmd.AddCommand(deleteRoleCmd)
 }
 
 var roleCmd = &cobra.Command{
