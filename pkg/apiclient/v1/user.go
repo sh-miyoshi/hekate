@@ -213,3 +213,43 @@ func (h *Handler) UserRoleDelete(projectName string, userName string, roleName s
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
+
+// UserChangePassword ...
+func (h *Handler) UserChangePassword(projectName string, userName string, newPassword string) error {
+	user, err := h.UserGetList(projectName, userName)
+	if err != nil {
+		return err
+	}
+	if len(user) != 1 {
+		if len(user) == 0 {
+			return fmt.Errorf("No such user")
+		}
+		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
+	}
+
+	userID := user[0].ID
+	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s/change-password", h.serverAddr, projectName, userID)
+
+	body, _ := json.Marshal(&userapi.UserChangePasswordRequest{
+		Password: newPassword,
+	})
+
+	httpReq, err := http.NewRequest("POST", u, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	httpReq.Header.Add("Content-Type", "application/json")
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 200:
+		return nil
+	}
+	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+}
