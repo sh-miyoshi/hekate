@@ -96,7 +96,8 @@ test_command role get --project master --name viewer
 
 ## TODO(update)
 
-## TODO(delete)
+## delete
+test_command role delete --project master --name viewer
 
 # logout
 test_command logout
