@@ -88,9 +88,11 @@ test_command client delete --project master --id oidc-client
 ## create
 test_command role add --project master --name viewer
 
-## TODO(get all)
+## get all
+test_command role get --project master
 
-## TODO(get)
+## get
+test_command role get --project master --name viewer
 
 ## TODO(update)
 
