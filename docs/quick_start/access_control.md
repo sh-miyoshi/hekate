@@ -57,6 +57,8 @@ docker run --name nginx -p 80:80 -d nginx
   - ここではClient ID: `sample-proxy`とする
 - Client一覧画面から`sample-proxy`のEditボタンを押下
 - 表示されているSecretを記憶する
+- Allowed Callback URLにcallback URLを設定する
+  - 後述のkeycloak gatekeeperを使用する場合は`http://localhost:5000/oauth/callback`を設定
 
 ### アクセス用のロールを作成・ユーザーに付与
 
@@ -107,12 +109,13 @@ docker run --name gatekeeper -d --network host -v $PWD:/mnt/conf \
 
 #### kuberentesを使用する場合
 
+TODO
+
 ### アクセス
 
-ブラウザから[http://localhost:5000](http://localhost:5000)にアクセス
-
-TODO(dockerを使用している際にkeycloak-gatekeeperにアクセスできないとき)
-TODO
+ブラウザから[http://localhost:5000](http://localhost:5000)にアクセスする。
+Access Tokenがない状態でアクセスするとhekateの認証画面にリダイレクトされるので、作成したユーザーの名前とパスワードを入力すると、リソースサーバーの画面が見える。
+また、hello-access roleを持たないユーザー(例えばmaster projectのadminなど)のAccess Tokenでアクセスすると空くkセスが拒否される。
 
 ### 後始末
 
