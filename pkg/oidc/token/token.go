@@ -48,8 +48,6 @@ func signToken(projectName string, claims jwt.Claims) (string, error) {
 
 // GenerateAccessToken ...
 func GenerateAccessToken(audiences []string, request Request) (string, error) {
-	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
-
 	user, err := db.GetInst().UserGet(request.ProjectName, request.UserID)
 	if err != nil {
 		return "", errors.Wrap(err, "Failed to get user")
@@ -91,8 +89,6 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 
 // GenerateRefreshToken ...
 func GenerateRefreshToken(sessionID string, audiences []string, request Request) (string, error) {
-	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
-
 	now := time.Now()
 	claims := &RefreshTokenClaims{
 		jwt.StandardClaims{
@@ -113,8 +109,6 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 
 // GenerateIDToken ...
 func GenerateIDToken(audiences []string, request Request) (string, error) {
-	// TODO(use Audience in jwt.StandardClaims after merging PR(https://github.com/dgrijalva/jwt-go/pull/355))
-
 	now := time.Now()
 	claims := &IDTokenClaims{
 		jwt.StandardClaims{
