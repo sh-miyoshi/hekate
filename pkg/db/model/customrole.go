@@ -17,7 +17,6 @@ type CustomRole struct {
 // CustomRoleFilter ...
 type CustomRoleFilter struct {
 	Name string
-	// TODO(CreatedAt)
 }
 
 var (

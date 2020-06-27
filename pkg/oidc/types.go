@@ -110,6 +110,8 @@ func (r *AuthRequest) Validate() error {
 		return errors.Wrap(ErrInvalidRequest, err.Error())
 	}
 
+	// TODO(check scope)
+
 	// Check Response Type
 	supportedTypes := GetSupportedResponseType()
 	if err := validateResponseType(r.ResponseType, supportedTypes); err != nil {
@@ -125,8 +127,6 @@ func (r *AuthRequest) Validate() error {
 	if err := validateResponseMode(r.ResponseMode); err != nil {
 		return errors.Wrapf(err, "Failed to validate response mode %s", r.ResponseMode)
 	}
-
-	// TODO(add more validation)
 
 	return nil
 }
