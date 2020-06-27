@@ -1,5 +1,11 @@
 # TODO List
 
+## For production
+
+- 初期allowed callback urlの初期化
+- Benchmark
+- portalのhttps化
+
 ## server application enhancement
 
 - ユーザーパスワードロック
@@ -116,9 +122,4 @@
 - add kubernetes yaml file
 - add release pipeline
   - create binary files
-- login pageの修正方法
-
-## For production
-
-- 初期allowed callback urlの初期化
-- Benchmark
+- login pageの修正方法のドキュメント
