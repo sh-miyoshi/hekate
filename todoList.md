@@ -121,5 +121,4 @@
 ## For production
 
 - 初期allowed callback urlの初期化
-- CLIのinsecure, timeoutの設定見直し
 - Benchmark

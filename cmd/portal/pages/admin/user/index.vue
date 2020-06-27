@@ -45,7 +45,9 @@
         </tbody>
       </table>
 
-      <!-- TODO show error -->
+      <div v-if="error" class="alert alert-danger">
+        {{ error }}
+      </div>
 
       <button class="btn btn-primary" @click="$router.push('/admin/user/new')">
         Add New User
