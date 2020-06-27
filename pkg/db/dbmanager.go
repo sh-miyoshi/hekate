@@ -134,9 +134,7 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 			return errors.Wrap(err, "Failed to add project")
 		}
 
-		callbacks := []string{
-			"http://localhost:3000/callback", // TODO(for debug)
-		}
+		callbacks := []string{}
 		if os.Getenv("HEKATE_PORTAL_ADDR") != "" {
 			addr := os.Getenv("HEKATE_PORTAL_ADDR") + "/callback"
 			callbacks = append(callbacks, addr)
