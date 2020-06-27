@@ -133,7 +133,6 @@ paths:
           in: query
           schema:
             type: string
-        # TODO(set other params)
       responses:
         '200':
           description: "Show login page or error page"
@@ -172,7 +171,6 @@ paths:
           in: query
           schema:
             type: string
-        # TODO(set other params)
       responses:
         '200':
           description: "Show login page or error page"

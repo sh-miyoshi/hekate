@@ -37,7 +37,7 @@ OpenID Connectのことを知らなくても簡単に認証・認可を行える
   - [http://localhost:3000](http://localhost:3000)へアクセス
 
 - コンポーネントごとにインストール
-  - TODO
+  - Kubernetesを使用してインストール: [docs/install/kubernetes.md](docs/install/kubernetes.md)
 
 ## Hekateでできること
 
@@ -47,7 +47,7 @@ OpenID Connectのことを知らなくても簡単に認証・認可を行える
   - 3 minutes Quick Start: [docs/quick_start/access_control.md](docs/quick_start/access_control.md)
 - ユーザー管理
   - Hekateの認証機能と組み合わせて、自身のアプリケーションにおけるユーザーの新規追加・ログイン処理を簡単に実装できます
-  - TODO(Quick Start)
+  - 3 minutes Quick Start: [docs/quick_start/user_manage.md](docs/quick_start/user_manage.md)
 
 ## 開発環境
 
