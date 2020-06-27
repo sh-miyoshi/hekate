@@ -216,7 +216,6 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous CustomRole Info
 	role, err := db.GetInst().CustomRoleGet(projectName, roleID)
 	if err != nil {
-		// TODO(check duplicate role name)
 		if errors.Cause(err) == model.ErrNoSuchProject {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)

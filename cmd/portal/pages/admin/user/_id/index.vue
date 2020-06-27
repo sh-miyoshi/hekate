@@ -291,7 +291,7 @@ export default {
 
       // load sessions when open dropdown
       if (this.showLoginSessions) {
-        // TODO
+        // TODO(implement this)
       }
     }
   }
