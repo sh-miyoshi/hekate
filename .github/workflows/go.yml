@@ -47,6 +47,7 @@ jobs:
     - name: OIDC Test
       run: |
         cd test/oidc
+        ./register_callback.sh
         cd authorization_code_flow
         go run main.go
         cd ../implicit_flow
