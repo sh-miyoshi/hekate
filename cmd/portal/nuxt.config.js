@@ -1,3 +1,6 @@
+// import path from 'path'
+// import fs from 'fs'
+
 export default {
   mode: 'spa',
   /*
@@ -80,7 +83,14 @@ export default {
 
   server: {
     host: '0.0.0.0',
-    port: process.env.HEKATE_PORTAL_PORT
+    port: process.env.HEKATE_PORTAL_PORT,
+
+    // set this param if run as https
+    // also set process.env.https: true
+    // https: {
+    //   key: fs.readFileSync(path.resolve(__dirname, 'assets/testcerts/tls.key')),
+    //   cert: fs.readFileSync(path.resolve(__dirname, 'assets/testcerts/tls.crt'))
+    // }
   },
 
   env: {
@@ -88,7 +98,7 @@ export default {
       process.env.HEKATE_SERVER_ADDR || 'http://localhost:18443',
     HEKATE_PORTAL_HOST: process.env.HEKATE_PORTAL_HOST || 'localhost',
     HEKATE_PORTAL_PORT: process.env.HEKATE_PORTAL_PORT || '3000',
-    // https: {}, // set this param if run as https
+    https: false,
     SYSTEM_ROLES: [
       'read-cluster',
       'write-cluster',
