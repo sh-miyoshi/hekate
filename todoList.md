@@ -1,10 +1,5 @@
 # TODO List
 
-## For production
-
-- Benchmark
-- portalのhttps化
-
 ## server application enhancement
 
 - ユーザーパスワードロック
@@ -120,3 +115,4 @@
 - add release pipeline
   - create binary files
 - login pageの修正方法のドキュメント
+- Benchmark
