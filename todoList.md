@@ -2,7 +2,6 @@
 
 ## For production
 
-- 初期allowed callback urlの初期化
 - Benchmark
 - portalのhttps化
 
@@ -101,8 +100,6 @@
   - client
     - update
   - customrole
-    - get
-    - delete
     - update
 - outputの修正
   - error出力の方法
