@@ -5,6 +5,7 @@ build-docker:
 run-windows:
 	cd cmd/hekate && \
 	go build && \
+	${env}:HEKATE_PORTAL_ADDR = "http://localhost:3000" && \
 	start hekate.exe
 	cd cmd/portal && \
 	npm run dev
