@@ -181,8 +181,18 @@ export default {
     deleteUserConfirm() {
       this.$refs['confirm-delete-user'].show()
     },
-    deleteUser() {
-      // TODO(implement this)
+    async deleteUser() {
+      console.log('delete user id: ' + this.$route.params.id)
+      const res = await this.$api.UserDelete(
+        this.$store.state.current_project,
+        this.$route.params.id
+      )
+      if (!res.ok) {
+        this.error = res.message
+        return
+      }
+      alert('Successfully delete user')
+      this.$router.push('/admin/user')
     },
     async updateUser() {
       if (!this.user) {
