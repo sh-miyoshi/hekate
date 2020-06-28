@@ -4,8 +4,8 @@ server_port: 18443
 server_bind_address: "0.0.0.0"
 https:
   enabled: true
-  cert-file: "/hekate/server/secret/tls.crt"
-  key-file: "/hekate/server/secret/tls.key"
+  cert-file: "/hekate/secret/tls.crt"
+  key-file: "/hekate/secret/tls.key"
 db:
   type: "memory"
   connection_string: ""

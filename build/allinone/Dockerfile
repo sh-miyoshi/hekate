@@ -22,14 +22,15 @@ FROM ubuntu:18.04
 RUN apt update -y && apt install -y nodejs npm
 WORKDIR /hekate
 RUN mkdir -p server && mkdir -p portal
+COPY cmd/hekate/_data/testcerts /hekate/secret
 
 COPY --from=server-builder /hekate/cmd/hekate/hekate-server /hekate/server/hekate-server
 COPY build/allinone/config.yaml /hekate/server/config.yaml
-COPY cmd/hekate/_data/testcerts /hekate/server/secret
 COPY cmd/hekate/_data/login /hekate/server/login
 
 COPY ./cmd/portal /hekate/portal/
 COPY --from=front-builder /hekate/cmd/portal/node_modules /hekate/portal/node_modules
+COPY nuxt.config.js /hekate/portal/nuxt.config.js
 
 COPY build/allinone/run.sh .
 
