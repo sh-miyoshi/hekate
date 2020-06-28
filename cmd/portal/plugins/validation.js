@@ -23,6 +23,13 @@ export function ValidateClientID(id) {
 }
 
 export function ValidateRoleName(name) {
-  // TODO(add validation)
+  if (typeof name !== 'string') {
+    return { ok: false, message: 'Invalid name type.' }
+  }
+
+  if (name.length < 3 || name.length >= 64) {
+    return { ok: false, message: 'The length of name must be 3 to 63.' }
+  }
+
   return { ok: true, message: '' }
 }
