@@ -22,9 +22,6 @@
     - resource-type: 以下のいずれか
       - cluster
       - project
-      - role
-      - user
-      - client
     - operate-type: 以下のいずれか
       - read
       - write
