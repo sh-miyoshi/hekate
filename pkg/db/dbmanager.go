@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/memory"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
@@ -137,7 +138,11 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) error {
 		callbacks := []string{}
 		if os.Getenv("HEKATE_PORTAL_ADDR") != "" {
 			addr := os.Getenv("HEKATE_PORTAL_ADDR") + "/callback"
+			if !govalidator.IsRequestURL(addr) {
+				return errors.Wrapf(model.ErrProjectValidateFailed, "Invalid portal callback URL %s is specified.", addr)
+			}
 			callbacks = append(callbacks, addr)
+			logger.Info("Set portal callback URL: %s", addr)
 		}
 		// add client for portal login
 		clientEnt := &model.ClientInfo{
