@@ -49,6 +49,12 @@ OpenID Connectのことを知らなくても簡単に認証・認可を行える
   - Hekateの認証機能と組み合わせて、自身のアプリケーションにおけるユーザーの新規追加・ログイン処理を簡単に実装できます
   - 3 minutes Quick Start: [docs/quick_start/user_manage.md](docs/quick_start/user_manage.md)
 
+## ログインページのカスタム
+
+hekateではユーザー認証の際、server上のログイン画面を表示します。  
+このログイン画面をカスタマイズし任意の画面を設定できます。  
+詳細は[こちら](docs/login_page.md)
+
 ## 開発環境
 
 - golang v1.12以上
