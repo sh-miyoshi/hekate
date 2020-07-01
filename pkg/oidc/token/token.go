@@ -110,6 +110,11 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 // GenerateIDToken ...
 func GenerateIDToken(audiences []string, request Request) (string, error) {
 	now := time.Now()
+	authTime := request.MaxAge
+	if authTime == nil {
+		*authTime = 0
+	}
+
 	claims := &IDTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
@@ -121,7 +126,7 @@ func GenerateIDToken(audiences []string, request Request) (string, error) {
 		},
 		audiences,
 		request.Nonce,
-		request.MaxAge,
+		authTime,
 	}
 
 	return signToken(request.ProjectName, claims)
