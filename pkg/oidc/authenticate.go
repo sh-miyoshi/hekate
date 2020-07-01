@@ -224,10 +224,10 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	if opt.genIDToken {
 		lifeSpan := project.TokenConfig.AccessTokenLifeSpan
-		var maxAge *uint
+		maxAge := project.TokenConfig.AccessTokenLifeSpan
 		if opt.maxAge > 0 {
 			lifeSpan = opt.maxAge
-			maxAge = &opt.maxAge
+			maxAge = opt.maxAge
 		}
 
 		idTokenReq := token.Request{

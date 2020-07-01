@@ -13,7 +13,7 @@ type Request struct {
 	ProjectName string
 	UserID      string
 	Nonce       string
-	MaxAge      *uint
+	MaxAge      uint
 }
 
 // RoleValue ...
@@ -52,7 +52,7 @@ type IDTokenClaims struct {
 
 	Audience []string `json:"aud"`
 	Nonce    string   `json:"nonce"`
-	AuthTime *uint    `json:"auth_time"`
+	AuthTime uint     `json:"auth_time"`
 	// TODO(acr, amr, azp)
 	// ref. https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#IDToken
 }

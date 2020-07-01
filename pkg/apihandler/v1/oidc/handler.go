@@ -567,7 +567,7 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 				ProjectName: session.ProjectName,
 				UserID:      session.UserID,
 				Nonce:       session.Nonce,
-				MaxAge:      &session.MaxAge,
+				MaxAge:      session.MaxAge,
 			}
 			tkn, err := token.GenerateIDToken(audiences, tokenReq)
 			if err != nil {
