@@ -121,7 +121,7 @@ func GenerateIDToken(audiences []string, request Request) (string, error) {
 		},
 		audiences,
 		request.Nonce,
-		request.MaxAge,
+		request.EndUserAuthTime.Unix(),
 	}
 
 	return signToken(request.ProjectName, claims)

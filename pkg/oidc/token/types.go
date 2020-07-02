@@ -8,12 +8,12 @@ import (
 
 // Request ...
 type Request struct {
-	Issuer      string
-	ExpiredTime time.Duration
-	ProjectName string
-	UserID      string
-	Nonce       string
-	MaxAge      uint
+	Issuer          string
+	ExpiredTime     time.Duration
+	ProjectName     string
+	UserID          string
+	Nonce           string
+	EndUserAuthTime time.Time
 }
 
 // RoleValue ...
@@ -52,7 +52,7 @@ type IDTokenClaims struct {
 
 	Audience []string `json:"aud"`
 	Nonce    string   `json:"nonce"`
-	AuthTime uint     `json:"auth_time"`
+	AuthTime int64    `json:"auth_time"`
 	// TODO(acr, amr, azp)
 	// ref. https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#IDToken
 }

@@ -20,6 +20,7 @@ type option struct {
 	genIDToken      bool
 	nonce           string
 	maxAge          uint
+	endUserAuthTime time.Time
 }
 
 // ClientAuth authenticates client with id and secret
@@ -100,6 +101,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 		genIDToken:      true,
 		nonce:           s.Nonce,
 		maxAge:          s.MaxAge,
+		endUserAuthTime: s.LoginDate,
 	})
 }
 
@@ -224,19 +226,17 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	if opt.genIDToken {
 		lifeSpan := project.TokenConfig.AccessTokenLifeSpan
-		maxAge := project.TokenConfig.AccessTokenLifeSpan
 		if opt.maxAge > 0 {
 			lifeSpan = opt.maxAge
-			maxAge = opt.maxAge
 		}
 
 		idTokenReq := token.Request{
-			Issuer:      token.GetFullIssuer(r),
-			ExpiredTime: time.Second * time.Duration(lifeSpan),
-			ProjectName: project.Name,
-			UserID:      userID,
-			Nonce:       opt.nonce,
-			MaxAge:      maxAge,
+			Issuer:          token.GetFullIssuer(r),
+			ExpiredTime:     time.Second * time.Duration(lifeSpan),
+			ProjectName:     project.Name,
+			UserID:          userID,
+			Nonce:           opt.nonce,
+			EndUserAuthTime: opt.endUserAuthTime,
 		}
 		res.IDToken, err = token.GenerateIDToken(audiences, idTokenReq)
 		if err != nil {

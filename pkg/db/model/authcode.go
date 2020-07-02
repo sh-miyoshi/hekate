@@ -21,6 +21,7 @@ type AuthCodeSession struct {
 	ResponseMode string
 	Prompt       []string
 	UserID       string
+	LoginDate    time.Time
 }
 
 var (

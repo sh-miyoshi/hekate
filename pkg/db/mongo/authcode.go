@@ -55,6 +55,7 @@ func (h *AuthCodeSessionHandler) Add(projectName string, ent *model.AuthCodeSess
 		MaxAge:       ent.MaxAge,
 		ResponseMode: ent.ResponseMode,
 		Prompt:       ent.Prompt,
+		LoginDate:    ent.LoginDate,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
@@ -91,6 +92,7 @@ func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeS
 		MaxAge:       ent.MaxAge,
 		ResponseMode: ent.ResponseMode,
 		Prompt:       ent.Prompt,
+		LoginDate:    ent.LoginDate,
 	}
 
 	updates := bson.D{
@@ -157,6 +159,7 @@ func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*mo
 		MaxAge:       res.MaxAge,
 		ResponseMode: res.ResponseMode,
 		Prompt:       res.Prompt,
+		LoginDate:    res.LoginDate,
 	}, nil
 }
 
@@ -192,6 +195,7 @@ func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.Auth
 		MaxAge:       res.MaxAge,
 		ResponseMode: res.ResponseMode,
 		Prompt:       res.Prompt,
+		LoginDate:    res.LoginDate,
 	}, nil
 }
 

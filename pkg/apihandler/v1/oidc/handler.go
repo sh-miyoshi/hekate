@@ -330,6 +330,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.UserID = usr.ID
+	s.LoginDate = time.Now()
 
 	if ok := slice.Contains(s.Prompt, "consent"); ok {
 		// save user id to session info
@@ -562,12 +563,12 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 
 			audiences := []string{session.UserID, session.ClientID}
 			tokenReq := token.Request{
-				Issuer:      tokenIssuer,
-				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
-				ProjectName: session.ProjectName,
-				UserID:      session.UserID,
-				Nonce:       session.Nonce,
-				MaxAge:      session.MaxAge,
+				Issuer:          tokenIssuer,
+				ExpiredTime:     time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
+				ProjectName:     session.ProjectName,
+				UserID:          session.UserID,
+				Nonce:           session.Nonce,
+				EndUserAuthTime: session.LoginDate,
 			}
 			tkn, err := token.GenerateIDToken(audiences, tokenReq)
 			if err != nil {
