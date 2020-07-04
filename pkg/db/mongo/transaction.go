@@ -57,7 +57,7 @@ func (m *TransactionManager) abortTx() *errors.Error {
 	err := m.session.AbortTransaction(ctx)
 	m.session.EndSession(ctx)
 	if err != nil {
-		return errors.New("Failed abort transaction", err)
+		return errors.New("Failed abort transaction: %v", err)
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func (m *TransactionManager) commitTx() *errors.Error {
 	err := m.session.CommitTransaction(ctx)
 	m.session.EndSession(ctx)
 	if err != nil {
-		return errors.New("Failed commit transaction", err)
+		return errors.New("Failed commit transaction: %v", err)
 	}
 	return nil
 }
