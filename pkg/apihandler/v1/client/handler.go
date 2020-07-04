@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/role"
@@ -29,7 +29,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	clients, err := db.GetInst().ClientGetList(projectName)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrClientValidateFailed {
+		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrClientValidateFailed) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -85,13 +85,13 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().ClientAdd(projectName, &client); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrClientAlreadyExists {
+		} else if errors.Contains(err, model.ErrClientAlreadyExists) {
 			logger.Info("Client %s is already exists", client.ID)
 			http.Error(w, "Client already exists", http.StatusConflict)
-		} else if errors.Cause(err) == model.ErrClientValidateFailed {
+		} else if errors.Contains(err, model.ErrClientValidateFailed) {
 			logger.Info("Bad Request: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
@@ -128,10 +128,10 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().ClientDelete(projectName, clientID); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchClient || errors.Cause(err) == model.ErrClientValidateFailed {
+		} else if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
 			logger.Info("No such client: %s", clientID)
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
@@ -162,10 +162,10 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchClient || errors.Cause(err) == model.ErrClientValidateFailed {
+		if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
 			logger.Info("No such client: %s", clientID)
 			http.Error(w, "Client Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchProject {
+		} else if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -211,10 +211,10 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Client Info
 	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchClient || errors.Cause(err) == model.ErrClientValidateFailed {
+		} else if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
 			logger.Info("No such client: %s", clientID)
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
@@ -231,7 +231,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().ClientUpdate(projectName, client); err != nil {
-		if errors.Cause(err) == model.ErrClientValidateFailed {
+		if errors.Contains(err, model.ErrClientValidateFailed) {
 			logger.Info("Bad Request: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {

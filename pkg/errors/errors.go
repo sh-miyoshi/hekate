@@ -1,35 +1,47 @@
 package errors
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
 
 // Error ...
 type Error struct {
-	privateMsgs []string
-	publicMsg   string
+	privateMsgs      []string
+	publicMsg        string
+	httpResponseCode int
 }
+
+// Name        string `json:"error"`
+// 	Description string `json:"error_description"`
+// 	Code        int    `json:"status_code"`
 
 // Error ...
 func (e *Error) Error() string {
 	return e.publicMsg
 }
 
+// GetHTTPStatusCode ...
+func (e *Error) GetHTTPStatusCode() int {
+	return e.httpResponseCode
+}
+
 // New ...
-func New(privateMsg, publicMsg string) *Error {
+func New(format string, a ...interface{}) *Error {
 	// TODO(runtime.caller)
 
-	res := &Error{
-		publicMsg: publicMsg,
-	}
-
-	if privateMsg != "" {
-		res.privateMsgs = []string{privateMsg}
+	res := &Error{}
+	msg := fmt.Sprintf(format, a...)
+	if msg != "" {
+		res.privateMsgs = append(res.privateMsgs, msg)
 	}
 
 	return res
 }
 
-// AppendPrivateMsg ...
-func AppendPrivateMsg(err *Error, format string, a ...interface{}) *Error {
+// Append ...
+func Append(err *Error, format string, a ...interface{}) *Error {
 	// TODO(runtime.caller)
 
 	if err == nil {
@@ -71,6 +83,26 @@ func Contains(all, err *Error) bool {
 	}
 
 	return true
+}
+
+// WriteOAuthError ...
+func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
+	res := map[string]interface{}{
+		"error": err.publicMsg,
+		// TODO(error_description)
+		"state": state,
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+
+	// TODO(code == 0 -> panic)
+	w.WriteHeader(err.httpResponseCode)
+
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		// TODO(logger)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 // TODO(Print)

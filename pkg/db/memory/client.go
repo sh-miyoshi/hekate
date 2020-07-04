@@ -2,6 +2,7 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // ClientInfoHandler implement db.ClientInfoHandler
@@ -16,13 +17,13 @@ func NewClientHandler() *ClientInfoHandler {
 }
 
 // Add ...
-func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) *errors.Error {
 	h.clientList = append(h.clientList, ent)
 	return nil
 }
 
 // Delete ...
-func (h *ClientInfoHandler) Delete(projectName, clientID string) error {
+func (h *ClientInfoHandler) Delete(projectName, clientID string) *errors.Error {
 	newList := []*model.ClientInfo{}
 	found := false
 	for _, c := range h.clientList {
@@ -41,7 +42,7 @@ func (h *ClientInfoHandler) Delete(projectName, clientID string) error {
 }
 
 // GetList ...
-func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, error) {
+func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *errors.Error) {
 	res := []*model.ClientInfo{}
 
 	for _, client := range h.clientList {
@@ -54,7 +55,7 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, er
 }
 
 // Get ...
-func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, error) {
+func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, *errors.Error) {
 	for _, c := range h.clientList {
 		if c.ProjectName == projectName && c.ID == clientID {
 			return c, nil
@@ -65,7 +66,7 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 }
 
 // Update ...
-func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) *errors.Error {
 	for i, c := range h.clientList {
 		if c.ProjectName == projectName && c.ID == ent.ID {
 			h.clientList[i] = ent
@@ -76,7 +77,7 @@ func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) er
 }
 
 // DeleteAll ...
-func (h *ClientInfoHandler) DeleteAll(projectName string) error {
+func (h *ClientInfoHandler) DeleteAll(projectName string) *errors.Error {
 	newList := []*model.ClientInfo{}
 	for _, c := range h.clientList {
 		if c.ProjectName != projectName {

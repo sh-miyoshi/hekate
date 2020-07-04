@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -22,9 +23,12 @@ func NewPingHandler(dbClient *mongo.Client) *PingHandler {
 }
 
 // Ping ...
-func (p *PingHandler) Ping() error {
+func (p *PingHandler) Ping() *errors.Error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	return p.dbClient.Ping(ctx, nil)
+	if err := p.dbClient.Ping(ctx, nil); err != nil {
+		return errors.New("DB Ping failed: %v", err)
+	}
+	return nil
 }

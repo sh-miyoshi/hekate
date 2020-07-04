@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // UserInfo ...
@@ -53,31 +53,31 @@ var (
 
 // UserInfoHandler ...
 type UserInfoHandler interface {
-	Add(projectName string, ent *UserInfo) error
-	Delete(projectName string, userID string) error
-	GetList(projectName string, filter *UserFilter) ([]*UserInfo, error)
-	Get(projectName string, userID string) (*UserInfo, error)
-	Update(projectName string, ent *UserInfo) error
-	DeleteAll(projectName string) error
-	AddRole(projectName string, userID string, roleType RoleType, roleID string) error
-	DeleteRole(projectName string, userID string, roleID string) error
-	DeleteAllCustomRole(projectName string, roleID string) error
+	Add(projectName string, ent *UserInfo) *errors.Error
+	Delete(projectName string, userID string) *errors.Error
+	GetList(projectName string, filter *UserFilter) ([]*UserInfo, *errors.Error)
+	Get(projectName string, userID string) (*UserInfo, *errors.Error)
+	Update(projectName string, ent *UserInfo) *errors.Error
+	DeleteAll(projectName string) *errors.Error
+	AddRole(projectName string, userID string, roleType RoleType, roleID string) *errors.Error
+	DeleteRole(projectName string, userID string, roleID string) *errors.Error
+	DeleteAllCustomRole(projectName string, roleID string) *errors.Error
 }
 
 // Validate ...
-func (ui *UserInfo) Validate() error {
+func (ui *UserInfo) Validate() *errors.Error {
 	// Check User ID
 	if !ValidateUserID(ui.ID) {
-		return errors.Wrap(ErrUserValidateFailed, "Invalid user ID format")
+		return errors.Append(ErrUserValidateFailed, "Invalid user ID format")
 	}
 
 	if !ValidateProjectName(ui.ProjectName) {
-		return errors.Wrap(ErrUserValidateFailed, "Invalid project Name format")
+		return errors.Append(ErrUserValidateFailed, "Invalid project Name format")
 	}
 
 	// Check User Name
 	if !ValidateUserName(ui.Name) {
-		return errors.Wrap(ErrUserValidateFailed, "Invalid user name format")
+		return errors.Append(ErrUserValidateFailed, "Invalid user name format")
 	}
 
 	return nil

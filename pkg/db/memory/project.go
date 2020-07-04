@@ -2,6 +2,7 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
@@ -18,13 +19,13 @@ func NewProjectHandler() *ProjectInfoHandler {
 }
 
 // Add ...
-func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) error {
+func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) *errors.Error {
 	h.projectList[ent.Name] = ent
 	return nil
 }
 
 // Delete ...
-func (h *ProjectInfoHandler) Delete(name string) error {
+func (h *ProjectInfoHandler) Delete(name string) *errors.Error {
 	if _, exists := h.projectList[name]; exists {
 		delete(h.projectList, name)
 		return nil
@@ -33,7 +34,7 @@ func (h *ProjectInfoHandler) Delete(name string) error {
 }
 
 // GetList ...
-func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
+func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, *errors.Error) {
 	res := []*model.ProjectInfo{}
 	for _, prj := range h.projectList {
 		res = append(res, prj)
@@ -42,7 +43,7 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, error) {
 }
 
 // Get ...
-func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
+func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, *errors.Error) {
 	res, ok := h.projectList[name]
 	if ok {
 		return res, nil
@@ -51,7 +52,7 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, error) {
 }
 
 // Update ...
-func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) error {
+func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) *errors.Error {
 	if _, ok := h.projectList[ent.Name]; ok {
 		h.projectList[ent.Name] = ent
 		return nil

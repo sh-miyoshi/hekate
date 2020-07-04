@@ -10,8 +10,8 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
@@ -28,29 +28,33 @@ func InitConfig(useHTTPS bool) {
 	}
 }
 
-func signToken(projectName string, claims jwt.Claims) (string, error) {
+func signToken(projectName string, claims jwt.Claims) (string, *errors.Error) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		return "", errors.Wrap(err, "Failed to get project")
+		return "", errors.Append(err, "Failed to get project")
 	}
 	switch project.TokenConfig.SigningAlgorithm {
 	case "RS256":
 		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 		key, err := x509.ParsePKCS1PrivateKey(project.TokenConfig.SignSecretKey)
 		if err != nil {
-			return "", err
+			return "", errors.New("Failed to parse private key: %v", err)
 		}
-		return token.SignedString(key)
+		str, err := token.SignedString(key)
+		if err != nil {
+			return "", errors.New("Failed to signing token: %v", err)
+		}
+		return str, nil
 	default:
 		return "", errors.New("Unexpected Token Signing Algorithm")
 	}
 }
 
 // GenerateAccessToken ...
-func GenerateAccessToken(audiences []string, request Request) (string, error) {
+func GenerateAccessToken(audiences []string, request Request) (string, *errors.Error) {
 	user, err := db.GetInst().UserGet(request.ProjectName, request.UserID)
 	if err != nil {
-		return "", errors.Wrap(err, "Failed to get user")
+		return "", errors.Append(err, "Failed to get user")
 	}
 
 	now := time.Now()
@@ -79,7 +83,7 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 	for _, rid := range user.CustomRoles {
 		role, err := db.GetInst().CustomRoleGet(request.ProjectName, rid)
 		if err != nil {
-			return "", errors.Wrap(err, "Failed to get custom role name")
+			return "", errors.Append(err, "Failed to get custom role name")
 		}
 		claims.ResourceAccess.User.Roles = append(claims.ResourceAccess.User.Roles, role.Name)
 	}
@@ -88,7 +92,7 @@ func GenerateAccessToken(audiences []string, request Request) (string, error) {
 }
 
 // GenerateRefreshToken ...
-func GenerateRefreshToken(sessionID string, audiences []string, request Request) (string, error) {
+func GenerateRefreshToken(sessionID string, audiences []string, request Request) (string, *errors.Error) {
 	now := time.Now()
 	claims := &RefreshTokenClaims{
 		jwt.StandardClaims{
@@ -108,7 +112,7 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 }
 
 // GenerateIDToken ...
-func GenerateIDToken(audiences []string, request Request) (string, error) {
+func GenerateIDToken(audiences []string, request Request) (string, *errors.Error) {
 	now := time.Now()
 	claims := &IDTokenClaims{
 		jwt.StandardClaims{
@@ -128,18 +132,18 @@ func GenerateIDToken(audiences []string, request Request) (string, error) {
 }
 
 // ValidateAccessToken ...
-func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIssuer string) error {
+func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIssuer string) *errors.Error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		project, err := db.GetInst().ProjectGet(claims.Project)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to get project")
+			return nil, errors.Append(err, "Failed to get project")
 		}
 
 		switch token.Method {
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, err
+				return nil, errors.New("Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
@@ -147,7 +151,8 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "Failed to parse token")
+		e := err.(*errors.Error)
+		return errors.Append(e, "Failed to parse token")
 	}
 
 	if !token.Valid {
@@ -173,18 +178,18 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 }
 
 // ValidateRefreshToken ...
-func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expectIssuer string) error {
+func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expectIssuer string) *errors.Error {
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		project, err := db.GetInst().ProjectGet(claims.Project)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to get project")
+			return nil, errors.Append(err, "Failed to get project")
 		}
 
 		switch token.Method {
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, err
+				return nil, errors.New("Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
@@ -192,7 +197,8 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "Failed to parse token")
+		e := err.(*errors.Error)
+		return errors.Append(e, "Failed to parse token")
 	}
 
 	if !token.Valid {

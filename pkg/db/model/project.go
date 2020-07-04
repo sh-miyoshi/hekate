@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -96,39 +96,39 @@ var (
 
 // ProjectInfoHandler ...
 type ProjectInfoHandler interface {
-	Add(ent *ProjectInfo) error
-	Delete(name string) error
-	GetList() ([]*ProjectInfo, error)
-	Get(name string) (*ProjectInfo, error)
+	Add(ent *ProjectInfo) *errors.Error
+	Delete(name string) *errors.Error
+	GetList() ([]*ProjectInfo, *errors.Error)
+	Get(name string) (*ProjectInfo, *errors.Error)
 
 	// Update method updates existing project
-	// It must return error if project is not found
-	Update(ent *ProjectInfo) error
+	// It must return *errors.Error if project is not found
+	Update(ent *ProjectInfo) *errors.Error
 }
 
-func (p *PasswordPolicy) validate() error {
+func (p *PasswordPolicy) validate() *errors.Error {
 	if p.UseCharacter != "" && !slice.Contains(AllCharacterTypes, p.UseCharacter) {
-		return errors.Wrap(ErrProjectValidateFailed, "Invalid Character type")
+		return errors.Append(ErrProjectValidateFailed, "Invalid Character type")
 	}
 	return nil
 }
 
 // Validate ...
-func (p *ProjectInfo) Validate() error {
+func (p *ProjectInfo) Validate() *errors.Error {
 	if !ValidateProjectName(p.Name) {
-		return errors.Wrap(ErrProjectValidateFailed, "Invalid Project Name format")
+		return errors.Append(ErrProjectValidateFailed, "Invalid Project Name format")
 	}
 
 	if !ValidateTokenSigningAlgorithm(p.TokenConfig.SigningAlgorithm) {
-		return errors.Wrap(ErrProjectValidateFailed, "Invalid Token Signing Algorithm")
+		return errors.Append(ErrProjectValidateFailed, "Invalid Token Signing Algorithm")
 	}
 
 	if !ValidateLifeSpan(p.TokenConfig.AccessTokenLifeSpan) {
-		return errors.Wrap(ErrProjectValidateFailed, "Access Token Life Span must >= 1")
+		return errors.Append(ErrProjectValidateFailed, "Access Token Life Span must >= 1")
 	}
 
 	if !ValidateLifeSpan(p.TokenConfig.RefreshTokenLifeSpan) {
-		return errors.Wrap(ErrProjectValidateFailed, "Refresh Token Life Span must >= 1")
+		return errors.Append(ErrProjectValidateFailed, "Refresh Token Life Span must >= 1")
 	}
 
 	if err := p.PasswordPolicy.validate(); err != nil {
@@ -139,7 +139,7 @@ func (p *ProjectInfo) Validate() error {
 }
 
 // GetGrantType ...
-func GetGrantType(str string) (GrantType, error) {
+func GetGrantType(str string) (GrantType, *errors.Error) {
 	if str == GrantTypeClientCredentials.String() {
 		return GrantTypeClientCredentials, nil
 	}

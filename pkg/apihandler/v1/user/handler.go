@@ -7,9 +7,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/pwpol"
@@ -39,7 +39,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	users, err := db.GetInst().UserGetList(projectName, filter)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrUserValidateFailed {
+		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -143,13 +143,13 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().UserAdd(projectName, &user); err != nil {
-		if errors.Cause(err) == model.ErrUserValidateFailed {
+		if errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("user validation failed: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-		} else if errors.Cause(err) == model.ErrNoSuchProject {
+		} else if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrUserAlreadyExists {
+		} else if errors.Contains(err, model.ErrUserAlreadyExists) {
 			logger.Info("User %s is already exists", user.Name)
 			http.Error(w, "User already exists", http.StatusConflict)
 		} else {
@@ -201,10 +201,10 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Delete User
 	if err := db.GetInst().UserDelete(projectName, userID); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("User %s is not found: %v", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
@@ -239,13 +239,13 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("User %s is not found: %v", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("Invalid User ID format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
@@ -316,13 +316,13 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous User Info
 	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser || errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("User %s is not found: %v", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("Invalid User ID format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
@@ -340,7 +340,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
-		if errors.Cause(err) == model.ErrUserValidateFailed || errors.Cause(err) == model.ErrUserAlreadyExists {
+		if errors.Contains(err, model.ErrUserValidateFailed) || errors.Contains(err, model.ErrUserAlreadyExists) {
 			logger.Info("Invalid user request format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
@@ -376,16 +376,16 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Previous User Info
 	if err := db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser {
+		} else if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrRoleAlreadyAppended {
+		} else if errors.Contains(err, model.ErrRoleAlreadyAppended) {
 			logger.Info("Role %s is already appended", roleID)
 			http.Error(w, "Role Already Appended", http.StatusConflict)
-		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			if !model.ValidateUserID(userID) {
 				logger.Info("UserID %s is invalid id format", userID)
 				http.Error(w, "User Not Found", http.StatusNotFound)
@@ -421,16 +421,16 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Previous User Info
 	if err := db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchUser {
+		} else if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrNoSuchRoleInUser {
+		} else if errors.Contains(err, model.ErrNoSuchRoleInUser) {
 			logger.Info("User %s do not have Role %s", userID, roleID)
 			http.Error(w, "No Such Role in User", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			if !model.ValidateUserID(userID) {
 				logger.Info("UserID %s is invalid id format", userID)
 				http.Error(w, "User Not Found", http.StatusNotFound)
@@ -472,10 +472,10 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().UserChangePassword(projectName, userID, req.Password); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchUser {
+		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrUserValidateFailed {
+		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			if !model.ValidateUserID(userID) {
 				logger.Info("UserID %s is invalid id format", userID)
 				http.Error(w, "User Not Found", http.StatusNotFound)
@@ -483,7 +483,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("Invalid password was specified: %v", err)
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
-		} else if errors.Cause(err) == pwpol.ErrPasswordPolicyFailed {
+		} else if errors.Contains(err, pwpol.ErrPasswordPolicyFailed) {
 			logger.Info("Invalid password was specified: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {

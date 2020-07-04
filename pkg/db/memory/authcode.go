@@ -2,6 +2,7 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // AuthCodeSessionHandler implement db.AuthCodeSessionHandler
@@ -15,13 +16,13 @@ func NewAuthCodeSessionHandler() *AuthCodeSessionHandler {
 }
 
 // Add ...
-func (h *AuthCodeSessionHandler) Add(projectName string, ent *model.AuthCodeSession) error {
+func (h *AuthCodeSessionHandler) Add(projectName string, ent *model.AuthCodeSession) *errors.Error {
 	h.sessionList = append(h.sessionList, ent)
 	return nil
 }
 
 // Update ...
-func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeSession) error {
+func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeSession) *errors.Error {
 	for i, s := range h.sessionList {
 		if s.ProjectName == projectName && s.SessionID == ent.SessionID {
 			h.sessionList[i] = ent
@@ -32,7 +33,7 @@ func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeS
 }
 
 // Delete ...
-func (h *AuthCodeSessionHandler) Delete(projectName string, sessionID string) error {
+func (h *AuthCodeSessionHandler) Delete(projectName string, sessionID string) *errors.Error {
 	newList := []*model.AuthCodeSession{}
 	ok := false
 	for _, s := range h.sessionList {
@@ -52,7 +53,7 @@ func (h *AuthCodeSessionHandler) Delete(projectName string, sessionID string) er
 }
 
 // GetByCode ...
-func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*model.AuthCodeSession, error) {
+func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*model.AuthCodeSession, *errors.Error) {
 	for _, s := range h.sessionList {
 		if s.ProjectName == projectName && s.Code == code {
 			return s, nil
@@ -63,7 +64,7 @@ func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*mo
 }
 
 // Get ...
-func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.AuthCodeSession, error) {
+func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.AuthCodeSession, *errors.Error) {
 	for _, s := range h.sessionList {
 		if s.ProjectName == projectName && s.SessionID == id {
 			return s, nil
@@ -74,7 +75,7 @@ func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.Auth
 }
 
 // DeleteAllInClient ...
-func (h *AuthCodeSessionHandler) DeleteAllInClient(projectName string, clientID string) error {
+func (h *AuthCodeSessionHandler) DeleteAllInClient(projectName string, clientID string) *errors.Error {
 	newList := []*model.AuthCodeSession{}
 	for _, s := range h.sessionList {
 		if s.ProjectName != projectName {
@@ -89,7 +90,7 @@ func (h *AuthCodeSessionHandler) DeleteAllInClient(projectName string, clientID 
 }
 
 // DeleteAllInUser ...
-func (h *AuthCodeSessionHandler) DeleteAllInUser(projectName string, userID string) error {
+func (h *AuthCodeSessionHandler) DeleteAllInUser(projectName string, userID string) *errors.Error {
 	newList := []*model.AuthCodeSession{}
 	for _, s := range h.sessionList {
 		if s.ProjectName != projectName {
@@ -104,7 +105,7 @@ func (h *AuthCodeSessionHandler) DeleteAllInUser(projectName string, userID stri
 }
 
 // DeleteAllInProject ...
-func (h *AuthCodeSessionHandler) DeleteAllInProject(projectName string) error {
+func (h *AuthCodeSessionHandler) DeleteAllInProject(projectName string) *errors.Error {
 	newList := []*model.AuthCodeSession{}
 	for _, s := range h.sessionList {
 		if s.ProjectName != projectName {

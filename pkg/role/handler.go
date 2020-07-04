@@ -3,7 +3,7 @@ package role
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 

@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/role"
@@ -27,8 +27,7 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().SessionDelete(projectName, sessionID); err != nil {
-		e := errors.Cause(err)
-		if e == model.ErrNoSuchProject || e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
+		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			logger.Error("Failed to delete session: %v", err)
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
@@ -59,8 +58,7 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	s, err := db.GetInst().SessionGet(projectName, sessionID)
 	if err != nil {
-		e := errors.Cause(err)
-		if e == model.ErrNoSuchProject || e == model.ErrNoSuchSession || e == model.ErrSessionValidateFailed {
+		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			logger.Error("Failed to get session: %v", err)
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	validator "github.com/go-playground/validator/v10"
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -46,24 +46,24 @@ type AuthCodeSession struct {
 	Prompt       []string
 }
 
-func validatePrompt(prompts []string) error {
+func validatePrompt(prompts []string) *errors.Error {
 	for _, prompt := range prompts {
 		switch prompt {
 		case "login", "select_account", "consent":
 			// correct values
 		case "none":
 			if len(prompts) != 1 {
-				return ErrInvalidRequest
+				return errors.ErrInvalidRequest
 			}
 		default:
-			return ErrInvalidRequest
+			return errors.ErrInvalidRequest
 		}
 	}
 
 	return nil
 }
 
-func validateResponseType(types, supportedTypes []string) error {
+func validateResponseType(types, supportedTypes []string) *errors.Error {
 	// sort types
 	sort.Slice(types, func(i, j int) bool {
 		return types[i] < types[j]
@@ -77,13 +77,13 @@ func validateResponseType(types, supportedTypes []string) error {
 	s = strings.TrimSuffix(s, " ")
 
 	if ok := slice.Contains(supportedTypes, s); !ok {
-		return ErrUnsupportedResponseType
+		return errors.ErrUnsupportedResponseType
 	}
 
 	return nil
 }
 
-func validateResponseMode(mode string) error {
+func validateResponseMode(mode string) *errors.Error {
 	if mode != "" {
 		// TODO(add support form_post)
 		modes := []string{"query", "fragment"}
@@ -98,16 +98,16 @@ func validateResponseMode(mode string) error {
 		// TODO return err when query && response_type is not none or code
 
 		if !ok {
-			return ErrInvalidRequest
+			return errors.ErrInvalidRequest
 		}
 	}
 	return nil
 }
 
 // Validate ...
-func (r *AuthRequest) Validate() error {
+func (r *AuthRequest) Validate() *errors.Error {
 	if err := validator.New().Struct(r); err != nil {
-		return errors.Wrap(ErrInvalidRequest, err.Error())
+		return errors.Append(errors.ErrInvalidRequest, err.Error())
 	}
 
 	// TODO(check scope)
@@ -115,17 +115,17 @@ func (r *AuthRequest) Validate() error {
 	// Check Response Type
 	supportedTypes := GetSupportedResponseType()
 	if err := validateResponseType(r.ResponseType, supportedTypes); err != nil {
-		return errors.Wrapf(err, "Failed to validate response type %v", r.ResponseType)
+		return errors.Append(err, "Failed to validate response type %v", r.ResponseType)
 	}
 
 	// Check prompt
 	if err := validatePrompt(r.Prompt); err != nil {
-		return errors.Wrapf(err, "Failed to validate prompt %v", r.Prompt)
+		return errors.Append(err, "Failed to validate prompt %v", r.Prompt)
 	}
 
 	// Check Response mode
 	if err := validateResponseMode(r.ResponseMode); err != nil {
-		return errors.Wrapf(err, "Failed to validate response mode %s", r.ResponseMode)
+		return errors.Append(err, "Failed to validate response mode %s", r.ResponseMode)
 	}
 
 	return nil
@@ -157,17 +157,3 @@ type TokenResponse struct {
 	RefreshExpiresIn uint
 	IDToken          string
 }
-
-// Error ...
-type Error struct {
-	Name        string `json:"error"`
-	Description string `json:"error_description"`
-	Code        int    `json:"status_code"`
-}
-
-// Error ...
-func (e *Error) Error() string {
-	return e.Name
-}
-
-// *) error definition is in errors.go

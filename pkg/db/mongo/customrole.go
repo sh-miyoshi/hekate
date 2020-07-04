@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +17,7 @@ type CustomRoleHandler struct {
 }
 
 // NewCustomRoleHandler ...
-func NewCustomRoleHandler(dbClient *mongo.Client) (*CustomRoleHandler, error) {
+func NewCustomRoleHandler(dbClient *mongo.Client) (*CustomRoleHandler, *errors.Error) {
 	res := &CustomRoleHandler{
 		dbClient: dbClient,
 	}
@@ -36,12 +36,15 @@ func NewCustomRoleHandler(dbClient *mongo.Client) (*CustomRoleHandler, error) {
 
 	col := res.dbClient.Database(databaseName).Collection(roleCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
+	if err != nil {
+		return nil, errors.New("Failed to create index: %v", err)
+	}
 
-	return res, err
+	return res, nil
 }
 
 // Add ...
-func (h *CustomRoleHandler) Add(projectName string, ent *model.CustomRole) error {
+func (h *CustomRoleHandler) Add(projectName string, ent *model.CustomRole) *errors.Error {
 	v := &customRole{
 		ID:          ent.ID,
 		ProjectName: ent.ProjectName,
@@ -56,14 +59,14 @@ func (h *CustomRoleHandler) Add(projectName string, ent *model.CustomRole) error
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.Wrap(err, "Failed to insert role to mongodb")
+		return errors.New("Failed to insert role to mongodb: %v", err)
 	}
 
 	return nil
 }
 
 // Delete ...
-func (h *CustomRoleHandler) Delete(projectName string, roleID string) error {
+func (h *CustomRoleHandler) Delete(projectName string, roleID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -75,13 +78,13 @@ func (h *CustomRoleHandler) Delete(projectName string, roleID string) error {
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "Failed to delete role from mongodb")
+		return errors.New("Failed to delete role from mongodb: %v", err)
 	}
 	return nil
 }
 
 // GetList ...
-func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRoleFilter) ([]*model.CustomRole, error) {
+func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRoleFilter) ([]*model.CustomRole, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 
 	f := bson.D{
@@ -99,12 +102,12 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 
 	cursor, err := col.Find(ctx, f)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to get custom role list from mongodb")
+		return nil, errors.New("Failed to get custom role list from mongodb: %v", err)
 	}
 
 	roles := []customRole{}
 	if err := cursor.All(ctx, &roles); err != nil {
-		return nil, errors.Wrap(err, "Failed to get custom role list from mongodb")
+		return nil, errors.New("Failed to get custom role list from mongodb: %v", err)
 	}
 
 	res := []*model.CustomRole{}
@@ -121,7 +124,7 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 }
 
 // Get ...
-func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.CustomRole, error) {
+func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.CustomRole, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -136,7 +139,7 @@ func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.Custo
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchCustomRole
 		}
-		return nil, errors.Wrap(err, "Failed to get role from mongodb")
+		return nil, errors.New("Failed to get role from mongodb: %v", err)
 	}
 
 	return &model.CustomRole{
@@ -148,7 +151,7 @@ func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.Custo
 }
 
 // Update ...
-func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) error {
+func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -170,14 +173,14 @@ func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) er
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.Wrap(err, "Failed to update client in mongodb")
+		return errors.New("Failed to update client in mongodb: %v", err)
 	}
 
 	return nil
 }
 
 // DeleteAll ...
-func (h *CustomRoleHandler) DeleteAll(projectName string) error {
+func (h *CustomRoleHandler) DeleteAll(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -188,7 +191,7 @@ func (h *CustomRoleHandler) DeleteAll(projectName string) error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "Failed to delete client from mongodb")
+		return errors.New("Failed to delete client from mongodb: %v", err)
 	}
 	return nil
 }

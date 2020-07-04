@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 	"github.com/sh-miyoshi/hekate/pkg/user"
 )
@@ -24,19 +24,18 @@ type option struct {
 }
 
 // ClientAuth authenticates client with id and secret
-func ClientAuth(projectName string, clientID string, clientSecret string) error {
+func ClientAuth(projectName string, clientID string, clientSecret string) *errors.Error {
 	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
-		e := errors.Cause(err)
-		if e == model.ErrNoSuchClient || e == model.ErrClientValidateFailed {
-			return errors.Wrap(ErrInvalidClient, err.Error())
+		if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
+			return errors.Append(errors.ErrInvalidClient, err.Error())
 		}
-		return errors.Wrap(err, "Failed to get client")
+		return errors.Append(err, "Failed to get client")
 	}
 
 	if client.AccessType != "public" {
 		if client.Secret != clientSecret {
-			return errors.Wrap(ErrInvalidClient, "client auth failed")
+			return errors.Append(errors.ErrInvalidClient, "client auth failed")
 		}
 	}
 
@@ -44,11 +43,11 @@ func ClientAuth(projectName string, clientID string, clientSecret string) error 
 }
 
 // ReqAuthByPassword ...
-func ReqAuthByPassword(project *model.ProjectInfo, userName string, password string, r *http.Request) (*TokenResponse, error) {
+func ReqAuthByPassword(project *model.ProjectInfo, userName string, password string, r *http.Request) (*TokenResponse, *errors.Error) {
 	usr, err := user.Verify(project.Name, userName, password)
 	if err != nil {
-		if errors.Cause(err) == user.ErrAuthFailed {
-			return nil, errors.Wrap(ErrRequestUnauthorized, "user authentication failed")
+		if errors.Contains(err, user.ErrAuthFailed) {
+			return nil, errors.Append(errors.ErrRequestUnauthorized, "user authentication failed")
 		}
 		return nil, err
 	}
@@ -66,28 +65,28 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 }
 
 // ReqAuthByCode ...
-func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *http.Request) (*TokenResponse, error) {
+func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *http.Request) (*TokenResponse, *errors.Error) {
 	s, err := db.GetInst().AuthCodeSessionGetByCode(project.Name, code)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchAuthCodeSession {
+		if errors.Contains(err, model.ErrNoSuchAuthCodeSession) {
 			// TODO(revoke all token in code.UserID) <- SHOULD
-			return nil, errors.Wrap(ErrInvalidRequest, "no such code")
+			return nil, errors.Append(errors.ErrInvalidRequest, "no such code")
 		}
-		return nil, errors.Wrap(err, "Failed to get auth code info")
+		return nil, errors.Append(err, "Failed to get auth code info")
 	}
 
 	// Validate session info
 	if time.Now().Unix() >= s.ExpiresIn.Unix() {
-		return nil, errors.Wrap(ErrInvalidRequest, "code is already expired")
+		return nil, errors.Append(errors.ErrInvalidRequest, "code is already expired")
 	}
 
 	if s.ClientID != clientID {
-		return nil, errors.Wrap(ErrRequestUnauthorized, "missing client id")
+		return nil, errors.Append(errors.ErrRequestUnauthorized, "missing client id")
 	}
 
 	// Remove Authorized code
 	if err := db.GetInst().AuthCodeSessionDelete(project.Name, s.SessionID); err != nil {
-		return nil, errors.Wrap(err, "Failed to delete auth code")
+		return nil, errors.Append(err, "Failed to delete auth code")
 	}
 
 	audiences := []string{
@@ -106,11 +105,11 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 }
 
 // ReqAuthByRefreshToken ...
-func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshToken string, r *http.Request) (*TokenResponse, error) {
+func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshToken string, r *http.Request) (*TokenResponse, *errors.Error) {
 	claims := &token.RefreshTokenClaims{}
 	issuer := token.GetExpectIssuer(r)
 	if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
-		return nil, errors.Wrap(ErrRequestUnauthorized, fmt.Sprintf("Failed to verify token: %v", err))
+		return nil, errors.Append(errors.ErrRequestUnauthorized, fmt.Sprintf("Failed to verify token: %v", err))
 	}
 
 	ok := false
@@ -122,12 +121,12 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	}
 
 	if !ok {
-		return nil, errors.Wrap(ErrInvalidClient, "refresh token is not for the client")
+		return nil, errors.Append(errors.ErrInvalidClient, "refresh token is not for the client")
 	}
 
 	// Delete previous token
 	if err := db.GetInst().SessionDelete(project.Name, claims.SessionID); err != nil {
-		return nil, errors.Wrap(err, "Failed to revoke previous token")
+		return nil, errors.Append(err, "Failed to revoke previous token")
 	}
 
 	return genTokenRes(claims.Subject, project, r, option{
@@ -137,13 +136,13 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 }
 
 // ReqAuthByClientCredentials ...
-func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *http.Request) (*TokenResponse, error) {
+func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *http.Request) (*TokenResponse, *errors.Error) {
 	cli, err := db.GetInst().ClientGet(project.Name, clientID)
 	if err != nil {
-		return nil, errors.Wrap(err, "Get client info failed")
+		return nil, errors.Append(err, "Get client info failed")
 	}
 	if cli.AccessType != "confidential" {
-		return nil, ErrInvalidRequest
+		return nil, errors.ErrInvalidRequest
 	}
 
 	audiences := []string{
@@ -154,7 +153,7 @@ func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *
 	})
 }
 
-func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*TokenResponse, error) {
+func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*TokenResponse, *errors.Error) {
 	accessLifeSpan := project.TokenConfig.AccessTokenLifeSpan
 	if opt.maxAge > 0 && opt.maxAge < accessLifeSpan {
 		accessLifeSpan = opt.maxAge
@@ -180,10 +179,10 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 		audiences = opt.audiences
 	}
 
-	var err error
+	var err *errors.Error
 	res.AccessToken, err = token.GenerateAccessToken(audiences, accessTokenReq)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to generate access token")
+		return nil, errors.Append(err, "Failed to generate access token")
 	}
 
 	if opt.genRefreshToken {
@@ -202,12 +201,12 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 		sessionID := uuid.New().String()
 		res.RefreshToken, err = token.GenerateRefreshToken(sessionID, audiences, refreshTokenReq)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to generate refresh token")
+			return nil, errors.Append(err, "Failed to generate refresh token")
 		}
 
 		ip, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to get IP")
+			return nil, errors.New("Failed to get IP: %v", err)
 		}
 		ent := &model.Session{
 			UserID:      userID,
@@ -219,7 +218,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 		}
 
 		if err := db.GetInst().SessionAdd(project.Name, ent); err != nil {
-			return nil, errors.Wrap(err, "Failed to register session")
+			return nil, errors.Append(err, "Failed to register session")
 		}
 
 	}
@@ -240,7 +239,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 		}
 		res.IDToken, err = token.GenerateIDToken(audiences, idTokenReq)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to generate id token")
+			return nil, errors.Append(err, "Failed to generate id token")
 		}
 	}
 

@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // AuthCodeSession ...
@@ -31,12 +31,12 @@ var (
 
 // AuthCodeSessionHandler ...
 type AuthCodeSessionHandler interface {
-	Add(projectName string, ent *AuthCodeSession) error
-	Update(projectName string, ent *AuthCodeSession) error
-	Delete(projectName string, sessionID string) error
-	GetByCode(projectName string, code string) (*AuthCodeSession, error)
-	Get(projectName string, sessionID string) (*AuthCodeSession, error)
-	DeleteAllInClient(projectName string, clientID string) error
-	DeleteAllInUser(projectName string, userID string) error
-	DeleteAllInProject(projectName string) error
+	Add(projectName string, ent *AuthCodeSession) *errors.Error
+	Update(projectName string, ent *AuthCodeSession) *errors.Error
+	Delete(projectName string, sessionID string) *errors.Error
+	GetByCode(projectName string, code string) (*AuthCodeSession, *errors.Error)
+	Get(projectName string, sessionID string) (*AuthCodeSession, *errors.Error)
+	DeleteAllInClient(projectName string, clientID string) *errors.Error
+	DeleteAllInUser(projectName string, userID string) *errors.Error
+	DeleteAllInProject(projectName string) *errors.Error
 }

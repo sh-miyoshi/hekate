@@ -4,13 +4,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // StartLoginSession ...
-func StartLoginSession(projectName string, req *AuthRequest) (string, error) {
+func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Error) {
 	resMode := req.ResponseMode
 	if resMode == "" {
 		resMode = "fragment"
@@ -36,22 +36,22 @@ func StartLoginSession(projectName string, req *AuthRequest) (string, error) {
 	// *) userID, code will be set in after
 
 	if err := db.GetInst().AuthCodeSessionAdd(projectName, s); err != nil {
-		return "", errors.Wrap(err, "add auth code session failed")
+		return "", errors.Append(err, "add auth code session failed")
 	}
 	return s.SessionID, nil
 }
 
 // VerifySession ...
-func VerifySession(projectName string, sessionID string) (*model.AuthCodeSession, error) {
+func VerifySession(projectName string, sessionID string) (*model.AuthCodeSession, *errors.Error) {
 	s, err := db.GetInst().AuthCodeSessionGet(projectName, sessionID)
 	if err != nil {
-		return nil, errors.Wrap(err, "user login session get failed")
+		return nil, errors.Append(err, "user login session get failed")
 	}
 
 	// verify session
 	now := time.Now().Unix()
 	if now > s.ExpiresIn.Unix() {
-		return nil, ErrSessionExpired
+		return nil, errors.ErrSessionExpired
 	}
 
 	return s, nil

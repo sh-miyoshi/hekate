@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // CustomRole ...
@@ -32,22 +32,22 @@ var (
 
 // CustomRoleHandler ...
 type CustomRoleHandler interface {
-	Add(projectName string, ent *CustomRole) error
-	Delete(projectName string, roleID string) error
-	Get(projectName string, roleID string) (*CustomRole, error)
-	GetList(projectName string, filter *CustomRoleFilter) ([]*CustomRole, error)
-	Update(projectName string, ent *CustomRole) error
-	DeleteAll(projectName string) error
+	Add(projectName string, ent *CustomRole) *errors.Error
+	Delete(projectName string, roleID string) *errors.Error
+	Get(projectName string, roleID string) (*CustomRole, *errors.Error)
+	GetList(projectName string, filter *CustomRoleFilter) ([]*CustomRole, *errors.Error)
+	Update(projectName string, ent *CustomRole) *errors.Error
+	DeleteAll(projectName string) *errors.Error
 }
 
 // Validate ...
-func (c *CustomRole) Validate() error {
+func (c *CustomRole) Validate() *errors.Error {
 	if !ValidateCustomRoleName(c.Name) {
-		return errors.Wrap(ErrCustomRoleValidateFailed, "Invalid Custom Role Name format")
+		return errors.Append(ErrCustomRoleValidateFailed, "Invalid Custom Role Name format")
 	}
 
 	if !ValidateProjectName(c.ProjectName) {
-		return errors.Wrap(ErrCustomRoleValidateFailed, "Invalid Project Name format")
+		return errors.Append(ErrCustomRoleValidateFailed, "Invalid Project Name format")
 	}
 
 	return nil

@@ -1,6 +1,8 @@
 package model
 
+import "github.com/sh-miyoshi/hekate/pkg/errors"
+
 // PingHandler ...
 type PingHandler interface {
-	Ping() error
+	Ping() *errors.Error
 }

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/role"
@@ -115,10 +115,10 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Create New Project
 	if err := db.GetInst().ProjectAdd(&project); err != nil {
-		if errors.Cause(err) == model.ErrProjectAlreadyExists {
+		if errors.Contains(err, model.ErrProjectAlreadyExists) {
 			logger.Info("Project %s is already exists", request.Name)
 			http.Error(w, "Project Already Exists", http.StatusConflict)
-		} else if errors.Cause(err) == model.ErrProjectValidateFailed {
+		} else if errors.Contains(err, model.ErrProjectValidateFailed) {
 			logger.Info("Invalid project entry is specified: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
@@ -165,10 +165,10 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrProjectValidateFailed {
+		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
 			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Cause(err) == model.ErrDeleteBlockedProject {
+		} else if errors.Contains(err, model.ErrDeleteBlockedProject) {
 			logger.Info("Failed to delete blocked project: %v", err)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 		} else {
@@ -199,7 +199,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Project
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -261,7 +261,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Project Info
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Cause(err) == model.ErrNoSuchProject || errors.Cause(err) == model.ErrProjectValidateFailed {
+		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
 			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -294,7 +294,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Update DB
 	if err := db.GetInst().ProjectUpdate(project); err != nil {
-		if errors.Cause(err) == model.ErrProjectValidateFailed {
+		if errors.Contains(err, model.ErrProjectValidateFailed) {
 			logger.Error("Project info validation failed: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {

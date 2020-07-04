@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +17,7 @@ type ClientInfoHandler struct {
 }
 
 // NewClientHandler ...
-func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, error) {
+func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, *errors.Error) {
 	res := &ClientInfoHandler{
 		dbClient: dbClient,
 	}
@@ -36,12 +36,15 @@ func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, error) {
 
 	col := res.dbClient.Database(databaseName).Collection(clientCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
+	if err != nil {
+		return nil, errors.New("Failed to create index: %v", err)
+	}
 
-	return res, err
+	return res, nil
 }
 
 // Add ...
-func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) *errors.Error {
 	v := &clientInfo{
 		ID:                  ent.ID,
 		ProjectName:         ent.ProjectName,
@@ -58,14 +61,14 @@ func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) error
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.Wrap(err, "Failed to insert client to mongodb")
+		return errors.New("Failed to insert client to mongodb: %v", err)
 	}
 
 	return nil
 }
 
 // Delete ...
-func (h *ClientInfoHandler) Delete(projectName, clientID string) error {
+func (h *ClientInfoHandler) Delete(projectName, clientID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -77,13 +80,13 @@ func (h *ClientInfoHandler) Delete(projectName, clientID string) error {
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "Failed to delete client from mongodb")
+		return errors.New("Failed to delete client from mongodb: %v", err)
 	}
 	return nil
 }
 
 // GetList ...
-func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, error) {
+func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 
 	filter := bson.D{
@@ -95,12 +98,12 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, er
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to get client list from mongodb")
+		return nil, errors.New("Failed to get client list from mongodb: %v", err)
 	}
 
 	clients := []clientInfo{}
 	if err := cursor.All(ctx, &clients); err != nil {
-		return nil, errors.Wrap(err, "Failed to get client list from mongodb")
+		return nil, errors.New("Failed to get client list from mongodb: %v", err)
 	}
 
 	res := []*model.ClientInfo{}
@@ -119,7 +122,7 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, er
 }
 
 // Get ...
-func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, error) {
+func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -134,7 +137,7 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchClient
 		}
-		return nil, errors.Wrap(err, "Failed to get client from mongodb")
+		return nil, errors.New("Failed to get client from mongodb: %v", err)
 	}
 
 	return &model.ClientInfo{
@@ -148,7 +151,7 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 }
 
 // Update ...
-func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) error {
+func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -172,14 +175,14 @@ func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) er
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.Wrap(err, "Failed to update client in mongodb")
+		return errors.New("Failed to update client in mongodb: %v", err)
 	}
 
 	return nil
 }
 
 // DeleteAll ...
-func (h *ClientInfoHandler) DeleteAll(projectName string) error {
+func (h *ClientInfoHandler) DeleteAll(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -190,7 +193,7 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "Failed to delete client from mongodb")
+		return errors.New("Failed to delete client from mongodb: %v", err)
 	}
 	return nil
 }
