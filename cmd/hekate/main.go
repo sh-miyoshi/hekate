@@ -108,7 +108,7 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	r.Use(loggingMiddleware)
 }
 
-func initDB(dbType, connStr, adminName, adminPassword string) error {
+func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 	if err := db.InitDBManager(dbType, connStr); err != nil {
 		return errors.Append(err, "Failed to init database manager")
 	}
@@ -186,7 +186,7 @@ func main() {
 
 	// Initialize Default Role Handler
 	if err := defaultrole.InitHandler(); err != nil {
-		logger.Error("Failed to initialize default role handler: %+v", err)
+		errors.Print(errors.LogMsgError, errors.Append(err, "Failed to initialize default role handler"))
 		os.Exit(1)
 	}
 
@@ -198,7 +198,7 @@ func main() {
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
-		logger.Error("Failed to initialize database: %+v", err)
+		errors.Print(errors.LogMsgError, errors.Append(err, "Failed to initialize database"))
 		os.Exit(1)
 	}
 
