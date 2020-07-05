@@ -9,6 +9,16 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
+// LogMessageType ...
+type LogMessageType string
+
+const (
+	// LogMsgInfo ...
+	LogMsgInfo LogMessageType = "INFO"
+	// LogMsgError ...
+	LogMsgError LogMessageType = "ERROR"
+)
+
 type info struct {
 	msg   string
 	fname string
@@ -124,19 +134,18 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 }
 
 // Print ...
-func Print(err *Error) {
+func Print(msgType LogMessageType, err *Error) {
 	if err == nil {
 		_, fname, line, _ := runtime.Caller(1)
-		logger.ErrorCustom("%s:%d [ERROR] nil", fname, line)
+		logger.ErrorCustom("%s:%d [%s] nil", fname, line, msgType)
 		return
 	}
 
-	// TODO
 	for i := len(err.privateInfo) - 1; i >= 0; i-- {
 		msg := err.privateInfo[i].msg
 		if i != len(err.privateInfo)-1 {
 			msg = "|- " + msg
 		}
-		logger.ErrorCustom("%s:%d [ERROR] %s", err.privateInfo[i].fname, err.privateInfo[i].line, msg)
+		logger.ErrorCustom("%s:%d [%s] %s", err.privateInfo[i].fname, err.privateInfo[i].line, msgType, msg)
 	}
 }
