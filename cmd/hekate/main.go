@@ -227,13 +227,13 @@ func main() {
 	if cfg.HTTPSConfig.Enabled {
 		logger.Info("Run server as https")
 		if err := http.ListenAndServeTLS(addr, cfg.HTTPSConfig.CertFile, cfg.HTTPSConfig.KeyFile, corsOpts.Handler(r)); err != nil {
-			logger.Error("Failed to run server: %+v", err)
+			logger.Error("Failed to run server: %v", err)
 			os.Exit(1)
 		}
 	} else {
 		logger.Info("Run server as http")
 		if err := http.ListenAndServe(addr, corsOpts.Handler(r)); err != nil {
-			logger.Error("Failed to run server: %+v", err)
+			logger.Error("Failed to run server: %v", err)
 			os.Exit(1)
 		}
 	}

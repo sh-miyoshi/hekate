@@ -15,7 +15,7 @@ type Handler struct {
 var inst *Handler
 
 // InitHandler ...
-func InitHandler() error {
+func InitHandler() *errors.Error {
 	if inst != nil {
 		return errors.New("Default Role Handler is already initialized")
 	}
