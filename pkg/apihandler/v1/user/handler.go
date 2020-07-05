@@ -43,7 +43,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -52,7 +52,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Get all custom roles due to check all users
 	customRoles, err := db.GetInst().CustomRoleGetList(projectName, nil)
 	if err != nil {
-		logger.Error("Failed to get custom role list: %+v", err)
+		errors.Print(errors.Append(err, "Failed to get custom role list"))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -81,7 +81,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
 		if err != nil {
-			logger.Error("Failed to get session list: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get session list"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
@@ -120,7 +120,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// validate password
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		logger.Error("Failed to get project: %+v", err)
+		errors.Print(errors.Append(err, "Failed to get project"))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -153,7 +153,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("User %s is already exists", user.Name)
 			http.Error(w, "User already exists", http.StatusConflict)
 		} else {
-			logger.Error("Failed to create user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to create user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -163,7 +163,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	for _, rid := range user.CustomRoles {
 		r, err := db.GetInst().CustomRoleGet(projectName, rid)
 		if err != nil {
-			logger.Error("Failed to get user %s custom role %s info: %+v", user.ID, r.ID, err)
+			errors.Print(errors.Append(err, "Failed to get user %s custom role %s info", user.ID, r.ID))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
@@ -208,7 +208,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("User %s is not found: %v", userID, err)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to delete user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to delete user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -249,7 +249,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Invalid User ID format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to get user: %+v", err)
+			errors.Print(errors.Append(err, "Failed toget user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -259,7 +259,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	for _, rid := range user.CustomRoles {
 		r, err := db.GetInst().CustomRoleGet(projectName, rid)
 		if err != nil {
-			logger.Error("Failed to get user %s custom role %s info: %+v", user.ID, r.ID, err)
+			errors.Print(errors.Append(err, "Failed to get user %s custom role %s info", user.ID, r.ID))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
@@ -279,7 +279,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
 	if err != nil {
-		logger.Error("Failed to get session list: %+v", err)
+		errors.Print(errors.Append(err, "Failed to get session list"))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -326,7 +326,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Invalid User ID format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to update user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to update user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -344,7 +344,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Invalid user request format: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to update user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to update user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -394,7 +394,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
 		} else {
-			logger.Error("Failed to add role to user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to add role to user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -439,7 +439,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
 		} else {
-			logger.Error("Failed to delete role from user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to delete role from user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -487,7 +487,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Invalid password was specified: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to change user password: %+v", err)
+			errors.Print(errors.Append(err, "Failed to change yser password"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return

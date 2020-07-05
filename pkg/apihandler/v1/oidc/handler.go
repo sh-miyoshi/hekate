@@ -75,7 +75,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Contains(err, model.ErrNoSuchProject) {
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get project info: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get project info"))
 			errors.WriteOAuthError(w, errors.ErrServerError, state)
 		}
 		return
@@ -101,7 +101,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Failed to authenticate client: %s", clientID)
 			errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
 		} else {
-			logger.Error("Failed to authenticate client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to authenticate client"))
 			errors.WriteOAuthError(w, errors.ErrServerError, state)
 		}
 		return
@@ -118,7 +118,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("Failed to get allowed callback urls: No such client %s", clientID)
 				errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
 			} else {
-				logger.Error("Failed to get allowed callback urls in client: %+v", err)
+				errors.Print(errors.Append(err, "Failed to get allowed callbak urls in client"))
 				errors.WriteOAuthError(w, errors.ErrServerError, state)
 			}
 			return
@@ -168,7 +168,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Failed to verify request: %v", err)
 			errors.WriteOAuthError(w, err, state)
 		} else {
-			logger.Error("Failed to verify request: %v", err)
+			errors.Print(errors.Append(err, "Failed to verify request"))
 			errors.WriteOAuthError(w, errors.ErrServerError, state)
 		}
 		return
@@ -199,7 +199,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get project: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get project"))
 			errors.WriteOAuthError(w, errors.ErrServerError, "")
 		}
 		return
@@ -207,7 +207,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 
 	res, err := oidc.GenerateJWKSet(project.TokenConfig.SigningAlgorithm, project.TokenConfig.SignPublicKey)
 	if err != nil {
-		logger.Error("Failed to generate JWT set: %+v", err)
+		errors.Print(errors.Append(err, "Failed to generate JWT set"))
 		errors.WriteOAuthError(w, errors.ErrServerError, "")
 		return
 	}
@@ -295,7 +295,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 			// delete old session and create new code for relogin
 			if err := db.GetInst().AuthCodeSessionDelete(projectName, sessionID); err != nil {
-				logger.Error("Failed to delete previous login session %+v", err)
+				errors.Print(errors.Append(err, "Failed to delete previous login session"))
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 				return
 			}
@@ -314,14 +314,14 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 			code, err := oidc.StartLoginSession(projectName, authReq)
 			if err != nil {
-				logger.Error("Failed to register login session %+v", err)
+				errors.Print(errors.Append(err, "Failed to register login session"))
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 				return
 			}
 			oidc.WriteUserLoginPage(projectName, code, "invalid user name or password", state, w)
 			err = nil // do not delete session in defer function
 		} else {
-			logger.Error("Failed to verify user: %+v", err)
+			errors.Print(errors.Append(err, "Failed to verify user"))
 			errMsg := "Request failed. internal server error occuerd"
 			oidc.WriteErrorPage(errMsg, w)
 		}
@@ -334,7 +334,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if ok := slice.Contains(s.Prompt, "consent"); ok {
 		// save user id to session info
 		if err = db.GetInst().AuthCodeSessionUpdate(projectName, s); err != nil {
-			logger.Error("Failed to update auth code session: %+v", err)
+			errors.Print(errors.Append(err, "Failed to update auth code session"))
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
 		}
@@ -348,7 +348,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	req, errMsg := createLoginRedirectInfo(s, state, issuer)
 	if errMsg != "" {
 		err = errors.New(errMsg)
-		logger.Error(errMsg)
+		errors.Print(err)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}
@@ -359,7 +359,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// Update auth code session info
 		if err = db.GetInst().AuthCodeSessionUpdate(projectName, s); err != nil {
-			logger.Error("Failed to update auth code session: %+v", err)
+			errors.Print(errors.Append(err, "Failed to update auth code session"))
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
 		}
@@ -433,7 +433,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := db.GetInst().UserGet(projectName, claims.Subject)
 	if err != nil {
 		// If token validate accepted, user absolutely exists
-		logger.Error("Failed to get user: %+v", err)
+		errors.Print(errors.Append(err, "Failed to get user"))
 		errors.WriteOAuthError(w, errors.ErrServerError, "")
 		return
 	}
@@ -483,7 +483,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("Failed to revoke session: %v", err)
 				w.WriteHeader(http.StatusOK)
 			} else {
-				logger.Error("Failed to revoke session: %+v", err)
+				errors.Print(errors.Append(err, "Failed to revoke session"))
 				errors.WriteOAuthError(w, errors.ErrServerError, r.Form.Get("state"))
 			}
 			return
@@ -520,7 +520,7 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
 			errMsg = "Request faild. no such client"
 		} else {
-			logger.Error("Failed to get allowed callback urls in client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get allowed callback urls in client"))
 			errMsg = "Request faild. internal server error occured"
 		}
 		oidc.WriteErrorPage(errMsg, w)
@@ -532,7 +532,7 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	// Start session for login flow
 	sessionID, err := oidc.StartLoginSession(projectName, authReq)
 	if err != nil {
-		logger.Error("Failed to register auth code session %+v", err)
+		errors.Print(errors.Append(err, "Failed to register auth code session"))
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
 	}

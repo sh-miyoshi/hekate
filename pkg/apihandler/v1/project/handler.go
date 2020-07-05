@@ -26,7 +26,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	projects, err := db.GetInst().ProjectGetList()
 	if err != nil {
-		logger.Error("Failed to get project list: %+v", err)
+		errors.Print(errors.Append(err, "Failed to get project list"))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -122,7 +122,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Invalid project entry is specified: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to create project: %+v", err)
+			errors.Print(errors.Append(err, "Failed to create project"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -172,7 +172,7 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Failed to delete blocked project: %v", err)
 			http.Error(w, "Forbidden", http.StatusForbidden)
 		} else {
-			logger.Error("Failed to delete project: %+v", err)
+			errors.Print(errors.Append(err, "Failed to delete project"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -203,7 +203,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get project: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get project"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -265,7 +265,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Project %s is not found: %v", projectName, err)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get project: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get project"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -295,10 +295,10 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update DB
 	if err := db.GetInst().ProjectUpdate(project); err != nil {
 		if errors.Contains(err, model.ErrProjectValidateFailed) {
-			logger.Error("Project info validation failed: %v", err)
+			logger.Info("Project info validation failed: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to update project: %+v", err)
+			errors.Print(errors.Append(err, "Failed to update project"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return

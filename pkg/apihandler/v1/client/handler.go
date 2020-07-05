@@ -33,7 +33,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get client"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -95,7 +95,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Bad Request: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to create client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to create client"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -135,7 +135,7 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such client: %s", clientID)
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to delete client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to delete client"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -169,7 +169,7 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such project: %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get client"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -218,7 +218,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("No such client: %s", clientID)
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to update client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to update client"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -235,7 +235,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Bad Request: %v", err)
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
-			logger.Error("Failed to update client: %+v", err)
+			errors.Print(errors.Append(err, "Failed to update client"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return

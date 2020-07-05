@@ -28,10 +28,10 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := db.GetInst().SessionDelete(projectName, sessionID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
-			logger.Error("Failed to delete session: %v", err)
+			logger.Info("Failed to delete session: %v", err)
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to delete session info: %+v", err)
+			errors.Print(errors.Append(err, "Failed to delete session info"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
@@ -59,10 +59,10 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 	s, err := db.GetInst().SessionGet(projectName, sessionID)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
-			logger.Error("Failed to get session: %v", err)
+			logger.Info("Failed to get session: %v", err)
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
-			logger.Error("Failed to get session info: %+v", err)
+			errors.Print(errors.Append(err, "Failed to get session info"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		}
 		return
