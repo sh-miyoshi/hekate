@@ -4,11 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime"
+
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
+
+type info struct {
+	msg   string
+	fname string
+	line  int
+}
 
 // Error ...
 type Error struct {
-	privateMsgs      []string
+	privateInfo      []info
 	publicMsg        string
 	httpResponseCode int
 }
@@ -29,12 +38,17 @@ func (e *Error) GetHTTPStatusCode() int {
 
 // New ...
 func New(format string, a ...interface{}) *Error {
-	// TODO(runtime.caller)
+	_, fname, line, _ := runtime.Caller(1)
 
-	res := &Error{}
 	msg := fmt.Sprintf(format, a...)
-	if msg != "" {
-		res.privateMsgs = append(res.privateMsgs, msg)
+	res := &Error{
+		privateInfo: []info{
+			{
+				msg:   msg,
+				fname: fname,
+				line:  line,
+			},
+		},
 	}
 
 	return res
@@ -42,7 +56,7 @@ func New(format string, a ...interface{}) *Error {
 
 // Append ...
 func Append(err *Error, format string, a ...interface{}) *Error {
-	// TODO(runtime.caller)
+	_, fname, line, _ := runtime.Caller(1)
 
 	if err == nil {
 		return nil
@@ -50,7 +64,11 @@ func Append(err *Error, format string, a ...interface{}) *Error {
 
 	msg := fmt.Sprintf(format, a...)
 	if msg != "" {
-		err.privateMsgs = append(err.privateMsgs, msg)
+		err.privateInfo = append(err.privateInfo, info{
+			msg:   msg,
+			fname: fname,
+			line:  line,
+		})
 	}
 
 	return err
@@ -74,10 +92,10 @@ func Contains(all, err *Error) bool {
 	}
 
 	if all.publicMsg == err.publicMsg {
-		if len(all.privateMsgs) == 0 || len(err.privateMsgs) == 0 {
+		if len(all.privateInfo) == 0 || len(err.privateInfo) == 0 {
 			return false
 		}
-		if all.privateMsgs[0] != err.privateMsgs[0] {
+		if all.privateInfo[0].msg != err.privateInfo[0].msg {
 			return false
 		}
 	}
@@ -105,5 +123,20 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 	}
 }
 
-// TODO(Print)
-// TODO(HTTPResponse)
+// Print ...
+func Print(err *Error) {
+	if err == nil {
+		_, fname, line, _ := runtime.Caller(1)
+		logger.ErrorCustom("%s:%d [ERROR] nil", fname, line)
+		return
+	}
+
+	// TODO
+	for i := len(err.privateInfo) - 1; i >= 0; i-- {
+		msg := err.privateInfo[i].msg
+		if i != len(err.privateInfo)-1 {
+			msg = "|- " + msg
+		}
+		logger.ErrorCustom("%s:%d [ERROR] %s", err.privateInfo[i].fname, err.privateInfo[i].line, msg)
+	}
+}
