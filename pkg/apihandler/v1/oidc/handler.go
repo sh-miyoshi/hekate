@@ -98,7 +98,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := oidc.ClientAuth(projectName, clientID, clientSecret); err != nil {
 		if errors.Contains(err, errors.ErrInvalidClient) {
-			logger.Info("Failed to authenticate client: %s", clientID)
+			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate client %s", clientID))
 			errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
 		} else {
 			errors.Print(errors.Append(err, "Failed to authenticate client"))
@@ -115,7 +115,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
 				errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, state)
 			} else if errors.Contains(err, model.ErrNoSuchClient) {
-				logger.Info("Failed to get allowed callback urls: No such client %s", clientID)
+				errors.PrintAsInfo(errors.Append(err, "Failed to get allowed callback urls"))
 				errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
 			} else {
 				errors.Print(errors.Append(err, "Failed to get allowed callbak urls in client"))
@@ -165,7 +165,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err.GetHTTPStatusCode() != 0 {
-			logger.Info("Failed to verify request: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to verify request"))
 			errors.WriteOAuthError(w, err, state)
 		} else {
 			errors.Print(errors.Append(err, "Failed to verify request"))
@@ -196,7 +196,7 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get project"))
@@ -276,7 +276,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Verify user login session code
 	s, err := oidc.VerifySession(projectName, sessionID)
 	if err != nil {
-		logger.Info("Failed to verify user login session: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
 		errMsg := "Request failed. internal server error occured."
 		if errors.Contains(err, errors.ErrSessionExpired) {
 			errMsg = "Request failed. the session was already expired."
@@ -291,7 +291,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	usr, err := user.Verify(projectName, uname, passwd)
 	if err != nil {
 		if errors.Contains(err, user.ErrAuthFailed) {
-			logger.Info("Failed to authenticate user %s: %v", uname, err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate user %s", uname))
 
 			// delete old session and create new code for relogin
 			if err := db.GetInst().AuthCodeSessionDelete(projectName, sessionID); err != nil {
@@ -392,7 +392,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		sessionID := r.Form.Get("login_session_id")
 		s, err := oidc.VerifySession(projectName, sessionID)
 		if err != nil {
-			logger.Info("Failed to verify user login session: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
 			errMsg := "Request failed. internal server error occured."
 			if errors.Contains(err, errors.ErrSessionExpired) {
 				errMsg = "Request failed. the session was already expired."
@@ -425,7 +425,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	claims, err := jwthttp.ValidateAPIRequest(r)
 	if err != nil {
-		logger.Info("Failed to validate header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to validate header"))
 		errors.WriteOAuthError(w, errors.ErrRequestUnauthorized, "")
 		return
 	}
@@ -473,14 +473,14 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 		claims := &token.RefreshTokenClaims{}
 		issuer := token.GetExpectIssuer(r)
 		if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
-			logger.Info("Failed to validate refresh token: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to validate refresh token"))
 			w.WriteHeader(http.StatusOK)
 			return
 		}
 
 		if err := db.GetInst().SessionDelete(projectName, claims.SessionID); err != nil {
 			if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
-				logger.Info("Failed to revoke session: %v", err)
+				errors.PrintAsInfo(errors.Append(err, "Failed to revoke session"))
 				w.WriteHeader(http.StatusOK)
 			} else {
 				errors.Print(errors.Append(err, "Failed to revoke session"))
@@ -499,7 +499,7 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	logger.Debug("Auth Request: %v", authReq)
 
 	if err := authReq.Validate(); err != nil {
-		logger.Info("Failed to validate request: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to validate request"))
 		errMsg := "Request failed. "
 		if err.GetHTTPStatusCode() == 0 {
 			errMsg += "internal server error occured."

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime"
+	"strings"
 
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
@@ -142,17 +143,17 @@ func Print(err *Error) {
 
 // PrintAsInfo ...
 func PrintAsInfo(err *Error) {
+	_, fname, line, _ := runtime.Caller(1)
+
 	if err == nil {
-		_, fname, line, _ := runtime.Caller(1)
 		logger.ErrorCustom("%s:%d [INFO] nil", fname, line)
 		return
 	}
 
-	for i := len(err.privateInfo) - 1; i >= 0; i-- {
-		msg := err.privateInfo[i].msg
-		if i != len(err.privateInfo)-1 {
-			msg = "|- " + msg
-		}
-		logger.ErrorCustom("%s:%d [INFO] %s", err.privateInfo[i].fname, err.privateInfo[i].line, msg)
+	msg := ""
+	for _, info := range err.privateInfo {
+		msg = info.msg + ": " + msg
 	}
+	msg = strings.TrimSuffix(msg, ": ")
+	logger.ErrorCustom("%s:%d [INFO] %s", fname, line, msg)
 }

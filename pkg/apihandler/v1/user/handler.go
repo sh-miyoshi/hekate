@@ -25,7 +25,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -40,7 +40,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := db.GetInst().UserGetList(projectName, filter)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("Project %s is not found: %v", projectName, err)
+			errors.PrintAsInfo(errors.Append(err, "Project %s is not found"))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get user"))
@@ -104,7 +104,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -126,7 +126,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := pwpol.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
-		logger.Info("The password %s does not much the policy: %v", request.Password, err)
+		errors.PrintAsInfo(errors.Append(err, "The password does not much the policy"))
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
@@ -144,13 +144,13 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := db.GetInst().UserAdd(projectName, &user); err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("user validation failed: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "user validation failed"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserAlreadyExists) {
-			logger.Info("User %s is already exists", user.Name)
+			errors.PrintAsInfo(errors.Append(err, "User %s is already exists", user.Name))
 			http.Error(w, "User already exists", http.StatusConflict)
 		} else {
 			errors.Print(errors.Append(err, "Failed to create user"))
@@ -194,7 +194,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -202,10 +202,10 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Delete User
 	if err := db.GetInst().UserDelete(projectName, userID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("User %s is not found: %v", userID, err)
+			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete user"))
@@ -231,7 +231,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		claims, err := jwthttp.ValidateAPIRequest(r)
 		// Check if the requester is the user
 		if err != nil || claims.Subject != userID {
-			logger.Info("Failed to authorize header: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
@@ -240,13 +240,13 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("User %s is not found: %v", userID, err)
+			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("Invalid User ID format: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Invalid user ID format"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed toget user"))
@@ -300,7 +300,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -317,13 +317,13 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("User %s is not found: %v", userID, err)
+			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("Invalid User ID format: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Invalid user ID format"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update user"))
@@ -341,7 +341,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update DB
 	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) || errors.Contains(err, model.ErrUserAlreadyExists) {
-			logger.Info("Invalid user request format: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Invalid user request format"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update user"))
@@ -364,7 +364,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -377,7 +377,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous User Info
 	if err := db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
@@ -390,7 +390,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("UserID %s is invalid id format", userID)
 				http.Error(w, "User Not Found", http.StatusNotFound)
 			} else {
-				logger.Info("Invalid role was specified: %v", err)
+				errors.PrintAsInfo(errors.Append(err, "Invalid role was specified"))
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
 		} else {
@@ -414,7 +414,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -422,7 +422,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous User Info
 	if err := db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
@@ -435,7 +435,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("UserID %s is invalid id format", userID)
 				http.Error(w, "User Not Found", http.StatusNotFound)
 			} else {
-				logger.Info("Invalid ID was specified: %v", err)
+				errors.PrintAsInfo(errors.Append(err, "Invalid ID was specified"))
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
 		} else {
@@ -459,7 +459,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	claims, err := jwthttp.ValidateAPIRequest(r)
 	if err != nil || claims.Subject != userID {
-		logger.Info("Failed to authorize user: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize user"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -480,11 +480,11 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("UserID %s is invalid id format", userID)
 				http.Error(w, "User Not Found", http.StatusNotFound)
 			} else {
-				logger.Info("Invalid password was specified: %v", err)
+				errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
 		} else if errors.Contains(err, pwpol.ErrPasswordPolicyFailed) {
-			logger.Info("Invalid password was specified: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to change yser password"))

@@ -21,14 +21,14 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
 	if err := db.GetInst().SessionDelete(projectName, sessionID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
-			logger.Info("Failed to delete session: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to delete session"))
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete session info"))
@@ -51,7 +51,7 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -59,7 +59,7 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 	s, err := db.GetInst().SessionGet(projectName, sessionID)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
-			logger.Info("Failed to get session: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to get session"))
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get session info"))

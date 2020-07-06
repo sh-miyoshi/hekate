@@ -19,7 +19,7 @@ import (
 func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeRead); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -67,7 +67,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -85,7 +85,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	for _, t := range request.AllowGrantTypes {
 		v, err := model.GetGrantType(t)
 		if err != nil {
-			logger.Info("Failed to get grant type %s: %v", t, err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to get grant type %s", t))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
@@ -119,7 +119,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Info("Project %s is already exists", request.Name)
 			http.Error(w, "Project Already Exists", http.StatusConflict)
 		} else if errors.Contains(err, model.ErrProjectValidateFailed) {
-			logger.Info("Invalid project entry is specified: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Invalid project entry is specified"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to create project"))
@@ -159,17 +159,17 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResCluster, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
-			logger.Info("Project %s is not found: %v", projectName, err)
+			errors.PrintAsInfo(errors.Append(err, "Project %s is not found", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrDeleteBlockedProject) {
-			logger.Info("Failed to delete blocked project: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to delete blocked project"))
 			http.Error(w, "Forbidden", http.StatusForbidden)
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete project"))
@@ -191,7 +191,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -200,7 +200,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get project"))
@@ -245,7 +245,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -262,7 +262,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
-			logger.Info("Project %s is not found: %v", projectName, err)
+			errors.PrintAsInfo(errors.Append(err, "Project %s is not found", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get project"))
@@ -285,7 +285,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	for _, t := range request.AllowGrantTypes {
 		v, err := model.GetGrantType(t)
 		if err != nil {
-			logger.Info("Failed to get grant type %s: %v", t, err)
+			errors.PrintAsInfo(errors.Append(err, "Failed to get grant type %s", t))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
@@ -295,7 +295,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update DB
 	if err := db.GetInst().ProjectUpdate(project); err != nil {
 		if errors.Contains(err, model.ErrProjectValidateFailed) {
-			logger.Info("Project info validation failed: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Project info validation failed"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update project"))

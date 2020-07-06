@@ -22,7 +22,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -30,7 +30,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	clients, err := db.GetInst().ClientGetList(projectName)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrClientValidateFailed) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get client"))
@@ -61,7 +61,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -86,13 +86,13 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := db.GetInst().ClientAdd(projectName, &client); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrClientAlreadyExists) {
-			logger.Info("Client %s is already exists", client.ID)
+			errors.PrintAsInfo(errors.Append(err, "Client %s is already exists", client.ID))
 			http.Error(w, "Client already exists", http.StatusConflict)
 		} else if errors.Contains(err, model.ErrClientValidateFailed) {
-			logger.Info("Bad Request: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Bad Request"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to create client"))
@@ -122,17 +122,17 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
 	if err := db.GetInst().ClientDelete(projectName, clientID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
-			logger.Info("No such client: %s", clientID)
+			errors.PrintAsInfo(errors.Append(err, "No such client: %s", clientID))
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete client"))
@@ -155,7 +155,7 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -163,10 +163,10 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
-			logger.Info("No such client: %s", clientID)
+			errors.PrintAsInfo(errors.Append(err, "No such client: %s", clientID))
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get client"))
@@ -195,7 +195,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		logger.Info("Failed to authorize header: %v", err)
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
@@ -212,10 +212,10 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	client, err := db.GetInst().ClientGet(projectName, clientID)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("No such project: %s", projectName)
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
-			logger.Info("No such client: %s", clientID)
+			errors.PrintAsInfo(errors.Append(err, "No such client: %s", clientID))
 			http.Error(w, "Client Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update client"))
@@ -232,7 +232,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update DB
 	if err := db.GetInst().ClientUpdate(projectName, client); err != nil {
 		if errors.Contains(err, model.ErrClientValidateFailed) {
-			logger.Info("Bad Request: %v", err)
+			errors.PrintAsInfo(errors.Append(err, "Bad Request"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update client"))
