@@ -20,12 +20,12 @@ func InitConfig(filePath string) (*GlobalConfig, *errors.Error) {
 
 	fp, err := os.Open(filePath)
 	if err != nil {
-		return nil, errors.New("Failed to open config file: %v", err)
+		return nil, errors.New("", "Failed to open config file: %v", err)
 	}
 	defer fp.Close()
 
 	if err := yaml.NewDecoder(fp).Decode(res); err != nil {
-		return nil, errors.New("Failed to decode config yaml: %v", err)
+		return nil, errors.New("", "Failed to decode config yaml: %v", err)
 	}
 
 	setEnvVar("HEKATE_ADMIN_NAME", &res.AdminName)

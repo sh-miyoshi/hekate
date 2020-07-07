@@ -1,7 +1,6 @@
 package oidc
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -345,9 +344,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	issuer := token.GetFullIssuer(r)
-	req, errMsg := createLoginRedirectInfo(s, state, issuer)
-	if errMsg != "" {
-		err = errors.New(errMsg)
+	req, err := createLoginRedirectInfo(s, state, issuer)
+	if err != nil {
 		errors.Print(err)
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
@@ -355,7 +353,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if ok := slice.Contains(s.ResponseType, "code"); !ok {
 		// delete session
-		err = errors.New("session end")
+		err = errors.New("Session end", "Session end")
 	} else {
 		// Update auth code session info
 		if err = db.GetInst().AuthCodeSessionUpdate(projectName, s); err != nil {
@@ -402,9 +400,9 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		issuer := token.GetFullIssuer(r)
-		req, errMsg := createLoginRedirectInfo(s, state, issuer)
-		if errMsg != "" {
-			logger.Error(errMsg)
+		req, err := createLoginRedirectInfo(s, state, issuer)
+		if err != nil {
+			errors.Print(err)
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
 		}
@@ -540,7 +538,7 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	oidc.WriteUserLoginPage(projectName, sessionID, "", authReq.State, w)
 }
 
-func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer string) (*http.Request, string) {
+func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
 	values := url.Values{}
 	if state != "" {
 		values.Set("state", state)
@@ -555,7 +553,7 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 		case "id_token":
 			prj, err := db.GetInst().ProjectGet(session.ProjectName)
 			if err != nil {
-				return nil, fmt.Sprintf("Failed to get token lifespan in project: %+v", err)
+				return nil, errors.Append(err, "Failed to get token lifespan in project")
 			}
 
 			audiences := []string{session.UserID, session.ClientID}
@@ -569,13 +567,13 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 			}
 			tkn, err := token.GenerateIDToken(audiences, tokenReq)
 			if err != nil {
-				return nil, fmt.Sprintf("Failed to generate id token: %+v", err)
+				return nil, errors.Append(err, "Failed to generate id token")
 			}
 			values.Set("id_token", tkn)
 		case "token":
 			prj, err := db.GetInst().ProjectGet(session.ProjectName)
 			if err != nil {
-				return nil, fmt.Sprintf("Failed to get token lifespan in project: %+v", err)
+				return nil, errors.Append(err, "Failed to get token lifespan in project")
 			}
 
 			audiences := []string{session.UserID, session.ClientID}
@@ -587,17 +585,17 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 			}
 			tkn, err := token.GenerateAccessToken(audiences, tokenReq)
 			if err != nil {
-				return nil, fmt.Sprintf("Failed to generate access token: %+v", err)
+				return nil, errors.Append(err, "Failed to generate access token")
 			}
 			values.Set("access_token", tkn)
 		default:
-			return nil, fmt.Sprintf("Unknown response type: %s", typ)
+			return nil, errors.New("Unknown response type", "Unknown response type %s", typ)
 		}
 	}
 
 	req, err := http.NewRequest("GET", session.RedirectURI, nil)
 	if err != nil {
-		return nil, fmt.Sprintf("Failed to create response: %v", err)
+		return nil, errors.New("Internal server error", "Failed to create response: %v", err)
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
@@ -606,8 +604,8 @@ func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer 
 	} else if session.ResponseMode == "fragment" {
 		req.URL.Fragment = values.Encode()
 	} else {
-		return nil, fmt.Sprintf("Invalid response mode %s is specified.", session.ResponseMode)
+		return nil, errors.New("Internal server error", "Invalid response mode %s is specified", session.ResponseMode)
 	}
 
-	return req, ""
+	return req, nil
 }

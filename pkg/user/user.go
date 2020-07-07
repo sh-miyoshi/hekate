@@ -9,7 +9,7 @@ import (
 
 var (
 	// ErrAuthFailed ...
-	ErrAuthFailed = errors.New("Authentication failed")
+	ErrAuthFailed = errors.New("Authentication failed", "Authentication failed")
 )
 
 // Verify ...

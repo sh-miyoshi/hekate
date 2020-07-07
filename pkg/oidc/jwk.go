@@ -22,13 +22,13 @@ func GenerateJWKSet(signAlg string, publicKey []byte) (*JWKSet, *errors.Error) {
 		jwk.KeyType = "RSA"
 		key, err := x509.ParsePKCS1PublicKey(publicKey)
 		if err != nil {
-			return nil, errors.New("Failed to parse RSA public key: %v", err)
+			return nil, errors.New("RSA key parse failed", "Failed to parse RSA public key: %v", err)
 		}
 		e := util.Int2bytes(uint64(key.E))
 		jwk.E = base64url.Encode(e)
 		jwk.N = base64url.Encode(key.N.Bytes())
 	default:
-		return nil, errors.New("Now such signing algorithm")
+		return nil, errors.New("", "Now such signing algorithm")
 	}
 
 	res := &JWKSet{}

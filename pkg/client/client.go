@@ -8,7 +8,7 @@ import (
 
 var (
 	// ErrNoRedirectURL ...
-	ErrNoRedirectURL = errors.New("no such redirect url")
+	ErrNoRedirectURL = errors.New("No such redirect url", "No such redirect url")
 )
 
 // CheckRedirectURL ...

@@ -29,13 +29,13 @@ type SessionHandler interface {
 
 var (
 	// ErrSessionAlreadyExists ...
-	ErrSessionAlreadyExists = errors.New("Session Already Exists")
+	ErrSessionAlreadyExists = errors.New("Session already exists", "Session already exists")
 
 	// ErrNoSuchSession ...
-	ErrNoSuchSession = errors.New("No Such Session")
+	ErrNoSuchSession = errors.New("No such session", "No such session")
 
 	// ErrSessionValidateFailed ...
-	ErrSessionValidateFailed = errors.New("Session validation failed")
+	ErrSessionValidateFailed = errors.New("Session validation failed", "Session validation failed")
 )
 
 // Validate ...

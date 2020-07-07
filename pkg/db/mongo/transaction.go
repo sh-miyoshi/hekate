@@ -24,7 +24,7 @@ func NewTransactionManager(dbClient *mongo.Client) *TransactionManager {
 // Transaction ...
 func (m *TransactionManager) Transaction(txFunc func() *errors.Error) *errors.Error {
 	if err := m.beginTx(); err != nil {
-		return errors.New("Begin transaction failed: %v", err)
+		return errors.New("", "Begin transaction failed: %v", err)
 	}
 
 	if err := txFunc(); err != nil {
@@ -38,14 +38,14 @@ func (m *TransactionManager) beginTx() *errors.Error {
 	var err error
 	m.session, err = m.dbClient.StartSession()
 	if err != nil {
-		return errors.New("Failed to start mongo session: %v", err)
+		return errors.New("", "Failed to start mongo session: %v", err)
 	}
 	err = m.session.StartTransaction()
 	if err != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 		defer cancel()
 		m.session.EndSession(ctx)
-		return errors.New("Failed to start mongo transaction: %v", err)
+		return errors.New("", "Failed to start mongo transaction: %v", err)
 	}
 	return nil
 }
@@ -57,7 +57,7 @@ func (m *TransactionManager) abortTx() *errors.Error {
 	err := m.session.AbortTransaction(ctx)
 	m.session.EndSession(ctx)
 	if err != nil {
-		return errors.New("Failed abort transaction: %v", err)
+		return errors.New("", "Failed abort transaction: %v", err)
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func (m *TransactionManager) commitTx() *errors.Error {
 	err := m.session.CommitTransaction(ctx)
 	m.session.EndSession(ctx)
 	if err != nil {
-		return errors.New("Failed commit transaction: %v", err)
+		return errors.New("", "Failed commit transaction: %v", err)
 	}
 	return nil
 }

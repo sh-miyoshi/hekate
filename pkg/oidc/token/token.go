@@ -38,15 +38,15 @@ func signToken(projectName string, claims jwt.Claims) (string, *errors.Error) {
 		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 		key, err := x509.ParsePKCS1PrivateKey(project.TokenConfig.SignSecretKey)
 		if err != nil {
-			return "", errors.New("Failed to parse private key: %v", err)
+			return "", errors.New("", "Failed to parse private key: %v", err)
 		}
 		str, err := token.SignedString(key)
 		if err != nil {
-			return "", errors.New("Failed to signing token: %v", err)
+			return "", errors.New("", "Failed to signing token: %v", err)
 		}
 		return str, nil
 	default:
-		return "", errors.New("Unexpected Token Signing Algorithm")
+		return "", errors.New("", "Unexpected Token Signing Algorithm")
 	}
 }
 
@@ -143,11 +143,11 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, errors.New("Failed to parse public key: %v", err)
+				return nil, errors.New("", "Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
-		return nil, errors.New("unknown token sigining method")
+		return nil, errors.New("", "unknown token sigining method")
 	})
 
 	if err != nil {
@@ -156,7 +156,7 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 	}
 
 	if !token.Valid {
-		return errors.New("Invalid token is specified")
+		return errors.New("", "Invalid token is specified")
 	}
 
 	// Token Validate
@@ -166,12 +166,12 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 	}
 	if ti != expectIssuer {
 		logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
-		return errors.New("Unexpected token issuer")
+		return errors.New("", "Unexpected token issuer")
 	}
 
 	now := time.Now().Unix()
 	if now > claims.ExpiresAt {
-		return errors.New("Token is expired")
+		return errors.New("", "Token is expired")
 	}
 
 	return nil
@@ -189,11 +189,11 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, errors.New("Failed to parse public key: %v", err)
+				return nil, errors.New("", "Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
-		return nil, errors.New("unknown token sigining method")
+		return nil, errors.New("", "unknown token sigining method")
 	})
 
 	if err != nil {
@@ -202,7 +202,7 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 	}
 
 	if !token.Valid {
-		return errors.New("Invalid token is specified")
+		return errors.New("", "Invalid token is specified")
 	}
 
 	// Token Validate
@@ -212,12 +212,12 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 	}
 	if ti != expectIssuer {
 		logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
-		return errors.New("Unexpected token issuer")
+		return errors.New("", "Unexpected token issuer")
 	}
 
 	now := time.Now().Unix()
 	if now > claims.ExpiresAt {
-		return errors.New("Token is expired")
+		return errors.New("", "Token is expired")
 	}
 
 	return nil

@@ -10,7 +10,7 @@ import (
 
 var (
 	// ErrPasswordPolicyFailed ...
-	ErrPasswordPolicyFailed = errors.New("possword do not much policy")
+	ErrPasswordPolicyFailed = errors.New("Password do not much policy", "Password do not much policy")
 
 	// ErrPasswordTooShort ...
 	ErrPasswordTooShort = errors.Append(ErrPasswordPolicyFailed, "too short")

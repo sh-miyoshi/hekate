@@ -37,7 +37,7 @@ func NewCustomRoleHandler(dbClient *mongo.Client) (*CustomRoleHandler, *errors.E
 	col := res.dbClient.Database(databaseName).Collection(roleCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
 	if err != nil {
-		return nil, errors.New("Failed to create index: %v", err)
+		return nil, errors.New("", "Failed to create index: %v", err)
 	}
 
 	return res, nil
@@ -59,7 +59,7 @@ func (h *CustomRoleHandler) Add(projectName string, ent *model.CustomRole) *erro
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.New("Failed to insert role to mongodb: %v", err)
+		return errors.New("", "Failed to insert role to mongodb: %v", err)
 	}
 
 	return nil
@@ -78,7 +78,7 @@ func (h *CustomRoleHandler) Delete(projectName string, roleID string) *errors.Er
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.New("Failed to delete role from mongodb: %v", err)
+		return errors.New("", "Failed to delete role from mongodb: %v", err)
 	}
 	return nil
 }
@@ -102,12 +102,12 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 
 	cursor, err := col.Find(ctx, f)
 	if err != nil {
-		return nil, errors.New("Failed to get custom role list from mongodb: %v", err)
+		return nil, errors.New("", "Failed to get custom role list from mongodb: %v", err)
 	}
 
 	roles := []customRole{}
 	if err := cursor.All(ctx, &roles); err != nil {
-		return nil, errors.New("Failed to get custom role list from mongodb: %v", err)
+		return nil, errors.New("", "Failed to get custom role list from mongodb: %v", err)
 	}
 
 	res := []*model.CustomRole{}
@@ -139,7 +139,7 @@ func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.Custo
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchCustomRole
 		}
-		return nil, errors.New("Failed to get role from mongodb: %v", err)
+		return nil, errors.New("", "Failed to get role from mongodb: %v", err)
 	}
 
 	return &model.CustomRole{
@@ -173,7 +173,7 @@ func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) *e
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.New("Failed to update client in mongodb: %v", err)
+		return errors.New("", "Failed to update client in mongodb: %v", err)
 	}
 
 	return nil
@@ -191,7 +191,7 @@ func (h *CustomRoleHandler) DeleteAll(projectName string) *errors.Error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("Failed to delete client from mongodb: %v", err)
+		return errors.New("", "Failed to delete client from mongodb: %v", err)
 	}
 	return nil
 }

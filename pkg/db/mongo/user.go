@@ -37,7 +37,7 @@ func NewUserHandler(dbClient *mongo.Client) (*UserInfoHandler, *errors.Error) {
 	col := res.dbClient.Database(databaseName).Collection(userCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
 	if err != nil {
-		return nil, errors.New("Failed to create index: %v", err)
+		return nil, errors.New("", "Failed to create index: %v", err)
 	}
 
 	return res, nil
@@ -70,14 +70,14 @@ func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) *errors.E
 	defer cancel()
 
 	if _, err := col.InsertOne(ctx, usr); err != nil {
-		return errors.New("Failed to insert user to mongodb: %v", err)
+		return errors.New("", "Failed to insert user to mongodb: %v", err)
 	}
 
 	if len(uroles) > 0 {
 		rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
 
 		if _, err := rcol.InsertMany(ctx, uroles); err != nil {
-			return errors.New("Failed to insert role info in user to mongodb: %v", err)
+			return errors.New("", "Failed to insert role info in user to mongodb: %v", err)
 		}
 	}
 
@@ -96,7 +96,7 @@ func (h *UserInfoHandler) Delete(projectName string, userID string) *errors.Erro
 	defer cancel()
 
 	if _, err := col.DeleteOne(ctx, filter); err != nil {
-		return errors.New("Failed to delete user from mongodb: %v", err)
+		return errors.New("", "Failed to delete user from mongodb: %v", err)
 	}
 
 	rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
@@ -105,7 +105,7 @@ func (h *UserInfoHandler) Delete(projectName string, userID string) *errors.Erro
 	}
 
 	if _, err := rcol.DeleteMany(ctx, filter); err != nil {
-		return errors.New("Failed to delete custom role in user from mongodb: %v", err)
+		return errors.New("", "Failed to delete custom role in user from mongodb: %v", err)
 	}
 
 	return nil
@@ -130,12 +130,12 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 
 	cursor, err := col.Find(ctx, f)
 	if err != nil {
-		return nil, errors.New("Failed to get user list from mongodb: %v", err)
+		return nil, errors.New("", "Failed to get user list from mongodb: %v", err)
 	}
 
 	users := []userInfo{}
 	if err := cursor.All(ctx, &users); err != nil {
-		return nil, errors.New("Failed to parse user list from mongodb: %v", err)
+		return nil, errors.New("", "Failed to parse user list from mongodb: %v", err)
 	}
 
 	res := []*model.UserInfo{}
@@ -170,7 +170,7 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchUser
 		}
-		return nil, errors.New("Failed to get user from mongodb: %v", err)
+		return nil, errors.New("", "Failed to get user from mongodb: %v", err)
 	}
 
 	return &model.UserInfo{
@@ -210,7 +210,7 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *error
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.New("Failed to update user in mongodb: %v", err)
+		return errors.New("", "Failed to update user in mongodb: %v", err)
 	}
 
 	rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
@@ -218,7 +218,7 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *error
 		{Key: "userID", Value: ent.ID},
 	}
 	if _, err := rcol.DeleteMany(ctx, filter); err != nil {
-		return errors.New("Failed to delete previous custom role in user from mongodb: %v", err)
+		return errors.New("", "Failed to delete previous custom role in user from mongodb: %v", err)
 	}
 	uroles := []interface{}{}
 	for _, r := range ent.CustomRoles {
@@ -230,7 +230,7 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *error
 	}
 	if len(uroles) > 0 {
 		if _, err := rcol.InsertMany(ctx, uroles); err != nil {
-			return errors.New("Failed to insert role info in user to mongodb: %v", err)
+			return errors.New("", "Failed to insert role info in user to mongodb: %v", err)
 		}
 	}
 
@@ -249,12 +249,12 @@ func (h *UserInfoHandler) DeleteAll(projectName string) *errors.Error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("Failed to delete user from mongodb: %v", err)
+		return errors.New("", "Failed to delete user from mongodb: %v", err)
 	}
 
 	rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
 	if _, err := rcol.DeleteMany(ctx, filter); err != nil {
-		return errors.New("Failed to delete custom role in user from mongodb: %v", err)
+		return errors.New("", "Failed to delete custom role in user from mongodb: %v", err)
 	}
 
 	return nil
@@ -276,7 +276,7 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType mo
 		if err == mongo.ErrNoDocuments {
 			return model.ErrNoSuchUser
 		}
-		return errors.New("Failed to get user from mongodb: %v", err)
+		return errors.New("", "Failed to get user from mongodb: %v", err)
 	}
 
 	if roleType == model.RoleSystem {
@@ -300,7 +300,7 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType mo
 	}
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.New("Failed to add role to user in mongodb: %v", err)
+		return errors.New("", "Failed to add role to user in mongodb: %v", err)
 	}
 
 	if roleType == model.RoleCustom {
@@ -311,7 +311,7 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType mo
 		}
 		rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
 		if _, err := rcol.InsertOne(ctx, role); err != nil {
-			return errors.New("Failed to insert role info in user to mongodb: %v", err)
+			return errors.New("", "Failed to insert role info in user to mongodb: %v", err)
 		}
 	}
 
@@ -334,7 +334,7 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 		if err == mongo.ErrNoDocuments {
 			return model.ErrNoSuchUser
 		}
-		return errors.New("Failed to get user from mongodb: %v", err)
+		return errors.New("", "Failed to get user from mongodb: %v", err)
 	}
 
 	deleted := false
@@ -370,7 +370,7 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 	}
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.New("Failed to add role to user in mongodb: %v", err)
+		return errors.New("", "Failed to add role to user in mongodb: %v", err)
 	}
 
 	rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
@@ -380,7 +380,7 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 	}
 
 	if _, err := rcol.DeleteOne(ctx, filter); err != nil {
-		return errors.New("Failed to delete custom role in user from mongodb: %v", err)
+		return errors.New("", "Failed to delete custom role in user from mongodb: %v", err)
 	}
 
 	return nil
@@ -399,12 +399,12 @@ func (h *UserInfoHandler) DeleteAllCustomRole(projectName string, roleID string)
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return errors.New("Failed to get role list from mongodb: %v", err)
+		return errors.New("", "Failed to get role list from mongodb: %v", err)
 	}
 
 	roles := []customRoleInUser{}
 	if err := cursor.All(ctx, &roles); err != nil {
-		return errors.New("Failed to parse role list from mongodb: %v", err)
+		return errors.New("", "Failed to parse role list from mongodb: %v", err)
 	}
 
 	for _, r := range roles {

@@ -61,13 +61,13 @@ var (
 	// Defines of Project Error
 
 	// ErrProjectAlreadyExists ...
-	ErrProjectAlreadyExists = errors.New("Project Already Exists")
+	ErrProjectAlreadyExists = errors.New("Project already exists", "Project already exists")
 	// ErrNoSuchProject ...
-	ErrNoSuchProject = errors.New("No such project")
+	ErrNoSuchProject = errors.New("No such project", "No such project")
 	// ErrDeleteBlockedProject ...
-	ErrDeleteBlockedProject = errors.New("Projects cannot be deleted")
+	ErrDeleteBlockedProject = errors.New("Project is blocked by delete", "Project cannot be deleted")
 	// ErrProjectValidateFailed ...
-	ErrProjectValidateFailed = errors.New("Project Validation Failed")
+	ErrProjectValidateFailed = errors.New("Project validation failed", "Project validation failed")
 
 	// Grant Types
 
@@ -153,5 +153,5 @@ func GetGrantType(str string) (GrantType, *errors.Error) {
 		return GrantTypePassword, nil
 	}
 
-	return GrantType{}, errors.New("No such grant type")
+	return GrantType{}, errors.New("No such grant type", "No such grant type")
 }

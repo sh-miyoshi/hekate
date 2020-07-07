@@ -37,7 +37,7 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, *errors.Error) 
 	col := res.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
 	if err != nil {
-		return nil, errors.New("Failed to create index: %v", err)
+		return nil, errors.New("", "Failed to create index: %v", err)
 	}
 
 	return res, nil
@@ -61,7 +61,7 @@ func (h *SessionHandler) Add(projectName string, s *model.Session) *errors.Error
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.New("Failed to insert session to mongodb: %v", err)
+		return errors.New("", "Failed to insert session to mongodb: %v", err)
 	}
 
 	return nil
@@ -80,7 +80,7 @@ func (h *SessionHandler) Delete(projectName string, sessionID string) *errors.Er
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.New("Failed to delete session from mongodb: %v", err)
+		return errors.New("", "Failed to delete session from mongodb: %v", err)
 	}
 	return nil
 }
@@ -98,7 +98,7 @@ func (h *SessionHandler) DeleteAll(projectName string, userID string) *errors.Er
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("Failed to delete session from mongodb: %v", err)
+		return errors.New("", "Failed to delete session from mongodb: %v", err)
 	}
 	return nil
 }
@@ -115,7 +115,7 @@ func (h *SessionHandler) DeleteAllInProject(projectName string) *errors.Error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("Failed to delete session from mongodb: %v", err)
+		return errors.New("", "Failed to delete session from mongodb: %v", err)
 	}
 	return nil
 }
@@ -136,7 +136,7 @@ func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Sessi
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchSession
 		}
-		return nil, errors.New("Failed to get session from mongodb: %v", err)
+		return nil, errors.New("", "Failed to get session from mongodb: %v", err)
 	}
 
 	return &model.Session{
@@ -163,12 +163,12 @@ func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Se
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return nil, errors.New("Failed to get session list from mongodb: %v", err)
+		return nil, errors.New("", "Failed to get session list from mongodb: %v", err)
 	}
 
 	sessions := []session{}
 	if err := cursor.All(ctx, &sessions); err != nil {
-		return nil, errors.New("Failed to parse session list from mongodb: %v", err)
+		return nil, errors.New("", "Failed to parse session list from mongodb: %v", err)
 	}
 
 	res := []*model.Session{}

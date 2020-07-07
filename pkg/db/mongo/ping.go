@@ -28,7 +28,7 @@ func (p *PingHandler) Ping() *errors.Error {
 	defer cancel()
 
 	if err := p.dbClient.Ping(ctx, nil); err != nil {
-		return errors.New("DB Ping failed: %v", err)
+		return errors.New("", "DB Ping failed: %v", err)
 	}
 	return nil
 }

@@ -21,13 +21,13 @@ type CustomRoleFilter struct {
 
 var (
 	// ErrNoSuchCustomRole ...
-	ErrNoSuchCustomRole = errors.New("No Such Custom Role")
+	ErrNoSuchCustomRole = errors.New("No such custom role", "No such custom role")
 
 	// ErrCustomRoleAlreadyExists ...
-	ErrCustomRoleAlreadyExists = errors.New("Custom Role Already Exists")
+	ErrCustomRoleAlreadyExists = errors.New("Custom role already exists", "Custom role already exists")
 
 	// ErrCustomRoleValidateFailed ...
-	ErrCustomRoleValidateFailed = errors.New("Custom Role Already Exists")
+	ErrCustomRoleValidateFailed = errors.New("Custom role validation failed", "Custom role validation failed")
 )
 
 // CustomRoleHandler ...

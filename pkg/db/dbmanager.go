@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"fmt"
 	"os"
 
 	"github.com/asaskevich/govalidator"
@@ -35,7 +34,7 @@ var inst *Manager
 // InitDBManager ...
 func InitDBManager(dbType string, connStr string) *errors.Error {
 	if inst != nil {
-		return errors.New("DBManager is already initialized")
+		return errors.New("", "DBManager is already initialized")
 	}
 
 	switch dbType {
@@ -94,7 +93,7 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 			ping:            mongo.NewPingHandler(dbClient),
 		}
 	default:
-		return errors.New(fmt.Sprintf("Database Type %s is not implemented yet", dbType))
+		return errors.New("", "Database Type %s is not implemented yet", dbType)
 	}
 
 	return nil
@@ -120,7 +119,7 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) *errors.Error {
 	case "RS256":
 		key, err := rsa.GenerateKey(rand.Reader, 2048) // fixed key length is ok?
 		if err != nil {
-			return errors.New("Failed to generate RSA private key: %v", err)
+			return errors.New("RSA key generate failed", "Failed to generate RSA private key: %v", err)
 		}
 		ent.TokenConfig.SignSecretKey = x509.MarshalPKCS1PrivateKey(key)
 		ent.TokenConfig.SignPublicKey = x509.MarshalPKCS1PublicKey(&key.PublicKey)

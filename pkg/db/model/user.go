@@ -35,15 +35,15 @@ func (t RoleType) String() string {
 
 var (
 	// ErrUserAlreadyExists ...
-	ErrUserAlreadyExists = errors.New("User already exists")
+	ErrUserAlreadyExists = errors.New("User already exists", "User already exists")
 	// ErrNoSuchUser ...
-	ErrNoSuchUser = errors.New("No such user")
+	ErrNoSuchUser = errors.New("No such user", "No such user")
 	// ErrRoleAlreadyAppended ...
-	ErrRoleAlreadyAppended = errors.New("Role already appended")
+	ErrRoleAlreadyAppended = errors.New("Role already appended", "Role already appended")
 	// ErrNoSuchRoleInUser ...
-	ErrNoSuchRoleInUser = errors.New("User do not have such role")
+	ErrNoSuchRoleInUser = errors.New("User do not have such role", "User do not have such role")
 	// ErrUserValidateFailed ...
-	ErrUserValidateFailed = errors.New("User validation failed")
+	ErrUserValidateFailed = errors.New("User validation failed", "User validation failed")
 
 	// RoleSystem ...
 	RoleSystem = RoleType{"system_management"}

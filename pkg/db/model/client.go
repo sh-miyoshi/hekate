@@ -19,13 +19,13 @@ type ClientInfo struct {
 
 var (
 	// ErrClientAlreadyExists ...
-	ErrClientAlreadyExists = errors.New("Client Already Exists")
+	ErrClientAlreadyExists = errors.New("Client already exists", "Client already exists")
 
 	// ErrNoSuchClient ...
-	ErrNoSuchClient = errors.New("No Such Client")
+	ErrNoSuchClient = errors.New("No such client", "No such client")
 
 	// ErrClientValidateFailed ...
-	ErrClientValidateFailed = errors.New("Client validation failed")
+	ErrClientValidateFailed = errors.New("Client validation failed", "Client validation failed")
 )
 
 // ClientInfoHandler ...

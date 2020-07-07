@@ -27,18 +27,18 @@ const (
 func NewClient(connStr string) (*mongo.Client, *errors.Error) {
 	cli, err := mongo.NewClient(options.Client().ApplyURI(connStr))
 	if err != nil {
-		return nil, errors.New("Failed to create mongo client: %v", err)
+		return nil, errors.New("", "Failed to create mongo client: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
 	if err := cli.Connect(ctx); err != nil {
-		return nil, errors.New("Failed to connect to mongo: %v", err)
+		return nil, errors.New("", "Failed to connect to mongo: %v", err)
 	}
 
 	if err := cli.Ping(ctx, nil); err != nil {
-		return nil, errors.New("Failed to ping to mongo: %v", err)
+		return nil, errors.New("", "Failed to ping to mongo: %v", err)
 	}
 
 	return cli, nil

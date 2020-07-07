@@ -26,7 +26,7 @@ type AuthCodeSession struct {
 
 var (
 	// ErrNoSuchAuthCodeSession ...
-	ErrNoSuchAuthCodeSession = errors.New("No such session")
+	ErrNoSuchAuthCodeSession = errors.New("No such session", "No such session")
 )
 
 // AuthCodeSessionHandler ...

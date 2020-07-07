@@ -16,7 +16,7 @@ func parseHTTPHeaderToken(tokenString string) (string, *errors.Error) {
 	} else if strings.Contains(tokenString, "Bearer ") {
 		splitToken = strings.Split(tokenString, "Bearer ")
 	} else {
-		return "", errors.New("token format is missing")
+		return "", errors.New("", "token format is missing")
 	}
 	reqToken := strings.TrimSpace(splitToken[1])
 	return reqToken, nil
@@ -26,11 +26,11 @@ func parseHTTPHeaderToken(tokenString string) (string, *errors.Error) {
 func ValidateAPIRequest(req *http.Request) (*token.AccessTokenClaims, *errors.Error) {
 	auth, ok := req.Header["Authorization"]
 	if !ok || len(auth) != 1 {
-		return nil, errors.New("Failed to get Authorization header")
+		return nil, errors.New("Failed to get Authorization header", "Failed to get Authorization header")
 	}
 	tokenString, err := parseHTTPHeaderToken(auth[0])
 	if err != nil {
-		return nil, errors.New("Failed to get token from header")
+		return nil, errors.Append(err, "Failed to get token from header")
 	}
 	claims := &token.AccessTokenClaims{}
 	issuer := token.GetExpectIssuer(req)
@@ -54,12 +54,12 @@ func Authorize(req *http.Request, projectName string, reqTrgRes role.Resource, r
 
 	// Authorize API Request
 	if !role.Authorize(claims.ResourceAccess.SystemManagement.Roles, reqTrgRes, reqRoleType) {
-		return errors.New("Do not have permission")
+		return errors.New("Do not have permission", "Do not have permission")
 	}
 
 	// check project
 	if claims.Project != projectName {
-		return errors.New("Wrong project")
+		return errors.New("Wrong project", "Wrong project")
 	}
 
 	return nil

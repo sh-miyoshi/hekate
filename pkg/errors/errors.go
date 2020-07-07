@@ -38,11 +38,12 @@ func (e *Error) GetHTTPStatusCode() int {
 }
 
 // New ...
-func New(format string, a ...interface{}) *Error {
+func New(publicMsg string, privateMsg string, a ...interface{}) *Error {
 	_, fname, line, _ := runtime.Caller(1)
 
-	msg := fmt.Sprintf(format, a...)
+	msg := fmt.Sprintf(privateMsg, a...)
 	res := &Error{
+		publicMsg: publicMsg,
 		privateInfo: []info{
 			{
 				msg:   msg,
@@ -118,7 +119,7 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 	w.WriteHeader(err.httpResponseCode)
 
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		// TODO(logger)
+		logger.Error("Failed to encode response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
