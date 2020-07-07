@@ -1,5 +1,11 @@
 # TODO List
 
+## Bug Fix
+
+- UserInfo APIの認証時にhttp bodyで認証
+- OpenID Connect 3.1.2.6対応
+  - [参考](https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#AuthError)
+
 ## server application enhancement
 
 - ユーザーパスワードロック
