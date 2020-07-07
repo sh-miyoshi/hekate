@@ -19,6 +19,11 @@ func writeLog(level string, format string, a ...interface{}) {
 	logger.Printf("%s:%d [%s] %s\n", fname, line, level, msg)
 }
 
+func writeCustomLog(format string, a ...interface{}) {
+	msg := fmt.Sprintf(format, a...)
+	logger.Printf("%s\n", msg)
+}
+
 // InitLogger initialize variables for logger
 func InitLogger(debugMode bool, fileName string) error {
 	logEnvDebug = debugMode
@@ -49,4 +54,9 @@ func Info(format string, a ...interface{}) {
 // Error method outputs log as ERROR Level
 func Error(format string, a ...interface{}) {
 	writeLog("ERROR", format, a...)
+}
+
+// ErrorCustom outputs custom format log as ERROR Level
+func ErrorCustom(format string, a ...interface{}) {
+	writeCustomLog(format, a...)
 }

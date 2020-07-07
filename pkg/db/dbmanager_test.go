@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/memory"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 func TestProjectAdd(t *testing.T) {
@@ -33,7 +33,7 @@ func TestProjectAdd(t *testing.T) {
 
 	// Test Duplicate Project Name
 	err := mgr.ProjectAdd(prjInfo)
-	if errors.Cause(err) != model.ErrProjectAlreadyExists {
+	if !errors.Contains(err, model.ErrProjectAlreadyExists) {
 		t.Errorf("Expect error is %v, but got %v", model.ErrProjectAlreadyExists, err)
 	}
 

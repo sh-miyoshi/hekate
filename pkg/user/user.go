@@ -1,19 +1,19 @@
 package user
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
 var (
 	// ErrAuthFailed ...
-	ErrAuthFailed = errors.New("Authentication failed")
+	ErrAuthFailed = errors.New("Authentication failed", "Authentication failed")
 )
 
 // Verify ...
-func Verify(projectName string, name string, password string) (*model.UserInfo, error) {
+func Verify(projectName string, name string, password string) (*model.UserInfo, *errors.Error) {
 	users, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: name})
 	if err != nil {
 		return nil, err

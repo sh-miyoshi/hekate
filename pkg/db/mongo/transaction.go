@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -22,9 +22,9 @@ func NewTransactionManager(dbClient *mongo.Client) *TransactionManager {
 }
 
 // Transaction ...
-func (m *TransactionManager) Transaction(txFunc func() error) error {
+func (m *TransactionManager) Transaction(txFunc func() *errors.Error) *errors.Error {
 	if err := m.beginTx(); err != nil {
-		return errors.Wrap(err, "Begin transaction failed")
+		return errors.New("", "Begin transaction failed: %v", err)
 	}
 
 	if err := txFunc(); err != nil {
@@ -34,36 +34,42 @@ func (m *TransactionManager) Transaction(txFunc func() error) error {
 	return m.commitTx()
 }
 
-func (m *TransactionManager) beginTx() error {
+func (m *TransactionManager) beginTx() *errors.Error {
 	var err error
 	m.session, err = m.dbClient.StartSession()
 	if err != nil {
-		return err
+		return errors.New("", "Failed to start mongo session: %v", err)
 	}
 	err = m.session.StartTransaction()
 	if err != nil {
 		ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 		defer cancel()
 		m.session.EndSession(ctx)
-		return err
+		return errors.New("", "Failed to start mongo transaction: %v", err)
 	}
 	return nil
 }
 
-func (m *TransactionManager) abortTx() error {
+func (m *TransactionManager) abortTx() *errors.Error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
 	err := m.session.AbortTransaction(ctx)
 	m.session.EndSession(ctx)
-	return err
+	if err != nil {
+		return errors.New("", "Failed abort transaction: %v", err)
+	}
+	return nil
 }
 
-func (m *TransactionManager) commitTx() error {
+func (m *TransactionManager) commitTx() *errors.Error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
 	err := m.session.CommitTransaction(ctx)
 	m.session.EndSession(ctx)
-	return err
+	if err != nil {
+		return errors.New("", "Failed commit transaction: %v", err)
+	}
+	return nil
 }

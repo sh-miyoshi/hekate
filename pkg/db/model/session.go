@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // Session ...
@@ -19,44 +19,44 @@ type Session struct {
 
 // SessionHandler ...
 type SessionHandler interface {
-	Add(projectName string, ent *Session) error
-	Delete(projectName string, sessionID string) error
-	DeleteAll(projectName string, userID string) error
-	DeleteAllInProject(projectName string) error
-	Get(projectName string, sessionID string) (*Session, error)
-	GetList(projectName string, userID string) ([]*Session, error)
+	Add(projectName string, ent *Session) *errors.Error
+	Delete(projectName string, sessionID string) *errors.Error
+	DeleteAll(projectName string, userID string) *errors.Error
+	DeleteAllInProject(projectName string) *errors.Error
+	Get(projectName string, sessionID string) (*Session, *errors.Error)
+	GetList(projectName string, userID string) ([]*Session, *errors.Error)
 }
 
 var (
 	// ErrSessionAlreadyExists ...
-	ErrSessionAlreadyExists = errors.New("Session Already Exists")
+	ErrSessionAlreadyExists = errors.New("Session already exists", "Session already exists")
 
 	// ErrNoSuchSession ...
-	ErrNoSuchSession = errors.New("No Such Session")
+	ErrNoSuchSession = errors.New("No such session", "No such session")
 
 	// ErrSessionValidateFailed ...
-	ErrSessionValidateFailed = errors.New("Session validation failed")
+	ErrSessionValidateFailed = errors.New("Session validation failed", "Session validation failed")
 )
 
 // Validate ...
-func (s *Session) Validate() error {
+func (s *Session) Validate() *errors.Error {
 	// Check Session ID
 	if !ValidateSessionID(s.SessionID) {
-		return errors.Wrap(ErrSessionValidateFailed, "Invalid session ID format")
+		return errors.Append(ErrSessionValidateFailed, "Invalid session ID format")
 	}
 
 	if !ValidateProjectName(s.ProjectName) {
-		return errors.Wrap(ErrUserValidateFailed, "Invalid project Name format")
+		return errors.Append(ErrUserValidateFailed, "Invalid project Name format")
 	}
 
 	// Check User ID
 	if !ValidateUserID(s.UserID) {
-		return errors.Wrap(ErrSessionValidateFailed, "Invalid user ID format")
+		return errors.Append(ErrSessionValidateFailed, "Invalid user ID format")
 	}
 
 	// Check From IP
 	if ok := govalidator.IsIP(s.FromIP); !ok {
-		return errors.Wrap(ErrSessionValidateFailed, "Invalid from IP")
+		return errors.Append(ErrSessionValidateFailed, "Invalid from IP")
 	}
 
 	return nil

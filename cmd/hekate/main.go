@@ -10,7 +10,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/pkg/errors"
 	"github.com/rs/cors"
 	"github.com/sh-miyoshi/hekate/cmd/hekate/config"
 	clientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
@@ -21,6 +20,7 @@ import (
 	userapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
@@ -108,9 +108,9 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	r.Use(loggingMiddleware)
 }
 
-func initDB(dbType, connStr, adminName, adminPassword string) error {
+func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 	if err := db.InitDBManager(dbType, connStr); err != nil {
-		return errors.Wrap(err, "Failed to init database manager")
+		return errors.Append(err, "Failed to init database manager")
 	}
 
 	// Set Master Project if not exsits
@@ -131,10 +131,10 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 		},
 	})
 	if err != nil {
-		if errors.Cause(err) == model.ErrProjectAlreadyExists {
+		if errors.Contains(err, model.ErrProjectAlreadyExists) {
 			logger.Info("Master Project is already exists.")
 		} else {
-			return errors.Wrap(err, "Failed to create master project")
+			return errors.Append(err, "Failed to create master project")
 		}
 	}
 
@@ -152,10 +152,10 @@ func initDB(dbType, connStr, adminName, adminPassword string) error {
 	})
 
 	if err != nil {
-		if errors.Cause(err) == model.ErrUserAlreadyExists {
+		if errors.Contains(err, model.ErrUserAlreadyExists) {
 			logger.Info("Admin user is already exists.")
 		} else {
-			return errors.Wrap(err, "Failed to create admin user")
+			return errors.Append(err, "Failed to create admin user")
 		}
 	}
 
@@ -186,7 +186,7 @@ func main() {
 
 	// Initialize Default Role Handler
 	if err := defaultrole.InitHandler(); err != nil {
-		logger.Error("Failed to initialize default role handler: %+v", err)
+		errors.Print(errors.Append(err, "Failed to initialize default role handler"))
 		os.Exit(1)
 	}
 
@@ -198,7 +198,7 @@ func main() {
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
-		logger.Error("Failed to initialize database: %+v", err)
+		errors.Print(errors.Append(err, "Failed to initialize database"))
 		os.Exit(1)
 	}
 
@@ -227,13 +227,13 @@ func main() {
 	if cfg.HTTPSConfig.Enabled {
 		logger.Info("Run server as https")
 		if err := http.ListenAndServeTLS(addr, cfg.HTTPSConfig.CertFile, cfg.HTTPSConfig.KeyFile, corsOpts.Handler(r)); err != nil {
-			logger.Error("Failed to run server: %+v", err)
+			logger.Error("Failed to run server: %v", err)
 			os.Exit(1)
 		}
 	} else {
 		logger.Info("Run server as http")
 		if err := http.ListenAndServe(addr, corsOpts.Handler(r)); err != nil {
-			logger.Error("Failed to run server: %+v", err)
+			logger.Error("Failed to run server: %v", err)
 			os.Exit(1)
 		}
 	}

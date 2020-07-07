@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 func TestCheckPassword(t *testing.T) {
@@ -20,7 +21,7 @@ func TestCheckPassword(t *testing.T) {
 		userName string
 		password string
 		policy   model.PasswordPolicy
-		expect   error
+		expect   *errors.Error
 	}{
 		{expect: nil}, // if empty policy, return ok
 		{userName: "admin", password: "Admin1234!", policy: allPol, expect: nil},                    // correct password

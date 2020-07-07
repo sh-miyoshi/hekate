@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +17,7 @@ type SessionHandler struct {
 }
 
 // NewSessionHandler ...
-func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
+func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, *errors.Error) {
 	res := &SessionHandler{
 		dbClient: dbClient,
 	}
@@ -36,12 +36,15 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, error) {
 
 	col := res.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
+	if err != nil {
+		return nil, errors.New("", "Failed to create index: %v", err)
+	}
 
-	return res, err
+	return res, nil
 }
 
 // Add ...
-func (h *SessionHandler) Add(projectName string, s *model.Session) error {
+func (h *SessionHandler) Add(projectName string, s *model.Session) *errors.Error {
 	v := &session{
 		UserID:      s.UserID,
 		ProjectName: s.ProjectName,
@@ -58,14 +61,14 @@ func (h *SessionHandler) Add(projectName string, s *model.Session) error {
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.Wrap(err, "Failed to insert session to mongodb")
+		return errors.New("", "Failed to insert session to mongodb: %v", err)
 	}
 
 	return nil
 }
 
 // Delete ...
-func (h *SessionHandler) Delete(projectName string, sessionID string) error {
+func (h *SessionHandler) Delete(projectName string, sessionID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -77,13 +80,13 @@ func (h *SessionHandler) Delete(projectName string, sessionID string) error {
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "Failed to delete session from mongodb")
+		return errors.New("", "Failed to delete session from mongodb: %v", err)
 	}
 	return nil
 }
 
 // DeleteAll ...
-func (h *SessionHandler) DeleteAll(projectName string, userID string) error {
+func (h *SessionHandler) DeleteAll(projectName string, userID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -95,13 +98,13 @@ func (h *SessionHandler) DeleteAll(projectName string, userID string) error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "Failed to delete session from mongodb")
+		return errors.New("", "Failed to delete session from mongodb: %v", err)
 	}
 	return nil
 }
 
 // DeleteAllInProject ...
-func (h *SessionHandler) DeleteAllInProject(projectName string) error {
+func (h *SessionHandler) DeleteAllInProject(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -112,13 +115,13 @@ func (h *SessionHandler) DeleteAllInProject(projectName string) error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.Wrap(err, "Failed to delete session from mongodb")
+		return errors.New("", "Failed to delete session from mongodb: %v", err)
 	}
 	return nil
 }
 
 // Get ...
-func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Session, error) {
+func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Session, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -133,7 +136,7 @@ func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Sessi
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchSession
 		}
-		return nil, errors.Wrap(err, "Failed to get session from mongodb")
+		return nil, errors.New("", "Failed to get session from mongodb: %v", err)
 	}
 
 	return &model.Session{
@@ -147,7 +150,7 @@ func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Sessi
 }
 
 // GetList ...
-func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Session, error) {
+func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Session, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 
 	filter := bson.D{
@@ -160,12 +163,12 @@ func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Se
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to get session list from mongodb")
+		return nil, errors.New("", "Failed to get session list from mongodb: %v", err)
 	}
 
 	sessions := []session{}
 	if err := cursor.All(ctx, &sessions); err != nil {
-		return nil, errors.Wrap(err, "Failed to get session list from mongodb")
+		return nil, errors.New("", "Failed to parse session list from mongodb: %v", err)
 	}
 
 	res := []*model.Session{}

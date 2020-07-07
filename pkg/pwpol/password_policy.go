@@ -3,23 +3,23 @@ package pwpol
 import (
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/stretchr/stew/slice"
 )
 
 var (
 	// ErrPasswordPolicyFailed ...
-	ErrPasswordPolicyFailed = errors.New("possword do not much policy")
+	ErrPasswordPolicyFailed = errors.New("Password do not much policy", "Password do not much policy")
 
 	// ErrPasswordTooShort ...
-	ErrPasswordTooShort = errors.Wrap(ErrPasswordPolicyFailed, "too short")
+	ErrPasswordTooShort = errors.Append(ErrPasswordPolicyFailed, "too short")
 	// ErrSameAsUserName ...
-	ErrSameAsUserName = errors.Wrap(ErrPasswordPolicyFailed, "same as user name")
+	ErrSameAsUserName = errors.Append(ErrPasswordPolicyFailed, "same as user name")
 	// ErrBlackListed ...
-	ErrBlackListed = errors.Wrap(ErrPasswordPolicyFailed, "is in black list")
+	ErrBlackListed = errors.Append(ErrPasswordPolicyFailed, "is in black list")
 	// ErrNotContainChar ...
-	ErrNotContainChar = errors.Wrap(ErrPasswordPolicyFailed, "do not contain required character")
+	ErrNotContainChar = errors.Append(ErrPasswordPolicyFailed, "do not contain required character")
 )
 
 const (
@@ -30,7 +30,7 @@ const (
 )
 
 // CheckPassword ...
-func CheckPassword(userName, password string, policy model.PasswordPolicy) error {
+func CheckPassword(userName, password string, policy model.PasswordPolicy) *errors.Error {
 	// MinimumLength
 	if policy.MinimumLength > 0 {
 		// If minimum length value is valid, check password length

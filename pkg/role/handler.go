@@ -3,7 +3,7 @@ package role
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
@@ -15,9 +15,9 @@ type Handler struct {
 var inst *Handler
 
 // InitHandler ...
-func InitHandler() error {
+func InitHandler() *errors.Error {
 	if inst != nil {
-		return errors.New("Default Role Handler is already initialized")
+		return errors.New("", "Default Role Handler is already initialized")
 	}
 
 	inst = &Handler{}

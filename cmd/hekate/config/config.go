@@ -3,7 +3,7 @@ package config
 import (
 	"os"
 
-	"github.com/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -15,17 +15,17 @@ func setEnvVar(key string, target *string) {
 }
 
 // InitConfig ...
-func InitConfig(filePath string) (*GlobalConfig, error) {
+func InitConfig(filePath string) (*GlobalConfig, *errors.Error) {
 	res := &GlobalConfig{}
 
 	fp, err := os.Open(filePath)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to open config file")
+		return nil, errors.New("", "Failed to open config file: %v", err)
 	}
 	defer fp.Close()
 
 	if err := yaml.NewDecoder(fp).Decode(res); err != nil {
-		return nil, errors.Wrap(err, "Failed to decode config yaml")
+		return nil, errors.New("", "Failed to decode config yaml: %v", err)
 	}
 
 	setEnvVar("HEKATE_ADMIN_NAME", &res.AdminName)

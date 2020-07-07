@@ -1,5 +1,7 @@
 package memory
 
+import "github.com/sh-miyoshi/hekate/pkg/errors"
+
 // PingHandler implement db.PingHandler
 type PingHandler struct {
 }
@@ -10,6 +12,6 @@ func NewPingHandler() *PingHandler {
 }
 
 // Ping ...
-func (p *PingHandler) Ping() error {
+func (p *PingHandler) Ping() *errors.Error {
 	return nil
 }

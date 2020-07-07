@@ -2,6 +2,8 @@ package memory
 
 import (
 	"sync"
+
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // TransactionManager ...
@@ -15,7 +17,7 @@ func NewTransactionManager() *TransactionManager {
 }
 
 // Transaction ...
-func (m *TransactionManager) Transaction(txFunc func() error) error {
+func (m *TransactionManager) Transaction(txFunc func() *errors.Error) *errors.Error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 

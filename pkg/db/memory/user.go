@@ -2,6 +2,7 @@ package memory
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
@@ -19,13 +20,13 @@ func NewUserHandler() *UserInfoHandler {
 }
 
 // Add ...
-func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) error {
+func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) *errors.Error {
 	h.userList[ent.ID] = ent
 	return nil
 }
 
 // Delete ...
-func (h *UserInfoHandler) Delete(projectName string, userID string) error {
+func (h *UserInfoHandler) Delete(projectName string, userID string) *errors.Error {
 	if res, exists := h.userList[userID]; exists {
 		if res.ProjectName == projectName {
 			delete(h.userList, userID)
@@ -36,7 +37,7 @@ func (h *UserInfoHandler) Delete(projectName string, userID string) error {
 }
 
 // GetList ...
-func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, error) {
+func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, *errors.Error) {
 	res := []*model.UserInfo{}
 
 	for _, user := range h.userList {
@@ -53,7 +54,7 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 }
 
 // Get ...
-func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, error) {
+func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, *errors.Error) {
 	res, exists := h.userList[userID]
 	if !exists || res.ProjectName != projectName {
 		return nil, model.ErrNoSuchUser
@@ -63,7 +64,7 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 }
 
 // Update ...
-func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) error {
+func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *errors.Error {
 	if res, exists := h.userList[ent.ID]; !exists || res.ProjectName != projectName {
 		return model.ErrNoSuchUser
 	}
@@ -74,7 +75,7 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) error 
 }
 
 // DeleteAll ...
-func (h *UserInfoHandler) DeleteAll(projectName string) error {
+func (h *UserInfoHandler) DeleteAll(projectName string) *errors.Error {
 	for _, user := range h.userList {
 		if user.ProjectName == projectName {
 			delete(h.userList, user.ID)
@@ -84,7 +85,7 @@ func (h *UserInfoHandler) DeleteAll(projectName string) error {
 }
 
 // AddRole ...
-func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType model.RoleType, roleID string) error {
+func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType model.RoleType, roleID string) *errors.Error {
 	if res, exists := h.userList[userID]; !exists || res.ProjectName != projectName {
 		return model.ErrNoSuchUser
 	}
@@ -111,7 +112,7 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType mo
 }
 
 // DeleteRole ....
-func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) error {
+func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) *errors.Error {
 	if res, exists := h.userList[userID]; !exists || res.ProjectName != projectName {
 		return model.ErrNoSuchUser
 	}
@@ -150,7 +151,7 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 }
 
 // DeleteAllCustomRole ...
-func (h *UserInfoHandler) DeleteAllCustomRole(projectName string, roleID string) error {
+func (h *UserInfoHandler) DeleteAllCustomRole(projectName string, roleID string) *errors.Error {
 	for id, user := range h.userList {
 		if user.ProjectName != projectName {
 			continue
