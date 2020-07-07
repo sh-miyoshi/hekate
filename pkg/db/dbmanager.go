@@ -27,6 +27,8 @@ type Manager struct {
 	authCodeSession model.AuthCodeSessionHandler
 	transaction     model.TransactionManager
 	ping            model.PingHandler
+
+	portalAddr string
 }
 
 var inst *Manager
@@ -96,6 +98,14 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 		return errors.New("", "Database Type %s is not implemented yet", dbType)
 	}
 
+	if os.Getenv("HEKATE_PORTAL_ADDR") != "" {
+		inst.portalAddr = os.Getenv("HEKATE_PORTAL_ADDR") + "/callback"
+		if !govalidator.IsRequestURL(inst.portalAddr) {
+			return errors.Append(model.ErrProjectValidateFailed, "Invalid portal callback URL %s is specified.", inst.portalAddr)
+		}
+		logger.Info("Set portal callback URL: %s", inst.portalAddr)
+	}
+
 	return nil
 }
 
@@ -135,13 +145,8 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) *errors.Error {
 		}
 
 		callbacks := []string{}
-		if os.Getenv("HEKATE_PORTAL_ADDR") != "" {
-			addr := os.Getenv("HEKATE_PORTAL_ADDR") + "/callback"
-			if !govalidator.IsRequestURL(addr) {
-				return errors.Append(model.ErrProjectValidateFailed, "Invalid portal callback URL %s is specified.", addr)
-			}
-			callbacks = append(callbacks, addr)
-			logger.Info("Set portal callback URL: %s", addr)
+		if m.portalAddr != "" {
+			callbacks = append(callbacks, m.portalAddr)
 		}
 		// add client for portal login
 		clientEnt := &model.ClientInfo{
