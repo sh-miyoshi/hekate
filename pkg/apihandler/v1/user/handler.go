@@ -40,7 +40,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := db.GetInst().UserGetList(projectName, filter)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrUserValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "Project %s is not found"))
+			errors.PrintAsInfo(errors.Append(err, "Project %s is not found", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get user"))

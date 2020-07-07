@@ -220,7 +220,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found"))
+			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", request.Name))
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update role"))
