@@ -15,6 +15,7 @@
   - success or failed
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
+  - http.Error関数の置き換え
 - db manager validationの追加
 - Custom RoleにDescriptionを追加
   - API docの修正
