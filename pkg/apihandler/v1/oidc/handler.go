@@ -498,30 +498,26 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 
 	if err := authReq.Validate(); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to validate request"))
-		errMsg := "Request failed. "
 		if err.GetHTTPStatusCode() == 0 {
-			errMsg += "internal server error occured."
+			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 		} else {
-			errMsg += err.Error()
+			errors.WriteOAuthError(w, err, authReq.State)
 		}
-		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
 	// Check Redirect URL
 	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
-		errMsg := ""
 		if errors.Contains(err, client.ErrNoRedirectURL) {
-			logger.Info("Redirect URL %s is not in Allowed list", authReq.RedirectURI)
-			errMsg = "Request failed. the redirect url is not allowed"
+			errors.PrintAsInfo(errors.Append(err, "Redirect URL %s is not in Allowed list", authReq.RedirectURI))
+			errors.WriteOAuthError(w, err, authReq.State)
 		} else if errors.Contains(err, model.ErrNoSuchClient) {
-			logger.Info("Failed to get allowed callback urls: No such client %s", authReq.ClientID)
-			errMsg = "Request faild. no such client"
+			errors.PrintAsInfo(errors.Append(err, "Failed to get allowed callback urls: No such client %s", authReq.ClientID))
+			errors.WriteOAuthError(w, errors.ErrInvalidClient, authReq.State)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get allowed callback urls in client"))
-			errMsg = "Request faild. internal server error occured"
+			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 		}
-		oidc.WriteErrorPage(errMsg, w)
 		return
 	}
 
@@ -531,7 +527,7 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	sessionID, err := oidc.StartLoginSession(projectName, authReq)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to register auth code session"))
-		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
+		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 		return
 	}
 
