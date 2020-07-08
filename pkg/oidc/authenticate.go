@@ -70,7 +70,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchAuthCodeSession) {
 			// TODO(revoke all token in code.UserID) <- SHOULD
-			return nil, errors.Append(errors.ErrInvalidRequest, "no such code")
+			return nil, errors.Append(errors.ErrInvalidGrant, "no such code")
 		}
 		return nil, errors.Append(err, "Failed to get auth code info")
 	}

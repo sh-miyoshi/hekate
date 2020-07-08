@@ -510,7 +510,7 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
 		if errors.Contains(err, client.ErrNoRedirectURL) {
 			errors.PrintAsInfo(errors.Append(err, "Redirect URL %s is not in Allowed list", authReq.RedirectURI))
-			errors.WriteOAuthError(w, err, authReq.State)
+			errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, authReq.State)
 		} else if errors.Contains(err, model.ErrNoSuchClient) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get allowed callback urls: No such client %s", authReq.ClientID))
 			errors.WriteOAuthError(w, errors.ErrInvalidClient, authReq.State)
