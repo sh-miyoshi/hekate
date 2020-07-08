@@ -55,6 +55,7 @@ func validatePrompt(prompts []string) *errors.Error {
 			if len(prompts) != 1 {
 				return errors.ErrInvalidRequest
 			}
+			return errors.ErrInteractionRequired
 		default:
 			return errors.ErrInvalidRequest
 		}
