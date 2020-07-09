@@ -25,12 +25,12 @@ type AuthRequest struct {
 	Prompt       []string
 	MaxAge       uint
 	ResponseMode string
+	LoginHint    string
 
 	// TODO(implement this)
 	// Display string // display(OPTIONAL)
 	// UILocales string // ui_locales(OPTIONAL)
 	// IDTokenHint string // id_token_hint(OPTIONAL)
-	// LoginHint string // login_hint(OPTIONAL)
 	// ACRValues string // acr_values(OPTIONAL)
 }
 
@@ -55,7 +55,6 @@ func validatePrompt(prompts []string) *errors.Error {
 			if len(prompts) != 1 {
 				return errors.ErrInvalidRequest
 			}
-			return errors.ErrInteractionRequired
 		default:
 			return errors.ErrInvalidRequest
 		}
