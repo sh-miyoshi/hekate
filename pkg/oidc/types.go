@@ -34,18 +34,6 @@ type AuthRequest struct {
 	// ACRValues string // acr_values(OPTIONAL)
 }
 
-// AuthCodeSession ...
-type AuthCodeSession struct {
-	Scope        string
-	ResponseType []string
-	ClientID     string
-	RedirectURI  string
-	Nonce        string
-	MaxAge       uint
-	ResponseMode string
-	Prompt       []string
-}
-
 func validatePrompt(prompts []string) *errors.Error {
 	for _, prompt := range prompts {
 		switch prompt {

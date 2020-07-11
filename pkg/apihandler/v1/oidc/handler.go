@@ -311,13 +311,13 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				Prompt:       s.Prompt,
 			}
 
-			code, err := oidc.StartLoginSession(projectName, authReq)
+			lsID, err := oidc.StartLoginSession(projectName, authReq)
 			if err != nil {
 				errors.Print(errors.Append(err, "Failed to register login session"))
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 				return
 			}
-			oidc.WriteUserLoginPage(projectName, code, "invalid user name or password", state, w)
+			oidc.WriteUserLoginPage(projectName, lsID, "invalid user name or password", state, w)
 			err = nil // do not delete session in defer function
 		} else {
 			errors.Print(errors.Append(err, "Failed to verify user"))
@@ -565,14 +565,14 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 	}
 
 	// Start session for login flow
-	sessionID, err := oidc.StartLoginSession(projectName, authReq)
+	lsID, err := oidc.StartLoginSession(projectName, authReq)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to register auth code session"))
 		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 		return
 	}
 
-	oidc.WriteUserLoginPage(projectName, sessionID, "", authReq.State, w)
+	oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
 }
 
 func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer string) (*http.Request, *errors.Error) {

@@ -36,7 +36,7 @@ func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Er
 	// *) userID, code will be set in after
 
 	if err := db.GetInst().AuthCodeSessionAdd(projectName, s); err != nil {
-		return "", errors.Append(err, "add auth code session failed")
+		return "", errors.Append(err, "add login session failed")
 	}
 	return s.SessionID, nil
 }
