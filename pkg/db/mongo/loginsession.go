@@ -11,14 +11,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// AuthCodeSessionHandler implement db.AuthCodeSessionHandler
-type AuthCodeSessionHandler struct {
+// LoginSessionHandler implement db.LoginSessionHandler
+type LoginSessionHandler struct {
 	dbClient *mongo.Client
 }
 
-// NewAuthCodeSessionHandler ...
-func NewAuthCodeSessionHandler(dbClient *mongo.Client) (*AuthCodeSessionHandler, *errors.Error) {
-	res := &AuthCodeSessionHandler{
+// NewLoginSessionHandler ...
+func NewLoginSessionHandler(dbClient *mongo.Client) (*LoginSessionHandler, *errors.Error) {
+	res := &LoginSessionHandler{
 		dbClient: dbClient,
 	}
 
@@ -44,8 +44,8 @@ func NewAuthCodeSessionHandler(dbClient *mongo.Client) (*AuthCodeSessionHandler,
 }
 
 // Add ...
-func (h *AuthCodeSessionHandler) Add(projectName string, ent *model.AuthCodeSession) *errors.Error {
-	v := &authCodeSession{
+func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *errors.Error {
+	v := &loginSession{
 		SessionID:    ent.SessionID,
 		Code:         ent.Code,
 		ExpiresIn:    ent.ExpiresIn,
@@ -75,14 +75,14 @@ func (h *AuthCodeSessionHandler) Add(projectName string, ent *model.AuthCodeSess
 }
 
 // Update ...
-func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeSession) *errors.Error {
+func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
 		{Key: "sessionID", Value: ent.SessionID},
 	}
 
-	v := &authCodeSession{
+	v := &loginSession{
 		SessionID:    ent.SessionID,
 		Code:         ent.Code,
 		ExpiresIn:    ent.ExpiresIn,
@@ -113,7 +113,7 @@ func (h *AuthCodeSessionHandler) Update(projectName string, ent *model.AuthCodeS
 }
 
 // Delete ...
-func (h *AuthCodeSessionHandler) Delete(projectName string, sessionID string) *errors.Error {
+func (h *LoginSessionHandler) Delete(projectName string, sessionID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -131,7 +131,7 @@ func (h *AuthCodeSessionHandler) Delete(projectName string, sessionID string) *e
 }
 
 // GetByCode ...
-func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*model.AuthCodeSession, *errors.Error) {
+func (h *LoginSessionHandler) GetByCode(projectName string, code string) (*model.LoginSession, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -141,15 +141,15 @@ func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*mo
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &authCodeSession{}
+	res := &loginSession{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchAuthCodeSession
+			return nil, model.ErrNoSuchLoginSession
 		}
 		return nil, errors.New("", "Failed to get login session from mongodb: %v", err)
 	}
 
-	return &model.AuthCodeSession{
+	return &model.LoginSession{
 		SessionID:    res.SessionID,
 		Code:         res.Code,
 		ExpiresIn:    res.ExpiresIn,
@@ -167,7 +167,7 @@ func (h *AuthCodeSessionHandler) GetByCode(projectName string, code string) (*mo
 }
 
 // Get ...
-func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.AuthCodeSession, *errors.Error) {
+func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSession, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -177,15 +177,15 @@ func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.Auth
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	res := &authCodeSession{}
+	res := &loginSession{}
 	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchAuthCodeSession
+			return nil, model.ErrNoSuchLoginSession
 		}
 		return nil, errors.New("", "Failed to get login session from mongodb: %v", err)
 	}
 
-	return &model.AuthCodeSession{
+	return &model.LoginSession{
 		SessionID:    res.SessionID,
 		Code:         res.Code,
 		ExpiresIn:    res.ExpiresIn,
@@ -203,7 +203,7 @@ func (h *AuthCodeSessionHandler) Get(projectName string, id string) (*model.Auth
 }
 
 // DeleteAllInClient ...
-func (h *AuthCodeSessionHandler) DeleteAllInClient(projectName string, clientID string) *errors.Error {
+func (h *LoginSessionHandler) DeleteAllInClient(projectName string, clientID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -221,7 +221,7 @@ func (h *AuthCodeSessionHandler) DeleteAllInClient(projectName string, clientID 
 }
 
 // DeleteAllInUser ...
-func (h *AuthCodeSessionHandler) DeleteAllInUser(projectName string, userID string) *errors.Error {
+func (h *LoginSessionHandler) DeleteAllInUser(projectName string, userID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},
@@ -239,7 +239,7 @@ func (h *AuthCodeSessionHandler) DeleteAllInUser(projectName string, userID stri
 }
 
 // DeleteAllInProject ...
-func (h *AuthCodeSessionHandler) DeleteAllInProject(projectName string) *errors.Error {
+func (h *LoginSessionHandler) DeleteAllInProject(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "projectName", Value: projectName},

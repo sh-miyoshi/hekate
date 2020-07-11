@@ -41,7 +41,7 @@ type session struct {
 	AuthMaxAge   uint      `bson:"maxAge"`
 }
 
-type authCodeSession struct {
+type loginSession struct {
 	SessionID    string    `bson:"sessionID"`
 	Code         string    `bson:"code"`
 	ExpiresIn    time.Time `bson:"expiresIn"`

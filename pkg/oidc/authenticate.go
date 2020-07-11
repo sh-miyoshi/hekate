@@ -68,13 +68,13 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 
 // ReqAuthByCode ...
 func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *http.Request) (*TokenResponse, *errors.Error) {
-	s, err := db.GetInst().AuthCodeSessionGetByCode(project.Name, code)
+	s, err := db.GetInst().LoginSessionGetByCode(project.Name, code)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchAuthCodeSession) {
+		if errors.Contains(err, model.ErrNoSuchLoginSession) {
 			// TODO(revoke all token in code.UserID) <- SHOULD
 			return nil, errors.Append(errors.ErrInvalidGrant, "no such code")
 		}
-		return nil, errors.Append(err, "Failed to get auth code info")
+		return nil, errors.Append(err, "Failed to get login session info")
 	}
 
 	// Validate session info
@@ -87,8 +87,8 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 	}
 
 	// Remove Authorized code
-	if err := db.GetInst().AuthCodeSessionDelete(project.Name, s.SessionID); err != nil {
-		return nil, errors.Append(err, "Failed to delete auth code")
+	if err := db.GetInst().LoginSessionDelete(project.Name, s.SessionID); err != nil {
+		return nil, errors.Append(err, "Failed to delete login session")
 	}
 
 	audiences := []string{

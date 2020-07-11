@@ -6,8 +6,8 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
-// AuthCodeSession ...
-type AuthCodeSession struct {
+// LoginSession ...
+type LoginSession struct {
 	SessionID    string
 	Code         string
 	ExpiresIn    time.Time
@@ -25,17 +25,17 @@ type AuthCodeSession struct {
 }
 
 var (
-	// ErrNoSuchAuthCodeSession ...
-	ErrNoSuchAuthCodeSession = errors.New("No such session", "No such session")
+	// ErrNoSuchLoginSession ...
+	ErrNoSuchLoginSession = errors.New("No such session", "No such session")
 )
 
-// AuthCodeSessionHandler ...
-type AuthCodeSessionHandler interface {
-	Add(projectName string, ent *AuthCodeSession) *errors.Error
-	Update(projectName string, ent *AuthCodeSession) *errors.Error
+// LoginSessionHandler ...
+type LoginSessionHandler interface {
+	Add(projectName string, ent *LoginSession) *errors.Error
+	Update(projectName string, ent *LoginSession) *errors.Error
 	Delete(projectName string, sessionID string) *errors.Error
-	GetByCode(projectName string, code string) (*AuthCodeSession, *errors.Error)
-	Get(projectName string, sessionID string) (*AuthCodeSession, *errors.Error)
+	GetByCode(projectName string, code string) (*LoginSession, *errors.Error)
+	Get(projectName string, sessionID string) (*LoginSession, *errors.Error)
 	DeleteAllInClient(projectName string, clientID string) *errors.Error
 	DeleteAllInUser(projectName string, userID string) *errors.Error
 	DeleteAllInProject(projectName string) *errors.Error

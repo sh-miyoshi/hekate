@@ -19,14 +19,14 @@ import (
 
 // Manager ...
 type Manager struct {
-	project         model.ProjectInfoHandler
-	user            model.UserInfoHandler
-	session         model.SessionHandler
-	client          model.ClientInfoHandler
-	customRole      model.CustomRoleHandler
-	authCodeSession model.AuthCodeSessionHandler
-	transaction     model.TransactionManager
-	ping            model.PingHandler
+	project      model.ProjectInfoHandler
+	user         model.UserInfoHandler
+	session      model.SessionHandler
+	client       model.ClientInfoHandler
+	customRole   model.CustomRoleHandler
+	loginSession model.LoginSessionHandler
+	transaction  model.TransactionManager
+	ping         model.PingHandler
 
 	portalAddr string
 }
@@ -43,14 +43,14 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 	case "memory":
 		logger.Info("Initialize with local memory DB")
 		inst = &Manager{
-			project:         memory.NewProjectHandler(),
-			user:            memory.NewUserHandler(),
-			session:         memory.NewSessionHandler(),
-			client:          memory.NewClientHandler(),
-			customRole:      memory.NewCustomRoleHandler(),
-			authCodeSession: memory.NewAuthCodeSessionHandler(),
-			transaction:     memory.NewTransactionManager(),
-			ping:            memory.NewPingHandler(),
+			project:      memory.NewProjectHandler(),
+			user:         memory.NewUserHandler(),
+			session:      memory.NewSessionHandler(),
+			client:       memory.NewClientHandler(),
+			customRole:   memory.NewCustomRoleHandler(),
+			loginSession: memory.NewLoginSessionHandler(),
+			transaction:  memory.NewTransactionManager(),
+			ping:         memory.NewPingHandler(),
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -79,20 +79,20 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 		if err != nil {
 			return errors.Append(err, "Failed to create custom role handler")
 		}
-		authCodeSessionHandler, err := mongo.NewAuthCodeSessionHandler(dbClient)
+		loginSessionHandler, err := mongo.NewLoginSessionHandler(dbClient)
 		if err != nil {
 			return errors.Append(err, "Failed to create login session handler")
 		}
 
 		inst = &Manager{
-			project:         prjHandler,
-			user:            userHandler,
-			session:         sessionHandler,
-			client:          clientHandler,
-			customRole:      customRoleHandler,
-			authCodeSession: authCodeSessionHandler,
-			transaction:     mongo.NewTransactionManager(dbClient),
-			ping:            mongo.NewPingHandler(dbClient),
+			project:      prjHandler,
+			user:         userHandler,
+			session:      sessionHandler,
+			client:       clientHandler,
+			customRole:   customRoleHandler,
+			loginSession: loginSessionHandler,
+			transaction:  mongo.NewTransactionManager(dbClient),
+			ping:         mongo.NewPingHandler(dbClient),
 		}
 	default:
 		return errors.New("", "Database Type %s is not implemented yet", dbType)
@@ -180,7 +180,7 @@ func (m *Manager) ProjectDelete(name string) *errors.Error {
 			return errors.Append(model.ErrDeleteBlockedProject, "the project can not delete")
 		}
 
-		if err := m.authCodeSession.DeleteAllInProject(name); err != nil {
+		if err := m.loginSession.DeleteAllInProject(name); err != nil {
 			return errors.Append(err, "Failed to delete login session data")
 		}
 
@@ -298,7 +298,7 @@ func (m *Manager) UserDelete(projectName string, userID string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.authCodeSession.DeleteAllInUser(projectName, userID); err != nil {
+		if err := m.loginSession.DeleteAllInUser(projectName, userID); err != nil {
 			return errors.Append(err, "Delete authoriation code failed")
 		}
 
@@ -486,47 +486,47 @@ func (m *Manager) UserChangePassword(projectName string, userID string, password
 	})
 }
 
-// AuthCodeSessionAdd ...
-func (m *Manager) AuthCodeSessionAdd(projectName string, ent *model.AuthCodeSession) *errors.Error {
+// LoginSessionAdd ...
+func (m *Manager) LoginSessionAdd(projectName string, ent *model.LoginSession) *errors.Error {
 	// create session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.authCodeSession.Add(projectName, ent); err != nil {
-			return errors.Append(err, "Failed to add auth code session")
+		if err := m.loginSession.Add(projectName, ent); err != nil {
+			return errors.Append(err, "Failed to add login session")
 		}
 		return nil
 	})
 }
 
-// AuthCodeSessionUpdate ...
-func (m *Manager) AuthCodeSessionUpdate(projectName string, ent *model.AuthCodeSession) *errors.Error {
+// LoginSessionUpdate ...
+func (m *Manager) LoginSessionUpdate(projectName string, ent *model.LoginSession) *errors.Error {
 	// update session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.authCodeSession.Update(projectName, ent); err != nil {
-			return errors.Append(err, "Failed to update auth code session")
+		if err := m.loginSession.Update(projectName, ent); err != nil {
+			return errors.Append(err, "Failed to update login session")
 		}
 		return nil
 	})
 }
 
-// AuthCodeSessionDelete ...
-func (m *Manager) AuthCodeSessionDelete(projectName string, sessionID string) *errors.Error {
+// LoginSessionDelete ...
+func (m *Manager) LoginSessionDelete(projectName string, sessionID string) *errors.Error {
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.authCodeSession.Delete(projectName, sessionID); err != nil {
-			return errors.Append(err, "Failed to delete auth code session")
+		if err := m.loginSession.Delete(projectName, sessionID); err != nil {
+			return errors.Append(err, "Failed to delete login session")
 		}
 
 		return nil
 	})
 }
 
-// AuthCodeSessionGet ...
-func (m *Manager) AuthCodeSessionGet(projectName string, sessionID string) (*model.AuthCodeSession, *errors.Error) {
-	return m.authCodeSession.Get(projectName, sessionID)
+// LoginSessionGet ...
+func (m *Manager) LoginSessionGet(projectName string, sessionID string) (*model.LoginSession, *errors.Error) {
+	return m.loginSession.Get(projectName, sessionID)
 }
 
-// AuthCodeSessionGetByCode ...
-func (m *Manager) AuthCodeSessionGetByCode(projectName string, code string) (*model.AuthCodeSession, *errors.Error) {
-	return m.authCodeSession.GetByCode(projectName, code)
+// LoginSessionGetByCode ...
+func (m *Manager) LoginSessionGetByCode(projectName string, code string) (*model.LoginSession, *errors.Error) {
+	return m.loginSession.GetByCode(projectName, code)
 }
 
 // SessionAdd ...
@@ -608,7 +608,7 @@ func (m *Manager) ClientDelete(projectName, clientID string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.authCodeSession.DeleteAllInClient(projectName, clientID); err != nil {
+		if err := m.loginSession.DeleteAllInClient(projectName, clientID); err != nil {
 			return errors.Append(err, "Failed to delete login session of the client")
 		}
 

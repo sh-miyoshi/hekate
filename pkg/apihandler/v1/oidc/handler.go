@@ -270,7 +270,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// delete session if login failed
 	defer func() {
 		if err != nil {
-			db.GetInst().AuthCodeSessionDelete(projectName, sessionID)
+			db.GetInst().LoginSessionDelete(projectName, sessionID)
 		}
 	}()
 
@@ -295,7 +295,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate user %s", uname))
 
 			// delete old session and create new code for relogin
-			if err := db.GetInst().AuthCodeSessionDelete(projectName, sessionID); err != nil {
+			if err := db.GetInst().LoginSessionDelete(projectName, sessionID); err != nil {
 				errors.Print(errors.Append(err, "Failed to delete previous login session"))
 				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 				return
@@ -334,8 +334,8 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if ok := slice.Contains(s.Prompt, "consent"); ok {
 		// save user id to session info
-		if err = db.GetInst().AuthCodeSessionUpdate(projectName, s); err != nil {
-			errors.Print(errors.Append(err, "Failed to update auth code session"))
+		if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
+			errors.Print(errors.Append(err, "Failed to update login session"))
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
 		}
@@ -357,9 +357,9 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		// delete session
 		err = errors.New("Session end", "Session end")
 	} else {
-		// Update auth code session info
-		if err = db.GetInst().AuthCodeSessionUpdate(projectName, s); err != nil {
-			errors.Print(errors.Append(err, "Failed to update auth code session"))
+		// Update login session info
+		if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
+			errors.Print(errors.Append(err, "Failed to update login session"))
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
 		}
@@ -572,7 +572,7 @@ func handleSSO(w http.ResponseWriter, projectName string, tokenIssuer string, au
 	now := time.Now()
 	for _, s := range sessions {
 		if now.Before(s.LastAuthTime.Add(time.Second * time.Duration(s.AuthMaxAge))) {
-			ls := &model.AuthCodeSession{
+			ls := &model.LoginSession{
 				ResponseType: authReq.ResponseType,
 				ProjectName:  projectName,
 				UserID:       s.UserID,
@@ -597,7 +597,7 @@ func handleSSO(w http.ResponseWriter, projectName string, tokenIssuer string, au
 	errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
 }
 
-func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
+func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
 	values := url.Values{}
 	if state != "" {
 		values.Set("state", state)
