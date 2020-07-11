@@ -40,10 +40,60 @@ func TestValidateResponseType(t *testing.T) {
 	for _, tc := range tt {
 		err := validateResponseType(tc.types, supported)
 		if tc.expectOK && err != nil {
-			t.Errorf("validateResponseType returns wrong response. got %v, want nil", err)
+			t.Errorf("validateResponseType returns wrong response. input: %v, got %v, want nil", tc.types, err)
 		}
 		if !tc.expectOK && err == nil {
-			t.Errorf("validateResponseType returns wrong response. got nil, but want not nil")
+			t.Errorf("validateResponseType returns wrong response. input: %v, got nil, but want not nil", tc.types)
+		}
+	}
+}
+
+func TestValidateprompt(t *testing.T) {
+	tt := []struct {
+		prompts  []string
+		expectOK bool
+	}{
+		{
+			prompts:  []string{},
+			expectOK: true,
+		},
+		{
+			prompts:  []string{"login"},
+			expectOK: true,
+		},
+		{
+			prompts:  []string{"select_account"},
+			expectOK: true,
+		},
+		{
+			prompts:  []string{"consent"},
+			expectOK: true,
+		},
+		{
+			prompts:  []string{"select_account", "login", "consent"},
+			expectOK: true,
+		},
+		{
+			prompts:  []string{"none"},
+			expectOK: true,
+		},
+		{
+			prompts:  []string{"invalid"},
+			expectOK: false,
+		},
+		{
+			prompts:  []string{"none", "login"},
+			expectOK: false,
+		},
+	}
+
+	for _, tc := range tt {
+		err := validatePrompt(tc.prompts)
+		if tc.expectOK && err != nil {
+			t.Errorf("validateprompt returns wrong response. input: %v, got %v, want nil", tc.prompts, err)
+		}
+		if !tc.expectOK && err == nil {
+			t.Errorf("validateprompt returns wrong response. input: %v, got nil, but want not nil", tc.prompts)
 		}
 	}
 }
