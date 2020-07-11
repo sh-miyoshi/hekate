@@ -61,6 +61,8 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 	return genTokenRes(usr.ID, project, r, option{
 		audiences:       audiences,
 		genRefreshToken: true,
+		maxAge:          0,
+		endUserAuthTime: time.Unix(0, 0),
 	})
 }
 
@@ -124,6 +126,11 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 		return nil, errors.Append(errors.ErrInvalidClient, "refresh token is not for the client")
 	}
 
+	s, err := db.GetInst().SessionGet(project.Name, claims.SessionID)
+	if err != nil {
+		return nil, errors.Append(err, "Failed to get previous token")
+	}
+
 	// Delete previous token
 	if err := db.GetInst().SessionDelete(project.Name, claims.SessionID); err != nil {
 		return nil, errors.Append(err, "Failed to revoke previous token")
@@ -132,6 +139,8 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	return genTokenRes(claims.Subject, project, r, option{
 		audiences:       claims.Audience,
 		genRefreshToken: true,
+		maxAge:          s.AuthMaxAge,
+		endUserAuthTime: s.LastAuthTime,
 	})
 }
 
@@ -209,12 +218,14 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 			return nil, errors.New("", "Failed to get IP: %v", err)
 		}
 		ent := &model.Session{
-			UserID:      userID,
-			ProjectName: project.Name,
-			SessionID:   sessionID,
-			CreatedAt:   time.Now(),
-			ExpiresIn:   res.RefreshExpiresIn,
-			FromIP:      ip,
+			UserID:       userID,
+			ProjectName:  project.Name,
+			SessionID:    sessionID,
+			CreatedAt:    time.Now(),
+			ExpiresIn:    res.RefreshExpiresIn,
+			FromIP:       ip,
+			LastAuthTime: opt.endUserAuthTime,
+			AuthMaxAge:   opt.maxAge,
 		}
 
 		if err := db.GetInst().SessionAdd(project.Name, ent); err != nil {

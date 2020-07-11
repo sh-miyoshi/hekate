@@ -46,12 +46,14 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, *errors.Error) 
 // Add ...
 func (h *SessionHandler) Add(projectName string, s *model.Session) *errors.Error {
 	v := &session{
-		UserID:      s.UserID,
-		ProjectName: s.ProjectName,
-		SessionID:   s.SessionID,
-		CreatedAt:   s.CreatedAt,
-		ExpiresIn:   s.ExpiresIn,
-		FromIP:      s.FromIP,
+		UserID:       s.UserID,
+		ProjectName:  s.ProjectName,
+		SessionID:    s.SessionID,
+		CreatedAt:    s.CreatedAt,
+		ExpiresIn:    s.ExpiresIn,
+		FromIP:       s.FromIP,
+		LastAuthTime: s.LastAuthTime,
+		AuthMaxAge:   s.AuthMaxAge,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
@@ -140,12 +142,14 @@ func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Sessi
 	}
 
 	return &model.Session{
-		UserID:      res.UserID,
-		ProjectName: res.ProjectName,
-		SessionID:   res.SessionID,
-		CreatedAt:   res.CreatedAt,
-		ExpiresIn:   res.ExpiresIn,
-		FromIP:      res.FromIP,
+		UserID:       res.UserID,
+		ProjectName:  res.ProjectName,
+		SessionID:    res.SessionID,
+		CreatedAt:    res.CreatedAt,
+		ExpiresIn:    res.ExpiresIn,
+		FromIP:       res.FromIP,
+		LastAuthTime: res.LastAuthTime,
+		AuthMaxAge:   res.AuthMaxAge,
 	}, nil
 }
 
@@ -174,12 +178,14 @@ func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Se
 	res := []*model.Session{}
 	for _, s := range sessions {
 		res = append(res, &model.Session{
-			UserID:      s.UserID,
-			ProjectName: s.ProjectName,
-			SessionID:   s.SessionID,
-			CreatedAt:   s.CreatedAt,
-			ExpiresIn:   s.ExpiresIn,
-			FromIP:      s.FromIP,
+			UserID:       s.UserID,
+			ProjectName:  s.ProjectName,
+			SessionID:    s.SessionID,
+			CreatedAt:    s.CreatedAt,
+			ExpiresIn:    s.ExpiresIn,
+			FromIP:       s.FromIP,
+			LastAuthTime: s.LastAuthTime,
+			AuthMaxAge:   s.AuthMaxAge,
 		})
 	}
 

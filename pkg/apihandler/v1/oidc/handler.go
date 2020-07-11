@@ -521,7 +521,48 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 		return
 	}
 
-	// TODO(if already logined (check by login_hint, prompt), redirect to callback)
+	// if already logined (check by login_hint, prompt), redirect to callback
+	if slice.Contains(authReq.Prompt, "none") {
+		uname := authReq.LoginHint
+		user, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: uname})
+		if err != nil {
+			errors.Print(errors.Append(err, "Failed to get user %s", uname))
+			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+			return
+		}
+		if len(user) != 1 {
+			logger.Info("Unexpect user num, expect 1 but got %d", len(user))
+			errors.WriteOAuthError(w, errors.ErrInvalidRequest, authReq.State)
+			return
+		}
+
+		userID := user[0].ID
+		sessions, err := db.GetInst().SessionGetList(projectName, userID)
+		if err != nil {
+			errors.Print(errors.Append(err, "Failed to get session list"))
+			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+			return
+		}
+		if len(sessions) == 0 {
+			logger.Info("No sessions, so return login_required")
+			errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
+			return
+		}
+
+		// check max_age
+		// if now > auth_time + max_age return login_required
+		now := time.Now()
+		for _, s := range sessions {
+			if now.Before(s.LastAuthTime.Add(time.Second * time.Duration(s.AuthMaxAge))) {
+				// TODO(set code, token, id_token)
+				return
+			}
+		}
+
+		logger.Info("No valid session, so return login_required")
+		errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
+		return // if prompt=none, never return login page
+	}
 
 	// Start session for login flow
 	sessionID, err := oidc.StartLoginSession(projectName, authReq)

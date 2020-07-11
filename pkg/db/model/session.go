@@ -9,12 +9,14 @@ import (
 
 // Session ...
 type Session struct {
-	UserID      string
-	ProjectName string
-	SessionID   string
-	CreatedAt   time.Time
-	ExpiresIn   uint
-	FromIP      string // Used to identify the user using this session
+	UserID       string
+	ProjectName  string
+	SessionID    string
+	CreatedAt    time.Time
+	ExpiresIn    uint
+	FromIP       string // Used to identify the user using this session
+	LastAuthTime time.Time
+	AuthMaxAge   uint
 }
 
 // SessionHandler ...
