@@ -225,7 +225,8 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	queries := r.URL.Query()
 	logger.Debug("Query: %v", queries)
 
-	authHandler(w, projectName, queries)
+	issuer := token.GetExpectIssuer(r)
+	authHandler(w, projectName, issuer, queries)
 }
 
 // AuthPOSTHandler ...
@@ -242,7 +243,8 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug("Form: %v", r.Form)
-	authHandler(w, projectName, r.Form)
+	issuer := token.GetExpectIssuer(r)
+	authHandler(w, projectName, issuer, r.Form)
 }
 
 // UserLoginHandler ...
@@ -492,7 +494,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
+func authHandler(w http.ResponseWriter, projectName string, tokenIssuer string, req url.Values) {
 	authReq := oidc.NewAuthRequest(req)
 	logger.Debug("Auth Request: %v", authReq)
 
@@ -523,56 +525,76 @@ func authHandler(w http.ResponseWriter, projectName string, req url.Values) {
 
 	// if already logined (check by login_hint, prompt), redirect to callback
 	if slice.Contains(authReq.Prompt, "none") {
-		uname := authReq.LoginHint
-		user, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: uname})
-		if err != nil {
-			errors.Print(errors.Append(err, "Failed to get user %s", uname))
-			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-			return
-		}
-		if len(user) != 1 {
-			logger.Info("Unexpect user num, expect 1 but got %d", len(user))
-			errors.WriteOAuthError(w, errors.ErrInvalidRequest, authReq.State)
-			return
-		}
-
-		userID := user[0].ID
-		sessions, err := db.GetInst().SessionGetList(projectName, userID)
-		if err != nil {
-			errors.Print(errors.Append(err, "Failed to get session list"))
-			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-			return
-		}
-		if len(sessions) == 0 {
-			logger.Info("No sessions, so return login_required")
-			errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
-			return
-		}
-
-		// check max_age
-		// if now > auth_time + max_age return login_required
-		now := time.Now()
-		for _, s := range sessions {
-			if now.Before(s.LastAuthTime.Add(time.Second * time.Duration(s.AuthMaxAge))) {
-				// TODO(set code, token, id_token)
-				return
-			}
-		}
-
-		logger.Info("No valid session, so return login_required")
-		errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
+		handleSSO(w, projectName, tokenIssuer, authReq)
 		return // if prompt=none, never return login page
 	}
 
 	// Start session for login flow
 	lsID, err := oidc.StartLoginSession(projectName, authReq)
 	if err != nil {
-		errors.Print(errors.Append(err, "Failed to register auth code session"))
+		errors.Print(errors.Append(err, "Failed to start login session"))
 		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 		return
 	}
 
 	oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
+}
+
+func handleSSO(w http.ResponseWriter, projectName string, tokenIssuer string, authReq *oidc.AuthRequest) {
+	uname := authReq.LoginHint
+	user, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: uname})
+	if err != nil {
+		errors.Print(errors.Append(err, "Failed to get user %s", uname))
+		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+		return
+	}
+	if len(user) != 1 {
+		logger.Info("Unexpect user num, expect 1 but got %d", len(user))
+		errors.WriteOAuthError(w, errors.ErrInvalidRequest, authReq.State)
+		return
+	}
+
+	userID := user[0].ID
+	sessions, err := db.GetInst().SessionGetList(projectName, userID)
+	if err != nil {
+		errors.Print(errors.Append(err, "Failed to get session list"))
+		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+		return
+	}
+	if len(sessions) == 0 {
+		logger.Info("No sessions, so return login_required")
+		errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
+		return
+	}
+
+	// check max_age
+	// if now > auth_time + max_age return login_required
+	now := time.Now()
+	for _, s := range sessions {
+		if now.Before(s.LastAuthTime.Add(time.Second * time.Duration(s.AuthMaxAge))) {
+			ls := &model.AuthCodeSession{
+				ResponseType: authReq.ResponseType,
+				ProjectName:  projectName,
+				UserID:       s.UserID,
+				ClientID:     authReq.ClientID,
+				Nonce:        authReq.Nonce,
+				LoginDate:    s.LastAuthTime,
+				RedirectURI:  authReq.RedirectURI,
+				ResponseMode: authReq.ResponseMode,
+			}
+			req, err := createLoginRedirectInfo(ls, authReq.State, tokenIssuer)
+			if err != nil {
+				errors.Print(errors.Append(err, "Failed to create login redirect info"))
+				errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+				return
+			}
+			http.Redirect(w, req, req.URL.String(), http.StatusFound)
+			return
+		}
+	}
+
+	logger.Info("No valid session, so return login_required")
+	errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
 }
 
 func createLoginRedirectInfo(session *model.AuthCodeSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
