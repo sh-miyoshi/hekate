@@ -97,3 +97,41 @@ func TestValidateprompt(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateResponseMode(t *testing.T) {
+	tt := []struct {
+		mode     string
+		expectOK bool
+	}{
+		{
+			mode:     "",
+			expectOK: true,
+		},
+		{
+			mode:     "query",
+			expectOK: true,
+		},
+		{
+			mode:     "fragment",
+			expectOK: true,
+		},
+		{
+			mode:     "invalid",
+			expectOK: false,
+		},
+		{
+			mode:     "queryfragment",
+			expectOK: false,
+		},
+	}
+
+	for _, tc := range tt {
+		err := validateResponseMode(tc.mode)
+		if tc.expectOK && err != nil {
+			t.Errorf("validateResponseMode returns wrong response. input: %v, got %v, want nil", tc.mode, err)
+		}
+		if !tc.expectOK && err == nil {
+			t.Errorf("validateResponseMode returns wrong response. input: %v, got nil, but want not nil", tc.mode)
+		}
+	}
+}

@@ -75,17 +75,7 @@ func validateResponseMode(mode string) *errors.Error {
 	if mode != "" {
 		// TODO(add support form_post)
 		modes := []string{"query", "fragment"}
-		ok := false
-		for _, m := range modes {
-			if mode == m {
-				ok = true
-				break
-			}
-		}
-
-		// TODO return err when query && response_type is not none or code
-
-		if !ok {
+		if !slice.Contains(modes, mode) {
 			return errors.ErrInvalidRequest
 		}
 	}
