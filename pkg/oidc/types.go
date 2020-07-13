@@ -27,6 +27,8 @@ type AuthRequest struct {
 	ResponseMode string
 	LoginHint    string
 
+	Request string
+
 	// TODO(implement this)
 	// Display string // display(OPTIONAL)
 	// UILocales string // ui_locales(OPTIONAL)
@@ -84,6 +86,11 @@ func validateResponseMode(mode string) *errors.Error {
 func (r *AuthRequest) Validate() *errors.Error {
 	if err := validator.New().Struct(r); err != nil {
 		return errors.Append(errors.ErrInvalidRequest, err.Error())
+	}
+
+	// TODO(support request)
+	if r.Request != "" {
+		return errors.ErrRequestNotSupported
 	}
 
 	// TODO(check scope)

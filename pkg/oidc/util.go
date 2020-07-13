@@ -8,6 +8,9 @@ import (
 
 // NewAuthRequest ...
 func NewAuthRequest(values url.Values) *AuthRequest {
+	request := values.Get("request")
+	// TODO(parse request and set params)
+
 	maxAge, _ := strconv.Atoi(values.Get("max_age"))
 	prompt := []string{}
 	if values.Get("prompt") != "" {
@@ -36,5 +39,6 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 		MaxAge:       uint(maxAge),
 		LoginHint:    values.Get("login_hint"),
 		ResponseMode: resMode,
+		Request:      request,
 	}
 }
