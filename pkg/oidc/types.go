@@ -72,12 +72,10 @@ func validateResponseType(types, supportedTypes []string) *errors.Error {
 }
 
 func validateResponseMode(mode string) *errors.Error {
-	if mode != "" {
-		// TODO(add support form_post)
-		modes := []string{"query", "fragment"}
-		if !slice.Contains(modes, mode) {
-			return errors.ErrInvalidRequest
-		}
+	// TODO(add support form_post)
+	modes := []string{"query", "fragment"}
+	if !slice.Contains(modes, mode) {
+		return errors.ErrInvalidRequest
 	}
 	return nil
 }

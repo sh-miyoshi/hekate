@@ -11,16 +11,6 @@ import (
 
 // StartLoginSession ...
 func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Error) {
-	resMode := req.ResponseMode
-	if resMode == "" {
-		resMode = "fragment"
-		if len(req.ResponseType) == 1 {
-			if req.ResponseType[0] == "code" || req.ResponseType[0] == "none" {
-				resMode = "query"
-			}
-		}
-	}
-
 	s := &model.LoginSession{
 		SessionID:    uuid.New().String(),
 		ExpiresIn:    time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
@@ -29,7 +19,7 @@ func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Er
 		Nonce:        req.Nonce,
 		ProjectName:  projectName,
 		MaxAge:       req.MaxAge,
-		ResponseMode: resMode,
+		ResponseMode: req.ResponseMode,
 		ResponseType: req.ResponseType,
 		Prompt:       req.Prompt,
 	}

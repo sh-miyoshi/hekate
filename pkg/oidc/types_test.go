@@ -105,7 +105,7 @@ func TestValidateResponseMode(t *testing.T) {
 	}{
 		{
 			mode:     "",
-			expectOK: true,
+			expectOK: false,
 		},
 		{
 			mode:     "query",

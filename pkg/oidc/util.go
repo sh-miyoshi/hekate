@@ -13,10 +13,21 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 	if values.Get("prompt") != "" {
 		prompt = strings.Split(values.Get("prompt"), " ")
 	}
+	responseTypes := strings.Split(values.Get("response_type"), " ")
+
+	resMode := values.Get("response_mode")
+	if resMode == "" {
+		resMode = "fragment"
+		if len(responseTypes) == 1 {
+			if responseTypes[0] == "code" || responseTypes[0] == "none" {
+				resMode = "query"
+			}
+		}
+	}
 
 	return &AuthRequest{
 		Scope:        values.Get("scope"),
-		ResponseType: strings.Split(values.Get("response_type"), " "),
+		ResponseType: responseTypes,
 		ClientID:     values.Get("client_id"),
 		RedirectURI:  values.Get("redirect_uri"),
 		State:        values.Get("state"),
@@ -24,5 +35,6 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 		Prompt:       prompt,
 		MaxAge:       uint(maxAge),
 		LoginHint:    values.Get("login_hint"),
+		ResponseMode: resMode,
 	}
 }
