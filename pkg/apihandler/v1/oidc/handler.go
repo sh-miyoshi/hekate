@@ -426,7 +426,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	claims, err := jwthttp.ValidateAPIRequest(r)
 	if err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to validate header"))
-		errors.WriteOAuthError(w, errors.ErrRequestUnauthorized, "")
+		errors.WriteOAuthError(w, errors.ErrInvalidRequest, "")
 		return
 	}
 

@@ -9,21 +9,21 @@ var (
 	// Define in RFC6749
 	//-------------------------------------
 
-	// ErrUnknownRequest ...
-	ErrUnknownRequest = &Error{
-		publicMsg:        "unknown_error",
-		httpResponseCode: http.StatusBadRequest,
-	}
-
-	// ErrRequestForbidden ...
-	ErrRequestForbidden = &Error{
-		publicMsg:        "request_forbidden",
-		httpResponseCode: http.StatusForbidden,
-	}
-
 	// ErrInvalidRequest ...
 	ErrInvalidRequest = &Error{
 		publicMsg:        "invalid_request",
+		httpResponseCode: http.StatusBadRequest,
+	}
+
+	// ErrInvalidClient ...
+	ErrInvalidClient = &Error{
+		publicMsg:        "invalid_client",
+		httpResponseCode: http.StatusUnauthorized,
+	}
+
+	// ErrInvalidGrant ...
+	ErrInvalidGrant = &Error{
+		publicMsg:        "invalid_grant",
 		httpResponseCode: http.StatusBadRequest,
 	}
 
@@ -69,87 +69,29 @@ var (
 		httpResponseCode: http.StatusBadRequest,
 	}
 
-	// ErrInvalidGrant ...
-	ErrInvalidGrant = &Error{
-		publicMsg:        "invalid_grant",
+	//-------------------------------------
+	// Define in RFC6750
+	//-------------------------------------
+
+	// ErrInvalidToken ...
+	ErrInvalidToken = &Error{
+		publicMsg:        "invalid_token",
 		httpResponseCode: http.StatusBadRequest,
 	}
 
-	// ErrInvalidClient ...
-	ErrInvalidClient = &Error{
-		publicMsg:        "invalid_client",
-		httpResponseCode: http.StatusUnauthorized,
-	}
-
-	// ErrInvalidState ...
-	ErrInvalidState = &Error{
-		publicMsg:        "invalid_state",
-		httpResponseCode: http.StatusBadRequest,
-	}
-
-	// ErrMisconfiguration ...
-	ErrMisconfiguration = &Error{
-		publicMsg:        "misconfiguration",
-		httpResponseCode: http.StatusInternalServerError,
-	}
-
-	// ErrInsufficientEntropy ...
-	ErrInsufficientEntropy = &Error{
-		publicMsg:        "insufficient_entropy",
-		httpResponseCode: http.StatusBadRequest,
-	}
-
-	// ErrNotFound ...
-	ErrNotFound = &Error{
-		publicMsg:        "not_found",
-		httpResponseCode: http.StatusNotFound,
-	}
-
-	// ErrRequestUnauthorized ...
-	ErrRequestUnauthorized = &Error{
-		publicMsg:        "request_unauthorized",
-		httpResponseCode: http.StatusUnauthorized,
-	}
-
-	// ErrTokenSignatureMismatch ...
-	ErrTokenSignatureMismatch = &Error{
-		publicMsg:        "token_signature_mismatch",
-		httpResponseCode: http.StatusBadRequest,
-	}
-
-	// ErrInvalidTokenFormat ...
-	ErrInvalidTokenFormat = &Error{
-		publicMsg:        "invalid_token_format",
-		httpResponseCode: http.StatusBadRequest,
-	}
-
-	// ErrTokenExpired ...
-	ErrTokenExpired = &Error{
-		publicMsg:        "token_expired",
-		httpResponseCode: http.StatusUnauthorized,
-	}
-
-	// ErrScopeNotGranted ...
-	ErrScopeNotGranted = &Error{
-		publicMsg:        "scope_not_granted",
+	// ErrInsufficientScope ...
+	ErrInsufficientScope = &Error{
+		publicMsg:        "insufficient_scope",
 		httpResponseCode: http.StatusForbidden,
 	}
 
-	// ErrTokenClaim ...
-	ErrTokenClaim = &Error{
-		publicMsg:        "token_claim",
-		httpResponseCode: http.StatusUnauthorized,
-	}
+	//-------------------------------------
+	// Define in Open ID Connect
+	//-------------------------------------
 
-	// ErrInactiveToken ...
-	ErrInactiveToken = &Error{
-		publicMsg:        "token_inactive",
-		httpResponseCode: http.StatusUnauthorized,
-	}
-
-	// ErrRevokationClientMismatch ...
-	ErrRevokationClientMismatch = &Error{
-		publicMsg:        "revokation_client_mismatch",
+	// ErrAccountSelectionRequired ...
+	ErrAccountSelectionRequired = &Error{
+		publicMsg:        "account_selection_required",
 		httpResponseCode: http.StatusBadRequest,
 	}
 
@@ -212,18 +154,14 @@ var (
 	}
 
 	//-------------------------------------
-	// Define in Open ID Connect
-	//-------------------------------------
-
-	// ErrAccountSelectionRequired ...
-	ErrAccountSelectionRequired = &Error{
-		publicMsg:        "account_selection_required",
-		httpResponseCode: http.StatusBadRequest,
-	}
-
-	//-------------------------------------
 	// Original
 	//-------------------------------------
+
+	// ErrRequestUnauthorized ...
+	ErrRequestUnauthorized = &Error{
+		publicMsg:        "request_unauthorized",
+		httpResponseCode: http.StatusUnauthorized,
+	}
 
 	// ErrSessionExpired ...
 	ErrSessionExpired = &Error{
