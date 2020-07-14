@@ -226,7 +226,7 @@ func AuthGETHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Debug("Query: %v", queries)
 
 	issuer := token.GetExpectIssuer(r)
-	authHandler(w, projectName, issuer, queries)
+	authHandler(w, "GET", projectName, issuer, queries)
 }
 
 // AuthPOSTHandler ...
@@ -244,7 +244,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug("Form: %v", r.Form)
 	issuer := token.GetExpectIssuer(r)
-	authHandler(w, projectName, issuer, r.Form)
+	authHandler(w, "POST", projectName, issuer, r.Form)
 }
 
 // UserLoginHandler ...
@@ -494,7 +494,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func authHandler(w http.ResponseWriter, projectName string, tokenIssuer string, req url.Values) {
+func authHandler(w http.ResponseWriter, method string, projectName string, tokenIssuer string, req url.Values) {
 	authReq := oidc.NewAuthRequest(req)
 	logger.Debug("Auth Request: %v", authReq)
 
@@ -525,7 +525,7 @@ func authHandler(w http.ResponseWriter, projectName string, tokenIssuer string, 
 
 	// if already logined (check by login_hint, prompt), redirect to callback
 	if slice.Contains(authReq.Prompt, "none") {
-		handleSSO(w, projectName, tokenIssuer, authReq)
+		handleSSO(w, method, projectName, tokenIssuer, authReq)
 		return // if prompt=none, never return login page
 	}
 
@@ -540,7 +540,7 @@ func authHandler(w http.ResponseWriter, projectName string, tokenIssuer string, 
 	oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
 }
 
-func handleSSO(w http.ResponseWriter, projectName string, tokenIssuer string, authReq *oidc.AuthRequest) {
+func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIssuer string, authReq *oidc.AuthRequest) {
 	uname := authReq.LoginHint
 	user, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: uname})
 	if err != nil {
@@ -550,7 +550,7 @@ func handleSSO(w http.ResponseWriter, projectName string, tokenIssuer string, au
 	}
 	if len(user) != 1 {
 		logger.Info("Unexpect user num, expect 1 but got %d", len(user))
-		errors.WriteOAuthError(w, errors.ErrInvalidRequest, authReq.State)
+		errors.RedirectWithOAuthError(w, method, authReq.RedirectURI, errors.ErrInvalidRequest, authReq.State)
 		return
 	}
 
@@ -563,7 +563,7 @@ func handleSSO(w http.ResponseWriter, projectName string, tokenIssuer string, au
 	}
 	if len(sessions) == 0 {
 		logger.Info("No sessions, so return login_required")
-		errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
+		errors.RedirectWithOAuthError(w, method, authReq.RedirectURI, errors.ErrLoginRequired, authReq.State)
 		return
 	}
 
@@ -594,7 +594,7 @@ func handleSSO(w http.ResponseWriter, projectName string, tokenIssuer string, au
 	}
 
 	logger.Info("No valid session, so return login_required")
-	errors.WriteOAuthError(w, errors.ErrLoginRequired, authReq.State)
+	errors.RedirectWithOAuthError(w, method, authReq.RedirectURI, errors.ErrLoginRequired, authReq.State)
 }
 
 func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer string) (*http.Request, *errors.Error) {

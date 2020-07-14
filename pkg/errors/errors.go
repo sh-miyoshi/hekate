@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -123,6 +124,19 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+// RedirectWithOAuthError ...
+func RedirectWithOAuthError(w http.ResponseWriter, method, redirectURL string, err *Error, state string) {
+	info := map[string]interface{}{
+		"error": err.publicMsg,
+		// TODO(error_description)
+		"state": state,
+	}
+	body, _ := json.Marshal(info)
+	req, _ := http.NewRequest(method, redirectURL, bytes.NewReader(body))
+	req.Header.Add("Content-Type", "application/json")
+	http.Redirect(w, req, redirectURL, http.StatusFound)
 }
 
 // Print ...
