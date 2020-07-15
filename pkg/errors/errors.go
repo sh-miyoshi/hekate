@@ -24,10 +24,6 @@ type Error struct {
 	httpResponseCode int
 }
 
-// Name        string `json:"error"`
-// 	Description string `json:"error_description"`
-// 	Code        int    `json:"status_code"`
-
 // Error ...
 func (e *Error) Error() string {
 	return e.publicMsg
