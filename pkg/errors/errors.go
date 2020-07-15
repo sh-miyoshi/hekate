@@ -1,10 +1,10 @@
 package errors
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strings"
 
@@ -123,15 +123,22 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 }
 
 // RedirectWithOAuthError ...
-func RedirectWithOAuthError(w http.ResponseWriter, method, redirectURL string, err *Error, state string) {
-	info := map[string]interface{}{
-		"error": err.publicMsg,
-		// TODO(error_description)
-		"state": state,
+func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectURL, responseMode, state string) {
+	values := url.Values{}
+	if state != "" {
+		values.Set("state", state)
 	}
-	body, _ := json.Marshal(info)
-	req, _ := http.NewRequest(method, redirectURL, bytes.NewReader(body))
-	req.Header.Add("Content-Type", "application/json")
+	values.Set("error", err.publicMsg)
+	// TODO(error_description)
+
+	req, _ := http.NewRequest(method, redirectURL, nil)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	if responseMode == "fragment" {
+		req.URL.Fragment = values.Encode()
+	} else {
+		req.URL.RawQuery = values.Encode()
+	}
+
 	http.Redirect(w, req, redirectURL, http.StatusFound)
 }
 
