@@ -498,16 +498,6 @@ func authHandler(w http.ResponseWriter, method string, projectName string, token
 	authReq := oidc.NewAuthRequest(req)
 	logger.Debug("Auth Request: %v", authReq)
 
-	if err := authReq.Validate(); err != nil {
-		errors.PrintAsInfo(errors.Append(err, "Failed to validate request"))
-		if err.GetHTTPStatusCode() == 0 {
-			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-		} else {
-			errors.WriteOAuthError(w, err, authReq.State)
-		}
-		return
-	}
-
 	// Check Redirect URL
 	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
 		if errors.Contains(err, client.ErrNoRedirectURL) {
@@ -519,6 +509,16 @@ func authHandler(w http.ResponseWriter, method string, projectName string, token
 		} else {
 			errors.Print(errors.Append(err, "Failed to get allowed callback urls in client"))
 			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+		}
+		return
+	}
+
+	if err := authReq.Validate(); err != nil {
+		errors.PrintAsInfo(errors.Append(err, "Failed to validate request"))
+		if err.GetHTTPStatusCode() == 0 {
+			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+		} else {
+			errors.RedirectWithOAuthError(w, err, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
 		}
 		return
 	}
@@ -550,7 +550,7 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 	}
 	if len(user) != 1 {
 		logger.Info("Unexpect user num, expect 1 but got %d", len(user))
-		errors.RedirectWithOAuthError(w, method, authReq.RedirectURI, errors.ErrInvalidRequest, authReq.State)
+		errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
 		return
 	}
 
@@ -563,7 +563,7 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 	}
 	if len(sessions) == 0 {
 		logger.Info("No sessions, so return login_required")
-		errors.RedirectWithOAuthError(w, method, authReq.RedirectURI, errors.ErrLoginRequired, authReq.State)
+		errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
 		return
 	}
 
@@ -594,7 +594,7 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 	}
 
 	logger.Info("No valid session, so return login_required")
-	errors.RedirectWithOAuthError(w, method, authReq.RedirectURI, errors.ErrLoginRequired, authReq.State)
+	errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
 }
 
 func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
