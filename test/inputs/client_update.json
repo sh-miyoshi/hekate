@@ -1,6 +1,5 @@
 {
-    "id": "updated-client",
-	"secret": "mysecretkey",
+    "secret": "mysecretkey",
     "access_type": "public",
     "allowed_callback_urls": [
         "http://localhost:3000/callback",

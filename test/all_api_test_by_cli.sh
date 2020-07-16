@@ -79,7 +79,8 @@ test_command client get --project master
 ## get
 test_command client get --project master --id oidc-client
 
-## TODO(update)
+## update
+test_command client update --project master --id oidc-client --file $TEST_DIR/inputs/client_update.json
 
 ## delete
 test_command client delete --project master --id oidc-client
