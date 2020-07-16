@@ -141,7 +141,7 @@ func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectU
 	}
 
 	logger.Debug("Return OAuth error to %s: %v", redirectURL, values)
-	http.Redirect(w, req, redirectURL, http.StatusFound)
+	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
 // Print ...
