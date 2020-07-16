@@ -115,3 +115,29 @@ func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetR
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
+
+// ClientUpdate ...
+func (h *Handler) ClientUpdate(projectName, clientID string, req *clientapi.ClientPutRequest) error {
+	u := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
+	body, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+	httpReq, err := http.NewRequest("PUT", u, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return err
+	}
+	defer httpRes.Body.Close()
+
+	switch httpRes.StatusCode {
+	case 204:
+		return nil
+	}
+	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+}

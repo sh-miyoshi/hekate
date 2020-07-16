@@ -9,6 +9,7 @@ func init() {
 	clientCmd.AddCommand(addClientCmd)
 	clientCmd.AddCommand(deleteClientCmd)
 	clientCmd.AddCommand(getClientCmd)
+	clientCmd.AddCommand(updateClientCmd)
 }
 
 var clientCmd = &cobra.Command{
