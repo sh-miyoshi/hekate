@@ -140,7 +140,7 @@ func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectU
 		req.URL.RawQuery = values.Encode()
 	}
 
-	logger.Debug("Return OAuth error to %s: %v", redirectURL, values)
+	logger.Debug("Return OAuth error to %s: %v", req.URL.String(), values)
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
