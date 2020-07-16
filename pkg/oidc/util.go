@@ -40,5 +40,6 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 		LoginHint:    values.Get("login_hint"),
 		ResponseMode: resMode,
 		Request:      request,
+		IDTokenHint:  values.Get("id_token_hint"),
 	}
 }

@@ -523,6 +523,12 @@ func authHandler(w http.ResponseWriter, method string, projectName string, token
 		return
 	}
 
+	// TODO parse id_token_hint
+	// https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#AuthRequest
+	if authReq.IDTokenHint != "" {
+
+	}
+
 	// if already logined (check by login_hint, prompt), redirect to callback
 	if slice.Contains(authReq.Prompt, "none") {
 		handleSSO(w, method, projectName, tokenIssuer, authReq)

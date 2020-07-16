@@ -26,13 +26,13 @@ type AuthRequest struct {
 	MaxAge       uint
 	ResponseMode string
 	LoginHint    string
+	IDTokenHint  string
 
 	Request string
 
 	// TODO(implement this)
 	// Display string // display(OPTIONAL)
 	// UILocales string // ui_locales(OPTIONAL)
-	// IDTokenHint string // id_token_hint(OPTIONAL)
 	// ACRValues string // acr_values(OPTIONAL)
 }
 
