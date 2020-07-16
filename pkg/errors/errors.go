@@ -124,7 +124,7 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 }
 
 // RedirectWithOAuthError ...
-func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectURL, responseMode, state string) {
+func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectURL, state string) {
 	values := url.Values{}
 	if state != "" {
 		values.Set("state", state)
@@ -134,11 +134,7 @@ func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectU
 
 	req, _ := http.NewRequest(method, redirectURL, nil)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	if responseMode == "fragment" {
-		req.URL.Fragment = values.Encode()
-	} else {
-		req.URL.RawQuery = values.Encode()
-	}
+	req.URL.RawQuery = values.Encode()
 
 	logger.Debug("Return OAuth error to %s: %v", req.URL.String(), values)
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)

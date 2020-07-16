@@ -518,7 +518,7 @@ func authHandler(w http.ResponseWriter, method string, projectName string, token
 		if err.GetHTTPStatusCode() == 0 {
 			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 		} else {
-			errors.RedirectWithOAuthError(w, err, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
+			errors.RedirectWithOAuthError(w, err, method, authReq.RedirectURI, authReq.State)
 		}
 		return
 	}
@@ -556,7 +556,7 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 	}
 	if len(user) != 1 {
 		logger.Info("Unexpect user num, expect 1 but got %d", len(user))
-		errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
+		errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.State)
 		return
 	}
 
@@ -569,7 +569,7 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 	}
 	if len(sessions) == 0 {
 		logger.Info("No sessions, so return login_required")
-		errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
+		errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.State)
 		return
 	}
 
@@ -600,7 +600,7 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 	}
 
 	logger.Info("No valid session, so return login_required")
-	errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.ResponseMode, authReq.State)
+	errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.State)
 }
 
 func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
