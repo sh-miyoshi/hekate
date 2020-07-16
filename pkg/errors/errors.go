@@ -115,6 +115,7 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 	// TODO(code == 0 -> panic)
 	w.WriteHeader(err.httpResponseCode)
 
+	logger.Debug("Return OAuth error: code %d, body %v", err.httpResponseCode, res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		logger.Error("Failed to encode response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -139,6 +140,7 @@ func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectU
 		req.URL.RawQuery = values.Encode()
 	}
 
+	logger.Debug("Return OAuth error to %s: %v", redirectURL, values)
 	http.Redirect(w, req, redirectURL, http.StatusFound)
 }
 
