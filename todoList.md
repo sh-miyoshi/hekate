@@ -1,11 +1,5 @@
 # TODO List
 
-## Bug Fix
-
-- UserInfo APIの認証時にhttp bodyで認証
-- OpenID Connect 3.1.2.6対応
-  - [参考](https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#AuthError)
-
 ## server application enhancement
 
 - ユーザーパスワードロック
@@ -22,6 +16,9 @@
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - http.Error関数の置き換え
+- ユーザー情報の追加
+  - email
+  - first/last name
 - db manager validationの追加
 - Custom RoleにDescriptionを追加
   - API docの修正
