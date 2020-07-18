@@ -548,6 +548,12 @@ func authHandler(w http.ResponseWriter, method string, projectName string, token
 
 func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIssuer string, authReq *oidc.AuthRequest) {
 	uname := authReq.LoginHint
+	if uname == "" {
+		logger.Info("No user name in login_hint")
+		errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.State)
+		return
+	}
+
 	user, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: uname})
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get user %s", uname))
@@ -577,8 +583,11 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 	// if now > auth_time + max_age return login_required
 	now := time.Now()
 	for _, s := range sessions {
-		if now.Before(s.LastAuthTime.Add(time.Second * time.Duration(s.AuthMaxAge))) {
+		valid := s.LastAuthTime.Add(time.Second * time.Duration(s.AuthMaxAge))
+		logger.Debug("Session Info: now %v, valid time %v", now, valid)
+		if now.Before(valid) {
 			ls := &model.LoginSession{
+				SessionID:    uuid.New().String(),
 				ResponseType: authReq.ResponseType,
 				ProjectName:  projectName,
 				UserID:       s.UserID,
@@ -587,10 +596,19 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIs
 				LoginDate:    s.LastAuthTime,
 				RedirectURI:  authReq.RedirectURI,
 				ResponseMode: authReq.ResponseMode,
+				Scope:        authReq.Scope,
+				MaxAge:       authReq.MaxAge,
+				Prompt:       authReq.Prompt,
+				ExpiresIn:    time.Now().Add(oidc.GetLoginSessionExpiresTime()),
 			}
 			req, err := createLoginRedirectInfo(ls, authReq.State, tokenIssuer)
 			if err != nil {
 				errors.Print(errors.Append(err, "Failed to create login redirect info"))
+				errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+				return
+			}
+			if err := db.GetInst().LoginSessionAdd(projectName, ls); err != nil {
+				errors.Print(errors.Append(err, "Failed to register login session"))
 				errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 				return
 			}

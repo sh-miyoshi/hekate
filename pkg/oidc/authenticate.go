@@ -196,8 +196,10 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	if opt.genRefreshToken {
 		res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
+		maxAge := project.TokenConfig.AccessTokenLifeSpan
 		if opt.maxAge > 0 {
 			res.RefreshExpiresIn = opt.maxAge
+			maxAge = opt.maxAge
 		}
 
 		refreshTokenReq := token.Request{
@@ -225,7 +227,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 			ExpiresIn:    res.RefreshExpiresIn,
 			FromIP:       ip,
 			LastAuthTime: opt.endUserAuthTime,
-			AuthMaxAge:   opt.maxAge,
+			AuthMaxAge:   maxAge,
 		}
 
 		if err := db.GetInst().SessionAdd(project.Name, ent); err != nil {

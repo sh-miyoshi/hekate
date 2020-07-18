@@ -13,7 +13,7 @@ import (
 func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Error) {
 	s := &model.LoginSession{
 		SessionID:    uuid.New().String(),
-		ExpiresIn:    time.Now().Add(time.Second * time.Duration(expiresTimeSec)),
+		ExpiresIn:    time.Now().Add(GetLoginSessionExpiresTime()),
 		ClientID:     req.ClientID,
 		RedirectURI:  req.RedirectURI,
 		Nonce:        req.Nonce,
