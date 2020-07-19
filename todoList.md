@@ -90,14 +90,10 @@
 ## CLI tool(hctl) enhancement
 
 - 各APIへの対応
-  - project
-    - update
   - user
     - update
     - session revoke
     - password change
-  - client
-    - update
   - customrole
     - update
 - outputの修正
