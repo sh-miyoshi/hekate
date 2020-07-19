@@ -9,6 +9,7 @@ func init() {
 	projectCmd.AddCommand(addProjectCmd)
 	projectCmd.AddCommand(deleteProjectCmd)
 	projectCmd.AddCommand(getProjectCmd)
+	projectCmd.AddCommand(updateProjectCmd)
 }
 
 var projectCmd = &cobra.Command{
