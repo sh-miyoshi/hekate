@@ -46,8 +46,6 @@
   - AuthRequestに他のパラメータを追加
     - display
     - ui_locales
-    - id_token_hint
-    - login_hint
     - acr_values
   - code認証失敗時、すべてのtokenを無効化
   - subject_types_supportedにpairwiseをサポート
