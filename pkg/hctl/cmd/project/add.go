@@ -10,20 +10,25 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/util"
 	"github.com/spf13/cobra"
 )
-
-var project projectapi.ProjectCreateRequest
 
 var addProjectCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add New Project",
 	Long:  "Add New Project",
 	Run: func(cmd *cobra.Command, args []string) {
-		fileName, _ := cmd.Flags().GetString("file")
+		file, _ := cmd.Flags().GetString("file")
+		projectName, _ := cmd.Flags().GetString("name")
 
-		if fileName == "" && project.Name == "" {
+		if file == "" && projectName == "" {
 			print.Error("\"name\" or \"file\" flag must be required")
+			os.Exit(1)
+		}
+
+		if file != "" && projectName != "" {
+			print.Error("Either \"id\" or \"file\" flag must be specified.")
 			os.Exit(1)
 		}
 
@@ -33,16 +38,30 @@ var addProjectCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		req := &project
+		req := &projectapi.ProjectCreateRequest{}
 
-		if fileName != "" {
-			bytes, err := ioutil.ReadFile(fileName)
+		if file != "" {
+			bytes, err := ioutil.ReadFile(file)
 			if err != nil {
-				print.Error("Failed to read file %s: %v", fileName, err)
+				print.Error("Failed to read file %s: %v", file, err)
 				os.Exit(1)
 			}
 			if err := json.Unmarshal(bytes, req); err != nil {
 				print.Error("Failed to parse input file to json: %v", err)
+				os.Exit(1)
+			}
+		} else {
+			// set params by commandline arguments
+			req.Name = projectName
+			req.TokenConfig.AccessTokenLifeSpan, _ = cmd.Flags().GetUint("accessExpires")
+			req.TokenConfig.RefreshTokenLifeSpan, _ = cmd.Flags().GetUint("refreshExpires")
+			req.TokenConfig.SigningAlgorithm, _ = cmd.Flags().GetString("signAlg")
+			req.AllowGrantTypes, _ = cmd.Flags().GetStringArray("grantTypes")
+
+			pwPols, _ := cmd.Flags().GetStringArray("passwordPolicies")
+			req.PasswordPolicy, err = util.ParsePolicies(pwPols)
+			if err != nil {
+				print.Error("Failed to parse password policy: %v", err)
 				os.Exit(1)
 			}
 		}
@@ -51,7 +70,7 @@ var addProjectCmd = &cobra.Command{
 		handler := apiclient.NewHandler(c.ServerAddr, token, c.Insecure, c.RequestTimeout)
 		res, err := handler.ProjectAdd(req)
 		if err != nil {
-			print.Fatal("Failed to add project %s: %v", project.Name, err)
+			print.Fatal("Failed to add project %s: %v", projectName, err)
 		}
 
 		format := output.NewProjectInfoFormat(res)
@@ -60,10 +79,11 @@ var addProjectCmd = &cobra.Command{
 }
 
 func init() {
-	addProjectCmd.Flags().StringVarP(&project.Name, "name", "n", "", "name of new project")
-	addProjectCmd.Flags().UintVar(&project.TokenConfig.AccessTokenLifeSpan, "accessExpires", 5*60, "access token life span [sec]")
-	addProjectCmd.Flags().UintVar(&project.TokenConfig.RefreshTokenLifeSpan, "refreshExpires", 14*24*60*60, "refresh token life span [sec]")
-	addProjectCmd.Flags().StringVar(&project.TokenConfig.SigningAlgorithm, "signAlg", "RS256", "token sigining algorithm, one of RS256, ")
-	addProjectCmd.Flags().StringArrayVar(&project.AllowGrantTypes, "grantTypes", []string{}, "allowed grant type list")
+	addProjectCmd.Flags().StringP("name", "n", "", "name of new project")
+	addProjectCmd.Flags().Uint("accessExpires", 5*60, "access token life span [sec]")
+	addProjectCmd.Flags().Uint("refreshExpires", 14*24*60*60, "refresh token life span [sec]")
+	addProjectCmd.Flags().String("signAlg", "RS256", "token sigining algorithm, only support RS256")
+	addProjectCmd.Flags().StringArray("grantTypes", []string{}, "allowed grant type list")
+	addProjectCmd.Flags().StringArray("passwordPolicies", []string{}, "password policy of users, supports \"minLen=<uint>\", \"notUserName=<bool>\", \"useChar=<lower|upper|both|either>\", \"useDigit=<bool>\", \"useSpecialChar=<bool>\", \"blackLists=<string separated by semicolon(;)>\"")
 	addProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
 }
