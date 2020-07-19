@@ -523,15 +523,39 @@ func authHandler(w http.ResponseWriter, method string, projectName string, token
 		return
 	}
 
-	// TODO parse id_token_hint
-	// https://openid-foundation-japan.github.io/openid-connect-core-1_0.ja.html#AuthRequest
 	if authReq.IDTokenHint != "" {
-
+		var claims token.IDTokenClaims
+		if err := token.ValidateIDToken(&claims, authReq.IDTokenHint, projectName, tokenIssuer); err != nil {
+			errors.PrintAsInfo(errors.Append(err, "Failed to validate id_token_hint"))
+			errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.State)
+			return
+		}
+		handleSSO(w, method, projectName, claims.Subject, tokenIssuer, authReq)
+		return
 	}
 
 	// if already logined (check by login_hint, prompt), redirect to callback
 	if slice.Contains(authReq.Prompt, "none") {
-		handleSSO(w, method, projectName, tokenIssuer, authReq)
+		uname := authReq.LoginHint
+		if uname == "" {
+			logger.Info("No user name in login_hint")
+			errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.State)
+			return
+		}
+
+		user, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: uname})
+		if err != nil {
+			errors.Print(errors.Append(err, "Failed to get user %s", uname))
+			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+			return
+		}
+		if len(user) != 1 {
+			logger.Info("Unexpect user num, expect 1 but got %d", len(user))
+			errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.State)
+			return
+		}
+
+		handleSSO(w, method, projectName, user[0].ID, tokenIssuer, authReq)
 		return // if prompt=none, never return login page
 	}
 
@@ -546,27 +570,7 @@ func authHandler(w http.ResponseWriter, method string, projectName string, token
 	oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
 }
 
-func handleSSO(w http.ResponseWriter, method string, projectName string, tokenIssuer string, authReq *oidc.AuthRequest) {
-	uname := authReq.LoginHint
-	if uname == "" {
-		logger.Info("No user name in login_hint")
-		errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.State)
-		return
-	}
-
-	user, err := db.GetInst().UserGetList(projectName, &model.UserFilter{Name: uname})
-	if err != nil {
-		errors.Print(errors.Append(err, "Failed to get user %s", uname))
-		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-		return
-	}
-	if len(user) != 1 {
-		logger.Info("Unexpect user num, expect 1 but got %d", len(user))
-		errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, method, authReq.RedirectURI, authReq.State)
-		return
-	}
-
-	userID := user[0].ID
+func handleSSO(w http.ResponseWriter, method string, projectName string, userID string, tokenIssuer string, authReq *oidc.AuthRequest) {
 	sessions, err := db.GetInst().SessionGetList(projectName, userID)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get session list"))
