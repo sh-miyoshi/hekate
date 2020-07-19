@@ -97,13 +97,13 @@ var updateProjectCmd = &cobra.Command{
 }
 
 func init() {
-	addProjectCmd.Flags().StringP("name", "n", "", "name of update project")
-	addProjectCmd.Flags().Uint("accessExpires", 5*60, "access token life span [sec]")
-	addProjectCmd.Flags().Uint("refreshExpires", 14*24*60*60, "refresh token life span [sec]")
-	addProjectCmd.Flags().String("signAlg", "RS256", "token sigining algorithm, only support RS256")
-	addProjectCmd.Flags().StringArray("grantTypes", []string{}, "allowed grant type list")
-	addProjectCmd.Flags().StringArray("passwordPolicies", []string{}, "password policy of users, supports \"minLen=<uint>\", \"notUserName=<bool>\", \"useChar=<lower|upper|both|either>\", \"useDigit=<bool>\", \"useSpecialChar=<bool>\", \"blackLists=<string separated by semicolon(;)>\"")
-	addProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
+	updateProjectCmd.Flags().StringP("name", "n", "", "name of update project")
+	updateProjectCmd.Flags().Uint("accessExpires", 5*60, "access token life span [sec]")
+	updateProjectCmd.Flags().Uint("refreshExpires", 14*24*60*60, "refresh token life span [sec]")
+	updateProjectCmd.Flags().String("signAlg", "RS256", "token sigining algorithm, only support RS256")
+	updateProjectCmd.Flags().StringArray("grantTypes", []string{}, "allowed grant type list")
+	updateProjectCmd.Flags().StringArray("passwordPolicies", []string{}, "password policy of users, supports \"minLen=<uint>\", \"notUserName=<bool>\", \"useChar=<lower|upper|both|either>\", \"useDigit=<bool>\", \"useSpecialChar=<bool>\", \"blackLists=<string separated by semicolon(;)>\"")
+	updateProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
 
 	updateProjectCmd.MarkFlagRequired("name")
 }
