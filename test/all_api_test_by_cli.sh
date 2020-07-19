@@ -41,7 +41,8 @@ test_command project get
 ## get
 test_command project get --name new-project
 
-## TODO(update)
+## update
+test_command project update --name new-project --file $TEST_DIR/inputs/project_update.json
 
 ## delete
 test_command project delete --name new-project
