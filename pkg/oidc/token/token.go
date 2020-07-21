@@ -75,6 +75,7 @@ func GenerateAccessToken(audiences []string, request Request) (string, *errors.E
 			},
 		},
 		user.Name,
+		"access",
 	}
 
 	for _, role := range user.SystemRoles {
@@ -106,6 +107,7 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 		request.ProjectName,
 		sessionID,
 		audiences,
+		"refresh",
 	}
 
 	return signToken(request.ProjectName, claims)
@@ -126,8 +128,23 @@ func GenerateIDToken(audiences []string, request Request) (string, *errors.Error
 		audiences,
 		request.Nonce,
 		request.EndUserAuthTime.Unix(),
+		"id",
 	}
 
+	return signToken(request.ProjectName, claims)
+}
+
+// GenerateSSOToken ...
+func GenerateSSOToken(request Request) (string, *errors.Error) {
+	now := time.Now()
+	claims := jwt.StandardClaims{
+		Id:        uuid.New().String(),
+		Issuer:    request.Issuer,
+		IssuedAt:  now.Unix(),
+		ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+		NotBefore: 0,
+		Subject:   request.UserID,
+	}
 	return signToken(request.ProjectName, claims)
 }
 
@@ -147,6 +164,11 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 			}
 			return key, nil
 		}
+
+		if claims.Format != "access" {
+			return nil, errors.New("", "Invalid token format: %s", claims.Format)
+		}
+
 		return nil, errors.New("", "unknown token sigining method")
 	})
 
@@ -193,6 +215,11 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 			}
 			return key, nil
 		}
+
+		if claims.Format != "refresh" {
+			return nil, errors.New("", "Invalid token format: %s", claims.Format)
+		}
+
 		return nil, errors.New("", "unknown token sigining method")
 	})
 
@@ -239,6 +266,11 @@ func ValidateIDToken(claims *IDTokenClaims, tokenString string, projectName stri
 			}
 			return key, nil
 		}
+
+		if claims.Format != "id" {
+			return nil, errors.New("", "Invalid token format: %s", claims.Format)
+		}
+
 		return nil, errors.New("", "unknown token sigining method")
 	})
 
