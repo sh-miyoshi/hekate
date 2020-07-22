@@ -37,7 +37,6 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 		Nonce:        values.Get("nonce"),
 		Prompt:       prompt,
 		MaxAge:       uint(maxAge),
-		LoginHint:    values.Get("login_hint"),
 		ResponseMode: resMode,
 		Request:      request,
 		IDTokenHint:  values.Get("id_token_hint"),

@@ -116,6 +116,13 @@ func main() {
 
 	fmt.Printf("access token: %v\n", tkn.AccessToken)
 
+	cookies := res.Cookies()
+	if len(cookies) != 1 {
+		fmt.Printf("Failed to get cookie: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("cookie: %v\n", cookies[0].String())
+
 	// TODO(get token by prompt=none)
 	values.Set("scope", "openid")
 	values.Set("response_type", "code")
@@ -131,6 +138,7 @@ func main() {
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.URL.RawQuery = values.Encode()
+	req.AddCookie(cookies[0])
 
 	res, err = client.Do(req)
 	if err != nil {

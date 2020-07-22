@@ -25,7 +25,6 @@ type AuthRequest struct {
 	Prompt       []string
 	MaxAge       uint
 	ResponseMode string
-	LoginHint    string
 	IDTokenHint  string
 
 	Request string
