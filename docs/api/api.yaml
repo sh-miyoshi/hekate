@@ -290,6 +290,7 @@ paths:
           description: "Internal server error"
   '/api/v1/project':
     post:
+      summary: "Create Project"
       tags:
         - project
       requestBody:
@@ -313,6 +314,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     get:
+      summary: "Get List of Projects"
       tags:
         - project
       responses:
@@ -330,6 +332,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}':
     get:
+      summary: "Get Project"
       tags:
         - project
       parameters:
@@ -352,6 +355,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     put:
+      summary: "Update Project"
       tags:
         - project
       parameters:
@@ -377,6 +381,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     delete:
+      summary: "Delete Project"
       tags:
         - project
       parameters:
@@ -396,6 +401,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user':
     post:
+      summary: "Create User"
       tags:
         - user
       parameters:
@@ -427,6 +433,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     get:
+      summary: "Get List of Users"
       tags:
         - user
       parameters:
@@ -456,6 +463,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user/{userID}':
     get:
+      summary: "Get User"
       tags:
         - user
       parameters:
@@ -483,6 +491,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     put:
+      summary: "Update User"
       tags:
         - user
       parameters:
@@ -513,6 +522,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     delete:
+      summary: "Delete User"
       tags:
         - user
       parameters:
@@ -537,6 +547,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user/{userID}/role/{roleID}':
     post:
+      summary: "Add Role to User"
       tags:
         - user
       description: 'Add a role to the user'
@@ -570,6 +581,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     delete:
+      summary: "Delete Role from User"
       tags:
         - user
       description: 'Delete a role from the user'
@@ -602,6 +614,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user/{userID}/change-password':
     post:
+      summary: "User Password Change"
       tags:
         - user
       parameters:
@@ -633,6 +646,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/client':
     post:
+      summary: "Create Client"
       tags:
         - client
       parameters:
@@ -664,6 +678,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     get:
+      summary: "Get List of Clients"
       tags:
         - client
       parameters:
@@ -689,6 +704,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/client/{clientID}':
     get:
+      summary: "Get Client"
       tags:
         - client
       parameters:
@@ -716,6 +732,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     put:
+      summary: "Update Client"
       tags:
         - client
       parameters:
@@ -746,6 +763,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     delete:
+      summary: "Delete Client"
       tags:
         - client
       parameters:
@@ -770,6 +788,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/role':
     post:
+      summary: "Create Role"
       tags:
         - role
       parameters:
@@ -801,6 +820,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     get:
+      summary: "Get List of Roles"
       tags:
         - role
       parameters:
@@ -832,6 +852,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/role/{roleID}':
     get:
+      summary: "Get Role"
       tags:
         - role
       parameters:
@@ -859,6 +880,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     put:
+      summary: "Update Role"
       tags:
         - role
       parameters:
@@ -889,6 +911,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     delete:
+      summary: "Delete Role"
       tags:
         - role
       parameters:
@@ -913,6 +936,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/session/{sessionID}':
     get:
+      summary: "Get Session"
       tags:
         - session
       parameters:
@@ -940,6 +964,7 @@ paths:
         '500':
           description: 'Internal Server Error'
     delete:
+      summary: "Delete Session"
       tags:
         - session
       parameters:
