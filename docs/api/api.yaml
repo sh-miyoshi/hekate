@@ -9,6 +9,7 @@ info:
 paths:
   '/api/v1/project/{projectName}/.well-known/openid-configuration':
     get:
+      summary: "OpenID Connect Discovery Endpoint"
       tags:
         - openid-connect
       parameters:
@@ -26,6 +27,7 @@ paths:
                 $ref: '#/components/schemas/OpenIDConfiguration'
   '/api/v1/project/{projectName}/openid-connect/token':
     post:
+      summary: "Token Endpoint"
       tags:
         - openid-connect
       parameters:
@@ -84,6 +86,7 @@ paths:
                 $ref: '#/components/schemas/TokenResponse'
   '/api/v1/project/{projectName}/openid-connect/certs':
     get:
+      summary: "JSON Web Keys Discovery"
       tags:
         - openid-connect
       parameters:
@@ -101,6 +104,7 @@ paths:
                 $ref: '#/components/schemas/JWKSet'
   '/api/v1/project/{projectName}/openid-connect/auth':
     get:
+      summary: "Authorization Endpoint"
       tags:
         - openid-connect
       parameters:
@@ -139,6 +143,7 @@ paths:
         '500':
           description: "Internal server error"
     post:
+      summary: "Authorization Endpoint"
       tags:
         - openid-connect
       parameters:
@@ -178,6 +183,7 @@ paths:
           description: "Internal server error"
   '/api/v1/project/{projectName}/openid-connect/userinfo':
     get:
+      summary: "UserInfo Endpoint"
       tags:
         - openid-connect
       parameters:
@@ -198,6 +204,7 @@ paths:
         '500':
           description: "Internal server error"
     post:
+      summary: "UserInfo Endpoint"
       tags:
         - openid-connect
       parameters:
@@ -219,6 +226,7 @@ paths:
           description: "Internal server error"
   '/api/v1/project/{projectName}/openid-connect/login':
     post:
+      summary: "Login to hekate"
       tags:
         - openid-connect
       parameters:
@@ -255,6 +263,7 @@ paths:
           description: "Internal server error"
   '/api/v1/project/{projectName}/openid-connect/revoke':
     post:
+      summary: "Revoke Token"
       tags:
         - openid-connect
       parameters:
