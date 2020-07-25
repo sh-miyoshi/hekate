@@ -365,7 +365,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
+	if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer, s.MaxAge); err != nil {
 		errors.Print(errors.Append(err, "Failed to set cookie"))
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
@@ -414,7 +414,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
+		if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer, s.MaxAge); err != nil {
 			errors.Print(errors.Append(err, "Failed to set cookie"))
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
@@ -613,11 +613,6 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, userID 
 				errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 				return
 			}
-			if err := setLoginSessionToCookie(w, projectName, s.UserID, tokenIssuer); err != nil {
-				errors.Print(errors.Append(err, "Failed to set cookie"))
-				errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-				return
-			}
 			http.Redirect(w, req, req.URL.String(), http.StatusFound)
 			return
 		}
@@ -699,15 +694,20 @@ func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer str
 	return req, nil
 }
 
-func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer string) *errors.Error {
+func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer string, maxAge uint) *errors.Error {
 	prj, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		return errors.Append(err, "Failed to get project config")
 	}
 
+	m := prj.TokenConfig.AccessTokenLifeSpan
+	if maxAge > 0 {
+		m = maxAge
+	}
+
 	req := token.Request{
 		Issuer:      issuer,
-		ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan), // TODO(set correct value)
+		ExpiredTime: time.Second * time.Duration(m),
 		ProjectName: projectName,
 		UserID:      userID,
 	}
@@ -719,7 +719,7 @@ func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer 
 	cookie := &http.Cookie{
 		Name:     "HEKATE_LOGIN_SESSION",
 		Value:    tkn,
-		MaxAge:   int(prj.TokenConfig.AccessTokenLifeSpan),
+		MaxAge:   int(m),
 		Secure:   false, // TODO(for debug)
 		HttpOnly: true,
 	}
