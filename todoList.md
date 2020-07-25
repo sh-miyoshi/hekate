@@ -2,6 +2,8 @@
 
 ## server application enhancement
 
+- User Logout API
+- 引数処理の追加
 - ユーザーパスワードロック
   - Project Infoに追加
   - APIの修正
@@ -114,3 +116,4 @@
   - create binary files
 - login pageの修正方法のドキュメント
 - Benchmark
+- set cookie to secure
