@@ -74,6 +74,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
+			logger.Info("no such project %s", projectName)
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get project info"))
@@ -111,13 +112,11 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var tkn *oidc.TokenResponse
 
 	if r.Form.Get("redirect_uri") != "" {
+		// existence of client is already checked in oidc.ClientAuth
 		if err := client.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
 			if errors.Contains(err, client.ErrNoRedirectURL) {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
 				errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, state)
-			} else if errors.Contains(err, model.ErrNoSuchClient) {
-				errors.PrintAsInfo(errors.Append(err, "Failed to get allowed callback urls"))
-				errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
 			} else {
 				errors.Print(errors.Append(err, "Failed to get allowed callbak urls in client"))
 				errors.WriteOAuthError(w, errors.ErrServerError, state)
@@ -238,8 +237,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errMsg := "Request failed. invalid form value"
-		oidc.WriteErrorPage(errMsg, w)
+		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
 		return
 	}
 
@@ -392,20 +390,20 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Debug("Form: %v", r.Form)
 	state := r.Form.Get("state")
 
+	sessionID := r.Form.Get("login_session_id")
+	s, err := oidc.VerifySession(projectName, sessionID)
+	if err != nil {
+		errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
+		errMsg := "Request failed. internal server error occured."
+		if errors.Contains(err, errors.ErrSessionExpired) {
+			errMsg = "Request failed. the session was already expired."
+		}
+		oidc.WriteErrorPage(errMsg, w)
+		return
+	}
+
 	switch sel {
 	case "yes":
-		sessionID := r.Form.Get("login_session_id")
-		s, err := oidc.VerifySession(projectName, sessionID)
-		if err != nil {
-			errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
-			errMsg := "Request failed. internal server error occured."
-			if errors.Contains(err, errors.ErrSessionExpired) {
-				errMsg = "Request failed. the session was already expired."
-			}
-			oidc.WriteErrorPage(errMsg, w)
-			return
-		}
-
 		issuer := token.GetFullIssuer(r)
 		req, err := createLoginRedirectInfo(s, state, issuer)
 		if err != nil {
@@ -421,10 +419,10 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, req, req.URL.String(), http.StatusFound)
 	case "no":
-		errors.WriteOAuthError(w, errors.ErrConsentRequired, state)
+		errors.RedirectWithOAuthError(w, errors.ErrConsentRequired, r.Method, s.RedirectURI, state)
 	default:
 		logger.Info("Invalid select type %s. consent page maybe broken.", sel)
-		errors.WriteOAuthError(w, errors.ErrServerError, state)
+		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 	}
 }
 
