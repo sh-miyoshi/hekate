@@ -199,7 +199,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Project
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
+		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
