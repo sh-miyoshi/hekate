@@ -36,47 +36,11 @@ paths:
           required: true
           schema:
             type: string
-        - name: grant_type
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: username
-          in: query
-          schema:
-            type: string
-        - name: password
-          in: query
-          schema:
-            type: string
-        - name: client_id
-          in: query
-          schema:
-            type: string
-        - name: client_secret
-          in: query
-          schema:
-            type: string
-        - name: scope
-          in: query
-          schema:
-            type: string
-        - name: refresh_token
-          in: query
-          schema:
-            type: string
-        - name: redirect_uri
-          in: query
-          schema:
-            type: string
-        - name: code
-          in: query
-          schema:
-            type: string
-        - name: state
-          in: query
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'  
       responses:
         '200':
           description: 'Get Token'
@@ -84,6 +48,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: 'invalid_request_object, invalid_request_uri, invalid_grant, unsupported_grant_type'
+        '403':
+          description: 'invalid_client, request_unauthorized'
+        '404':
+          description: 'Project Not Found'
+        '500':
+          description: 'Internal Server Error'
   '/api/v1/project/{projectName}/openid-connect/certs':
     get:
       summary: "JSON Web Keys Discovery"
@@ -102,6 +74,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JWKSet'
+        '404':
+          description: 'Project Not Found'
+        '500':
+          description: 'Internal Server Error'
   '/api/v1/project/{projectName}/openid-connect/auth':
     get:
       summary: "Authorization Endpoint"
@@ -139,7 +115,13 @@ paths:
             type: string
       responses:
         '200':
-          description: "Show login page or error page"
+          description: "Success"
+        '400':
+          description: "invalid_request_uri"
+        '403':
+          description: "invalid_client"
+        '302':
+          description: "return error to callback url"
         '500':
           description: "Internal server error"
     post:
@@ -152,33 +134,20 @@ paths:
           required: true
           schema:
             type: string
-        - name: scope
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: response_type
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: client_id
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: redirect_uri
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: state
-          in: query
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'  
       responses:
         '200':
-          description: "Show login page or error page"
+          description: "Success"
+        '400':
+          description: "invalid_request_uri, invalid_request_object"
+        '403':
+          description: "invalid_client"
+        '302':
+          description: "return error to callback url"
         '500':
           description: "Internal server error"
   '/api/v1/project/{projectName}/openid-connect/userinfo':
@@ -199,8 +168,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInfo'
-        '401':
-          description: "Unauthorized"
+        '400':
+          description: "invalid_request"
         '500':
           description: "Internal server error"
     post:
@@ -220,8 +189,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInfo'
-        '401':
-          description: "Unauthorized"
+        '400':
+          description: "invalid_request"
         '500':
           description: "Internal server error"
   '/api/v1/project/{projectName}/openid-connect/login':
@@ -235,32 +204,39 @@ paths:
           required: true
           schema:
             type: string
-        - name: login_verify_code
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: state
-          in: query
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: "Return error page"
+          description: "Return error page or consent page"
         '302':
           description: "Redirect to callback URL"
         '500':
           description: "Internal server error"
+  'api/v1/project/{projectName}/openid-connect/consent':
+    post:
+      summary: "Consent to auth"
+      tags:
+        - openid-connect
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsentRequest'
+      responses:
+        '200':
+          description: "Return error page"
+        '302':
+          description: "Return error or success to callback URL"
   '/api/v1/project/{projectName}/openid-connect/revoke':
     post:
       summary: "Revoke Token"
@@ -272,15 +248,11 @@ paths:
           required: true
           schema:
             type: string
-        - name: token
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: token_type_hint
-          in: query
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRevokeRequest' 
       responses:
         '200':
           description: "ok"
@@ -291,6 +263,9 @@ paths:
   '/api/v1/project':
     post:
       summary: "Create Project"
+      description: |
+        create new project  
+        require role is write-cluster
       tags:
         - project
       requestBody:
@@ -315,17 +290,20 @@ paths:
           description: 'Internal Server Error'
     get:
       summary: "Get List of Projects"
+      description: |
+        get a list of projects
+        require role is read-cluster
       tags:
         - project
       responses:
         '200':
-          description: 'Get All Project IDs'
+          description: 'Get projects'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/ProjectGetResponse'
         '403':
           description: 'Forbidden'
         '500':
@@ -333,6 +311,9 @@ paths:
   '/api/v1/project/{projectName}':
     get:
       summary: "Get Project"
+      description: |
+        get a project
+        require role is read-project
       tags:
         - project
       parameters:
@@ -356,6 +337,9 @@ paths:
           description: 'Internal Server Error'
     put:
       summary: "Update Project"
+      description: |
+        update the project
+        require role is write-project
       tags:
         - project
       parameters:
@@ -382,6 +366,9 @@ paths:
           description: 'Internal Server Error'
     delete:
       summary: "Delete Project"
+      description: |
+        delete the project
+        require role is write-cluster
       tags:
         - project
       parameters:
@@ -614,7 +601,7 @@ paths:
           description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user/{userID}/change-password':
     post:
-      summary: "User Password Change"
+      summary: "Change User Password"
       tags:
         - user
       parameters:
@@ -639,7 +626,32 @@ paths:
         '400':
           description: 'Bad Request'
         '404':
-          description: 'Project Not Found'
+          description: 'Project or User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/user/{userID}/logout':
+    post:
+      summary: "Logout User"
+      tags:
+        - user
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Success'
+        '404':
+          description: 'Project or User Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -1268,4 +1280,75 @@ components:
         sub:
           type: string
         preferred_username:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        login_verify_code:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        state:
+          type: string
+    TokenRequest:
+      type: object
+      properties:
+        grant_type:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        client_id:
+          type: string
+        client_secret:
+          type: string
+        scope:
+          type: string
+        refresh_token:
+          type: string
+        redirect_uri:
+          type: string
+        code:
+          type: string
+        state:
+          type: string
+    AuthRequest:
+      type: object
+      properties:
+        scope:
+          type: string
+        response_type:
+          type: string
+        client_id:
+          type: string
+        redirect_uri:
+          type: string
+        state:
+          type: string
+        nonce:
+          type: string
+        prompt:
+          type: string
+        max_age:
+          type: integer
+        id_token_hint:
+          type: string
+    ConsentRequest:
+      type: object
+      properties:
+        select:
+          type: string
+        state:
+          type: string
+    TokenRevokeRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        token_type_hint:
+          type: string
+        state:
           type: string
