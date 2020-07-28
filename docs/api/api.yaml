@@ -216,7 +216,7 @@ paths:
           description: "Redirect to callback URL"
         '500':
           description: "Internal server error"
-  'api/v1/project/{projectName}/openid-connect/consent':
+  '/api/v1/project/{projectName}/openid-connect/consent':
     post:
       summary: "Consent to auth"
       tags:
