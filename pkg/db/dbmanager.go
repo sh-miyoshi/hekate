@@ -486,6 +486,21 @@ func (m *Manager) UserChangePassword(projectName string, userID string, password
 	})
 }
 
+// UserLogout ...
+func (m *Manager) UserLogout(projectName string, userID string) *errors.Error {
+	if !model.ValidateUserID(userID) {
+		return errors.Append(model.ErrUserValidateFailed, "invalid user id format")
+	}
+
+	return m.transaction.Transaction(func() *errors.Error {
+		if err := m.session.DeleteAll(projectName, userID); err != nil {
+			return errors.Append(err, "Delete user session failed")
+		}
+
+		return nil
+	})
+}
+
 // LoginSessionAdd ...
 func (m *Manager) LoginSessionAdd(projectName string, ent *model.LoginSession) *errors.Error {
 	// create session is in internal only, so validation is not required

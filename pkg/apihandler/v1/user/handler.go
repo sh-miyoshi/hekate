@@ -496,3 +496,35 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserChangePasswordHandler method successfully finished")
 }
+
+// UserLogoutHandler ...
+//   require role: <oneself> or write-project
+func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+		claims, _ := jwthttp.ValidateAPIRequest(r)
+		if claims.Subject != userID {
+			errors.PrintAsInfo(errors.Append(err, "Failed to authorize user: don't have permission and not yourself"))
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+	}
+
+	if err := db.GetInst().UserLogout(projectName, userID); err != nil {
+		if errors.Contains(err, model.ErrUserValidateFailed) {
+			logger.Info("User ID %s is invalid", userID)
+			http.Error(w, "User Not Found", http.StatusNotFound)
+		} else {
+			errors.Print(errors.Append(err, "Failed to logout"))
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	logger.Info("UserLogoutHandler method successfully finished")
+}
