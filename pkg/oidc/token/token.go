@@ -186,7 +186,10 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 	})
 
 	if err != nil {
-		e := err.(*errors.Error)
+		e, ok := err.(*errors.Error)
+		if !ok {
+			return errors.New("", err.Error())
+		}
 		return errors.Append(e, "Failed to parse token")
 	}
 
@@ -234,7 +237,10 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 	})
 
 	if err != nil {
-		e := err.(*errors.Error)
+		e, ok := err.(*errors.Error)
+		if !ok {
+			return errors.New("", err.Error())
+		}
 		return errors.Append(e, "Failed to parse token")
 	}
 
@@ -283,7 +289,10 @@ func ValidateIDToken(claims *IDTokenClaims, tokenString string, projectName stri
 	})
 
 	if err != nil {
-		e := err.(*errors.Error)
+		e, ok := err.(*errors.Error)
+		if !ok {
+			return errors.New("", err.Error())
+		}
 		return errors.Append(e, "Failed to parse token")
 	}
 
