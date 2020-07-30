@@ -1,3 +1,8 @@
+build-binary:
+	cd cmd/hekate && \
+	go build
+	cd cmd/hctl && \
+	go build
 build-docker:
 	docker build -t hekate:all-in-one -f build/allinone/Dockerfile .
 	docker build -t hekate -f build/server/Dockerfile .
