@@ -532,6 +532,33 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 		return
 	}
 
+	// if prompt contains login or select_account or consent
+	//   create login_session and return login page
+	// else
+	//   get user id from id_token_hint or cookie
+	//   find sessions
+	//   if ok
+	//     return success response(token, code, ...)
+	//   else if prompt is none
+	//     return logiin_required
+	//   else
+	//     create login_session and return login page
+
+	if slice.Contains(authReq.Prompt, "login") || slice.Contains(authReq.Prompt, "select_account") || slice.Contains(authReq.Prompt, "consent") {
+		// Start session for login flow
+		lsID, err := oidc.StartLoginSession(projectName, authReq)
+		if err != nil {
+			errors.Print(errors.Append(err, "Failed to start login session"))
+			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+			return
+		}
+
+		oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
+		return
+	}
+
+	// get user id from id_token_hint or cookie
+	userID := ""
 	if authReq.IDTokenHint != "" {
 		var claims token.IDTokenClaims
 		if err := token.ValidateIDToken(&claims, authReq.IDTokenHint, projectName, tokenIssuer); err != nil {
@@ -539,18 +566,32 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 			errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, r.Method, authReq.RedirectURI, authReq.State)
 			return
 		}
-		handleSSO(w, r.Method, projectName, claims.Subject, tokenIssuer, authReq)
-		return
+		userID = claims.Subject
+	} else {
+		cookie, err := r.Cookie("HEKATE_LOGIN_SESSION")
+		if err != nil {
+			logger.Debug("Failed to get user id from cookie: %v", err)
+		} else {
+			userID, err = getLoginUserIDFromCookie(cookie, projectName)
+		}
+	}
+
+	if userID != "" {
+		req, err := handleSSO(r.Method, projectName, userID, tokenIssuer, authReq)
+		if err == nil {
+			http.Redirect(w, req, req.URL.String(), http.StatusFound)
+			return
+		} else if !errors.Contains(err, errors.ErrLoginRequired) {
+			// Internal Server Error
+			errors.Print(errors.Append(err, "Failed to handler SSO"))
+			errors.RedirectWithOAuthError(w, errors.ErrServerError, r.Method, authReq.RedirectURI, authReq.State)
+			return
+		}
 	}
 
 	if slice.Contains(authReq.Prompt, "none") {
-		userID, err := getLoginUserIDFromCookie(r, projectName)
-		if err != nil {
-			errors.PrintAsInfo(errors.Append(err, "Failed to get user id from cookie"))
-			errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, r.Method, authReq.RedirectURI, authReq.State)
-			return
-		}
-		handleSSO(w, r.Method, projectName, userID, tokenIssuer, authReq)
+		logger.Info("request is prompt=none, but no valid sessions")
+		errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, r.Method, authReq.RedirectURI, authReq.State)
 		return // if prompt=none, never return login page
 	}
 
@@ -562,20 +603,17 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 		return
 	}
 
+	// Return login page
 	oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
 }
 
-func handleSSO(w http.ResponseWriter, method string, projectName string, userID string, tokenIssuer string, authReq *oidc.AuthRequest) {
+func handleSSO(method string, projectName string, userID string, tokenIssuer string, authReq *oidc.AuthRequest) (*http.Request, *errors.Error) {
 	sessions, err := db.GetInst().SessionGetList(projectName, userID)
 	if err != nil {
-		errors.Print(errors.Append(err, "Failed to get session list"))
-		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-		return
+		return nil, errors.Append(err, "Failed to get session list")
 	}
 	if len(sessions) == 0 {
-		logger.Info("No sessions, so return login_required")
-		errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.State)
-		return
+		return nil, errors.Append(errors.ErrLoginRequired, "No sessions, so return login_required")
 	}
 
 	// check max_age
@@ -602,22 +640,16 @@ func handleSSO(w http.ResponseWriter, method string, projectName string, userID 
 			}
 			req, err := createLoginRedirectInfo(ls, authReq.State, tokenIssuer)
 			if err != nil {
-				errors.Print(errors.Append(err, "Failed to create login redirect info"))
-				errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-				return
+				return nil, errors.Append(err, "Failed to create login redirect info")
 			}
 			if err := db.GetInst().LoginSessionAdd(projectName, ls); err != nil {
-				errors.Print(errors.Append(err, "Failed to register login session"))
-				errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
-				return
+				return nil, errors.Append(err, "Failed to register login session")
 			}
-			http.Redirect(w, req, req.URL.String(), http.StatusFound)
-			return
+			return req, nil
 		}
 	}
 
-	logger.Info("No valid session, so return login_required")
-	errors.RedirectWithOAuthError(w, errors.ErrLoginRequired, method, authReq.RedirectURI, authReq.State)
+	return nil, errors.Append(errors.ErrLoginRequired, "No valid session, so return login_required")
 }
 
 func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
@@ -726,12 +758,7 @@ func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer 
 	return nil
 }
 
-func getLoginUserIDFromCookie(r *http.Request, projectName string) (string, *errors.Error) {
-	cookie, err := r.Cookie("HEKATE_LOGIN_SESSION")
-	if err != nil {
-		return "", errors.New("", "Failed to get session: %v", err)
-	}
-
+func getLoginUserIDFromCookie(cookie *http.Cookie, projectName string) (string, *errors.Error) {
 	var claims jwt.StandardClaims
 	tkn, err := jwt.ParseWithClaims(cookie.Value, &claims, func(token *jwt.Token) (interface{}, error) {
 		project, err := db.GetInst().ProjectGet(projectName)
