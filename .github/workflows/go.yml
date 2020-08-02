@@ -31,7 +31,7 @@ jobs:
       run: |
         cd cmd/hekate
         go build -o hekate
-        ./hekate &
+        ./hekate --config config.yaml &
 
     - name: API Test
       run: |
