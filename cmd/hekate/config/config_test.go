@@ -21,8 +21,10 @@ db:
   connection_string: ""
 oidc_auth_code_expires_time: 300`)
 
+	args := []string{"--config", tmpFile.Name()}
+
 	// Test loading correct yaml file
-	if _, err := InitConfig(tmpFile.Name()); err != nil {
+	if _, err := InitConfig(args); err != nil {
 		t.Errorf("Failed to load correct yaml file: %v", err)
 	}
 
@@ -31,7 +33,7 @@ oidc_auth_code_expires_time: 300`)
 	passwd := "securepassword"
 	os.Setenv("HEKATE_ADMIN_NAME", admin)
 	os.Setenv("HEKATE_ADMIN_PASSWORD", passwd)
-	cfg, _ := InitConfig(tmpFile.Name())
+	cfg, _ := InitConfig(args)
 	if cfg.AdminName != admin || cfg.AdminPassword != passwd {
 		t.Errorf("Failed to overwrite by os.Env: want %s:%s, got %s:%s", admin, passwd, cfg.AdminName, cfg.AdminPassword)
 	}
