@@ -20,6 +20,6 @@
 | https鍵ファイルパス | https.key-file | - | https-key-file | httpsサーバー用の鍵ファイルのパス |
 | ログファイルパス | logfile | - | logfile | ログの出力先ファイルのパス。設定されてない、もしくは空文字列の場合は標準出力に表示されます |
 | デバッグモード | debug_mode | HEKATE_ENV="DEBUG" | debug | デバッグ用のログも出力 |
-| DBタイプ | db.type | - | db-type | サーバーが接続するDBのタイプ |
-| DB接続文字列 | db.connection_string | - | db-conn-str | DBに接続するための接続文字列 |
+| DBタイプ | db.type | HEKATE_DB_TYPE | db-type | サーバーが接続するDBのタイプ |
+| DB接続文字列 | db.connection_string | HEKATE_DB_CONNECT_STRING | db-conn-str | DBに接続するための接続文字列 |
 | ログインページリソースパス | user_login_page_res | HEKATE_LOGIN_PAGE_RES | login-res | ユーザーログインページのリソースへのパス |
