@@ -22,7 +22,7 @@ https:
 
 # File Name of Output Log
 #   If set empty, output log to stdout
-logfile: ''
+logfile: 'hekate.log'
 
 # If true, output debug level log
 #   CAUTION: debug mode may output secret info into log, so you never use at production environment
