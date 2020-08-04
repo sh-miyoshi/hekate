@@ -19,7 +19,6 @@ type option struct {
 	genRefreshToken bool
 	genIDToken      bool
 	nonce           string
-	maxAge          uint
 	endUserAuthTime time.Time
 }
 
@@ -61,7 +60,6 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 	return genTokenRes(usr.ID, project, r, option{
 		audiences:       audiences,
 		genRefreshToken: true,
-		maxAge:          0,
 		endUserAuthTime: time.Unix(0, 0),
 	})
 }
@@ -101,7 +99,6 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 		genRefreshToken: true,
 		genIDToken:      true,
 		nonce:           s.Nonce,
-		maxAge:          s.MaxAge,
 		endUserAuthTime: s.LoginDate,
 	})
 }
@@ -139,7 +136,6 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 	return genTokenRes(claims.Subject, project, r, option{
 		audiences:       claims.Audience,
 		genRefreshToken: true,
-		maxAge:          s.AuthMaxAge,
 		endUserAuthTime: s.LastAuthTime,
 	})
 }
@@ -163,11 +159,6 @@ func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *
 }
 
 func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*TokenResponse, *errors.Error) {
-	accessLifeSpan := project.TokenConfig.AccessTokenLifeSpan
-	if opt.maxAge > 0 && opt.maxAge < accessLifeSpan {
-		accessLifeSpan = opt.maxAge
-	}
-
 	// Generate JWT Token
 	res := TokenResponse{
 		TokenType: "Bearer",
@@ -176,7 +167,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	accessTokenReq := token.Request{
 		Issuer:      token.GetFullIssuer(r),
-		ExpiredTime: time.Second * time.Duration(accessLifeSpan),
+		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
 		ProjectName: project.Name,
 		UserID:      userID,
 	}
@@ -196,12 +187,6 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	if opt.genRefreshToken {
 		res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
-		maxAge := project.TokenConfig.AccessTokenLifeSpan
-		if opt.maxAge > 0 {
-			res.RefreshExpiresIn = opt.maxAge
-			maxAge = opt.maxAge
-		}
-
 		refreshTokenReq := token.Request{
 			Issuer:      token.GetFullIssuer(r),
 			ExpiredTime: time.Second * time.Duration(res.RefreshExpiresIn),
@@ -227,7 +212,6 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 			ExpiresIn:    res.RefreshExpiresIn,
 			FromIP:       ip,
 			LastAuthTime: opt.endUserAuthTime,
-			AuthMaxAge:   maxAge,
 		}
 
 		if err := db.GetInst().SessionAdd(project.Name, ent); err != nil {
@@ -237,14 +221,9 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 	}
 
 	if opt.genIDToken {
-		lifeSpan := project.TokenConfig.AccessTokenLifeSpan
-		if opt.maxAge > 0 {
-			lifeSpan = opt.maxAge
-		}
-
 		idTokenReq := token.Request{
 			Issuer:          token.GetFullIssuer(r),
-			ExpiredTime:     time.Second * time.Duration(lifeSpan),
+			ExpiredTime:     time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
 			ProjectName:     project.Name,
 			UserID:          userID,
 			Nonce:           opt.nonce,

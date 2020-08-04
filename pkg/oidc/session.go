@@ -18,7 +18,6 @@ func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Er
 		RedirectURI:  req.RedirectURI,
 		Nonce:        req.Nonce,
 		ProjectName:  projectName,
-		MaxAge:       req.MaxAge,
 		ResponseMode: req.ResponseMode,
 		ResponseType: req.ResponseType,
 		Prompt:       req.Prompt,

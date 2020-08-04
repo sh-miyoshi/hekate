@@ -38,7 +38,6 @@ type session struct {
 	ExpiresIn    uint      `bson:"expiresIn"`
 	FromIP       string    `bson:"fromIP"`
 	LastAuthTime time.Time `bson:"lastAuthTime"`
-	AuthMaxAge   uint      `bson:"maxAge"`
 }
 
 type loginSession struct {
@@ -51,7 +50,6 @@ type loginSession struct {
 	RedirectURI  string    `bson:"redirectURI"`
 	Nonce        string    `bson:"nonce"`
 	ProjectName  string    `bson:"projectName"`
-	MaxAge       uint      `bson:"maxAge"`
 	ResponseMode string    `bson:"responseMode"`
 	Prompt       []string  `bson:"prompt"`
 	LoginDate    time.Time `bson:"loginDate"`

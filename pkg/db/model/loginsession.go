@@ -17,7 +17,6 @@ type LoginSession struct {
 	RedirectURI  string
 	Nonce        string
 	ProjectName  string
-	MaxAge       uint
 	ResponseMode string
 	Prompt       []string
 	UserID       string

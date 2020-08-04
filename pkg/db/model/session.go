@@ -16,7 +16,6 @@ type Session struct {
 	ExpiresIn    uint
 	FromIP       string // Used to identify the user using this session
 	LastAuthTime time.Time
-	AuthMaxAge   uint
 }
 
 // SessionHandler ...

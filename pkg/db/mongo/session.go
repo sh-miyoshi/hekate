@@ -53,7 +53,6 @@ func (h *SessionHandler) Add(projectName string, s *model.Session) *errors.Error
 		ExpiresIn:    s.ExpiresIn,
 		FromIP:       s.FromIP,
 		LastAuthTime: s.LastAuthTime,
-		AuthMaxAge:   s.AuthMaxAge,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
@@ -149,7 +148,6 @@ func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Sessi
 		ExpiresIn:    res.ExpiresIn,
 		FromIP:       res.FromIP,
 		LastAuthTime: res.LastAuthTime,
-		AuthMaxAge:   res.AuthMaxAge,
 	}, nil
 }
 
@@ -185,7 +183,6 @@ func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Se
 			ExpiresIn:    s.ExpiresIn,
 			FromIP:       s.FromIP,
 			LastAuthTime: s.LastAuthTime,
-			AuthMaxAge:   s.AuthMaxAge,
 		})
 	}
 

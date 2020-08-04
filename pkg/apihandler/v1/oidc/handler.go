@@ -321,7 +321,6 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				RedirectURI:  s.RedirectURI,
 				State:        state,
 				Nonce:        s.Nonce,
-				MaxAge:       s.MaxAge,
 				ResponseMode: s.ResponseMode,
 				Prompt:       s.Prompt,
 			}
@@ -378,7 +377,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer, s.MaxAge); err != nil {
+	if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
 		errors.Print(errors.Append(err, "Failed to set cookie"))
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
@@ -427,7 +426,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer, s.MaxAge); err != nil {
+		if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
 			errors.Print(errors.Append(err, "Failed to set cookie"))
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
@@ -635,7 +634,12 @@ func handleSSO(method string, projectName string, userID string, tokenIssuer str
 	// if now > auth_time + max_age return login_required
 	now := time.Now()
 	for _, s := range sessions {
-		valid := s.LastAuthTime.Add(time.Second * time.Duration(s.AuthMaxAge))
+		lifeSpan := s.ExpiresIn
+		if authReq.MaxAge > 0 {
+			lifeSpan = authReq.MaxAge
+		}
+
+		valid := s.LastAuthTime.Add(time.Second * time.Duration(lifeSpan))
 		logger.Debug("Session Info: now %v, valid time %v", now, valid)
 		if now.Before(valid) {
 			ls := &model.LoginSession{
@@ -649,7 +653,6 @@ func handleSSO(method string, projectName string, userID string, tokenIssuer str
 				RedirectURI:  authReq.RedirectURI,
 				ResponseMode: authReq.ResponseMode,
 				Scope:        authReq.Scope,
-				MaxAge:       authReq.MaxAge,
 				Prompt:       authReq.Prompt,
 				ExpiresIn:    time.Now().Add(oidc.GetLoginSessionExpiresTime()),
 			}
@@ -739,20 +742,18 @@ func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer str
 	return req, nil
 }
 
-func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer string, maxAge uint) *errors.Error {
+func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer string) *errors.Error {
 	prj, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		return errors.Append(err, "Failed to get project config")
 	}
 
-	m := prj.TokenConfig.AccessTokenLifeSpan
-	if maxAge > 0 {
-		m = maxAge
-	}
+	// TODO(set new value to config?)
+	lifeSpan := prj.TokenConfig.AccessTokenLifeSpan
 
 	req := token.Request{
 		Issuer:      issuer,
-		ExpiredTime: time.Second * time.Duration(m),
+		ExpiredTime: time.Second * time.Duration(lifeSpan),
 		ProjectName: projectName,
 		UserID:      userID,
 	}
@@ -764,7 +765,7 @@ func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer 
 	cookie := &http.Cookie{
 		Name:     "HEKATE_LOGIN_SESSION",
 		Value:    tkn,
-		MaxAge:   int(m),
+		MaxAge:   int(lifeSpan),
 		Secure:   false, // TODO(for debug)
 		HttpOnly: true,
 	}
