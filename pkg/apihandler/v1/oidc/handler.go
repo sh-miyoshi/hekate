@@ -151,7 +151,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil && errors.Contains(err, model.ErrNoSuchSession) {
 			logger.Info("Refresh token is already revoked")
-			errors.WriteOAuthError(w, errors.ErrInvalidRequest, state)
+			errors.WriteOAuthError(w, errors.ErrInvalidGrant, state)
 			return
 		}
 	case model.GrantTypeAuthorizationCode:
