@@ -13,6 +13,7 @@ type Config struct {
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 	ClaimsSupported                  []string `json:"claims_supported"`
 	ResponseModesSupported           []string `json:"response_modes_supported"`
+	GrantTypesSupported              []string `json:"grant_types_supported"`
 }
 
 // TokenResponse ...

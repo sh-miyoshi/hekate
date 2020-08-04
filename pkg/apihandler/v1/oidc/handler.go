@@ -23,8 +23,22 @@ import (
 
 // ConfigGetHandler method return a configuration of OpenID Connect
 func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
 	issuer := token.GetFullIssuer(r)
 	logger.Debug("Issuer: %s", issuer)
+
+	prj, err := db.GetInst().ProjectGet(projectName)
+	if err != nil {
+		errors.Print(errors.Append(err, "Failed to get project info"))
+		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		return
+	}
+	grantTypes := []string{}
+	for _, t := range prj.AllowGrantTypes {
+		grantTypes = append(grantTypes, t.String())
+	}
 
 	res := Config{
 		Issuer:                 issuer,
@@ -51,6 +65,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 			"query",
 			"fragment",
 		},
+		GrantTypesSupported: grantTypes,
 	}
 
 	jwthttp.ResponseWrite(w, "ConfigGetHandler", &res)
