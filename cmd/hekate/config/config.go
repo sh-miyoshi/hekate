@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"os"
 	"regexp"
 	"strconv"
@@ -57,23 +58,29 @@ func InitConfig(osArgs []string) (*GlobalConfig, *errors.Error) {
 	setEnvVar("HEKATE_LOGIN_PAGE_RES", &res.UserLoginResourceDir)
 
 	// Set by command line args
-	// TODO
-	/*
-		admin
-		password
-		port
-		bind-addr
-		https
-		https-cert-file
-		https-key-file
-		logfile
-		debug
-		db-type
-		db-conn-str
-		login-res
-	*/
+
+	// "config" flag here is just to avoid an error.
+	var c string
+	flag.StringVar(&c, "config", "", "config file path")
+
+	flag.StringVar(&res.AdminName, "admin", res.AdminName, "name of administrator")
+	flag.StringVar(&res.AdminPassword, "password", res.AdminPassword, "password of administrator")
+	flag.IntVar(&res.Port, "port", res.Port, "port number of server")
+	flag.StringVar(&res.BindAddr, "bind-addr", res.BindAddr, "bind address of server")
+	flag.BoolVar(&res.HTTPSConfig.Enabled, "https", res.HTTPSConfig.Enabled, "start server with https")
+	flag.StringVar(&res.HTTPSConfig.CertFile, "https-cert-file", res.HTTPSConfig.CertFile, "cert file path of https")
+	flag.StringVar(&res.HTTPSConfig.KeyFile, "https-key-file", res.HTTPSConfig.KeyFile, "key file path of https")
+	flag.StringVar(&res.LogFile, "logfile", res.LogFile, "file path for log, output to STDOUT if empty")
+	flag.BoolVar(&res.ModeDebug, "debug", res.ModeDebug, "output debug log")
+	flag.StringVar(&res.DB.Type, "db-type", res.DB.Type, "type of database")
+	flag.StringVar(&res.DB.ConnectionString, "db-conn-str", res.DB.ConnectionString, "database connection string")
+	flag.StringVar(&res.UserLoginResourceDir, "login-res", res.UserLoginResourceDir, "directory path for user login")
+	flag.Parse()
 
 	// Validate config
+	if err := res.Validate(); err != nil {
+		return nil, errors.Append(err, "Failed to validate config")
+	}
 
 	return res, nil
 }

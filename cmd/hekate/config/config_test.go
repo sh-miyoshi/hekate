@@ -1,40 +1,81 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 )
 
-func TestInitConfig(t *testing.T) {
-	tmpFile, _ := ioutil.TempFile("", "testconf")
-	defer os.Remove(tmpFile.Name())
+func TestSetEnvVar(t *testing.T) {
+	k1 := "value1"
+	k2 := "value2"
+	os.Setenv("KEY1", "new_value")
+	setEnvVar("KEY1", &k1)
+	setEnvVar("KEY2", &k2)
 
-	tmpFile.WriteString(`admin_name: admin
-admin_password: password
-server_port: 18443
-server_bind_address: "0.0.0.0"
-logfile: ''
-debug_mode: true
-db:
-  type: "memory"
-  connection_string: ""
-oidc_auth_code_expires_time: 300`)
+	if k1 != "new_value" {
+		t.Errorf("setEnvVar failed. expect new_value, but got %s", k1)
+	}
+	if k2 != "value2" {
+		t.Errorf("setEnvVar failed. expect value2, but got %s", k2)
+	}
+}
 
-	args := []string{"--config", tmpFile.Name()}
-
-	// Test loading correct yaml file
-	if _, err := InitConfig(args); err != nil {
-		t.Errorf("Failed to load correct yaml file: %v", err)
+func TestGetConfigFileName(t *testing.T) {
+	tt := []struct {
+		args     []string
+		expectOK bool
+		fname    string
+	}{
+		{
+			args:     []string{},
+			expectOK: true,
+			fname:    "",
+		},
+		{
+			args:     []string{"--config=test.yaml"},
+			expectOK: true,
+			fname:    "test.yaml",
+		},
+		{
+			args:     []string{"-config=test.yaml"},
+			expectOK: true,
+			fname:    "test.yaml",
+		},
+		{
+			args:     []string{"--config", "test.yaml"},
+			expectOK: true,
+			fname:    "test.yaml",
+		},
+		{
+			args:     []string{"-config", "test.yaml"},
+			expectOK: true,
+			fname:    "test.yaml",
+		},
+		{
+			args:     []string{"--test=test.yaml"},
+			expectOK: true,
+			fname:    "",
+		},
+		{
+			args:     []string{"--config"},
+			expectOK: false,
+		},
+		{
+			args:     []string{"--config", "--test"},
+			expectOK: false,
+		},
 	}
 
-	// Test overwrite by env
-	admin := "hekate"
-	passwd := "securepassword"
-	os.Setenv("HEKATE_ADMIN_NAME", admin)
-	os.Setenv("HEKATE_ADMIN_PASSWORD", passwd)
-	cfg, _ := InitConfig(args)
-	if cfg.AdminName != admin || cfg.AdminPassword != passwd {
-		t.Errorf("Failed to overwrite by os.Env: want %s:%s, got %s:%s", admin, passwd, cfg.AdminName, cfg.AdminPassword)
+	for _, tc := range tt {
+		f, err := getConfigFileName(tc.args)
+		if tc.expectOK && err != nil {
+			t.Errorf("getConfigFileName returns wrong response. input: %v, got %v, want nil", tc.args, err)
+		}
+		if !tc.expectOK && err == nil {
+			t.Errorf("getConfigFileName returns wrong response. input: %v, got nil, but want not nil", tc.args)
+		}
+		if tc.expectOK && f != tc.fname {
+			t.Errorf("getConfigFileName returns wrong file name. expect %s, but got %s", tc.fname, f)
+		}
 	}
 }
