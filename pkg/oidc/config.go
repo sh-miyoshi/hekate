@@ -11,15 +11,17 @@ var (
 	userLoginErrorHTML string
 	userConsentHTML    string
 	userLoginResPath   string
+	cookieSecure       bool
 )
 
 // InitConfig ...
-func InitConfig(loginSessionExpiresTimeSec uint64, loginResDir string, resourcePath string) {
+func InitConfig(runAsHTTPS bool, loginSessionExpiresTimeSec uint64, loginResDir string, resourcePath string) {
 	userLoginHTML = filepath.Join(loginResDir, "index.html")
 	userLoginErrorHTML = filepath.Join(loginResDir, "error.html")
 	userConsentHTML = filepath.Join(loginResDir, "consent.html")
 	expiresTimeSec = loginSessionExpiresTimeSec
 	userLoginResPath = resourcePath
+	cookieSecure = runAsHTTPS
 }
 
 // GetSupportedResponseType ...
@@ -39,4 +41,9 @@ func GetSupportedResponseType() []string {
 // GetLoginSessionExpiresTime ...
 func GetLoginSessionExpiresTime() time.Duration {
 	return time.Second * time.Duration(expiresTimeSec)
+}
+
+// IsCookieSecure ...
+func IsCookieSecure() bool {
+	return cookieSecure
 }

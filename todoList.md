@@ -123,4 +123,3 @@
   - create binary files
 - login pageの修正方法のドキュメント
 - Benchmark
-- set cookie to secure

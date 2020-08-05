@@ -766,7 +766,7 @@ func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer 
 		Name:     "HEKATE_LOGIN_SESSION",
 		Value:    tkn,
 		MaxAge:   int(lifeSpan),
-		Secure:   false, // TODO(for debug)
+		Secure:   oidc.IsCookieSecure(),
 		HttpOnly: true,
 	}
 

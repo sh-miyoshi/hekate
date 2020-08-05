@@ -41,7 +41,7 @@ func main() {
 	token.InitConfig(cfg.HTTPSConfig.Enabled)
 
 	// Initialize OIDC Config
-	oidc.InitConfig(cfg.AuthCodeExpiresTime, cfg.UserLoginResourceDir, authCodeUserLoginResourcePath)
+	oidc.InitConfig(cfg.HTTPSConfig.Enabled, cfg.AuthCodeExpiresTime, cfg.UserLoginResourceDir, authCodeUserLoginResourcePath)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
