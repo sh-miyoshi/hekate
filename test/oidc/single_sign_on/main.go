@@ -123,14 +123,13 @@ func main() {
 	}
 	fmt.Printf("cookie: %v\n", cookies[0].String())
 
-	// TODO(get token by prompt=none)
+	// get token by prompt=none
 	values.Set("scope", "openid")
 	values.Set("response_type", "code")
 	values.Set("client_id", clientID)
 	values.Set("redirect_uri", config.RedirectURL)
 	values.Set("state", state)
 	values.Set("prompt", "none")
-	values.Set("login_hint", "admin")
 	req, err = http.NewRequest("GET", config.Endpoint.AuthURL, nil)
 	if err != nil {
 		fmt.Printf("Failed to create new request: %v\n", err)
