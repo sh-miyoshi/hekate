@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/sh-miyoshi/hekate/pkg/errors"
-	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"gopkg.in/yaml.v2"
 )
 
@@ -29,8 +28,6 @@ func InitConfig(osArgs []string) (*GlobalConfig, *errors.Error) {
 
 	// Set by config file
 	if cfile != "" {
-		logger.Info("Get config data from file %s", cfile)
-
 		fp, err := os.Open(cfile)
 		if err != nil {
 			return nil, errors.New("", "Failed to open config file: %v", err)
