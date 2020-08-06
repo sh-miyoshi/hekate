@@ -506,8 +506,8 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		claims, _ := jwthttp.ValidateAPIRequest(r)
-		if claims.Subject != userID {
+		claims, err := jwthttp.ValidateAPIRequest(r)
+		if err != nil || claims.Subject != userID {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authorize user: don't have permission and not yourself"))
 			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
