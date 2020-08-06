@@ -125,6 +125,8 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 		} else {
 			return errors.Append(err, "Failed to create master project")
 		}
+	} else {
+		logger.Debug("Add master project")
 	}
 
 	err = db.GetInst().UserAdd("master", &model.UserInfo{
@@ -146,6 +148,8 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 		} else {
 			return errors.Append(err, "Failed to create admin user")
 		}
+	} else {
+		logger.Debug("Add admin user to master project")
 	}
 
 	return nil

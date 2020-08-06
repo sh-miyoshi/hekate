@@ -31,6 +31,12 @@ func main() {
 	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
 	logger.Debug("Start with config: %v", *cfg)
 
+	// Check login resource directory struct
+	if err := cfg.CheckLoginResDirStruct(); err != nil {
+		errors.Print(errors.Append(err, "Login resource directory is broken"))
+		os.Exit(1)
+	}
+
 	// Initialize Default Role Handler
 	if err := defaultrole.InitHandler(); err != nil {
 		errors.Print(errors.Append(err, "Failed to initialize default role handler"))

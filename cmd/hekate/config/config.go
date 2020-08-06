@@ -8,14 +8,14 @@ import (
 	"strings"
 
 	"github.com/sh-miyoshi/hekate/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"gopkg.in/yaml.v2"
 )
 
-func setEnvVar(key string, target *string) {
-	val := os.Getenv(key)
-	if len(val) > 0 {
-		*target = val
-	}
+// CheckLoginResDirStruct check a struct of login resource directory
+func (c *GlobalConfig) CheckLoginResDirStruct() *errors.Error {
+	// TODO(implement this)
+	return nil
 }
 
 // InitConfig ...
@@ -29,6 +29,8 @@ func InitConfig(osArgs []string) (*GlobalConfig, *errors.Error) {
 
 	// Set by config file
 	if cfile != "" {
+		logger.Info("Get config data from file %s", cfile)
+
 		fp, err := os.Open(cfile)
 		if err != nil {
 			return nil, errors.New("", "Failed to open config file: %v", err)
@@ -83,6 +85,13 @@ func InitConfig(osArgs []string) (*GlobalConfig, *errors.Error) {
 	}
 
 	return res, nil
+}
+
+func setEnvVar(key string, target *string) {
+	val := os.Getenv(key)
+	if len(val) > 0 {
+		*target = val
+	}
 }
 
 // getConfigFileName return config file name if -config is in os.Args
