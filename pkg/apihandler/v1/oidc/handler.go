@@ -66,6 +66,10 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 			"fragment",
 		},
 		GrantTypesSupported: grantTypes,
+		TokenEndpointAuthMethodsSupported: []string{
+			"client_secret_basic",
+			"client_secret_post",
+		},
 	}
 
 	jwthttp.ResponseWrite(w, "ConfigGetHandler", &res)
