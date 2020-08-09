@@ -41,6 +41,7 @@ type GlobalConfig struct {
 	AuthCodeExpiresTime  uint64      `yaml:"oidc_auth_code_expires_time"`
 	UserLoginResourceDir string      `yaml:"oidc_user_login_page_res"`
 	HTTPSConfig          HTTPSConfig `yaml:"https"`
+	AuditDB              DBInfo      `yaml:"audit_db"`
 }
 
 // Validate ...

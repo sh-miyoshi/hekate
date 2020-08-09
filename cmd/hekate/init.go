@@ -14,6 +14,7 @@ import (
 	projectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 	sessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/session"
 	userapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
@@ -182,6 +183,17 @@ func initAll(cfg *config.GlobalConfig) *errors.Error {
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
 		return errors.Append(err, "Failed to initialize database")
+	}
+
+	// Initialize Audit Log Database
+	typ := cfg.AuditDB.Type
+	connStr := cfg.AuditDB.ConnectionString
+	if typ == "" {
+		typ = cfg.DB.Type
+		connStr = cfg.DB.ConnectionString
+	}
+	if err := audit.Init(typ, connStr); err != nil {
+		return errors.Append(err, "Failed to initialize audit log database")
 	}
 
 	return nil
