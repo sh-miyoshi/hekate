@@ -8,9 +8,7 @@
     - client
     - role
     - session
-  - User Logout APIの追加
   - Update Project Secret Info APIの追加
-- 引数処理の追加
 - ユーザーパスワードロック
   - Project Infoに追加
   - APIの修正
