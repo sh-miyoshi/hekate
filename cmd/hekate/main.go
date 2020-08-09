@@ -10,9 +10,6 @@ import (
 	"github.com/sh-miyoshi/hekate/cmd/hekate/config"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"github.com/sh-miyoshi/hekate/pkg/oidc"
-	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
-	defaultrole "github.com/sh-miyoshi/hekate/pkg/role"
 )
 
 const (
@@ -27,31 +24,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Initialize logger
-	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
-	logger.Debug("Start with config: %v", *cfg)
-
-	// Check login resource directory struct
-	if err := cfg.CheckLoginResDirStruct(); err != nil {
-		errors.Print(errors.Append(err, "Login resource directory is broken"))
-		os.Exit(1)
-	}
-
-	// Initialize Default Role Handler
-	if err := defaultrole.InitHandler(); err != nil {
-		errors.Print(errors.Append(err, "Failed to initialize default role handler"))
-		os.Exit(1)
-	}
-
-	// Initialize Token Config
-	token.InitConfig(cfg.HTTPSConfig.Enabled)
-
-	// Initialize OIDC Config
-	oidc.InitConfig(cfg.HTTPSConfig.Enabled, cfg.AuthCodeExpiresTime, cfg.UserLoginResourceDir, authCodeUserLoginResourcePath)
-
-	// Initalize Database
-	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
-		errors.Print(errors.Append(err, "Failed to initialize database"))
+	// Initialize server
+	if err := initAll(cfg); err != nil {
+		errors.Print(errors.Append(err, "Failed to init server"))
 		os.Exit(1)
 	}
 

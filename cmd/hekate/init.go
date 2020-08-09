@@ -18,6 +18,9 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/oidc"
+	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
+	defaultrole "github.com/sh-miyoshi/hekate/pkg/role"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
@@ -150,6 +153,35 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 		}
 	} else {
 		logger.Debug("Add admin user to master project")
+	}
+
+	return nil
+}
+
+func initAll(cfg *config.GlobalConfig) *errors.Error {
+	// Initialize logger
+	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
+	logger.Debug("Start with config: %v", *cfg)
+
+	// Check login resource directory struct
+	if err := cfg.CheckLoginResDirStruct(); err != nil {
+		return errors.Append(err, "Login resource directory is broken")
+	}
+
+	// Initialize Default Role Handler
+	if err := defaultrole.InitHandler(); err != nil {
+		return errors.Append(err, "Failed to initialize default role handler")
+	}
+
+	// Initialize Token Config
+	token.InitConfig(cfg.HTTPSConfig.Enabled)
+
+	// Initialize OIDC Config
+	oidc.InitConfig(cfg.HTTPSConfig.Enabled, cfg.AuthCodeExpiresTime, cfg.UserLoginResourceDir, authCodeUserLoginResourcePath)
+
+	// Initalize Database
+	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
+		return errors.Append(err, "Failed to initialize database")
 	}
 
 	return nil
