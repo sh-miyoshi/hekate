@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
@@ -56,11 +57,22 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 // ClientCreateHandler ...
 //   require role: write-project
 func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(time.Now(), "CLIENT", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit log"))
+		}
+	}()
+
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
@@ -68,8 +80,9 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse Request
 	var request ClientCreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		logger.Info("Failed to decode client create request: %v", err)
+	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
+		err = errors.New("", "Failed to decode client create request: %v", e)
+		errors.PrintAsInfo(err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
@@ -84,7 +97,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 		AllowedCallbackURLs: request.AllowedCallbackURLs,
 	}
 
-	if err := db.GetInst().ClientAdd(projectName, &client); err != nil {
+	if err = db.GetInst().ClientAdd(projectName, &client); err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
 			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)

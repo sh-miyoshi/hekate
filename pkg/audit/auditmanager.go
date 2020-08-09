@@ -46,8 +46,8 @@ func (m *Manager) Ping() *errors.Error {
 }
 
 // Save ...
-func (m *Manager) Save(tm time.Time, resType, method, path, body string) *errors.Error {
-	return m.handler.Save(tm, resType, method, path, body)
+func (m *Manager) Save(tm time.Time, resType, method, path, message string) *errors.Error {
+	return m.handler.Save(tm, resType, method, path, message)
 }
 
 // Get ...

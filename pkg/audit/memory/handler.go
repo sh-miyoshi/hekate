@@ -23,13 +23,14 @@ func (h *Handler) Ping() *errors.Error {
 }
 
 // Save ...
-func (h *Handler) Save(tm time.Time, resType, method, path, body string) *errors.Error {
+func (h *Handler) Save(tm time.Time, resType, method, path, message string) *errors.Error {
 	h.data = append(h.data, model.Audit{
 		Time:         tm,
 		ResourceType: resType,
 		Method:       method,
 		Path:         path,
-		Body:         body,
+		IsSuccess:    message == "",
+		Message:      message,
 	})
 
 	return nil

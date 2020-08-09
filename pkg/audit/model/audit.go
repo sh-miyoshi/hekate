@@ -8,6 +8,7 @@ type Audit struct {
 	ResourceType string
 	Method       string
 	Path         string
-	Body         string
+	IsSuccess    bool
+	Message      string
 	// TODO(userID, clientID)
 }
