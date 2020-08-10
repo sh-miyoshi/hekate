@@ -81,7 +81,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse Request
 	var request ClientCreateRequest
 	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
-		err = errors.New("", "Failed to decode client create request: %v", e)
+		err = errors.New("Invalid request", "Failed to decode client create request: %v", e)
 		errors.PrintAsInfo(err)
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return

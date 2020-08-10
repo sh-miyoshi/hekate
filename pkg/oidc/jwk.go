@@ -28,7 +28,7 @@ func GenerateJWKSet(signAlg string, publicKey []byte) (*JWKSet, *errors.Error) {
 		jwk.E = base64url.Encode(e)
 		jwk.N = base64url.Encode(key.N.Bytes())
 	default:
-		return nil, errors.New("", "Now such signing algorithm")
+		return nil, errors.New("Invalid request", "Now such signing algorithm")
 	}
 
 	res := &JWKSet{}

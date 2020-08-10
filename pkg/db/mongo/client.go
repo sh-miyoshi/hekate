@@ -37,7 +37,7 @@ func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, *errors.Error
 	col := res.dbClient.Database(databaseName).Collection(clientCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
 	if err != nil {
-		return nil, errors.New("", "Failed to create index: %v", err)
+		return nil, errors.New("DB failed", "Failed to create index: %v", err)
 	}
 
 	return res, nil
@@ -61,7 +61,7 @@ func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) *erro
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.New("", "Failed to insert client to mongodb: %v", err)
+		return errors.New("DB failed", "Failed to insert client to mongodb: %v", err)
 	}
 
 	return nil
@@ -80,7 +80,7 @@ func (h *ClientInfoHandler) Delete(projectName, clientID string) *errors.Error {
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.New("", "Failed to delete client from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete client from mongodb: %v", err)
 	}
 	return nil
 }
@@ -98,12 +98,12 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *e
 
 	cursor, err := col.Find(ctx, filter)
 	if err != nil {
-		return nil, errors.New("", "Failed to get client list from mongodb: %v", err)
+		return nil, errors.New("DB failed", "Failed to get client list from mongodb: %v", err)
 	}
 
 	clients := []clientInfo{}
 	if err := cursor.All(ctx, &clients); err != nil {
-		return nil, errors.New("", "Failed to get client list from mongodb: %v", err)
+		return nil, errors.New("DB failed", "Failed to get client list from mongodb: %v", err)
 	}
 
 	res := []*model.ClientInfo{}
@@ -137,7 +137,7 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchClient
 		}
-		return nil, errors.New("", "Failed to get client from mongodb: %v", err)
+		return nil, errors.New("DB failed", "Failed to get client from mongodb: %v", err)
 	}
 
 	return &model.ClientInfo{
@@ -175,7 +175,7 @@ func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) *e
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.New("", "Failed to update client in mongodb: %v", err)
+		return errors.New("DB failed", "Failed to update client in mongodb: %v", err)
 	}
 
 	return nil
@@ -193,7 +193,7 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) *errors.Error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("", "Failed to delete client from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete client from mongodb: %v", err)
 	}
 	return nil
 }

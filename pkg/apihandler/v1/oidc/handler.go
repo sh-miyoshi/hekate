@@ -790,16 +790,16 @@ func getLoginUserIDFromCookie(cookie *http.Cookie, projectName string) (string, 
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, errors.New("", "Failed to parse public key: %v", err)
+				return nil, errors.New("Invalid request", "Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
 
-		return nil, errors.New("", "unknown token sigining method")
+		return nil, errors.New("Invalid request", "unknown token sigining method")
 	})
 
 	if err != nil || !tkn.Valid {
-		return "", errors.New("", "Token in cookie is not valid: %v", err)
+		return "", errors.New("Invalid request", "Token in cookie is not valid: %v", err)
 	}
 
 	return claims.Subject, nil

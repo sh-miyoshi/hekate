@@ -16,7 +16,7 @@ func parseHTTPHeaderToken(tokenString string) (string, *errors.Error) {
 	} else if strings.Contains(tokenString, "Bearer ") {
 		splitToken = strings.Split(tokenString, "Bearer ")
 	} else {
-		return "", errors.New("", "token format is missing")
+		return "", errors.New("Invalid request", "token format is missing")
 	}
 	reqToken := strings.TrimSpace(splitToken[1])
 	return reqToken, nil

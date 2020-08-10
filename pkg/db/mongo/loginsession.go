@@ -37,7 +37,7 @@ func NewLoginSessionHandler(dbClient *mongo.Client) (*LoginSessionHandler, *erro
 	col := res.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
 	if err != nil {
-		return nil, errors.New("", "Failed to create index: %v", err)
+		return nil, errors.New("DB failed", "Failed to create index: %v", err)
 	}
 
 	return res, nil
@@ -67,7 +67,7 @@ func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.New("", "Failed to insert login session to mongodb: %v", err)
+		return errors.New("DB failed", "Failed to insert login session to mongodb: %v", err)
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.New("", "Failed to update auth codoe session in mongodb: %v", err)
+		return errors.New("DB failed", "Failed to update auth codoe session in mongodb: %v", err)
 	}
 
 	return nil
@@ -123,7 +123,7 @@ func (h *LoginSessionHandler) Delete(projectName string, sessionID string) *erro
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.New("", "Failed to delete login session from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete login session from mongodb: %v", err)
 	}
 	return nil
 }
@@ -144,7 +144,7 @@ func (h *LoginSessionHandler) GetByCode(projectName string, code string) (*model
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchLoginSession
 		}
-		return nil, errors.New("", "Failed to get login session from mongodb: %v", err)
+		return nil, errors.New("DB failed", "Failed to get login session from mongodb: %v", err)
 	}
 
 	return &model.LoginSession{
@@ -179,7 +179,7 @@ func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSe
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchLoginSession
 		}
-		return nil, errors.New("", "Failed to get login session from mongodb: %v", err)
+		return nil, errors.New("DB failed", "Failed to get login session from mongodb: %v", err)
 	}
 
 	return &model.LoginSession{
@@ -211,7 +211,7 @@ func (h *LoginSessionHandler) DeleteAllInClient(projectName string, clientID str
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("", "Failed to delete authcode session from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete authcode session from mongodb: %v", err)
 	}
 	return nil
 }
@@ -229,7 +229,7 @@ func (h *LoginSessionHandler) DeleteAllInUser(projectName string, userID string)
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("", "Failed to delete authcode session from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete authcode session from mongodb: %v", err)
 	}
 	return nil
 }
@@ -246,7 +246,7 @@ func (h *LoginSessionHandler) DeleteAllInProject(projectName string) *errors.Err
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("", "Failed to delete authcode session from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete authcode session from mongodb: %v", err)
 	}
 	return nil
 }

@@ -36,7 +36,7 @@ var inst *Manager
 // InitDBManager ...
 func InitDBManager(dbType string, connStr string) *errors.Error {
 	if inst != nil {
-		return errors.New("", "DBManager is already initialized")
+		return errors.New("Internal server error", "DBManager is already initialized")
 	}
 
 	switch dbType {
@@ -95,7 +95,7 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 			ping:         mongo.NewPingHandler(dbClient),
 		}
 	default:
-		return errors.New("", "Database Type %s is not implemented yet", dbType)
+		return errors.New("Internal server error", "Database Type %s is not implemented yet", dbType)
 	}
 
 	if os.Getenv("HEKATE_PORTAL_ADDR") != "" {

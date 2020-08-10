@@ -202,7 +202,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 		ip, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
-			return nil, errors.New("", "Failed to get IP: %v", err)
+			return nil, errors.New("Invalid request", "Failed to get IP: %v", err)
 		}
 		ent := &model.Session{
 			UserID:       userID,

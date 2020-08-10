@@ -37,7 +37,7 @@ func NewProjectHandler(dbClient *mongo.Client) (*ProjectInfoHandler, *errors.Err
 	col := res.dbClient.Database(databaseName).Collection(projectCollectionName)
 	_, err := col.Indexes().CreateOne(ctx, mod)
 	if err != nil {
-		return nil, errors.New("", "Failed to create index: %v", err)
+		return nil, errors.New("DB failed", "Failed to create index: %v", err)
 	}
 
 	return res, nil
@@ -76,7 +76,7 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) *errors.Error {
 
 	_, err := col.InsertOne(ctx, v)
 	if err != nil {
-		return errors.New("", "Failed to insert project to mongodb: %v", err)
+		return errors.New("DB failed", "Failed to insert project to mongodb: %v", err)
 	}
 
 	return nil
@@ -94,7 +94,7 @@ func (h *ProjectInfoHandler) Delete(name string) *errors.Error {
 
 	_, err := col.DeleteOne(ctx, filter)
 	if err != nil {
-		return errors.New("", "Failed to delete project from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete project from mongodb: %v", err)
 	}
 	return nil
 }
@@ -108,12 +108,12 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, *errors.Error) {
 
 	cursor, err := col.Find(ctx, bson.D{})
 	if err != nil {
-		return nil, errors.New("", "Failed to get project list from mongodb: %v", err)
+		return nil, errors.New("DB failed", "Failed to get project list from mongodb: %v", err)
 	}
 
 	projects := []projectInfo{}
 	if err := cursor.All(ctx, &projects); err != nil {
-		return nil, errors.New("", "Failed to parse project list: %v", err)
+		return nil, errors.New("DB failed", "Failed to parse project list: %v", err)
 	}
 
 	res := []*model.ProjectInfo{}
@@ -163,7 +163,7 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, *errors.Error
 		if err == mongo.ErrNoDocuments {
 			return nil, model.ErrNoSuchProject
 		}
-		return nil, errors.New("", "Failed to get project from mongodb: %v", err)
+		return nil, errors.New("DB failed", "Failed to get project from mongodb: %v", err)
 	}
 	logger.Debug("Get project %s data: %v", name, project)
 
@@ -234,7 +234,7 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) *errors.Error {
 	defer cancel()
 
 	if _, err := col.UpdateOne(ctx, filter, updates); err != nil {
-		return errors.New("", "Failed to update project in mongodb: %v", err)
+		return errors.New("DB failed", "Failed to update project in mongodb: %v", err)
 	}
 
 	return nil

@@ -30,12 +30,12 @@ func InitConfig(osArgs []string) (*GlobalConfig, *errors.Error) {
 	if cfile != "" {
 		fp, err := os.Open(cfile)
 		if err != nil {
-			return nil, errors.New("", "Failed to open config file: %v", err)
+			return nil, errors.New("Broken config", "Failed to open config file: %v", err)
 		}
 		defer fp.Close()
 
 		if err := yaml.NewDecoder(fp).Decode(res); err != nil {
-			return nil, errors.New("", "Failed to decode config yaml: %v", err)
+			return nil, errors.New("Broken config", "Failed to decode config yaml: %v", err)
 		}
 	}
 
@@ -111,13 +111,13 @@ func getConfigFileName(args []string) (string, *errors.Error) {
 			if len(v) == 1 {
 				// arg maybe `-config <yaml>` or `--config <yaml>`
 				if i >= len(args)-1 {
-					return "", errors.New("", "no config file name")
+					return "", errors.New("Invalid args", "no config file name")
 				}
 
 				nextArg := args[i+1]
 				if nextArg[0] == '-' {
 					// nextArg is not a config file, but a flag such as "--logfile"
-					return "", errors.New("", "nextArg is not a config file name, but a flag")
+					return "", errors.New("Invalid args", "nextArg is not a config file name, but a flag")
 				}
 
 				configFilePath = nextArg

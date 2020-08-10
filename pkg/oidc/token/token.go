@@ -38,15 +38,15 @@ func signToken(projectName string, claims jwt.Claims) (string, *errors.Error) {
 		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 		key, err := x509.ParsePKCS1PrivateKey(project.TokenConfig.SignSecretKey)
 		if err != nil {
-			return "", errors.New("", "Failed to parse private key: %v", err)
+			return "", errors.New("Invalid request", "Failed to parse private key: %v", err)
 		}
 		str, err := token.SignedString(key)
 		if err != nil {
-			return "", errors.New("", "Failed to signing token: %v", err)
+			return "", errors.New("Invalid request", "Failed to signing token: %v", err)
 		}
 		return str, nil
 	default:
-		return "", errors.New("", "Unexpected Token Signing Algorithm")
+		return "", errors.New("Invalid request", "Unexpected Token Signing Algorithm")
 	}
 }
 
@@ -157,7 +157,7 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 		}
 
 		if claims.Format != "access" {
-			return nil, errors.New("", "Invalid token format: %s", claims.Format)
+			return nil, errors.New("Invalid request", "Invalid token format: %s", claims.Format)
 		}
 
 		ti := claims.Issuer
@@ -166,35 +166,35 @@ func ValidateAccessToken(claims *AccessTokenClaims, tokenString string, expectIs
 		}
 		if ti != expectIssuer {
 			logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
-			return nil, errors.New("", "Unexpected token issuer")
+			return nil, errors.New("Invalid request", "Unexpected token issuer")
 		}
 		now := time.Now().Unix()
 		if now > claims.ExpiresAt {
-			return nil, errors.New("", "Token is expired")
+			return nil, errors.New("Invalid request", "Token is expired")
 		}
 
 		switch token.Method {
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, errors.New("", "Failed to parse public key: %v", err)
+				return nil, errors.New("Invalid request", "Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
 
-		return nil, errors.New("", "unknown token sigining method")
+		return nil, errors.New("Invalid request", "unknown token sigining method")
 	})
 
 	if err != nil {
 		e, ok := err.(*errors.Error)
 		if !ok {
-			return errors.New("", err.Error())
+			return errors.New("Invalid request", err.Error())
 		}
 		return errors.Append(e, "Failed to parse token")
 	}
 
 	if !token.Valid {
-		return errors.New("", "Invalid token is specified")
+		return errors.New("Invalid request", "Invalid token is specified")
 	}
 	return nil
 }
@@ -208,7 +208,7 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 		}
 
 		if claims.Format != "refresh" {
-			return nil, errors.New("", "Invalid token format: %s", claims.Format)
+			return nil, errors.New("Invalid request", "Invalid token format: %s", claims.Format)
 		}
 
 		ti := claims.Issuer
@@ -217,35 +217,35 @@ func ValidateRefreshToken(claims *RefreshTokenClaims, tokenString string, expect
 		}
 		if ti != expectIssuer {
 			logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
-			return nil, errors.New("", "Unexpected token issuer")
+			return nil, errors.New("Invalid request", "Unexpected token issuer")
 		}
 		now := time.Now().Unix()
 		if now > claims.ExpiresAt {
-			return nil, errors.New("", "Token is expired")
+			return nil, errors.New("Invalid request", "Token is expired")
 		}
 
 		switch token.Method {
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, errors.New("", "Failed to parse public key: %v", err)
+				return nil, errors.New("Invalid request", "Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
 
-		return nil, errors.New("", "unknown token sigining method")
+		return nil, errors.New("Invalid request", "unknown token sigining method")
 	})
 
 	if err != nil {
 		e, ok := err.(*errors.Error)
 		if !ok {
-			return errors.New("", err.Error())
+			return errors.New("Invalid request", err.Error())
 		}
 		return errors.Append(e, "Failed to parse token")
 	}
 
 	if !token.Valid {
-		return errors.New("", "Invalid token is specified")
+		return errors.New("Invalid request", "Invalid token is specified")
 	}
 
 	return nil
@@ -260,7 +260,7 @@ func ValidateIDToken(claims *IDTokenClaims, tokenString string, projectName stri
 		}
 
 		if claims.Format != "id" {
-			return nil, errors.New("", "Invalid token format: %s", claims.Format)
+			return nil, errors.New("Invalid request", "Invalid token format: %s", claims.Format)
 		}
 
 		ti := claims.Issuer
@@ -269,35 +269,35 @@ func ValidateIDToken(claims *IDTokenClaims, tokenString string, projectName stri
 		}
 		if ti != expectIssuer {
 			logger.Debug("Unexpected token issuer: want %s, got %s", expectIssuer, ti)
-			return nil, errors.New("", "Unexpected token issuer")
+			return nil, errors.New("Invalid request", "Unexpected token issuer")
 		}
 		now := time.Now().Unix()
 		if now > claims.ExpiresAt {
-			return nil, errors.New("", "Token is expired")
+			return nil, errors.New("Invalid request", "Token is expired")
 		}
 
 		switch token.Method {
 		case jwt.SigningMethodRS256:
 			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
 			if err != nil {
-				return nil, errors.New("", "Failed to parse public key: %v", err)
+				return nil, errors.New("Invalid request", "Failed to parse public key: %v", err)
 			}
 			return key, nil
 		}
 
-		return nil, errors.New("", "unknown token sigining method")
+		return nil, errors.New("Invalid request", "unknown token sigining method")
 	})
 
 	if err != nil {
 		e, ok := err.(*errors.Error)
 		if !ok {
-			return errors.New("", err.Error())
+			return errors.New("Invalid request", err.Error())
 		}
 		return errors.Append(e, "Failed to parse token")
 	}
 
 	if !token.Valid {
-		return errors.New("", "Invalid token is specified")
+		return errors.New("Invalid request", "Invalid token is specified")
 	}
 
 	return nil

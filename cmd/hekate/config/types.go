@@ -17,7 +17,7 @@ type DBInfo struct {
 func (i *DBInfo) Validate() *errors.Error {
 	valid := []string{"memory", "mongo"}
 	if !slice.Contains(valid, i.Type) {
-		return errors.New("", "%s is not valid db type", i.Type)
+		return errors.New("Invalid DB type", "%s is not valid db type", i.Type)
 	}
 	return nil
 }
@@ -47,7 +47,7 @@ type GlobalConfig struct {
 // Validate ...
 func (c *GlobalConfig) Validate() *errors.Error {
 	if c.Port == 0 || c.Port > 65535 {
-		return errors.New("", "port number %d is not valid", c.Port)
+		return errors.New("Invalid config", "port number %d is not valid", c.Port)
 	}
 
 	if err := c.DB.Validate(); err != nil {
@@ -55,23 +55,23 @@ func (c *GlobalConfig) Validate() *errors.Error {
 	}
 
 	if c.AdminName == "" {
-		return errors.New("", "admin name is empty")
+		return errors.New("Invalid config", "admin name is empty")
 	}
 
 	if c.AdminPassword == "" {
-		return errors.New("", "admin password is empty")
+		return errors.New("Invalid config", "admin password is empty")
 	}
 
 	if c.AuthCodeExpiresTime == 0 {
-		return errors.New("", "login session expires time is 0")
+		return errors.New("Invalid config", "login session expires time is 0")
 	}
 
 	finfo, err := os.Stat(c.UserLoginResourceDir)
 	if err != nil {
-		return errors.New("", "Failed to get login resource info: %v", err)
+		return errors.New("Invalid config", "Failed to get login resource info: %v", err)
 	}
 	if !finfo.IsDir() {
-		return errors.New("", "login resource path %s is not directory", c.UserLoginResourceDir)
+		return errors.New("Invalid config", "login resource path %s is not directory", c.UserLoginResourceDir)
 	}
 
 	return nil

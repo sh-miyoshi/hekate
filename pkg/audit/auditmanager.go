@@ -19,7 +19,7 @@ var inst *Manager
 // Init ...
 func Init(dbType string, connStr string) *errors.Error {
 	if inst != nil {
-		return errors.New("", "AuditManager is already initialized")
+		return errors.New("Internal server error", "AuditManager is already initialized")
 	}
 
 	switch dbType {
@@ -30,7 +30,7 @@ func Init(dbType string, connStr string) *errors.Error {
 			handler: memory.NewHandler(),
 		}
 	default:
-		return errors.New("", "Database Type %s is not implemented for Audit logs", dbType)
+		return errors.New("Internal server error", "Database Type %s is not implemented for Audit logs", dbType)
 	}
 	return nil
 }
