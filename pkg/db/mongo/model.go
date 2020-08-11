@@ -5,94 +5,94 @@ import (
 )
 
 type tokenConfig struct {
-	AccessTokenLifeSpan  uint   `bson:"accessTokenLifeSpan"`
-	RefreshTokenLifeSpan uint   `bson:"refreshTokenLifeSpan"`
-	SigningAlgorithm     string `bson:"signingAlgorithm"`
-	SignPublicKey        []byte `bson:"signPublicKey"`
-	SignSecretKey        []byte `bson:"signSecretKey"`
+	AccessTokenLifeSpan  uint   `bson:"access_token_life_span"`
+	RefreshTokenLifeSpan uint   `bson:"refresh_token_life_span"`
+	SigningAlgorithm     string `bson:"signing_algorithm"`
+	SignPublicKey        []byte `bson:"sign_public_key"`
+	SignSecretKey        []byte `bson:"sign_secret_key"`
 }
 
 type passwordPolicy struct {
 	MinimumLength       uint     `bson:"length"`
-	NotUserName         bool     `bson:"notUserName"`
-	BlackList           []string `bson:"blackList"`
-	UseCharacter        string   `bson:"useCharacter"`
-	UseDigit            bool     `bson:"useDigit"`
-	UseSpecialCharacter bool     `bson:"useSpecialCharacter"`
+	NotUserName         bool     `bson:"not_user_name"`
+	BlackList           []string `bson:"black_list"`
+	UseCharacter        string   `bson:"use_character"`
+	UseDigit            bool     `bson:"use_digit"`
+	UseSpecialCharacter bool     `bson:"use_special_character"`
 }
 
 type projectInfo struct {
 	Name            string         `bson:"name"`
-	CreatedAt       time.Time      `bson:"createAt"`
-	TokenConfig     *tokenConfig   `bson:"tokenConfig"`
-	PermitDelete    bool           `bson:"permitDelete"`
-	AllowGrantTypes []string       `bson:"allowGrantTypes"`
-	PasswordPolicy  passwordPolicy `bson:"passwordPolicy"`
+	CreatedAt       time.Time      `bson:"create_at"`
+	TokenConfig     *tokenConfig   `bson:"token_config"`
+	PermitDelete    bool           `bson:"permit_delete"`
+	AllowGrantTypes []string       `bson:"allow_grant_types"`
+	PasswordPolicy  passwordPolicy `bson:"password_policy"`
 }
 
 type session struct {
-	UserID       string    `bson:"userID"`
-	ProjectName  string    `bson:"projectName"`
-	SessionID    string    `bson:"sessionID"`
-	CreatedAt    time.Time `bson:"createdAt"`
-	ExpiresIn    uint      `bson:"expiresIn"`
-	FromIP       string    `bson:"fromIP"`
-	LastAuthTime time.Time `bson:"lastAuthTime"`
+	UserID       string    `bson:"user_id"`
+	ProjectName  string    `bson:"project_name"`
+	SessionID    string    `bson:"session_id"`
+	CreatedAt    time.Time `bson:"created_at"`
+	ExpiresIn    uint      `bson:"expires_in"`
+	FromIP       string    `bson:"from_ip"`
+	LastAuthTime time.Time `bson:"last_auth_time"`
 }
 
 type loginSession struct {
-	SessionID    string    `bson:"sessionID"`
+	SessionID    string    `bson:"session_id"`
 	Code         string    `bson:"code"`
-	ExpiresIn    time.Time `bson:"expiresIn"`
+	ExpiresIn    time.Time `bson:"expires_in"`
 	Scope        string    `bson:"scope"`
-	ResponseType []string  `bson:"responseType"`
-	ClientID     string    `bson:"clientID"`
-	RedirectURI  string    `bson:"redirectURI"`
+	ResponseType []string  `bson:"response_type"`
+	ClientID     string    `bson:"client_id"`
+	RedirectURI  string    `bson:"redirect_uri"`
 	Nonce        string    `bson:"nonce"`
-	ProjectName  string    `bson:"projectName"`
-	ResponseMode string    `bson:"responseMode"`
+	ProjectName  string    `bson:"project_name"`
+	ResponseMode string    `bson:"response_mode"`
 	Prompt       []string  `bson:"prompt"`
-	LoginDate    time.Time `bson:"loginDate"`
+	LoginDate    time.Time `bson:"login_date"`
 }
 
 type userInfo struct {
 	ID           string    `bson:"id"`
-	ProjectName  string    `bson:"projectName"`
+	ProjectName  string    `bson:"project_name"`
 	Name         string    `bson:"name"`
-	CreatedAt    time.Time `bson:"createdAt"`
-	PasswordHash string    `bson:"passwordHash"`
-	SystemRoles  []string  `bson:"systemRoles"`
-	CustomRoles  []string  `bson:"customRoles"`
+	CreatedAt    time.Time `bson:"created_at"`
+	PasswordHash string    `bson:"password_hash"`
+	SystemRoles  []string  `bson:"system_roles"`
+	CustomRoles  []string  `bson:"custom_roles"`
 }
 
 type clientInfo struct {
 	ID                  string    `bson:"id"`
-	ProjectName         string    `bson:"projectName"`
+	ProjectName         string    `bson:"project_name"`
 	Secret              string    `bson:"secret"`
-	AccessType          string    `bson:"accessType"`
-	CreatedAt           time.Time `bson:"createdAt"`
-	AllowedCallbackURLs []string  `bson:"allowedCallbackURLs"`
+	AccessType          string    `bson:"access_type"`
+	CreatedAt           time.Time `bson:"created_at"`
+	AllowedCallbackURLs []string  `bson:"allowed_callback_urls"`
 }
 
 type authCode struct {
-	CodeID      string    `bson:"codeID"`
-	ExpiresIn   time.Time `bson:"expiresIn"`
-	ClientID    string    `bson:"clientID"`
-	RedirectURL string    `bson:"redirectURL"`
-	UserID      string    `bson:"userID"`
+	CodeID      string    `bson:"code_id"`
+	ExpiresIn   time.Time `bson:"expires_in"`
+	ClientID    string    `bson:"client_id"`
+	RedirectURL string    `bson:"redirect_url"`
+	UserID      string    `bson:"user_id"`
 	Nonce       string    `bson:"nonce"`
-	MaxAge      uint      `bson:"maxAge"`
+	MaxAge      uint      `bson:"max_age"`
 }
 
 type customRole struct {
 	ID          string    `bson:"id"`
 	Name        string    `bson:"name"`
-	CreatedAt   time.Time `bson:"createdAt"`
-	ProjectName string    `bson:"projectName"`
+	CreatedAt   time.Time `bson:"created_at"`
+	ProjectName string    `bson:"project_name"`
 }
 
 type customRoleInUser struct {
-	ProjectName  string `bson:"projectName"`
-	UserID       string `bson:"userID"`
-	CustomRoleID string `bson:"customRoleID"`
+	ProjectName  string `bson:"project_name"`
+	UserID       string `bson:"user_id"`
+	CustomRoleID string `bson:"custom_role_id"`
 }
