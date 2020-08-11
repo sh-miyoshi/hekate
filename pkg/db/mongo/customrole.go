@@ -25,8 +25,8 @@ func NewCustomRoleHandler(dbClient *mongo.Client) (*CustomRoleHandler, *errors.E
 	// Create Index to Project Name and Custom Role ID
 	mod := mongo.IndexModel{
 		Keys: bson.M{
-			"projectName": 1, // index in ascending order
-			"id":          1, // index in ascending order
+			"project_name": 1, // index in ascending order
+			"id":           1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -69,7 +69,7 @@ func (h *CustomRoleHandler) Add(projectName string, ent *model.CustomRole) *erro
 func (h *CustomRoleHandler) Delete(projectName string, roleID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: roleID},
 	}
 
@@ -88,7 +88,7 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 
 	f := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 	}
 
 	if filter != nil {
@@ -127,7 +127,7 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.CustomRole, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: roleID},
 	}
 
@@ -154,7 +154,7 @@ func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.Custo
 func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: ent.ID},
 	}
 
@@ -183,7 +183,7 @@ func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) *e
 func (h *CustomRoleHandler) DeleteAll(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)

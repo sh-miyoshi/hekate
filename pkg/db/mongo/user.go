@@ -25,8 +25,8 @@ func NewUserHandler(dbClient *mongo.Client) (*UserInfoHandler, *errors.Error) {
 	// Create Index to Project Name and User ID
 	mod := mongo.IndexModel{
 		Keys: bson.M{
-			"projectName": 1, // index in ascending order
-			"id":          1, // index in ascending order
+			"project_name": 1, // index in ascending order
+			"id":           1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -88,7 +88,7 @@ func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) *errors.E
 func (h *UserInfoHandler) Delete(projectName string, userID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -101,7 +101,7 @@ func (h *UserInfoHandler) Delete(projectName string, userID string) *errors.Erro
 
 	rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
 	filter = bson.D{
-		{Key: "userID", Value: userID},
+		{Key: "user_id", Value: userID},
 	}
 
 	if _, err := rcol.DeleteMany(ctx, filter); err != nil {
@@ -116,7 +116,7 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 
 	f := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 	}
 
 	if filter != nil {
@@ -158,7 +158,7 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -188,7 +188,7 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: ent.ID},
 	}
 
@@ -215,7 +215,7 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *error
 
 	rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
 	filter = bson.D{
-		{Key: "userID", Value: ent.ID},
+		{Key: "user_id", Value: ent.ID},
 	}
 	if _, err := rcol.DeleteMany(ctx, filter); err != nil {
 		return errors.New("DB failed", "Failed to delete previous custom role in user from mongodb: %v", err)
@@ -241,7 +241,7 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *error
 func (h *UserInfoHandler) DeleteAll(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -264,7 +264,7 @@ func (h *UserInfoHandler) DeleteAll(projectName string) *errors.Error {
 func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType model.RoleType, roleID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -322,7 +322,7 @@ func (h *UserInfoHandler) AddRole(projectName string, userID string, roleType mo
 func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: userID},
 	}
 
@@ -375,8 +375,8 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 
 	rcol := h.dbClient.Database(databaseName).Collection(roleInUserCollectionName)
 	filter = bson.D{
-		{Key: "userID", Value: userID},
-		{Key: "customRoleID", Value: roleID},
+		{Key: "user_id", Value: userID},
+		{Key: "custom_role_id", Value: roleID},
 	}
 
 	if _, err := rcol.DeleteOne(ctx, filter); err != nil {
@@ -390,8 +390,8 @@ func (h *UserInfoHandler) DeleteRole(projectName string, userID string, roleID s
 func (h *UserInfoHandler) DeleteAllCustomRole(projectName string, roleID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
-		{Key: "customRoleID", Value: roleID},
+		{Key: "project_name", Value: projectName},
+		{Key: "custom_role_id", Value: roleID},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)

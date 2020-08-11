@@ -26,7 +26,7 @@ func NewLoginSessionHandler(dbClient *mongo.Client) (*LoginSessionHandler, *erro
 	mod := mongo.IndexModel{
 		Keys: bson.M{
 			"projectName": 1, // index in ascending order
-			"sessionID":   1, // index in ascending order
+			"session_id":  1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -77,8 +77,8 @@ func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *
 func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
-		{Key: "sessionID", Value: ent.SessionID},
+		{Key: "project_name", Value: projectName},
+		{Key: "session_id", Value: ent.SessionID},
 	}
 
 	v := &loginSession{
@@ -114,8 +114,8 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 func (h *LoginSessionHandler) Delete(projectName string, sessionID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
-		{Key: "sessionID", Value: sessionID},
+		{Key: "project_name", Value: projectName},
+		{Key: "session_id", Value: sessionID},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -132,7 +132,7 @@ func (h *LoginSessionHandler) Delete(projectName string, sessionID string) *erro
 func (h *LoginSessionHandler) GetByCode(projectName string, code string) (*model.LoginSession, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "code", Value: code},
 	}
 
@@ -167,8 +167,8 @@ func (h *LoginSessionHandler) GetByCode(projectName string, code string) (*model
 func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSession, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
-		{Key: "sessionID", Value: id},
+		{Key: "project_name", Value: projectName},
+		{Key: "session_id", Value: id},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -202,8 +202,8 @@ func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSe
 func (h *LoginSessionHandler) DeleteAllInClient(projectName string, clientID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
-		{Key: "clientID", Value: clientID},
+		{Key: "project_name", Value: projectName},
+		{Key: "client_id", Value: clientID},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -220,8 +220,8 @@ func (h *LoginSessionHandler) DeleteAllInClient(projectName string, clientID str
 func (h *LoginSessionHandler) DeleteAllInUser(projectName string, userID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
-		{Key: "userID", Value: userID},
+		{Key: "project_name", Value: projectName},
+		{Key: "user_id", Value: userID},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -238,7 +238,7 @@ func (h *LoginSessionHandler) DeleteAllInUser(projectName string, userID string)
 func (h *LoginSessionHandler) DeleteAllInProject(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)

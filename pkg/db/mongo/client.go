@@ -25,8 +25,8 @@ func NewClientHandler(dbClient *mongo.Client) (*ClientInfoHandler, *errors.Error
 	// Create Index to Project Name and Client ID
 	mod := mongo.IndexModel{
 		Keys: bson.M{
-			"projectName": 1, // index in ascending order
-			"id":          1, // index in ascending order
+			"project_name": 1, // index in ascending order
+			"id":           1, // index in ascending order
 		},
 		Options: options.Index().SetUnique(true),
 	}
@@ -71,7 +71,7 @@ func (h *ClientInfoHandler) Add(projectName string, ent *model.ClientInfo) *erro
 func (h *ClientInfoHandler) Delete(projectName, clientID string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: clientID},
 	}
 
@@ -90,7 +90,7 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *e
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -125,7 +125,7 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *e
 func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: clientID},
 	}
 
@@ -154,7 +154,7 @@ func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo
 func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 		{Key: "id", Value: ent.ID},
 	}
 
@@ -185,7 +185,7 @@ func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) *e
 func (h *ClientInfoHandler) DeleteAll(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 	filter := bson.D{
-		{Key: "projectName", Value: projectName},
+		{Key: "project_name", Value: projectName},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
