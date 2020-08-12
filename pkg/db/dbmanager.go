@@ -166,8 +166,8 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) *errors.Error {
 
 // ProjectDelete ...
 func (m *Manager) ProjectDelete(name string) *errors.Error {
-	if name == "" {
-		return errors.Append(model.ErrProjectValidateFailed, "name of entry is empty")
+	if !model.ValidateProjectName(name) {
+		return errors.Append(model.ErrProjectValidateFailed, "Invalid project name format")
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
@@ -215,8 +215,8 @@ func (m *Manager) ProjectGetList() ([]*model.ProjectInfo, *errors.Error) {
 
 // ProjectGet ...
 func (m *Manager) ProjectGet(name string) (*model.ProjectInfo, *errors.Error) {
-	if name == "" {
-		return nil, errors.Append(model.ErrProjectValidateFailed, "name of entry is empty")
+	if !model.ValidateProjectName(name) {
+		return nil, errors.Append(model.ErrProjectValidateFailed, "Invalid project name format")
 	}
 
 	return m.project.Get(name)
@@ -315,10 +315,6 @@ func (m *Manager) UserDelete(projectName string, userID string) *errors.Error {
 
 // UserGetList ...
 func (m *Manager) UserGetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, *errors.Error) {
-	if !model.ValidateProjectName(projectName) {
-		return nil, errors.Append(model.ErrUserValidateFailed, "invalid project name format")
-	}
-
 	return m.user.GetList(projectName, filter)
 }
 
@@ -615,9 +611,6 @@ func (m *Manager) ClientAdd(projectName string, ent *model.ClientInfo) *errors.E
 
 // ClientDelete ...
 func (m *Manager) ClientDelete(projectName, clientID string) *errors.Error {
-	if !model.ValidateProjectName(projectName) {
-		return errors.Append(model.ErrClientValidateFailed, "Invalid project name format")
-	}
 	if !model.ValidateClientID(clientID) {
 		return errors.Append(model.ErrClientValidateFailed, "invalid client id format")
 	}
@@ -636,18 +629,11 @@ func (m *Manager) ClientDelete(projectName, clientID string) *errors.Error {
 
 // ClientGetList ...
 func (m *Manager) ClientGetList(projectName string) ([]*model.ClientInfo, *errors.Error) {
-	if !model.ValidateProjectName(projectName) {
-		return nil, errors.Append(model.ErrClientValidateFailed, "Invalid project name format")
-	}
-
 	return m.client.GetList(projectName)
 }
 
 // ClientGet ...
 func (m *Manager) ClientGet(projectName, clientID string) (*model.ClientInfo, *errors.Error) {
-	if !model.ValidateProjectName(projectName) {
-		return nil, errors.Append(model.ErrClientValidateFailed, "Invalid project name format")
-	}
 	if !model.ValidateClientID(clientID) {
 		return nil, errors.Append(model.ErrClientValidateFailed, "invalid client id format")
 	}
@@ -711,9 +697,6 @@ func (m *Manager) CustomRoleDelete(projectName string, customRoleID string) *err
 
 // CustomRoleGetList ...
 func (m *Manager) CustomRoleGetList(projectName string, filter *model.CustomRoleFilter) ([]*model.CustomRole, *errors.Error) {
-	if !model.ValidateProjectName(projectName) {
-		return nil, errors.Append(model.ErrCustomRoleValidateFailed, "invalid project name format")
-	}
 	return m.customRole.GetList(projectName, filter)
 }
 
