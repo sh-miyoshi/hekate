@@ -23,8 +23,9 @@ func (h *Handler) Ping() *errors.Error {
 }
 
 // Save ...
-func (h *Handler) Save(tm time.Time, resType, method, path, message string) *errors.Error {
+func (h *Handler) Save(projectName string, tm time.Time, resType, method, path, message string) *errors.Error {
 	h.data = append(h.data, model.Audit{
+		ProjectName:  projectName,
 		Time:         tm,
 		ResourceType: resType,
 		Method:       method,
@@ -37,12 +38,14 @@ func (h *Handler) Save(tm time.Time, resType, method, path, message string) *err
 }
 
 // Get ...
-func (h *Handler) Get(fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
+func (h *Handler) Get(projectName string, fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
 	res := []model.Audit{}
 
 	for _, d := range h.data {
-		if fromDate.After(d.Time) && toDate.Before(d.Time) {
-			res = append(res, d)
+		if d.ProjectName == projectName {
+			if fromDate.After(d.Time) && toDate.Before(d.Time) {
+				res = append(res, d)
+			}
 		}
 	}
 

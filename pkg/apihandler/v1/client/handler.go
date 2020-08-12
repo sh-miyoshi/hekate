@@ -57,19 +57,21 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 // ClientCreateHandler ...
 //   require role: write-project
 func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
+	// TODO(validate project name)
+
 	var err *errors.Error
 	defer func() {
 		msg := ""
 		if err != nil {
 			msg = err.Error()
 		}
-		if err = audit.GetInst().Save(time.Now(), "CLIENT", r.Method, r.URL.String(), msg); err != nil {
+		if err = audit.GetInst().Save(projectName, time.Now(), "CLIENT", r.Method, r.URL.String(), msg); err != nil {
 			errors.Print(errors.Append(err, "Failed to save audit log"))
 		}
 	}()
-
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
 
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {

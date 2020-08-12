@@ -46,11 +46,11 @@ func (m *Manager) Ping() *errors.Error {
 }
 
 // Save ...
-func (m *Manager) Save(tm time.Time, resType, method, path, message string) *errors.Error {
-	return m.handler.Save(tm, resType, method, path, message)
+func (m *Manager) Save(projectName string, tm time.Time, resType, method, path, message string) *errors.Error {
+	return m.handler.Save(projectName, tm, resType, method, path, message)
 }
 
 // Get ...
-func (m *Manager) Get(fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
-	return m.handler.Get(fromDate, toDate)
+func (m *Manager) Get(projectName string, fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
+	return m.handler.Get(projectName, fromDate, toDate)
 }

@@ -4,6 +4,7 @@ import "time"
 
 // Audit ...
 type Audit struct {
+	ProjectName  string
 	Time         time.Time
 	ResourceType string
 	Method       string
