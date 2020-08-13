@@ -28,6 +28,24 @@ import (
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger.Info("%s: %s called", r.Method, r.URL.String())
+
+		vars := mux.Vars(r)
+		projectName := vars["projectName"]
+
+		// Validate project name
+		if projectName != "" {
+			if _, err := db.GetInst().ProjectGet(projectName); err != nil {
+				if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
+					errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
+					http.Error(w, "Project Not Found", http.StatusNotFound)
+				} else {
+					errors.Print(errors.Append(err, "Failed to validate project name"))
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				}
+				return
+			}
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }
