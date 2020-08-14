@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
@@ -37,7 +38,7 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	roles, err := db.GetInst().CustomRoleGetList(projectName, filter)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
+		if errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get role list"))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -67,6 +68,17 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "ROLE", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit log"))
+		}
+	}()
+
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
@@ -91,10 +103,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().CustomRoleAdd(projectName, &role); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
+		if errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Custom Role %s is already exists", role.Name))
 			http.Error(w, "Custom Role already exists", http.StatusConflict)
 		} else if errors.Contains(err, model.ErrCustomRoleValidateFailed) {
@@ -126,6 +135,17 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	roleID := vars["roleID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "ROLE", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit log"))
+		}
+	}()
+
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
@@ -134,10 +154,7 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().CustomRoleDelete(projectName, roleID); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", roleID))
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {
@@ -171,9 +188,6 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", roleID))
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get role"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -198,6 +212,17 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	roleID := vars["roleID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "ROLE", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit log"))
+		}
+	}()
+
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
@@ -216,10 +241,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous CustomRole Info
 	role, err := db.GetInst().CustomRoleGet(projectName, roleID)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", request.Name))
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {
