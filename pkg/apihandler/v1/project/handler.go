@@ -165,10 +165,7 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "Project %s is not found", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrDeleteBlockedProject) {
+		if errors.Contains(err, model.ErrDeleteBlockedProject) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to delete blocked project"))
 			http.Error(w, "Forbidden", http.StatusForbidden)
 		} else {
@@ -199,13 +196,8 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Project
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else {
-			errors.Print(errors.Append(err, "Failed to get project"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
+		errors.Print(errors.Append(err, "Failed to get project"))
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -261,13 +253,8 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Project Info
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "Project %s is not found", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else {
-			errors.Print(errors.Append(err, "Failed to get project"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
+		errors.Print(errors.Append(err, "Failed to get project"))
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
