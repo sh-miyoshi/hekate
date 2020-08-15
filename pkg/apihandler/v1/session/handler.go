@@ -28,7 +28,7 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			msg = err.Error()
 		}
 		if err = audit.GetInst().Save(projectName, time.Now(), "SESSION", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit log"))
+			errors.Print(errors.Append(err, "Failed to save audit event"))
 		}
 	}()
 

@@ -76,7 +76,7 @@ func InitConfig(osArgs []string) (*GlobalConfig, *errors.Error) {
 	flag.StringVar(&res.DB.Type, "db-type", res.DB.Type, "type of database")
 	flag.StringVar(&res.DB.ConnectionString, "db-conn-str", res.DB.ConnectionString, "database connection string")
 	flag.StringVar(&res.UserLoginResourceDir, "login-res", res.UserLoginResourceDir, "directory path for user login")
-	flag.StringVar(&res.AuditDB.Type, "audit-db-type", res.AuditDB.Type, "type of audit log database")
+	flag.StringVar(&res.AuditDB.Type, "audit-db-type", res.AuditDB.Type, "type of audit events database")
 	flag.StringVar(&res.AuditDB.ConnectionString, "audit-db-conn-str", res.AuditDB.ConnectionString, "audit database connection string")
 	flag.Parse()
 

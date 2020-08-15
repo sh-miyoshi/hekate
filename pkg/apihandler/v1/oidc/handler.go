@@ -81,7 +81,16 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
-	// TODO(audit log)
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "TOKEN", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
 
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
@@ -115,7 +124,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		clientSecret = s
 	}
 
-	if err := oidc.ClientAuth(projectName, clientID, clientSecret); err != nil {
+	if err = oidc.ClientAuth(projectName, clientID, clientSecret); err != nil {
 		if errors.Contains(err, errors.ErrInvalidClient) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate client %s", clientID))
 			errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
@@ -130,7 +139,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Form.Get("redirect_uri") != "" {
 		// existence of client is already checked in oidc.ClientAuth
-		if err := client.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
+		if err = client.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
 			if errors.Contains(err, client.ErrNoRedirectURL) {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
 				errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, state)
@@ -286,7 +295,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err = audit.GetInst().Save(projectName, time.Now(), "USER_LOGIN", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit log"))
+			errors.Print(errors.Append(err, "Failed to save audit event"))
 		}
 	}()
 
@@ -527,7 +536,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 			msg = err.Error()
 		}
 		if err = audit.GetInst().Save(projectName, time.Now(), "AUTHORIZATION_CODE", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit log"))
+			errors.Print(errors.Append(err, "Failed to save audit event"))
 		}
 	}()
 

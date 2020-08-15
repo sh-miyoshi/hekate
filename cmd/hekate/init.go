@@ -203,7 +203,7 @@ func initAll(cfg *config.GlobalConfig) *errors.Error {
 		return errors.Append(err, "Failed to initialize database")
 	}
 
-	// Initialize Audit Log Database
+	// Initialize Audit Events Database
 	typ := cfg.AuditDB.Type
 	connStr := cfg.AuditDB.ConnectionString
 	if typ == "" {
@@ -211,7 +211,7 @@ func initAll(cfg *config.GlobalConfig) *errors.Error {
 		connStr = cfg.DB.ConnectionString
 	}
 	if err := audit.Init(typ, connStr); err != nil {
-		return errors.Append(err, "Failed to initialize audit log database")
+		return errors.Append(err, "Failed to initialize audit events database")
 	}
 
 	return nil

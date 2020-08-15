@@ -75,7 +75,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 			msg = err.Error()
 		}
 		if err = audit.GetInst().Save(projectName, time.Now(), "ROLE", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit log"))
+			errors.Print(errors.Append(err, "Failed to save audit event"))
 		}
 	}()
 
@@ -142,7 +142,7 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 			msg = err.Error()
 		}
 		if err = audit.GetInst().Save(projectName, time.Now(), "ROLE", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit log"))
+			errors.Print(errors.Append(err, "Failed to save audit event"))
 		}
 	}()
 
@@ -219,7 +219,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			msg = err.Error()
 		}
 		if err = audit.GetInst().Save(projectName, time.Now(), "ROLE", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit log"))
+			errors.Print(errors.Append(err, "Failed to save audit event"))
 		}
 	}()
 
