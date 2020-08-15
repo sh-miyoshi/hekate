@@ -999,6 +999,38 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/audit':
+    get:
+      summary: "Get Audit events"
+      tags:
+        - audit-event
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: from_date
+          in: query
+          schema:
+            type: string
+        - name: to_date
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Successfully get audit event list'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditGetResponse'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
 components:
   schemas:
     ProjectCreateRequest:
@@ -1351,4 +1383,20 @@ components:
         token_type_hint:
           type: string
         state:
+          type: string
+    AuditGetResponse:
+      type: object
+      properties:
+        time:
+          type: string
+          format: date
+        response_type:
+          type: string
+        method:
+          type: string
+        path:
+          type: string
+        success:
+          type: boolean
+        message:
           type: string
