@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/client"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
@@ -80,6 +81,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
+	// TODO(audit log)
+
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
 		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
@@ -92,13 +95,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Project Info for Token Config
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			logger.Info("no such project %s", projectName)
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else {
-			errors.Print(errors.Append(err, "Failed to get project info"))
-			errors.WriteOAuthError(w, errors.ErrServerError, state)
-		}
+		errors.Print(errors.Append(err, "Failed to get project info"))
+		errors.WriteOAuthError(w, errors.ErrServerError, state)
 		return
 	}
 
@@ -214,13 +212,8 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else {
-			errors.Print(errors.Append(err, "Failed to get project"))
-			errors.WriteOAuthError(w, errors.ErrServerError, "")
-		}
+		errors.Print(errors.Append(err, "Failed to get project"))
+		errors.WriteOAuthError(w, errors.ErrServerError, "")
 		return
 	}
 
@@ -284,10 +277,16 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionID := r.Form.Get("login_session_id")
 
-	// delete session if login failed
 	defer func() {
+		msg := ""
 		if err != nil {
+			msg = err.Error()
+			// delete session if login failed
 			db.GetInst().LoginSessionDelete(projectName, sessionID)
+		}
+
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER_LOGIN", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit log"))
 		}
 	}()
 
@@ -505,7 +504,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := db.GetInst().SessionDelete(projectName, claims.SessionID); err != nil {
-			if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
+			if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 				errors.PrintAsInfo(errors.Append(err, "Failed to revoke session"))
 				w.WriteHeader(http.StatusOK)
 			} else {
@@ -521,12 +520,23 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req url.Values) {
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "AUTHORIZATION_CODE", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit log"))
+		}
+	}()
+
 	tokenIssuer := token.GetExpectIssuer(r)
 	authReq := oidc.NewAuthRequest(req)
 	logger.Debug("Auth Request: %v", authReq)
 
 	// Check Redirect URL
-	if err := client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
+	if err = client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
 		if errors.Contains(err, client.ErrNoRedirectURL) {
 			errors.PrintAsInfo(errors.Append(err, "Redirect URL %s is not in Allowed list", authReq.RedirectURI))
 			errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, authReq.State)
@@ -540,7 +550,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 		return
 	}
 
-	if err := authReq.Validate(); err != nil {
+	if err = authReq.Validate(); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to validate request"))
 		if err.GetHTTPStatusCode() == 0 {
 			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
@@ -579,7 +589,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 	userID := ""
 	if authReq.IDTokenHint != "" {
 		var claims token.IDTokenClaims
-		if err := token.ValidateIDToken(&claims, authReq.IDTokenHint, projectName, tokenIssuer); err != nil {
+		if err = token.ValidateIDToken(&claims, authReq.IDTokenHint, projectName, tokenIssuer); err != nil {
 			errors.PrintAsInfo(errors.Append(err, "Failed to validate id_token_hint"))
 			errors.RedirectWithOAuthError(w, errors.ErrInvalidRequest, r.Method, authReq.RedirectURI, authReq.State)
 			return
