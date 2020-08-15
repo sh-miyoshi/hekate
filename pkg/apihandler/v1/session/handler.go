@@ -2,8 +2,10 @@ package sessionapi
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
@@ -19,15 +21,26 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	sessionID := vars["sessionID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "SESSION", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit log"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
-	if err := db.GetInst().SessionDelete(projectName, sessionID); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
+	if err = db.GetInst().SessionDelete(projectName, sessionID); err != nil {
+		if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to delete session"))
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
@@ -58,7 +71,7 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	s, err := db.GetInst().SessionGet(projectName, sessionID)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get session"))
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
