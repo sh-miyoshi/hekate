@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/hekate/cmd/hekate/config"
+	auditapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/audit"
 	clientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	roleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
 	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
@@ -98,6 +99,9 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	// Session API
 	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", sessionapiv1.SessionDeleteHandler).Methods("DELETE")
 	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", sessionapiv1.SessionGetHandler).Methods("GET")
+
+	// Audit API
+	r.HandleFunc(basePath+"/project/{projectName}/audit", auditapiv1.AuditGetHandler).Methods("GET")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
