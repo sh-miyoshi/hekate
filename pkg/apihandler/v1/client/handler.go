@@ -30,13 +30,8 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	clients, err := db.GetInst().ClientGetList(projectName)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrClientValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else {
-			errors.Print(errors.Append(err, "Failed to get client"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		}
+		errors.Print(errors.Append(err, "Failed to get client"))
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -51,7 +46,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	jwthttp.ResponseWrite(w, "ClientGetAllClientGetHandlerHandler", res)
+	jwthttp.ResponseWrite(w, "AllClientGetHandlerHandler", res)
 }
 
 // ClientCreateHandler ...
@@ -120,7 +115,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 		AllowedCallbackURLs: client.AllowedCallbackURLs,
 	}
 
-	jwthttp.ResponseWrite(w, "ClientGetAllClientGetHandlerHandler", &res)
+	jwthttp.ResponseWrite(w, "ClientCreateHandler", &res)
 }
 
 // ClientDeleteHandler ...
