@@ -1390,7 +1390,7 @@ components:
         time:
           type: string
           format: date
-        response_type:
+        resource_type:
           type: string
         method:
           type: string
