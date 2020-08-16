@@ -6,6 +6,9 @@
 ユーザー管理と認証・認可処理を実行できます。  
 OpenID Connectのことを知らなくても簡単にスケーラブルな認証・認可を行えるシステムを目指しています。
 
+OpenID Foundationの公式テストのbasic certification test planをパスしました。  
+結果: [https://www.certification.openid.net/plan-detail.html?plan=AYsfCxrGGu0zr&public=true](https://www.certification.openid.net/plan-detail.html?plan=AYsfCxrGGu0zr&public=true)
+
 ## インストール方法
 
 - All In One環境の構築

@@ -15,11 +15,6 @@
     - ログインリクエスト失敗時にロックする
     - 強制ロック解除用のAPI
   - API docの修正
-- audit log
-  - time
-  - resource type (or url path and method)
-  - client
-  - success or failed
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - http.Error関数の置き換え
@@ -91,6 +86,7 @@
   - 前回開いていたページに戻る
 - alert画面のcss修正
 - headerにユーザー名を表示
+- audit eventの表示
 
 ## CLI tool(hctl) enhancement
 
@@ -101,6 +97,7 @@
     - password change
   - customrole
     - update
+  - audit event
 - outputの修正
   - error出力の方法
   - debug出力
