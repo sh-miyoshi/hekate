@@ -34,6 +34,11 @@ db:
   # type: "mongo"
   # connection_string: "mongodb://root:example@localhost:27017"
 
+# use same params as db if comment out this
+audit_db:
+  type: "none"
+  connection_string: ""
+
 # Expires Time of Authorization code in OpenID Connect [sec]
 oidc_auth_code_expires_time: 300
 

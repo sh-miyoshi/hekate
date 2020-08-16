@@ -5,6 +5,9 @@ import (
 
 	"github.com/sh-miyoshi/hekate/pkg/audit/memory"
 	"github.com/sh-miyoshi/hekate/pkg/audit/model"
+	"github.com/sh-miyoshi/hekate/pkg/audit/mongo"
+	"github.com/sh-miyoshi/hekate/pkg/audit/none"
+	dbmongo "github.com/sh-miyoshi/hekate/pkg/db/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
@@ -28,6 +31,20 @@ func Init(dbType string, connStr string) *errors.Error {
 
 		inst = &Manager{
 			handler: memory.NewHandler(),
+		}
+	case "mongo":
+		logger.Info("Initialize AuditManager with mongo DB")
+		dbClient, err := dbmongo.NewClient(connStr)
+		if err != nil {
+			return errors.Append(err, "Failed to get db client")
+		}
+		inst = &Manager{
+			handler: mongo.NewHandler(dbClient),
+		}
+	case "none":
+		logger.Info("Initialize AuditManager with none DB")
+		inst = &Manager{
+			handler: none.NewHandler(),
 		}
 	default:
 		return errors.New("Internal server error", "Database Type %s is not implemented for audit events", dbType)
