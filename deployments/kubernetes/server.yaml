@@ -33,7 +33,7 @@ spec:
   ports:
     - port: 18443
       targetPort: 18443
-  clusterIP: LoadBalancer
+  type: LoadBalancer
   selector:
     app: hekate-server
 ---
