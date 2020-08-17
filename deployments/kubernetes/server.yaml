@@ -18,8 +18,8 @@ data:
     server_bind_address: "0.0.0.0"
     https:
       enabled: true
-      cert-file: "/etc/hekate/tls.crt"
-      key-file: "/etc/hekate/tls.key"
+      cert-file: "/etc/hekate/secret/tls.crt"
+      key-file: "/etc/hekate/secret/tls.key"
     oidc_auth_code_expires_time: 300
     oidc_user_login_page_res: "/etc/hekate/login"
 ---
