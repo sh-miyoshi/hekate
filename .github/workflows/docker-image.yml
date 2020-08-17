@@ -12,9 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Build the Docker image
+    - name: Build all-in-one image
       run: docker build -t smiyoshi/hekate:all-in-one -f build/allinone/Dockerfile .
+    - name: Build server image
+      run: |
+        docker build -t smiyoshi/hekate -f build/server/Dockerfile .
+        docker tag smiyoshi/hekate smiyoshi/hekate:server
     - name: Login to Docker Hub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
     - name: Push to Docker Hub
-      run: docker push smiyoshi/hekate:all-in-one
+      run: |
+        docker push smiyoshi/hekate
+        docker push smiyoshi/hekate:server
+        docker push smiyoshi/hekate:all-in-one
