@@ -35,7 +35,7 @@ spec:
       targetPort: 18443
   clusterIP: LoadBalancer
   selector:
-	  app: hekate-server
+    app: hekate-server
 ---
 apiVersion: apps/v1
 kind: Deployment
