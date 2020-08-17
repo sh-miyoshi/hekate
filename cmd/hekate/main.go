@@ -20,7 +20,7 @@ func main() {
 	// Get config
 	cfg, err := config.InitConfig(os.Args)
 	if err != nil {
-		fmt.Printf("Failed to set config: %v", err)
+		errors.Print(errors.Append(err, "Failed to set config"))
 		os.Exit(1)
 	}
 
