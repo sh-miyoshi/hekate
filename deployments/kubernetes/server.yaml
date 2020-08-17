@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hekate-server
+type: Opaque
+stringData:
+  admin_name: admin
+  admin_password: password
+  db_conn_str: "mongodb://root:example@mongo.default.svc.cluster.local:27017"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hekate-server
+data:
+  default.yaml: |
+    server_port: 18443
+    server_bind_address: "0.0.0.0"
+    https:
+      enabled: true
+      cert-file: "/etc/hekate/tls.crt"
+      key-file: "/etc/hekate/tls.key"
+    oidc_auth_code_expires_time: 300
+    oidc_user_login_page_res: "/etc/hekate/login"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hekate-server
+  labels:
+    app: hekate-server
+spec:
+  ports:
+    - port: 18443
+      targetPort: 18443
+  clusterIP: LoadBalancer
+  selector:
+	  app: hekate-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hekate-server
+spec:
+  selector:
+    matchLabels:
+      app: hekate-server
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: hekate-server
+    spec:
+      containers:
+        - name: hekate-server
+          image: smiyoshi/hekate:server
+          ports:
+            - containerPort: 18443
+          env:
+            - name: HEKATE_ADMIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: hekate-server
+                  key: admin_name
+            - name: HEKATE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hekate-server
+                  key: admin_password
+            - name: HEKATE_DB_TYPE
+              value: mongo
+            - name: HEKATE_DB_CONNECT_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: hekate-server
+                  key: db_conn_str
+          volumeMounts:
+            - name: config
+              mountPath: "/etc/hekate/config"
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: hekate-server
