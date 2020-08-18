@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: hekate-server
+  name: hekate
 type: Opaque
 stringData:
   admin_name: admin
@@ -11,7 +11,7 @@ stringData:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hekate-server
+  name: hekate
 data:
   default.yaml: |
     server_port: 18443
@@ -26,33 +26,33 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hekate-server
+  name: hekate
   labels:
-    app: hekate-server
+    app: hekate
 spec:
   ports:
     - port: 18443
       targetPort: 18443
   type: LoadBalancer
   selector:
-    app: hekate-server
+    app: hekate
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hekate-server
+  name: hekate
 spec:
   selector:
     matchLabels:
-      app: hekate-server
+      app: hekate
   replicas: 2
   template:
     metadata:
       labels:
-        app: hekate-server
+        app: hekate
     spec:
       containers:
-        - name: hekate-server
+        - name: hekate
           image: smiyoshi/hekate:server
           ports:
             - containerPort: 18443
@@ -60,19 +60,19 @@ spec:
             - name: HEKATE_ADMIN_NAME
               valueFrom:
                 secretKeyRef:
-                  name: hekate-server
+                  name: hekate
                   key: admin_name
             - name: HEKATE_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: hekate-server
+                  name: hekate
                   key: admin_password
             - name: HEKATE_DB_TYPE
               value: mongo
             - name: HEKATE_DB_CONNECT_STRING
               valueFrom:
                 secretKeyRef:
-                  name: hekate-server
+                  name: hekate
                   key: db_conn_str
           volumeMounts:
             - name: config
@@ -81,4 +81,4 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: hekate-server
+            name: hekate
