@@ -6,6 +6,7 @@ import (
 
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -22,22 +23,34 @@ func NewSessionHandler(dbClient *mongo.Client) (*SessionHandler, *errors.Error) 
 		dbClient: dbClient,
 	}
 
-	// Create Index to ProjectName and SessionID
-	mod := mongo.IndexModel{
-		Keys: bson.M{
-			"project_name": 1, // index in ascending order
-			"session_id":   1, // index in ascending order
-		},
-		Options: options.Index().SetUnique(true),
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
+	// Get index info
 	col := res.dbClient.Database(databaseName).Collection(sessionCollectionName)
-	_, err := col.Indexes().CreateOne(ctx, mod)
+	iv := col.Indexes()
+	var ires []bson.M
+	cur, err := iv.List(ctx)
 	if err != nil {
-		return nil, errors.New("DB failed", "Failed to create index: %v", err)
+		return nil, errors.New("DB failed", "Failed to get index info: %v", err)
+	}
+	if err := cur.All(ctx, &ires); err != nil {
+		return nil, errors.New("DB failed", "Failed to get index info: %v", err)
+	}
+
+	if len(ires) == 0 {
+		logger.Info("Create index for session")
+		// Create Index to Project Name and SessionID
+		mod := mongo.IndexModel{
+			Keys: bson.M{
+				"project_name": 1, // index in ascending order
+				"session_id":   1, // index in ascending order
+			},
+			Options: options.Index().SetUnique(true),
+		}
+		if _, err := iv.CreateOne(ctx, mod); err != nil {
+			return nil, errors.New("DB failed", "Failed to create index: %v", err)
+		}
 	}
 
 	return res, nil
