@@ -10,8 +10,8 @@ FROM node:13-alpine
 EXPOSE 3000
 WORKDIR /hekate
 
-COPY ./cmd/portal /hekate/portal/
-COPY --from=builder /hekate/cmd/portal/node_modules /hekate/portal/node_modules
+COPY ./cmd/portal /hekate/
+COPY --from=builder /hekate/cmd/portal/node_modules /hekate/node_modules
 
 RUN npm run build
 CMD ["npm", "run", "start"]
