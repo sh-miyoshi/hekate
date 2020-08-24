@@ -57,6 +57,9 @@ spec:
           ports:
             - containerPort: 18443
           env:
+            # Please set if you want to deploy hekate-portal
+            # - name: HEKATE_PORTAL_ADDR
+            #   value: "http://localhost:3000"
             - name: HEKATE_ADMIN_NAME
               valueFrom:
                 secretKeyRef:
