@@ -83,7 +83,7 @@ export default {
 
   server: {
     host: '0.0.0.0',
-    port: process.env.HEKATE_PORTAL_PORT,
+    port: process.env.HEKATE_PORTAL_PORT
 
     // set this param if run as https
     // also set process.env.https: true
@@ -98,12 +98,6 @@ export default {
       process.env.HEKATE_SERVER_ADDR || 'http://localhost:18443',
     HEKATE_PORTAL_HOST: process.env.HEKATE_PORTAL_HOST || 'localhost',
     HEKATE_PORTAL_PORT: process.env.HEKATE_PORTAL_PORT || '3000',
-    https: false,
-    SYSTEM_ROLES: [
-      'read-cluster',
-      'write-cluster',
-      'read-project',
-      'write-project'
-    ]
+    https: false
   }
 }
