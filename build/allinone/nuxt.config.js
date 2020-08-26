@@ -37,8 +37,8 @@ export default {
     host: '0.0.0.0',
     port: process.env.HEKATE_PORTAL_PORT,
     https: {
-      key: fs.readFileSync('/hekatesecret/tls.key'),
-      cert: fs.readFileSync('/hekatesecret/tls.crt')
+      key: fs.readFileSync('/hekate/secret/tls.key'),
+      cert: fs.readFileSync('/hekate/secret/tls.crt')
     }
   },
   env: {
