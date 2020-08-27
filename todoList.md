@@ -1,5 +1,9 @@
 # TODO List
 
+## Documents
+
+- 構成図
+
 ## server application enhancement
 
 - APIの修正
@@ -59,7 +63,7 @@
 - projectのimport/export
 - Client Secretに証明書を追加できるようにする
 - filterの追加(user, role)
-- SAML対応
+- ~~SAML対応~~
 - user federation
   - user情報を外部に保存し、それと連携する
 - User Authentication HTMLの拡充
