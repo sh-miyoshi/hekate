@@ -29,7 +29,7 @@ OpenID Foundationの公式テストのbasic certification test planをパスし�
   export PORTAL_PORT=3000
 
   docker run -d --name hekate \
-    -p $PORTAL_PORT:3000 -p 18443:18443 \
+    -p $PORTAL_PORT:$PORTAL_PORT -p 18443:18443 \
     -e SERVER_ADDR=$SERVER_ADDR \
     -e HEKATE_ADMIN_NAME=$ADMIN_NAME \
     -e HEKATE_ADMIN_PASSWORD=$ADMIN_PASSWORD \
