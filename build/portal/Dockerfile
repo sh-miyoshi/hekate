@@ -13,5 +13,6 @@ WORKDIR /hekate
 COPY ./cmd/portal /hekate/
 COPY --from=builder /hekate/cmd/portal/node_modules /hekate/node_modules
 
-RUN npm run build
-CMD ["npm", "run", "start"]
+COPY build/portal/run.sh /hekate
+
+CMD ["./run.sh"]
