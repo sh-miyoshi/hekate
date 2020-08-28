@@ -185,3 +185,7 @@ echo "success to client update"
 # Client Delete
 test_api "$URL/project/master/client/$clientID" DELETE $master_access_token
 echo "success to client delete"
+
+# User Logout
+test_api "$URL/project/master/user/$userID/logout" POST $master_access_token
+echo "success to user logout"
