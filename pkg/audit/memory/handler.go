@@ -47,7 +47,7 @@ func (h *Handler) Get(projectName string, fromDate, toDate time.Time) ([]model.A
 
 	for _, d := range h.data {
 		if d.ProjectName == projectName {
-			if fromDate.After(d.Time) && toDate.Before(d.Time) {
+			if fromDate.Before(d.Time) && toDate.After(d.Time) {
 				res = append(res, d)
 			}
 		}

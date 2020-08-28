@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hekate-portal
+  labels:
+    app: hekate-portal
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: LoadBalancer
+  loadBalancerIP: localhost
+  selector:
+    app: hekate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hekate-portal
+spec:
+  selector:
+    matchLabels:
+      app: hekate-portal
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hekate-portal
+    spec:
+      containers:
+        - name: hekate-portal
+          image: smiyoshi/hekate:portal
+          ports:
+            - containerPort: 3000
+          env:
+            - name: HEKATE_PORTAL_PORT
+              value: "3000"
+            - name: HEKATE_SERVER_ADDR
+              value: "https://hekate.default.svc.cluster.local:18443"
+            - name: HEKATE_PORTAL_HOST
+              value: "http://localhost:3000"
+

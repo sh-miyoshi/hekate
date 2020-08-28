@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hekate
+type: Opaque
+stringData:
+  admin_name: admin
+  admin_password: password
+  db_conn_str: "mongodb://root:example@mongo.default.svc.cluster.local:27017"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hekate
+data:
+  default.yaml: |
+    server_port: 18443
+    server_bind_address: "0.0.0.0"
+    https:
+      enabled: true
+      cert-file: "/etc/hekate/secret/tls.crt"
+      key-file: "/etc/hekate/secret/tls.key"
+    oidc_auth_code_expires_time: 300
+    oidc_user_login_page_res: "/etc/hekate/login"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hekate
+  labels:
+    app: hekate
+spec:
+  ports:
+    - port: 18443
+      targetPort: 18443
+  type: LoadBalancer
+  selector:
+    app: hekate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hekate
+spec:
+  selector:
+    matchLabels:
+      app: hekate
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: hekate
+    spec:
+      containers:
+        - name: hekate
+          image: smiyoshi/hekate:server
+          ports:
+            - containerPort: 18443
+          env:
+            # Please set if you want to deploy hekate-portal
+            # - name: HEKATE_PORTAL_ADDR
+            #   value: "http://localhost:3000"
+            - name: HEKATE_ADMIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: hekate
+                  key: admin_name
+            - name: HEKATE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hekate
+                  key: admin_password
+            - name: HEKATE_DB_TYPE
+              value: mongo
+            - name: HEKATE_DB_CONNECT_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: hekate
+                  key: db_conn_str
+          volumeMounts:
+            - name: config
+              mountPath: "/etc/hekate/config"
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: hekate

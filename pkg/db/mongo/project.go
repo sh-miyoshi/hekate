@@ -23,21 +23,33 @@ func NewProjectHandler(dbClient *mongo.Client) (*ProjectInfoHandler, *errors.Err
 		dbClient: dbClient,
 	}
 
-	// Create Index to Project Name
-	mod := mongo.IndexModel{
-		Keys: bson.M{
-			"name": 1, // index in ascending order
-		},
-		Options: options.Index().SetUnique(true),
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
+	// Get index info
 	col := res.dbClient.Database(databaseName).Collection(projectCollectionName)
-	_, err := col.Indexes().CreateOne(ctx, mod)
+	iv := col.Indexes()
+	var ires []bson.M
+	cur, err := iv.List(ctx)
 	if err != nil {
-		return nil, errors.New("DB failed", "Failed to create index: %v", err)
+		return nil, errors.New("DB failed", "Failed to get index info: %v", err)
+	}
+	if err := cur.All(ctx, &ires); err != nil {
+		return nil, errors.New("DB failed", "Failed to get index info: %v", err)
+	}
+
+	if len(ires) == 0 {
+		logger.Info("Create index for project")
+		// Create Index to Project Name
+		mod := mongo.IndexModel{
+			Keys: bson.M{
+				"name": 1, // index in ascending order
+			},
+			Options: options.Index().SetUnique(true),
+		}
+		if _, err := iv.CreateOne(ctx, mod); err != nil {
+			return nil, errors.New("DB failed", "Failed to create index: %v", err)
+		}
 	}
 
 	return res, nil

@@ -146,7 +146,13 @@ export default {
       assignedSystemRole: null,
       assignedCustomRole: null,
       customRoleCandidates: [],
-      showLoginSessions: false
+      showLoginSessions: false,
+      SYSTEM_ROLES: [
+        'read-cluster',
+        'write-cluster',
+        'read-project',
+        'write-project'
+      ]
     }
   },
   async mounted() {
@@ -222,7 +228,7 @@ export default {
       if (!this.user) {
         return res
       }
-      for (const item of process.env.SYSTEM_ROLES) {
+      for (const item of this.SYSTEM_ROLES) {
         if (!this.user.system_roles.includes(item)) {
           res.push({ value: item, text: item })
         }

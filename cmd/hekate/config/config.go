@@ -45,7 +45,11 @@ func InitConfig(osArgs []string) (*GlobalConfig, *errors.Error) {
 	setEnvVar("HEKATE_ADMIN_PASSWORD", &res.AdminPassword)
 	setEnvVar("HEKATE_SERVER_PORT", &port)
 	if port != "" {
-		res.Port, _ = strconv.Atoi(port)
+		var err error
+		res.Port, err = strconv.Atoi(port)
+		if err != nil {
+			return nil, errors.New("Invalid os env", "Failed to get port number: %v", err)
+		}
 	}
 	setEnvVar("HEKATE_SERVER_BIND_ADDR", &res.BindAddr)
 	setEnvVar("HEKATE_SERVER_ENV", &env)

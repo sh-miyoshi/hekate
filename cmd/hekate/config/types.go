@@ -4,22 +4,12 @@ import (
 	"os"
 
 	"github.com/sh-miyoshi/hekate/pkg/errors"
-	"github.com/stretchr/stew/slice"
 )
 
 // DBInfo ...
 type DBInfo struct {
 	Type             string `yaml:"type"`
 	ConnectionString string `yaml:"connection_string"`
-}
-
-// Validate ...
-func (i *DBInfo) Validate() *errors.Error {
-	valid := []string{"memory", "mongo"}
-	if !slice.Contains(valid, i.Type) {
-		return errors.New("Invalid DB type", "%s is not valid db type", i.Type)
-	}
-	return nil
 }
 
 // HTTPSConfig ...
@@ -48,10 +38,6 @@ type GlobalConfig struct {
 func (c *GlobalConfig) Validate() *errors.Error {
 	if c.Port == 0 || c.Port > 65535 {
 		return errors.New("Invalid config", "port number %d is not valid", c.Port)
-	}
-
-	if err := c.DB.Validate(); err != nil {
-		return err
 	}
 
 	if c.AdminName == "" {
