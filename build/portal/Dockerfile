@@ -13,6 +13,6 @@ WORKDIR /hekate
 COPY ./cmd/portal /hekate/
 COPY --from=builder /hekate/cmd/portal/node_modules /hekate/node_modules
 
-COPY build/portal/run.sh /hekate
+COPY build/portal/run.sh /hekate/run.sh
 
 CMD ["./run.sh"]
