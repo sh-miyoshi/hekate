@@ -189,3 +189,7 @@ echo "success to client delete"
 # Audit Events Get
 test_api "$URL/project/master/audit" GET $master_access_token
 echo "success to get audit events"
+
+# User Logout
+test_api "$URL/project/master/user/$userID/logout" POST $master_access_token
+echo "success to user logout"
