@@ -6,6 +6,12 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
+// LockState ...
+type LockState struct {
+	Locked            bool
+	VerifyFailedTimes []time.Time
+}
+
 // UserInfo ...
 type UserInfo struct {
 	ID           string
@@ -15,6 +21,7 @@ type UserInfo struct {
 	PasswordHash string
 	SystemRoles  []string
 	CustomRoles  []string
+	LockState    LockState
 }
 
 // UserFilter ...

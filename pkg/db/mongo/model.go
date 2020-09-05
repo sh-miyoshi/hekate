@@ -21,6 +21,13 @@ type passwordPolicy struct {
 	UseSpecialCharacter bool     `bson:"use_special_character"`
 }
 
+type userLock struct {
+	Enabled          bool          `bson:"enabled"`
+	MaxLoginFailure  uint          `bson:"max_login_failure"`
+	LockDuration     time.Duration `bson:"lock_duration"`
+	FailureResetTime time.Duration `bson:"failure_reset_time"`
+}
+
 type projectInfo struct {
 	Name            string         `bson:"name"`
 	CreatedAt       time.Time      `bson:"create_at"`
@@ -28,6 +35,7 @@ type projectInfo struct {
 	PermitDelete    bool           `bson:"permit_delete"`
 	AllowGrantTypes []string       `bson:"allow_grant_types"`
 	PasswordPolicy  passwordPolicy `bson:"password_policy"`
+	UserLock        userLock       `bson:"user_lock"`
 }
 
 type session struct {
@@ -55,6 +63,11 @@ type loginSession struct {
 	LoginDate    time.Time `bson:"login_date"`
 }
 
+type lockState struct {
+	Locked            bool        `bson:"locked"`
+	VerifyFailedTimes []time.Time `bson:"verify_failed_times"`
+}
+
 type userInfo struct {
 	ID           string    `bson:"id"`
 	ProjectName  string    `bson:"project_name"`
@@ -63,6 +76,7 @@ type userInfo struct {
 	PasswordHash string    `bson:"password_hash"`
 	SystemRoles  []string  `bson:"system_roles"`
 	CustomRoles  []string  `bson:"custom_roles"`
+	LockState    lockState `bson:"lock_state"`
 }
 
 type clientInfo struct {

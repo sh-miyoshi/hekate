@@ -39,6 +39,14 @@ type PasswordPolicy struct {
 	UseSpecialCharacter bool
 }
 
+// UserLock ...
+type UserLock struct {
+	Enabled          bool
+	MaxLoginFailure  uint
+	LockDuration     time.Duration
+	FailureResetTime time.Duration
+}
+
 // ProjectInfo ...
 type ProjectInfo struct {
 	Name            string
@@ -47,6 +55,7 @@ type ProjectInfo struct {
 	PermitDelete    bool
 	AllowGrantTypes []GrantType
 	PasswordPolicy  PasswordPolicy
+	UserLock        UserLock
 }
 
 const (
