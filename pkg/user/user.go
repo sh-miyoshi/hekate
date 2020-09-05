@@ -17,6 +17,10 @@ var (
 )
 
 func isLocked(state model.LockState, setting model.UserLock) bool {
+	if !setting.Enabled {
+		return false
+	}
+
 	if state.Locked {
 		now := time.Now()
 		last := state.VerifyFailedTimes[len(state.VerifyFailedTimes)-1]
@@ -29,6 +33,10 @@ func isLocked(state model.LockState, setting model.UserLock) bool {
 }
 
 func inclementFailedNum(state *model.LockState, setting model.UserLock) {
+	if !setting.Enabled {
+		return
+	}
+
 	now := time.Now()
 	tmp := []time.Time{}
 
@@ -79,9 +87,11 @@ func Verify(projectName string, name string, password string) (*model.UserInfo, 
 	}
 
 	// clear lock state
-	user.LockState = model.LockState{}
-	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
-		return nil, err
+	if prj.UserLock.Enabled {
+		user.LockState = model.LockState{}
+		if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+			return nil, err
+		}
 	}
 
 	return user, nil
