@@ -14,9 +14,7 @@
     - session
   - Update Project Secret Info APIの追加
 - ユーザーパスワードロック
-  - Project Infoに追加
-  - APIの修正
-    - ログインリクエスト失敗時にロックする
+  - APIの追加
     - 強制ロック解除用のAPI
   - API docの修正
 - http errorの充実
