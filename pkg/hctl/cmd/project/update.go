@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"time"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
@@ -13,6 +14,28 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/hctl/util"
 	"github.com/spf13/cobra"
 )
+
+func getData(cmd *cobra.Command, name string, prev interface{}, typ string) interface{} {
+	if !cmd.Flag(name).Changed {
+		return prev
+	}
+
+	switch typ {
+	case "string":
+		return cmd.Flag(name).Value.String()
+	case "uint":
+		v, _ := strconv.ParseUint(cmd.Flag(name).Value.String(), 10, 64)
+		return uint(v)
+	case "stringarray":
+		v, _ := cmd.Flags().GetStringArray(name)
+		return v
+	case "bool":
+		v, _ := strconv.ParseBool(cmd.Flag(name).Value.String())
+		return v
+	}
+
+	return nil
+}
 
 var updateProjectCmd = &cobra.Command{
 	Use:   "update",
@@ -49,43 +72,20 @@ var updateProjectCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			accessExpires := cmd.Flag("accessExpires")
-			if accessExpires.Changed {
-				a, _ := strconv.ParseUint(accessExpires.Value.String(), 10, 64)
-				req.TokenConfig.AccessTokenLifeSpan = uint(a)
-			} else {
-				req.TokenConfig.AccessTokenLifeSpan = prev.TokenConfig.AccessTokenLifeSpan
+			req.TokenConfig.AccessTokenLifeSpan = getData(cmd, "accessExpires", prev.TokenConfig.AccessTokenLifeSpan, "uint").(uint)
+			req.TokenConfig.RefreshTokenLifeSpan = getData(cmd, "refreshExpires", prev.TokenConfig.RefreshTokenLifeSpan, "uint").(uint)
+			req.TokenConfig.SigningAlgorithm = getData(cmd, "signAlg", prev.TokenConfig.SigningAlgorithm, "string").(string)
+			req.AllowGrantTypes = getData(cmd, "grantTypes", prev.AllowGrantTypes, "stringarray").([]string)
+			pwPols := getData(cmd, "passwordPolicies", prev.PasswordPolicy, "stringarray").([]string)
+			req.PasswordPolicy, err = util.ParsePolicies(pwPols)
+			if err != nil {
+				print.Error("Failed to parse password policy: %v", err)
+				os.Exit(1)
 			}
-			refreshExpires := cmd.Flag("refreshExpires")
-			if refreshExpires.Changed {
-				r, _ := strconv.ParseUint(refreshExpires.Value.String(), 10, 64)
-				req.TokenConfig.RefreshTokenLifeSpan = uint(r)
-			} else {
-				req.TokenConfig.RefreshTokenLifeSpan = prev.TokenConfig.RefreshTokenLifeSpan
-			}
-			signAlg := cmd.Flag("signAlg")
-			if signAlg.Changed {
-				req.TokenConfig.SigningAlgorithm = signAlg.Value.String()
-			} else {
-				req.TokenConfig.SigningAlgorithm = prev.TokenConfig.SigningAlgorithm
-			}
-			grantTypes := cmd.Flag("grantTypes")
-			if grantTypes.Changed {
-				req.AllowGrantTypes, _ = cmd.Flags().GetStringArray("grantTypes")
-			} else {
-				req.AllowGrantTypes = prev.AllowGrantTypes
-			}
-			passwordPolicies := cmd.Flag("passwordPolicies")
-			if passwordPolicies.Changed {
-				pwPols, _ := cmd.Flags().GetStringArray("passwordPolicies")
-				req.PasswordPolicy, err = util.ParsePolicies(pwPols)
-				if err != nil {
-					print.Error("Failed to parse password policy: %v", err)
-					os.Exit(1)
-				}
-			} else {
-				req.PasswordPolicy = prev.PasswordPolicy
-			}
+			req.UserLock.Enabled = getData(cmd, "userLockEnabled", prev.UserLock.Enabled, "bool").(bool)
+			req.UserLock.MaxLoginFailure = getData(cmd, "maxLoginFailure", prev.UserLock.MaxLoginFailure, "uint").(uint)
+			req.UserLock.LockDuration = getData(cmd, "lockDuration", prev.UserLock.LockDuration, "uint").(time.Duration)
+			req.UserLock.FailureResetTime = getData(cmd, "failureResetTime", prev.UserLock.FailureResetTime, "uint").(time.Duration)
 		}
 
 		if err := handler.ProjectUpdate(projectName, req); err != nil {
@@ -103,6 +103,10 @@ func init() {
 	updateProjectCmd.Flags().String("signAlg", "RS256", "token sigining algorithm, only support RS256")
 	updateProjectCmd.Flags().StringArray("grantTypes", []string{}, "allowed grant type list")
 	updateProjectCmd.Flags().StringArray("passwordPolicies", []string{}, "password policy of users, supports \"minLen=<uint>\", \"notUserName=<bool>\", \"useChar=<lower|upper|both|either>\", \"useDigit=<bool>\", \"useSpecialChar=<bool>\", \"blackLists=<string separated by semicolon(;)>\"")
+	updateProjectCmd.Flags().Bool("userLockEnabled", false, "enable user lock")
+	updateProjectCmd.Flags().Uint("maxLoginFailure", 5, "the max number of user login failure")
+	updateProjectCmd.Flags().Uint("lockDuration", 10*60, "a duration of couting login failure [sec]")
+	updateProjectCmd.Flags().Uint("failureResetTime", 10*60, "reset time of user locked [sec]")
 	updateProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
 
 	updateProjectCmd.MarkFlagRequired("name")
