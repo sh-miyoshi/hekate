@@ -37,6 +37,20 @@ func (f *ProjectInfoFormat) ToText() (string, error) {
 	res += fmt.Sprintf("Created Time:            %s\n", f.project.CreatedAt.String())
 	res += fmt.Sprintf("Access Token Life Span:  %d [sec]\n", f.project.TokenConfig.AccessTokenLifeSpan)
 	res += fmt.Sprintf("Refresh Token Life Span: %d [sec]", f.project.TokenConfig.RefreshTokenLifeSpan)
+	res += fmt.Sprintf("Token Signing Algorithm: %s\n", f.project.TokenConfig.SigningAlgorithm)
+	res += fmt.Sprintf("Allow Grant Types:       %v\n", f.project.AllowGrantTypes)
+	res += fmt.Sprintf("Password Policies:\n")
+	res += fmt.Sprintf("  Minimum Length:        %d\n", f.project.PasswordPolicy.MinimumLength)
+	res += fmt.Sprintf("  Not User Name:         %v\n", f.project.PasswordPolicy.NotUserName)
+	res += fmt.Sprintf("  Use Character:         %v\n", f.project.PasswordPolicy.UseCharacter)
+	res += fmt.Sprintf("  Use Digit:             %v\n", f.project.PasswordPolicy.UseDigit)
+	res += fmt.Sprintf("  Use Special Character: %v\n", f.project.PasswordPolicy.UseSpecialCharacter)
+	res += fmt.Sprintf("  Black List:            %v\n", f.project.PasswordPolicy.BlackList)
+	res += fmt.Sprintf("User Lock Enabled:       %v\n", f.project.UserLock.Enabled)
+	res += fmt.Sprintf("Max Login Failure:       %d\n", f.project.UserLock.MaxLoginFailure)
+	res += fmt.Sprintf("Lock Duration:           %s\n", f.project.UserLock.LockDuration.String())
+	res += fmt.Sprintf("Failure Reset Time:      %s\n", f.project.UserLock.FailureResetTime.String())
+
 	return res, nil
 }
 
