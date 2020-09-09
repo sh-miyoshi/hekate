@@ -70,9 +70,9 @@ var addProjectCmd = &cobra.Command{
 			if req.UserLock.Enabled {
 				req.UserLock.MaxLoginFailure, _ = cmd.Flags().GetUint("maxLoginFailure")
 				ld, _ := cmd.Flags().GetUint("lockDuration")
-				req.UserLock.LockDuration = time.Duration(ld)
+				req.UserLock.LockDuration = time.Duration(ld) * time.Second
 				rt, _ := cmd.Flags().GetUint("failureResetTime")
-				req.UserLock.FailureResetTime = time.Duration(rt)
+				req.UserLock.FailureResetTime = time.Duration(rt) * time.Second
 			}
 		}
 
