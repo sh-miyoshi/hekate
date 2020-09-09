@@ -31,7 +31,7 @@ cd $CLI_DIR
 go build
 
 ./hctl login --name admin --password password
-./hctl project add --name lock-test --grantTypes password --maxLoginFailure 3 --failureResetTime 10 --userLockEnabled
+./hctl project add --name lock-test --grantTypes password --maxLoginFailure 3 --lockDuration 5 --failureResetTime 10 --userLockEnabled
 ./hctl user add --project lock-test --name tester --password password
 
 #----------------------------------
@@ -42,6 +42,14 @@ test_command_failed login --project lock-test --name tester --password invalid_p
 test_command_failed login --project lock-test --name tester --password invalid_password
 test_command_failed login --project lock-test --name tester --password invalid_password
 test_command_failed login --project lock-test --name tester --password password
+
+#----------------------------------
+# Test reset failure state
+#----------------------------------
+echo "wait 11[sec] for reset failure state"
+sleep 11
+test_command_failed login --project lock-test --name tester --password invalid_password
+test_command login --project lock-test --name tester --password password
 
 #----------------------------------
 # Post-processing

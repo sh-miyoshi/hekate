@@ -54,6 +54,7 @@ func inclementFailedNum(state *model.LockState, setting model.UserLock) {
 	state.VerifyFailedTimes = append(tmp, now)
 
 	// update locked
+	state.Locked = false
 	if len(state.VerifyFailedTimes) >= int(setting.MaxLoginFailure) {
 		state.Locked = true
 	}
