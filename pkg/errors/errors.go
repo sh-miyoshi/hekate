@@ -29,6 +29,17 @@ func (e *Error) Error() string {
 	return e.publicMsg
 }
 
+// Copy ...
+func (e *Error) Copy() *Error {
+	res := Error{
+		publicMsg:        e.publicMsg,
+		httpResponseCode: e.httpResponseCode,
+		privateInfo:      append([]info{}, e.privateInfo...),
+	}
+
+	return &res
+}
+
 // GetHTTPStatusCode ...
 func (e *Error) GetHTTPStatusCode() int {
 	return e.httpResponseCode
@@ -61,16 +72,17 @@ func Append(err *Error, format string, a ...interface{}) *Error {
 		return nil
 	}
 
+	resErr := err.Copy()
 	msg := fmt.Sprintf(format, a...)
 	if msg != "" {
-		err.privateInfo = append(err.privateInfo, info{
+		resErr.privateInfo = append(resErr.privateInfo, info{
 			msg:   msg,
 			fname: fname,
 			line:  line,
 		})
 	}
 
-	return err
+	return resErr
 }
 
 // UpdatePublicMsg ...
