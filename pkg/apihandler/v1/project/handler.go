@@ -55,6 +55,12 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 				UseSpecialCharacter: prj.PasswordPolicy.UseSpecialCharacter,
 			},
 			AllowGrantTypes: grantTypes,
+			UserLock: UserLock{
+				Enabled:          prj.UserLock.Enabled,
+				MaxLoginFailure:  prj.UserLock.MaxLoginFailure,
+				LockDuration:     prj.UserLock.LockDuration,
+				FailureResetTime: prj.UserLock.FailureResetTime,
+			},
 		})
 	}
 	logger.Debug("Project List: %v", res)
@@ -111,6 +117,12 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			UseSpecialCharacter: request.PasswordPolicy.UseSpecialCharacter,
 		},
 		AllowGrantTypes: grantTypes,
+		UserLock: model.UserLock{
+			Enabled:          request.UserLock.Enabled,
+			MaxLoginFailure:  request.UserLock.MaxLoginFailure,
+			LockDuration:     request.UserLock.LockDuration,
+			FailureResetTime: request.UserLock.FailureResetTime,
+		},
 	}
 
 	// Create New Project
@@ -146,6 +158,12 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 			UseSpecialCharacter: project.PasswordPolicy.UseSpecialCharacter,
 		},
 		AllowGrantTypes: request.AllowGrantTypes,
+		UserLock: UserLock{
+			Enabled:          project.UserLock.Enabled,
+			MaxLoginFailure:  project.UserLock.MaxLoginFailure,
+			LockDuration:     project.UserLock.LockDuration,
+			FailureResetTime: project.UserLock.FailureResetTime,
+		},
 	}
 
 	jwthttp.ResponseWrite(w, "ProjectCreateHandler", &res)
@@ -224,6 +242,12 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 			UseSpecialCharacter: project.PasswordPolicy.UseSpecialCharacter,
 		},
 		AllowGrantTypes: grantTypes,
+		UserLock: UserLock{
+			Enabled:          project.UserLock.Enabled,
+			MaxLoginFailure:  project.UserLock.MaxLoginFailure,
+			LockDuration:     project.UserLock.LockDuration,
+			FailureResetTime: project.UserLock.FailureResetTime,
+		},
 	}
 
 	jwthttp.ResponseWrite(w, "ProjectGetHandler", &res)
@@ -277,6 +301,12 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		project.AllowGrantTypes = append(project.AllowGrantTypes, v)
+	}
+	project.UserLock = model.UserLock{
+		Enabled:          request.UserLock.Enabled,
+		MaxLoginFailure:  request.UserLock.MaxLoginFailure,
+		LockDuration:     request.UserLock.LockDuration,
+		FailureResetTime: request.UserLock.FailureResetTime,
 	}
 
 	// Update DB

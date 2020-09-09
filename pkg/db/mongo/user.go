@@ -66,6 +66,10 @@ func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) *errors.E
 		PasswordHash: ent.PasswordHash,
 		SystemRoles:  ent.SystemRoles,
 		CustomRoles:  ent.CustomRoles,
+		LockState: lockState{
+			Locked:            ent.LockState.Locked,
+			VerifyFailedTimes: ent.LockState.VerifyFailedTimes,
+		},
 	}
 
 	uroles := []interface{}{}
@@ -161,6 +165,10 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 			PasswordHash: user.PasswordHash,
 			SystemRoles:  user.SystemRoles,
 			CustomRoles:  user.CustomRoles,
+			LockState: model.LockState{
+				Locked:            user.LockState.Locked,
+				VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+			},
 		})
 	}
 
@@ -194,6 +202,10 @@ func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInf
 		PasswordHash: res.PasswordHash,
 		SystemRoles:  res.SystemRoles,
 		CustomRoles:  res.CustomRoles,
+		LockState: model.LockState{
+			Locked:            res.LockState.Locked,
+			VerifyFailedTimes: res.LockState.VerifyFailedTimes,
+		},
 	}, nil
 }
 
@@ -213,6 +225,10 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *error
 		PasswordHash: ent.PasswordHash,
 		SystemRoles:  ent.SystemRoles,
 		CustomRoles:  ent.CustomRoles,
+		LockState: lockState{
+			Locked:            ent.LockState.Locked,
+			VerifyFailedTimes: ent.LockState.VerifyFailedTimes,
+		},
 	}
 
 	updates := bson.D{

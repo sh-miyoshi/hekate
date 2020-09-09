@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"time"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
@@ -64,6 +65,15 @@ var addProjectCmd = &cobra.Command{
 				print.Error("Failed to parse password policy: %v", err)
 				os.Exit(1)
 			}
+
+			req.UserLock.Enabled, _ = cmd.Flags().GetBool("userLockEnabled")
+			if req.UserLock.Enabled {
+				req.UserLock.MaxLoginFailure, _ = cmd.Flags().GetUint("maxLoginFailure")
+				ld, _ := cmd.Flags().GetUint("lockDuration")
+				req.UserLock.LockDuration = time.Duration(ld) * time.Second
+				rt, _ := cmd.Flags().GetUint("failureResetTime")
+				req.UserLock.FailureResetTime = time.Duration(rt) * time.Second
+			}
 		}
 
 		c := config.Get()
@@ -85,5 +95,9 @@ func init() {
 	addProjectCmd.Flags().String("signAlg", "RS256", "token sigining algorithm, only support RS256")
 	addProjectCmd.Flags().StringArray("grantTypes", []string{}, "allowed grant type list")
 	addProjectCmd.Flags().StringArray("passwordPolicies", []string{}, "password policy of users, supports \"minLen=<uint>\", \"notUserName=<bool>\", \"useChar=<lower|upper|both|either>\", \"useDigit=<bool>\", \"useSpecialChar=<bool>\", \"blackLists=<string separated by semicolon(;)>\"")
+	addProjectCmd.Flags().Bool("userLockEnabled", false, "enable user lock")
+	addProjectCmd.Flags().Uint("maxLoginFailure", 5, "the max number of user login failure")
+	addProjectCmd.Flags().Uint("lockDuration", 10*60, "a duration of couting login failure [sec]")
+	addProjectCmd.Flags().Uint("failureResetTime", 10*60, "reset time of user locked [sec]")
 	addProjectCmd.Flags().StringP("file", "f", "", "json file name of project info")
 }

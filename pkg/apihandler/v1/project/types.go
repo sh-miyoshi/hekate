@@ -21,12 +21,21 @@ type PasswordPolicy struct {
 	UseSpecialCharacter bool     `json:"useSpecialCharacter"`
 }
 
+// UserLock ...
+type UserLock struct {
+	Enabled          bool          `json:"enabled"`
+	MaxLoginFailure  uint          `json:"maxLoginFailure"`
+	LockDuration     time.Duration `json:"lockDuration"`
+	FailureResetTime time.Duration `json:"failureResetTime"`
+}
+
 // ProjectCreateRequest ...
 type ProjectCreateRequest struct {
 	Name            string         `json:"name"`
 	TokenConfig     TokenConfig    `json:"tokenConfig"`
 	PasswordPolicy  PasswordPolicy `json:"passwordPolicy"`
 	AllowGrantTypes []string       `json:"allowGrantTypes"`
+	UserLock        UserLock       `json:"userLock"`
 }
 
 // ProjectGetResponse ...
@@ -36,6 +45,7 @@ type ProjectGetResponse struct {
 	TokenConfig     TokenConfig    `json:"tokenConfig"`
 	PasswordPolicy  PasswordPolicy `json:"passwordPolicy"`
 	AllowGrantTypes []string       `json:"allowGrantTypes"`
+	UserLock        UserLock       `json:"userLock"`
 }
 
 // ProjectPutRequest ...
@@ -43,4 +53,5 @@ type ProjectPutRequest struct {
 	TokenConfig     TokenConfig    `json:"tokenConfig"`
 	PasswordPolicy  PasswordPolicy `json:"passwordPolicy"`
 	AllowGrantTypes []string       `json:"allowGrantTypes"`
+	UserLock        UserLock       `json:"userLock"`
 }

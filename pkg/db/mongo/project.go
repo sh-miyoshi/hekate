@@ -76,6 +76,12 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) *errors.Error {
 			UseDigit:            ent.PasswordPolicy.UseDigit,
 			UseSpecialCharacter: ent.PasswordPolicy.UseSpecialCharacter,
 		},
+		UserLock: userLock{
+			Enabled:          ent.UserLock.Enabled,
+			MaxLoginFailure:  ent.UserLock.MaxLoginFailure,
+			LockDuration:     ent.UserLock.LockDuration,
+			FailureResetTime: ent.UserLock.FailureResetTime,
+		},
 	}
 	for _, t := range ent.AllowGrantTypes {
 		v.AllowGrantTypes = append(v.AllowGrantTypes, t.String())
@@ -149,6 +155,12 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, *errors.Error) {
 				UseDigit:            prj.PasswordPolicy.UseDigit,
 				UseSpecialCharacter: prj.PasswordPolicy.UseSpecialCharacter,
 			},
+			UserLock: model.UserLock{
+				Enabled:          prj.UserLock.Enabled,
+				MaxLoginFailure:  prj.UserLock.MaxLoginFailure,
+				LockDuration:     prj.UserLock.LockDuration,
+				FailureResetTime: prj.UserLock.FailureResetTime,
+			},
 		}
 		for _, t := range prj.AllowGrantTypes {
 			typ, _ := model.GetGrantType(t)
@@ -198,6 +210,12 @@ func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, *errors.Error
 			UseDigit:            project.PasswordPolicy.UseDigit,
 			UseSpecialCharacter: project.PasswordPolicy.UseSpecialCharacter,
 		},
+		UserLock: model.UserLock{
+			Enabled:          project.UserLock.Enabled,
+			MaxLoginFailure:  project.UserLock.MaxLoginFailure,
+			LockDuration:     project.UserLock.LockDuration,
+			FailureResetTime: project.UserLock.FailureResetTime,
+		},
 	}
 	for _, t := range project.AllowGrantTypes {
 		typ, _ := model.GetGrantType(t)
@@ -232,6 +250,12 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) *errors.Error {
 			UseCharacter:        string(ent.PasswordPolicy.UseCharacter),
 			UseDigit:            ent.PasswordPolicy.UseDigit,
 			UseSpecialCharacter: ent.PasswordPolicy.UseSpecialCharacter,
+		},
+		UserLock: userLock{
+			Enabled:          ent.UserLock.Enabled,
+			MaxLoginFailure:  ent.UserLock.MaxLoginFailure,
+			LockDuration:     ent.UserLock.LockDuration,
+			FailureResetTime: ent.UserLock.FailureResetTime,
 		},
 	}
 	for _, t := range ent.AllowGrantTypes {

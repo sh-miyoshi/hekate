@@ -15,6 +15,14 @@ func TestVerify(t *testing.T) {
 
 	// Initialize test DB
 	db.InitDBManager("memory", "")
+	db.GetInst().ProjectAdd(&model.ProjectInfo{
+		Name: "master",
+		TokenConfig: &model.TokenConfig{
+			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresTimeSec,
+			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresTimeSec,
+			SigningAlgorithm:     "RS256",
+		},
+	})
 	db.GetInst().UserAdd("master", &model.UserInfo{
 		ID:           uuid.New().String(),
 		ProjectName:  "master",

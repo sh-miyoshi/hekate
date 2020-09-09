@@ -316,7 +316,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	passwd := r.Form.Get("password")
 	usr, err := user.Verify(projectName, uname, passwd)
 	if err != nil {
-		if errors.Contains(err, user.ErrAuthFailed) {
+		if errors.Contains(err, user.ErrAuthFailed) || errors.Contains(err, user.ErrUserLocked) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate user %s", uname))
 
 			// delete old session and create new code for relogin

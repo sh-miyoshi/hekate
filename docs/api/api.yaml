@@ -1046,6 +1046,8 @@ components:
           type: array
           items:
             type: string
+        userLock:
+          $ref: '#/components/schemas/UserLock'
     ProjectGetResponse:
       type: object
       properties:
@@ -1062,6 +1064,8 @@ components:
           type: array
           items:
             type: string
+        userLock:
+          $ref: '#/components/schemas/UserLock'
     ProjectPutRequest:
       type: object
       properties:
@@ -1073,6 +1077,8 @@ components:
           type: array
           items:
             type: string
+        userLock:
+          $ref: '#/components/schemas/UserLock'
     TokenConfig:
       type: object
       properties:
@@ -1099,6 +1105,19 @@ components:
           type: boolean
         useSpecialCharacter:
           type: boolean
+    UserLock:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        maxLoginFailure:
+          type: integer
+        lockDuration:
+          type: string
+          format: date
+        failureResetTime:
+          type: string
+          format: date
     UserCreateRequest:
       type: object
       properties:
@@ -1144,6 +1163,8 @@ components:
                 type: string
               name:
                 type: string
+        lockState:
+          $ref: '#/components/schemas/LockState'
     UserPutRequest:
       type: object
       properties:
@@ -1164,6 +1185,16 @@ components:
       properties:
         password:
           type: string
+    LockState:
+      type: object
+      properties:
+        locked:
+          type: boolean
+        veriftFailedTimes:
+          type: array
+          items:
+            type: string
+            format: date
     ClientCreateRequest:
       type: object
       properties:

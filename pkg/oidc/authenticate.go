@@ -45,8 +45,9 @@ func ClientAuth(projectName string, clientID string, clientSecret string) *error
 func ReqAuthByPassword(project *model.ProjectInfo, userName string, password string, r *http.Request) (*TokenResponse, *errors.Error) {
 	usr, err := user.Verify(project.Name, userName, password)
 	if err != nil {
-		if errors.Contains(err, user.ErrAuthFailed) {
-			return nil, errors.Append(errors.ErrRequestUnauthorized, "user authentication failed")
+		// TODO(locked)
+		if errors.Contains(err, user.ErrAuthFailed) || errors.Contains(err, user.ErrUserLocked) {
+			return nil, errors.Append(errors.ErrRequestUnauthorized, err.Error())
 		}
 		return nil, err
 	}

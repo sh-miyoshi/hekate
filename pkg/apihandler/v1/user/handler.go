@@ -78,6 +78,10 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 			CreatedAt:   user.CreatedAt.String(),
 			SystemRoles: user.SystemRoles,
 			CustomRoles: roles,
+			LockState: LockState{
+				Locked:            user.LockState.Locked,
+				VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+			},
 		}
 		sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
 		if err != nil {
@@ -180,6 +184,10 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:   user.CreatedAt.String(),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
+		LockState: LockState{
+			Locked:            user.LockState.Locked,
+			VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+		},
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
@@ -275,6 +283,10 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:   user.CreatedAt.String(),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
+		LockState: LockState{
+			Locked:            user.LockState.Locked,
+			VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+		},
 	}
 
 	sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
