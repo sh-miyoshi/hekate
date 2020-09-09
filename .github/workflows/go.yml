@@ -60,3 +60,9 @@ jobs:
         cd test
         chmod 755 rbac_test.sh
         ./rbac_test.sh
+    
+    - name: User Lock Test
+        run: |
+          cd test
+          chmod 755 user_lock_test.sh
+          ./user_lock_test.sh
