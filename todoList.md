@@ -17,8 +17,6 @@
   - APIの追加
     - 強制ロック解除用のAPI
   - API docの修正
-  - testの追加
-    - ロック後一定時間で解除されるか(解除後1回失敗してから成功してみる)
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - http.Error関数の置き換え
