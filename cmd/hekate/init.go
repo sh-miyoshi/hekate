@@ -144,6 +144,12 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 			model.GrantTypeRefreshToken,
 			model.GrantTypePassword, // TODO(for debug)
 		},
+		UserLock: model.UserLock{
+			Enabled:          false,
+			MaxLoginFailure:  model.DefaultMaxLoginFailure,
+			LockDuration:     model.DefaultLockDuration,
+			FailureResetTime: model.DefaultFailureResetTime,
+		},
 	})
 	if err != nil {
 		if errors.Contains(err, model.ErrProjectAlreadyExists) {
