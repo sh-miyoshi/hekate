@@ -64,6 +64,15 @@ const (
 
 	// DefaultRefreshTokenExpiresTimeSec is default expires time for refresh token(14 days)
 	DefaultRefreshTokenExpiresTimeSec = 14 * 24 * 60 * 60
+
+	// DefaultMaxLoginFailure ...
+	DefaultMaxLoginFailure = 5
+
+	// DefaultLockDuration ...
+	DefaultLockDuration = time.Duration(10) * time.Minute
+
+	// DefaultFailureResetTime ...
+	DefaultFailureResetTime = time.Duration(10) * time.Minute
 )
 
 var (
