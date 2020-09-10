@@ -48,8 +48,8 @@ func (f *ProjectInfoFormat) ToText() (string, error) {
 	res += fmt.Sprintf("  Black List:            %v\n", f.project.PasswordPolicy.BlackList)
 	res += fmt.Sprintf("User Lock Enabled:       %v\n", f.project.UserLock.Enabled)
 	res += fmt.Sprintf("Max Login Failure:       %d\n", f.project.UserLock.MaxLoginFailure)
-	res += fmt.Sprintf("Lock Duration:           %s\n", f.project.UserLock.LockDuration.String())
-	res += fmt.Sprintf("Failure Reset Time:      %s\n", f.project.UserLock.FailureResetTime.String())
+	res += fmt.Sprintf("Lock Duration:           %d [sec]\n", f.project.UserLock.LockDuration)
+	res += fmt.Sprintf("Failure Reset Time:      %d [sec]\n", f.project.UserLock.FailureResetTime)
 
 	return res, nil
 }

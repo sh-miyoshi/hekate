@@ -23,10 +23,10 @@ type PasswordPolicy struct {
 
 // UserLock ...
 type UserLock struct {
-	Enabled          bool          `json:"enabled"`
-	MaxLoginFailure  uint          `json:"maxLoginFailure"`
-	LockDuration     time.Duration `json:"lockDuration"`
-	FailureResetTime time.Duration `json:"failureResetTime"`
+	Enabled          bool `json:"enabled"`
+	MaxLoginFailure  uint `json:"maxLoginFailure"`
+	LockDuration     uint `json:"lockDuration"`
+	FailureResetTime uint `json:"failureResetTime"`
 }
 
 // ProjectCreateRequest ...

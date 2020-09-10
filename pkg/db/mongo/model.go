@@ -22,10 +22,10 @@ type passwordPolicy struct {
 }
 
 type userLock struct {
-	Enabled          bool          `bson:"enabled"`
-	MaxLoginFailure  uint          `bson:"max_login_failure"`
-	LockDuration     time.Duration `bson:"lock_duration"`
-	FailureResetTime time.Duration `bson:"failure_reset_time"`
+	Enabled          bool `bson:"enabled"`
+	MaxLoginFailure  uint `bson:"max_login_failure"`
+	LockDuration     uint `bson:"lock_duration"`
+	FailureResetTime uint `bson:"failure_reset_time"`
 }
 
 type projectInfo struct {

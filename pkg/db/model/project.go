@@ -43,8 +43,8 @@ type PasswordPolicy struct {
 type UserLock struct {
 	Enabled          bool
 	MaxLoginFailure  uint
-	LockDuration     time.Duration
-	FailureResetTime time.Duration
+	LockDuration     uint
+	FailureResetTime uint
 }
 
 // ProjectInfo ...
@@ -68,11 +68,11 @@ const (
 	// DefaultMaxLoginFailure ...
 	DefaultMaxLoginFailure = 5
 
-	// DefaultLockDuration ...
-	DefaultLockDuration = time.Duration(10) * time.Minute
+	// DefaultLockDuration is default lock duration(10 minutes)
+	DefaultLockDuration = 10 * 60
 
-	// DefaultFailureResetTime ...
-	DefaultFailureResetTime = time.Duration(10) * time.Minute
+	// DefaultFailureResetTime is default reset time of login failure(10 minutes)
+	DefaultFailureResetTime = 10 * 60
 )
 
 var (

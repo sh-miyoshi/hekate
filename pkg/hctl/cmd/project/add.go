@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"time"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
@@ -69,10 +68,8 @@ var addProjectCmd = &cobra.Command{
 			req.UserLock.Enabled, _ = cmd.Flags().GetBool("userLockEnabled")
 			if req.UserLock.Enabled {
 				req.UserLock.MaxLoginFailure, _ = cmd.Flags().GetUint("maxLoginFailure")
-				ld, _ := cmd.Flags().GetUint("lockDuration")
-				req.UserLock.LockDuration = time.Duration(ld) * time.Second
-				rt, _ := cmd.Flags().GetUint("failureResetTime")
-				req.UserLock.FailureResetTime = time.Duration(rt) * time.Second
+				req.UserLock.LockDuration, _ = cmd.Flags().GetUint("lockDuration")
+				req.UserLock.FailureResetTime, _ = cmd.Flags().GetUint("failureResetTime")
 			}
 		}
 

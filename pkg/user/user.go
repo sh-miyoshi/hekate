@@ -26,7 +26,7 @@ func isLocked(state model.LockState, setting model.UserLock) bool {
 		now := time.Now()
 		last := state.VerifyFailedTimes[len(state.VerifyFailedTimes)-1]
 		// If it's not yet time to unlock, return locked
-		if now.Before(last.Add(setting.FailureResetTime)) {
+		if now.Before(last.Add(time.Duration(setting.FailureResetTime) * time.Second)) {
 			return true
 		}
 	}
@@ -43,7 +43,7 @@ func inclementFailedNum(state *model.LockState, setting model.UserLock) {
 	tmp := []time.Time{}
 
 	// remove too old data
-	old := now.Add(-setting.LockDuration)
+	old := now.Add(-time.Duration(setting.LockDuration) * time.Second)
 	for _, t := range state.VerifyFailedTimes {
 		if t.After(old) {
 			tmp = append(tmp, t)

@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
-	"time"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
@@ -32,9 +31,6 @@ func getData(cmd *cobra.Command, name string, prev interface{}, typ string) inte
 	case "bool":
 		v, _ := strconv.ParseBool(cmd.Flag(name).Value.String())
 		return v
-	case "time":
-		v, _ := strconv.ParseUint(cmd.Flag(name).Value.String(), 10, 64)
-		return time.Duration(v) * time.Second
 	}
 
 	return nil
@@ -87,8 +83,8 @@ var updateProjectCmd = &cobra.Command{
 			}
 			req.UserLock.Enabled = getData(cmd, "userLockEnabled", prev.UserLock.Enabled, "bool").(bool)
 			req.UserLock.MaxLoginFailure = getData(cmd, "maxLoginFailure", prev.UserLock.MaxLoginFailure, "uint").(uint)
-			req.UserLock.LockDuration = getData(cmd, "lockDuration", prev.UserLock.LockDuration, "time").(time.Duration)
-			req.UserLock.FailureResetTime = getData(cmd, "failureResetTime", prev.UserLock.FailureResetTime, "time").(time.Duration)
+			req.UserLock.LockDuration = getData(cmd, "lockDuration", prev.UserLock.LockDuration, "uint").(uint)
+			req.UserLock.FailureResetTime = getData(cmd, "failureResetTime", prev.UserLock.FailureResetTime, "uint").(uint)
 		}
 
 		if err := handler.ProjectUpdate(projectName, req); err != nil {
