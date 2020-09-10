@@ -130,9 +130,9 @@
                 class="c-switch c-switch-label c-switch-pill c-switch-primary"
               >
                 <input
+                  v-model="passwordPolicy.notUserName"
                   class="c-switch-input"
                   type="checkbox"
-                  :checked="passwordPolicy.notUserName"
                 />
                 <span
                   class="c-switch-slider"
@@ -234,6 +234,98 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <button
+          class="btn btn-link dropdown-toggle h5 ml-n3"
+          @click="showUserLock = !showUserLock"
+        >
+          User Lock Setting
+        </button>
+        <div v-if="showUserLock" class="card-body">
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Enabled
+            </label>
+            <div class="col-sm-3">
+              <label
+                class="c-switch c-switch-label c-switch-pill c-switch-primary"
+              >
+                <input
+                  v-model="userLock.enabled"
+                  class="c-switch-input"
+                  type="checkbox"
+                />
+                <span
+                  class="c-switch-slider"
+                  data-checked="On"
+                  data-unchecked="Off"
+                ></span>
+              </label>
+            </div>
+          </div>
+          <div v-if="userLock.enabled">
+            <div class="form-group row">
+              <label class="col-sm-4 control-label">
+                Max Login Failure
+              </label>
+              <div class="col-sm-3">
+                <input
+                  v-model.number="userLock.maxLoginFailure"
+                  type="number"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-4 control-label">
+                Lock Duration
+              </label>
+              <div class="col-sm-3">
+                <input
+                  v-model.number="userLock.lockDuration"
+                  type="number"
+                  class="form-control"
+                />
+              </div>
+              <div class="col-sm-2">
+                <select
+                  v-model="userLock.lockDurationUnit"
+                  name="lockDurationUnit"
+                  class="form-control"
+                >
+                  <option v-for="unit in units" :key="unit" :value="unit">
+                    {{ unit }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-4 control-label">
+                Failure Reset Time
+              </label>
+              <div class="col-sm-3">
+                <input
+                  v-model.number="userLock.failureResetTime"
+                  type="number"
+                  class="form-control"
+                />
+              </div>
+              <div class="col-sm-2">
+                <select
+                  v-model="userLock.failureResetTimeUnit"
+                  name="failureResetTimeUnit"
+                  class="form-control"
+                >
+                  <option v-for="unit in units" :key="unit" :value="unit">
+                    {{ unit }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group row">
         <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
           Allow Grant Types
@@ -297,6 +389,15 @@ export default {
           digit: { name: 'Digits', checked: false },
           special: { name: 'Special Characters', checked: false }
         }
+      },
+      showUserLock: true,
+      userLock: {
+        enabled: false,
+        maxLoginFailure: 0,
+        lockDuration: 0,
+        lockDurationUnit: 'sec',
+        failureResetTime: 0,
+        failureResetTimeUnit: 'sec'
       },
       grantTypes: [
         {
@@ -372,7 +473,19 @@ export default {
           useDigit: this.passwordPolicy.includes.digit.checked,
           useSpecialCharacter: this.passwordPolicy.includes.special.checked
         },
-        allowGrantTypes: grantTypes
+        allowGrantTypes: grantTypes,
+        userLock: {
+          enabled: this.userLock.enabled,
+          maxLoginFailure: this.userLock.maxLoginFailure,
+          lockDuration: this.getSpan(
+            this.userLock.lockDuration,
+            this.userLock.lockDurationUnit
+          ),
+          failureResetTime: this.getSpan(
+            this.userLock.failureResetTime,
+            this.userLock.failureResetTimeUnit
+          )
+        }
       }
       console.log(data)
 
@@ -434,6 +547,16 @@ export default {
           }
         }
       }
+
+      // set user lock setting
+      this.userLock.enabled = res.data.userLock.enabled
+      this.userLock.maxLoginFailure = res.data.userLock.maxLoginFailure
+      t = this.setUnit(res.data.userLock.lockDuration)
+      this.userLock.lockDuration = t.span
+      this.userLock.lockDurationUnit = t.unit
+      t = this.setUnit(res.data.userLock.failureResetTime)
+      this.userLock.failureResetTime = t.span
+      this.userLock.failureResetTimeUnit = t.unit
     },
     setUnit(span) {
       let unit = 'sec'
