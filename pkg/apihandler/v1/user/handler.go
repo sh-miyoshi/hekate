@@ -253,9 +253,6 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrUserValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "Invalid user ID format"))
-			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed toget user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -331,7 +328,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Contains(err, model.ErrNoSuchProject) {
 			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
+		} else if errors.Contains(err, model.ErrNoSuchUser) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
@@ -402,6 +399,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("UserID %s is invalid id format", userID)
 				http.Error(w, "User Not Found", http.StatusNotFound)
 			} else {
+				// Includes role not found
 				errors.PrintAsInfo(errors.Append(err, "Invalid role was specified"))
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
@@ -412,7 +410,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
 	logger.Info("UserRoleAddHandler method successfully finished")
 }
 
@@ -457,7 +455,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
 	logger.Info("UserRoleDeleteHandler method successfully finished")
 }
 
@@ -484,7 +482,10 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().UserChangePassword(projectName, userID, req.Password); err != nil {
-		if errors.Contains(err, model.ErrNoSuchUser) {
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {

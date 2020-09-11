@@ -560,7 +560,7 @@ paths:
         '400':
           description: 'Bad Request'
         '404':
-          description: 'User or Project or Role Not Found'
+          description: 'User or Project Not Found'
         '409':
           description: 'Role Already Appended'
         '403':
@@ -651,7 +651,7 @@ paths:
         '204':
           description: 'Success'
         '404':
-          description: 'Project or User Not Found'
+          description: 'User Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -1142,8 +1142,6 @@ components:
         id:
           type: string
         name:
-          type: string
-        passwordHash:
           type: string
         createdAt:
           type: string
