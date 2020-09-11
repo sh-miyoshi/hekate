@@ -69,12 +69,14 @@
   - Project名を表示
 - LDAP連携？
 - http headerの追加
+- user password変更ページの追加
 
 ## Portal(Admin Console) enhancement
 
 - 各ページの作成
   - User
     - Login Sessionの表示
+    - force password reset
 - validationの追加
   - portal側でリクエストを出す前にはじく
 - user role更新時のvalidation
@@ -90,7 +92,8 @@
 - headerにユーザー名を表示
 - audit eventの表示
 - user lock状態の表示
-- lock settingの追加
+- black listに登録されているパスワードでユーザーを作成する際のエラーを修正
+  - 現在はBad Requestと表示される
 
 ## CLI tool(hctl) enhancement
 
