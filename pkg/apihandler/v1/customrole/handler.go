@@ -38,7 +38,7 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	roles, err := db.GetInst().CustomRoleGetList(projectName, filter)
 	if err != nil {
-		if errors.Contains(err, model.ErrCustomRoleValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchProject) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get role list"))
 			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else {
@@ -103,7 +103,10 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().CustomRoleAdd(projectName, &role); err != nil {
-		if errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Custom Role %s is already exists", role.Name))
 			http.Error(w, "Custom Role already exists", http.StatusConflict)
 		} else if errors.Contains(err, model.ErrCustomRoleValidateFailed) {
@@ -154,7 +157,10 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().CustomRoleDelete(projectName, roleID); err != nil {
-		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", roleID))
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {
@@ -185,7 +191,10 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	role, err := db.GetInst().CustomRoleGet(projectName, roleID)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", roleID))
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {
@@ -241,7 +250,10 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous CustomRole Info
 	role, err := db.GetInst().CustomRoleGet(projectName, roleID)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
+			http.Error(w, "Project Not Found", http.StatusNotFound)
+		} else if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", request.Name))
 			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
 		} else {

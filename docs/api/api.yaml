@@ -854,8 +854,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CustomRoleGetResponse'
-        '400':
-          description: 'Bad Request'
         '404':
           description: 'Project Not Found'
         '403':
@@ -1244,6 +1242,8 @@ components:
         id:
           type: string
         name:
+          type: string
+        projectName:
           type: string
         created_at:
           type: string
