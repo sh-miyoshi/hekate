@@ -7,11 +7,6 @@
 ## server application enhancement
 
 - APIの修正
-  - docsの修正
-    - user
-    - client
-    - role
-    - session
   - Update Project Secret Info APIの追加
 - ユーザーパスワードロック
   - APIの追加
