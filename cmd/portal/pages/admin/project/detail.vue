@@ -146,7 +146,40 @@
             <label class="col-sm-4 control-label">
               BlackList
             </label>
-            <div class="col-sm-3">value</div>
+            <div class="col-sm-5">
+              <div
+                v-for="(value, index) in passwordPolicy.blackList"
+                :key="index"
+              >
+                <div class="mb-1 input-group">
+                  <input
+                    v-model="passwordPolicy.blackList[index]"
+                    class="form-control"
+                    type="text"
+                  />
+                  <div class="input-group-append">
+                    <span
+                      class="input-group-text icon"
+                      @click="removeBlackList(index)"
+                    >
+                      <i class="fa fa-trash"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-1 input-group">
+                <input
+                  v-model="newBlackList"
+                  class="form-control"
+                  type="text"
+                />
+                <div class="input-group-append" @click="appendBlackList">
+                  <span class="input-group-text icon">
+                    +
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="form-group row">
             <label class="col-sm-4 control-label">
@@ -367,6 +400,7 @@ export default {
       algs: ['RS256'],
       error: '',
       showTokenConfig: true,
+      newBlackList: '',
       tokenConfig: {
         accessTokenLifeSpan: 0,
         accessTokenUnit: 'sec',
@@ -628,6 +662,17 @@ export default {
       }
 
       return res
+    },
+    removeBlackList(index) {
+      this.passwordPolicy.blackList.splice(index, 1)
+    },
+    appendBlackList() {
+      if (!this.passwordPolicy.blackList) {
+        this.passwordPolicy.blackList = [this.newBlackList]
+      } else {
+        this.passwordPolicy.blackList.push(this.newBlackList)
+      }
+      this.newBlackList = ''
     }
   }
 }
