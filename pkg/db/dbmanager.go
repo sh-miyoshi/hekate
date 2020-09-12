@@ -594,6 +594,10 @@ func (m *Manager) ClientAdd(projectName string, ent *model.ClientInfo) *errors.E
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		if _, err := m.project.Get(projectName); err != nil {
+			return errors.Append(err, "Failed to get project info")
+		}
+
 		clis, err := m.client.GetList(ent.ProjectName, &model.ClientFilter{ID: ent.ID})
 		if err != nil {
 			return errors.Append(err, "Failed to get current client list")

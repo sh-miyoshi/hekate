@@ -708,8 +708,6 @@ paths:
                 type: array
                 items:
                   type: string
-        '404':
-          description: 'Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -738,7 +736,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClientGetResponse'
         '404':
-          description: 'Client or Project Not Found'
+          description: 'Client Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -769,7 +767,7 @@ paths:
         '400':
           description: 'Bad Request'
         '404':
-          description: 'Client or Project Not Found'
+          description: 'Client Not Found'
         '403':
           description: 'Forbidden'
         '500':
