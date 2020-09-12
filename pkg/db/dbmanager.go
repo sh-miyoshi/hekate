@@ -694,6 +694,10 @@ func (m *Manager) CustomRoleAdd(projectName string, ent *model.CustomRole) *erro
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		if _, err := m.project.Get(projectName); err != nil {
+			return errors.Append(err, "Failed to get project info")
+		}
+
 		roles, err := m.customRole.GetList(projectName, &model.CustomRoleFilter{
 			ID:   ent.ID,
 			Name: ent.Name,

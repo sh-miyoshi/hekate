@@ -852,8 +852,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CustomRoleGetResponse'
-        '404':
-          description: 'Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -882,7 +880,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomRoleGetResponse'
         '404':
-          description: 'Role or Project Not Found'
+          description: 'Role Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -913,7 +911,7 @@ paths:
         '400':
           description: 'Bad Request'
         '404':
-          description: 'Role or Project Not Found'
+          description: 'Role Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -937,7 +935,7 @@ paths:
         '204':
           description: 'Deleted'
         '404':
-          description: 'Role or Project Not Found'
+          description: 'Role Not Found'
         '403':
           description: 'Forbidden'
         '500':
