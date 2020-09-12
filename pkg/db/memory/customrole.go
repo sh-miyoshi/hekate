@@ -33,7 +33,7 @@ func (h *CustomRoleHandler) Delete(projectName string, roleID string) *errors.Er
 			return nil
 		}
 	}
-	return model.ErrNoSuchCustomRole
+	return errors.New("Internal Error", "No such custom role %s", roleID)
 }
 
 // GetList ...
@@ -57,7 +57,7 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.CustomRole, *errors.Error) {
 	res, exists := h.roleList[roleID]
 	if !exists || res.ProjectName != projectName {
-		return nil, model.ErrNoSuchCustomRole
+		return nil, errors.New("Internal Error", "No such custom role %s", roleID)
 	}
 
 	return res, nil
@@ -66,7 +66,7 @@ func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.Custo
 // Update ...
 func (h *CustomRoleHandler) Update(projectName string, ent *model.CustomRole) *errors.Error {
 	if res, exists := h.roleList[ent.ID]; !exists || res.ProjectName != projectName {
-		return model.ErrNoSuchCustomRole
+		return errors.New("Internal Error", "No such custom role %s", ent.ID)
 	}
 
 	h.roleList[ent.ID] = ent
@@ -95,7 +95,12 @@ func filterRoleList(data []*model.CustomRole, filter *model.CustomRoleFilter) []
 			// missmatch name
 			continue
 		}
-		// TODO(add other filter)
+
+		if filter.ID != "" && role.ID != filter.ID {
+			// missmatch id
+			continue
+		}
+
 		res = append(res, role)
 	}
 

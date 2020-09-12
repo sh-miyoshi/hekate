@@ -108,6 +108,9 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 		if filter.Name != "" {
 			f = append(f, bson.E{Key: "name", Value: filter.Name})
 		}
+		if filter.ID != "" {
+			f = append(f, bson.E{Key: "id", Value: filter.ID})
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -134,33 +137,6 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 	}
 
 	return res, nil
-}
-
-// Get ...
-func (h *CustomRoleHandler) Get(projectName string, roleID string) (*model.CustomRole, *errors.Error) {
-	col := h.dbClient.Database(databaseName).Collection(roleCollectionName)
-	filter := bson.D{
-		{Key: "project_name", Value: projectName},
-		{Key: "id", Value: roleID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	res := &customRole{}
-	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchCustomRole
-		}
-		return nil, errors.New("DB failed", "Failed to get role from mongodb: %v", err)
-	}
-
-	return &model.CustomRole{
-		ID:          res.ID,
-		ProjectName: res.ProjectName,
-		CreatedAt:   res.CreatedAt,
-		Name:        res.Name,
-	}, nil
 }
 
 // Update ...

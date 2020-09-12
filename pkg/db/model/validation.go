@@ -81,6 +81,11 @@ func ValidateSessionID(id string) bool {
 	return govalidator.IsUUID(id)
 }
 
+// ValidateCustomRoleID ...
+func ValidateCustomRoleID(id string) bool {
+	return govalidator.IsUUID(id)
+}
+
 // ValidateCustomRoleName ...
 func ValidateCustomRoleName(name string) bool {
 	if !(3 <= len(name) && len(name) < 64) {

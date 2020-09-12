@@ -259,11 +259,12 @@ func (m *Manager) UserAdd(projectName string, ent *model.UserInfo) *errors.Error
 
 	return m.transaction.Transaction(func() *errors.Error {
 		for _, r := range ent.CustomRoles {
-			if _, err := m.customRole.Get(projectName, r); err != nil {
-				if errors.Contains(err, model.ErrNoSuchCustomRole) {
-					return errors.Append(model.ErrUserValidateFailed, "Invalid custom role")
-				}
+			roles, err := m.customRole.GetList(projectName, &model.CustomRoleFilter{ID: r})
+			if err != nil {
 				return errors.Append(err, "Custom role get error")
+			}
+			if len(roles) == 0 {
+				return errors.Append(model.ErrUserValidateFailed, "No such custom role")
 			}
 		}
 
@@ -350,11 +351,12 @@ func (m *Manager) UserUpdate(projectName string, ent *model.UserInfo) *errors.Er
 
 	return m.transaction.Transaction(func() *errors.Error {
 		for _, r := range ent.CustomRoles {
-			if _, err := m.customRole.Get(projectName, r); err != nil {
-				if errors.Contains(err, model.ErrNoSuchCustomRole) {
-					return errors.Append(model.ErrUserValidateFailed, "Invalid custom role")
-				}
+			roles, err := m.customRole.GetList(projectName, &model.CustomRoleFilter{ID: r})
+			if err != nil {
 				return errors.Append(err, "Custom role get error")
+			}
+			if len(roles) == 0 {
+				return errors.Append(model.ErrUserValidateFailed, "No such custom role")
 			}
 		}
 
@@ -406,11 +408,12 @@ func (m *Manager) UserAddRole(projectName string, userID string, roleType model.
 				}
 			}
 		} else if roleType == model.RoleCustom {
-			if _, err := m.customRole.Get(projectName, roleID); err != nil {
-				if errors.Contains(err, model.ErrNoSuchCustomRole) {
-					return errors.Append(model.ErrUserValidateFailed, "Invalid custom role")
-				}
+			roles, err := m.customRole.GetList(projectName, &model.CustomRoleFilter{ID: roleID})
+			if err != nil {
 				return errors.Append(err, "Custom role get error")
+			}
+			if len(roles) == 0 {
+				return errors.Append(model.ErrUserValidateFailed, "No such custom role")
 			}
 		}
 
@@ -690,15 +693,16 @@ func (m *Manager) CustomRoleAdd(projectName string, ent *model.CustomRole) *erro
 		return errors.Append(err, "Failed to validate entry")
 	}
 
-	// TODO(validate name uniquness in project)
-
 	return m.transaction.Transaction(func() *errors.Error {
-		_, err := m.customRole.Get(projectName, ent.ID)
-		if err != model.ErrNoSuchCustomRole {
-			if err == nil {
-				return model.ErrCustomRoleAlreadyExists
-			}
-			return errors.Append(err, "Failed to get customRole info")
+		roles, err := m.customRole.GetList(projectName, &model.CustomRoleFilter{
+			ID:   ent.ID,
+			Name: ent.Name,
+		})
+		if err != nil {
+			return errors.Append(err, "Failed to get current custom role list")
+		}
+		if len(roles) != 0 {
+			return model.ErrCustomRoleAlreadyExists
 		}
 
 		if err := m.customRole.Add(projectName, ent); err != nil {
@@ -710,9 +714,19 @@ func (m *Manager) CustomRoleAdd(projectName string, ent *model.CustomRole) *erro
 
 // CustomRoleDelete ...
 func (m *Manager) CustomRoleDelete(projectName string, customRoleID string) *errors.Error {
-	// TODO(validate customRoleID)
+	if !model.ValidateCustomRoleID(customRoleID) {
+		return model.ErrCustomRoleValidateFailed
+	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		roles, err := m.customRole.GetList(projectName, &model.CustomRoleFilter{ID: customRoleID})
+		if err != nil {
+			return errors.Append(err, "Failed to get current custom role list")
+		}
+		if len(roles) != 0 {
+			return model.ErrCustomRoleAlreadyExists
+		}
+
 		if err := m.user.DeleteAllCustomRole(projectName, customRoleID); err != nil {
 			return errors.Append(err, "Failed to delete custom role from user")
 		}
@@ -726,13 +740,28 @@ func (m *Manager) CustomRoleDelete(projectName string, customRoleID string) *err
 
 // CustomRoleGetList ...
 func (m *Manager) CustomRoleGetList(projectName string, filter *model.CustomRoleFilter) ([]*model.CustomRole, *errors.Error) {
+	if filter != nil {
+		if filter.ID != "" && !model.ValidateCustomRoleID(filter.ID) {
+			return nil, errors.Append(model.ErrCustomRoleValidateFailed, "Invalid role id format")
+		}
+		if filter.Name != "" && !model.ValidateCustomRoleName(filter.Name) {
+			return nil, errors.Append(model.ErrCustomRoleValidateFailed, "Invalid role name format")
+		}
+	}
 	return m.customRole.GetList(projectName, filter)
 }
 
 // CustomRoleGet ...
 func (m *Manager) CustomRoleGet(projectName string, customRoleID string) (*model.CustomRole, *errors.Error) {
-	// TODO(validate customRoleID)
-	return m.customRole.Get(projectName, customRoleID)
+	roles, err := m.CustomRoleGetList(projectName, &model.CustomRoleFilter{ID: customRoleID})
+	if err != nil {
+		return nil, err
+	}
+	if len(roles) == 0 {
+		return nil, errors.Append(model.ErrNoSuchCustomRole, "Failed to get role")
+	}
+
+	return roles[0], nil
 }
 
 // CustomRoleUpdate ...
@@ -742,9 +771,18 @@ func (m *Manager) CustomRoleUpdate(projectName string, ent *model.CustomRole) *e
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		r, err := m.customRole.GetList(ent.ProjectName, &model.CustomRoleFilter{Name: ent.Name})
+		r, err := m.customRole.GetList(ent.ProjectName, &model.CustomRoleFilter{ID: ent.ID})
 		if err != nil {
-			return errors.Append(err, "Failed to get role list")
+			return errors.Append(err, "Failed to get current role list by ID")
+		}
+
+		if len(r) == 0 {
+			return model.ErrNoSuchCustomRole
+		}
+
+		r, err = m.customRole.GetList(ent.ProjectName, &model.CustomRoleFilter{Name: ent.Name})
+		if err != nil {
+			return errors.Append(err, "Failed to get current role list by Name")
 		}
 
 		// check name uniquness in project

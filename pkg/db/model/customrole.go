@@ -16,6 +16,7 @@ type CustomRole struct {
 
 // CustomRoleFilter ...
 type CustomRoleFilter struct {
+	ID   string
 	Name string
 }
 
@@ -34,7 +35,6 @@ var (
 type CustomRoleHandler interface {
 	Add(projectName string, ent *CustomRole) *errors.Error
 	Delete(projectName string, roleID string) *errors.Error
-	Get(projectName string, roleID string) (*CustomRole, *errors.Error)
 	GetList(projectName string, filter *CustomRoleFilter) ([]*CustomRole, *errors.Error)
 	Update(projectName string, ent *CustomRole) *errors.Error
 	DeleteAll(projectName string) *errors.Error
@@ -42,6 +42,10 @@ type CustomRoleHandler interface {
 
 // Validate ...
 func (c *CustomRole) Validate() *errors.Error {
+	if !ValidateCustomRoleID(c.ID) {
+		return errors.Append(ErrCustomRoleValidateFailed, "Invalid Custom Role ID format")
+	}
+
 	if !ValidateCustomRoleName(c.Name) {
 		return errors.Append(ErrCustomRoleValidateFailed, "Invalid Custom Role Name format")
 	}
