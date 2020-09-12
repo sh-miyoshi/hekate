@@ -502,7 +502,7 @@ func (m *Manager) UserLogout(projectName string, userID string) *errors.Error {
 
 // LoginSessionAdd ...
 func (m *Manager) LoginSessionAdd(projectName string, ent *model.LoginSession) *errors.Error {
-	// create session is in internal only, so validation is not required
+	// login session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
 		if err := m.loginSession.Add(projectName, ent); err != nil {
 			return errors.Append(err, "Failed to add login session")
@@ -513,7 +513,7 @@ func (m *Manager) LoginSessionAdd(projectName string, ent *model.LoginSession) *
 
 // LoginSessionUpdate ...
 func (m *Manager) LoginSessionUpdate(projectName string, ent *model.LoginSession) *errors.Error {
-	// update session is in internal only, so validation is not required
+	// login session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
 		if err := m.loginSession.Update(projectName, ent); err != nil {
 			return errors.Append(err, "Failed to update login session")
@@ -524,6 +524,7 @@ func (m *Manager) LoginSessionUpdate(projectName string, ent *model.LoginSession
 
 // LoginSessionDelete ...
 func (m *Manager) LoginSessionDelete(projectName string, sessionID string) *errors.Error {
+	// login session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
 		if err := m.loginSession.Delete(projectName, sessionID); err != nil {
 			return errors.Append(err, "Failed to delete login session")
@@ -535,11 +536,13 @@ func (m *Manager) LoginSessionDelete(projectName string, sessionID string) *erro
 
 // LoginSessionGet ...
 func (m *Manager) LoginSessionGet(projectName string, sessionID string) (*model.LoginSession, *errors.Error) {
+	// login session is in internal only, so validation is not required
 	return m.loginSession.Get(projectName, sessionID)
 }
 
 // LoginSessionGetByCode ...
 func (m *Manager) LoginSessionGetByCode(projectName string, code string) (*model.LoginSession, *errors.Error) {
+	// login session is in internal only, so validation is not required
 	return m.loginSession.GetByCode(projectName, code)
 }
 
