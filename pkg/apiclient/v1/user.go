@@ -158,7 +158,7 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 	defer httpRes.Body.Close()
 
 	switch httpRes.StatusCode {
-	case 200:
+	case 204:
 		return nil
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
