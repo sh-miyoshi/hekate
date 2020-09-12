@@ -28,7 +28,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clients, err := db.GetInst().ClientGetList(projectName)
+	clients, err := db.GetInst().ClientGetList(projectName, nil)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchProject) {
 			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))

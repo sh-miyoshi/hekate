@@ -7,6 +7,11 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
+// ClientFilter ...
+type ClientFilter struct {
+	ID string
+}
+
 // ClientInfo ...
 type ClientInfo struct {
 	ID                  string
@@ -32,8 +37,7 @@ var (
 type ClientInfoHandler interface {
 	Add(projectName string, ent *ClientInfo) *errors.Error
 	Delete(projectName, clientID string) *errors.Error
-	GetList(projectName string) ([]*ClientInfo, *errors.Error)
-	Get(projectName, clientID string) (*ClientInfo, *errors.Error)
+	GetList(projectName string, filter *ClientFilter) ([]*ClientInfo, *errors.Error)
 	Update(projectName string, ent *ClientInfo) *errors.Error
 	DeleteAll(projectName string) *errors.Error
 }

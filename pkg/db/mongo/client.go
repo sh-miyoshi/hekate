@@ -99,17 +99,23 @@ func (h *ClientInfoHandler) Delete(projectName, clientID string) *errors.Error {
 }
 
 // GetList ...
-func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *errors.Error) {
+func (h *ClientInfoHandler) GetList(projectName string, filter *model.ClientFilter) ([]*model.ClientInfo, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
 
-	filter := bson.D{
+	f := bson.D{
 		{Key: "project_name", Value: projectName},
+	}
+
+	if filter != nil {
+		if filter.ID != "" {
+			f = append(f, bson.E{Key: "id", Value: filter.ID})
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	cursor, err := col.Find(ctx, filter)
+	cursor, err := col.Find(ctx, f)
 	if err != nil {
 		return nil, errors.New("DB failed", "Failed to get client list from mongodb: %v", err)
 	}
@@ -132,35 +138,6 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *e
 	}
 
 	return res, nil
-}
-
-// Get ...
-func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, *errors.Error) {
-	col := h.dbClient.Database(databaseName).Collection(clientCollectionName)
-	filter := bson.D{
-		{Key: "project_name", Value: projectName},
-		{Key: "id", Value: clientID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	res := &clientInfo{}
-	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchClient
-		}
-		return nil, errors.New("DB failed", "Failed to get client from mongodb: %v", err)
-	}
-
-	return &model.ClientInfo{
-		ID:                  res.ID,
-		ProjectName:         res.ProjectName,
-		Secret:              res.Secret,
-		AccessType:          res.AccessType,
-		CreatedAt:           res.CreatedAt,
-		AllowedCallbackURLs: res.AllowedCallbackURLs,
-	}, nil
 }
 
 // Update ...

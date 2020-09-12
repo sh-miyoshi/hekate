@@ -38,11 +38,11 @@ func (h *ClientInfoHandler) Delete(projectName, clientID string) *errors.Error {
 		h.clientList = newList
 		return nil
 	}
-	return model.ErrNoSuchClient
+	return errors.New("Internal Error", "No such client %s", clientID)
 }
 
 // GetList ...
-func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *errors.Error) {
+func (h *ClientInfoHandler) GetList(projectName string, filter *model.ClientFilter) ([]*model.ClientInfo, *errors.Error) {
 	res := []*model.ClientInfo{}
 
 	for _, client := range h.clientList {
@@ -51,18 +51,11 @@ func (h *ClientInfoHandler) GetList(projectName string) ([]*model.ClientInfo, *e
 		}
 	}
 
-	return res, nil
-}
-
-// Get ...
-func (h *ClientInfoHandler) Get(projectName, clientID string) (*model.ClientInfo, *errors.Error) {
-	for _, c := range h.clientList {
-		if c.ProjectName == projectName && c.ID == clientID {
-			return c, nil
-		}
+	if filter != nil {
+		res = filterClientList(res, filter)
 	}
 
-	return nil, model.ErrNoSuchClient
+	return res, nil
 }
 
 // Update ...
@@ -73,7 +66,7 @@ func (h *ClientInfoHandler) Update(projectName string, ent *model.ClientInfo) *e
 			return nil
 		}
 	}
-	return model.ErrNoSuchClient
+	return errors.New("Internal Error", "No such client %s", ent.ID)
 }
 
 // DeleteAll ...
@@ -86,4 +79,21 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) *errors.Error {
 	}
 	h.clientList = newList
 	return nil
+}
+
+func filterClientList(data []*model.ClientInfo, filter *model.ClientFilter) []*model.ClientInfo {
+	if filter == nil {
+		return data
+	}
+	res := []*model.ClientInfo{}
+
+	for _, cli := range data {
+		if filter.ID != "" && cli.ID != filter.ID {
+			// missmatch name
+			continue
+		}
+		res = append(res, cli)
+	}
+
+	return res
 }

@@ -594,12 +594,13 @@ func (m *Manager) ClientAdd(projectName string, ent *model.ClientInfo) *errors.E
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		_, err := m.client.Get(ent.ProjectName, ent.ID)
-		if err != model.ErrNoSuchClient {
-			if err == nil {
-				return model.ErrClientAlreadyExists
-			}
-			return errors.Append(err, "Failed to get client info")
+		clis, err := m.client.GetList(ent.ProjectName, &model.ClientFilter{ID: ent.ID})
+		if err != nil {
+			return errors.Append(err, "Failed to get current client list")
+		}
+
+		if len(clis) > 0 {
+			return model.ErrClientAlreadyExists
 		}
 
 		if err := m.client.Add(projectName, ent); err != nil {
@@ -616,6 +617,14 @@ func (m *Manager) ClientDelete(projectName, clientID string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		clis, err := m.client.GetList(projectName, &model.ClientFilter{ID: clientID})
+		if err != nil {
+			return errors.Append(err, "Failed to get current client list")
+		}
+		if len(clis) == 0 {
+			return model.ErrNoSuchClient
+		}
+
 		if err := m.loginSession.DeleteAllInClient(projectName, clientID); err != nil {
 			return errors.Append(err, "Failed to delete login session of the client")
 		}
@@ -628,17 +637,25 @@ func (m *Manager) ClientDelete(projectName, clientID string) *errors.Error {
 }
 
 // ClientGetList ...
-func (m *Manager) ClientGetList(projectName string) ([]*model.ClientInfo, *errors.Error) {
-	return m.client.GetList(projectName)
+func (m *Manager) ClientGetList(projectName string, filter *model.ClientFilter) ([]*model.ClientInfo, *errors.Error) {
+	if filter != nil && !model.ValidateClientID(filter.ID) {
+		return nil, errors.Append(model.ErrClientValidateFailed, "invalid client id format in filter")
+	}
+
+	return m.client.GetList(projectName, filter)
 }
 
 // ClientGet ...
-func (m *Manager) ClientGet(projectName, clientID string) (*model.ClientInfo, *errors.Error) {
-	if !model.ValidateClientID(clientID) {
-		return nil, errors.Append(model.ErrClientValidateFailed, "invalid client id format")
+func (m *Manager) ClientGet(projectName string, clientID string) (*model.ClientInfo, *errors.Error) {
+	clients, err := m.ClientGetList(projectName, &model.ClientFilter{ID: clientID})
+	if err != nil {
+		return nil, err
+	}
+	if len(clients) == 0 {
+		return nil, errors.Append(model.ErrNoSuchClient, "Failed to get client")
 	}
 
-	return m.client.Get(projectName, clientID)
+	return clients[0], nil
 }
 
 // ClientUpdate ...
@@ -648,6 +665,14 @@ func (m *Manager) ClientUpdate(projectName string, ent *model.ClientInfo) *error
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		clis, err := m.client.GetList(projectName, &model.ClientFilter{ID: ent.ID})
+		if err != nil {
+			return errors.Append(err, "Failed to get current client list")
+		}
+		if len(clis) == 0 {
+			return model.ErrNoSuchClient
+		}
+
 		if err := m.client.Update(projectName, ent); err != nil {
 			return errors.Append(err, "Failed to update client")
 		}
