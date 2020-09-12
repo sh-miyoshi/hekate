@@ -186,7 +186,6 @@ func filterUserList(data []*model.UserInfo, filter *model.UserFilter) []*model.U
 			// missmatch name
 			continue
 		}
-		// TODO(add other filter)
 		res = append(res, user)
 	}
 

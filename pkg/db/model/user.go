@@ -27,7 +27,6 @@ type UserInfo struct {
 // UserFilter ...
 type UserFilter struct {
 	Name string
-	// TODO(CreatedAt, SystemRoles, CustomRoles, ...)
 }
 
 // RoleType ...
