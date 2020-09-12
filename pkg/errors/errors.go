@@ -109,9 +109,11 @@ func Contains(all, err *Error) bool {
 		if all.privateInfo[0].msg != err.privateInfo[0].msg {
 			return false
 		}
+
+		return true
 	}
 
-	return true
+	return false
 }
 
 // WriteOAuthError ...

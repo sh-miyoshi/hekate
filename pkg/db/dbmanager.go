@@ -723,8 +723,8 @@ func (m *Manager) CustomRoleDelete(projectName string, customRoleID string) *err
 		if err != nil {
 			return errors.Append(err, "Failed to get current custom role list")
 		}
-		if len(roles) != 0 {
-			return model.ErrCustomRoleAlreadyExists
+		if len(roles) == 0 {
+			return model.ErrNoSuchCustomRole
 		}
 
 		if err := m.user.DeleteAllCustomRole(projectName, customRoleID); err != nil {
