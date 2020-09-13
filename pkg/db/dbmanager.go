@@ -196,7 +196,7 @@ func (m *Manager) ProjectDelete(name string) *errors.Error {
 			return errors.Append(err, "Failed to delete login session data")
 		}
 
-		if err := m.session.DeleteAllInProject(name); err != nil {
+		if err := m.session.DeleteAll(name); err != nil {
 			return errors.Append(err, "Failed to delete session data")
 		}
 
@@ -325,7 +325,7 @@ func (m *Manager) UserDelete(projectName string, userID string) *errors.Error {
 			return errors.Append(err, "Delete authoriation code failed")
 		}
 
-		if err := m.session.DeleteAll(projectName, userID); err != nil {
+		if err := m.session.Delete(projectName, &model.SessionFilter{UserID: userID}); err != nil {
 			return errors.Append(err, "Delete user session failed")
 		}
 
@@ -518,7 +518,7 @@ func (m *Manager) UserLogout(projectName string, userID string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.session.DeleteAll(projectName, userID); err != nil {
+		if err := m.session.Delete(projectName, &model.SessionFilter{UserID: userID}); err != nil {
 			return errors.Append(err, "Delete user session failed")
 		}
 
@@ -579,7 +579,11 @@ func (m *Manager) SessionAdd(projectName string, ent *model.Session) *errors.Err
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if _, err := m.session.Get(projectName, ent.SessionID); err != model.ErrNoSuchSession {
+		sessions, err := m.session.GetList(projectName, &model.SessionFilter{SessionID: ent.SessionID})
+		if err != nil {
+			return errors.Append(err, "Failed to get current session list")
+		}
+		if len(sessions) != 0 {
 			return model.ErrSessionAlreadyExists
 		}
 
@@ -590,10 +594,30 @@ func (m *Manager) SessionAdd(projectName string, ent *model.Session) *errors.Err
 	})
 }
 
+// SessionGetList ...
+func (m *Manager) SessionGetList(projectName string, filter *model.SessionFilter) ([]*model.Session, *errors.Error) {
+	if filter != nil {
+		if filter.SessionID != "" && !model.ValidateSessionID(filter.SessionID) {
+			return nil, model.ErrSessionValidateFailed
+		}
+		if filter.UserID != "" && !model.ValidateUserID(filter.UserID) {
+			return nil, model.ErrSessionValidateFailed
+		}
+	}
+
+	return m.session.GetList(projectName, filter)
+}
+
 // SessionGet ..
 func (m *Manager) SessionGet(projectName string, sessionID string) (*model.Session, *errors.Error) {
-	// TODO(add validation)
-	return m.session.Get(projectName, sessionID)
+	sessions, err := m.SessionGetList(projectName, &model.SessionFilter{SessionID: sessionID})
+	if err != nil {
+		return nil, errors.Append(err, "Failed to get current session list")
+	}
+	if len(sessions) == 0 {
+		return nil, model.ErrNoSuchSession
+	}
+	return sessions[0], nil
 }
 
 // SessionDelete ...
@@ -603,20 +627,11 @@ func (m *Manager) SessionDelete(projectName string, sessionID string) *errors.Er
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.session.Delete(projectName, sessionID); err != nil {
+		if err := m.session.Delete(projectName, &model.SessionFilter{SessionID: sessionID}); err != nil {
 			return errors.Append(err, "Failed to revoke session")
 		}
 		return nil
 	})
-}
-
-// SessionGetList ...
-func (m *Manager) SessionGetList(projectName string, userID string) ([]*model.Session, *errors.Error) {
-	if !model.ValidateUserID(userID) {
-		return nil, errors.Append(model.ErrSessionValidateFailed, "invalid user id format")
-	}
-
-	return m.session.GetList(projectName, userID)
 }
 
 // ClientAdd ...

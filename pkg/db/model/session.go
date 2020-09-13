@@ -18,14 +18,18 @@ type Session struct {
 	LastAuthTime time.Time
 }
 
+// SessionFilter ...
+type SessionFilter struct {
+	SessionID string
+	UserID    string
+}
+
 // SessionHandler ...
 type SessionHandler interface {
 	Add(projectName string, ent *Session) *errors.Error
-	Delete(projectName string, sessionID string) *errors.Error
-	DeleteAll(projectName string, userID string) *errors.Error
-	DeleteAllInProject(projectName string) *errors.Error
-	Get(projectName string, sessionID string) (*Session, *errors.Error)
-	GetList(projectName string, userID string) ([]*Session, *errors.Error)
+	Delete(projectName string, filter *SessionFilter) *errors.Error
+	DeleteAll(projectName string) *errors.Error
+	GetList(projectName string, filter *SessionFilter) ([]*Session, *errors.Error)
 }
 
 var (

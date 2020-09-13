@@ -645,7 +645,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 }
 
 func handleSSO(method string, projectName string, userID string, tokenIssuer string, authReq *oidc.AuthRequest) (*http.Request, *errors.Error) {
-	sessions, err := db.GetInst().SessionGetList(projectName, userID)
+	sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: userID})
 	if err != nil {
 		return nil, errors.Append(err, "Failed to get session list")
 	}

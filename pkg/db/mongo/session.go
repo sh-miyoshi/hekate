@@ -82,17 +82,24 @@ func (h *SessionHandler) Add(projectName string, s *model.Session) *errors.Error
 }
 
 // Delete ...
-func (h *SessionHandler) Delete(projectName string, sessionID string) *errors.Error {
+func (h *SessionHandler) Delete(projectName string, filter *model.SessionFilter) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
-	filter := bson.D{
+	f := bson.D{
 		{Key: "project_name", Value: projectName},
-		{Key: "session_id", Value: sessionID},
+	}
+	if filter != nil {
+		if filter.SessionID != "" {
+			f = append(f, bson.E{Key: "session_id", Value: filter.SessionID})
+		}
+		if filter.UserID != "" {
+			f = append(f, bson.E{Key: "user_id", Value: filter.UserID})
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	_, err := col.DeleteOne(ctx, filter)
+	_, err := col.DeleteOne(ctx, f)
 	if err != nil {
 		return errors.New("DB failed", "Failed to delete session from mongodb: %v", err)
 	}
@@ -100,25 +107,7 @@ func (h *SessionHandler) Delete(projectName string, sessionID string) *errors.Er
 }
 
 // DeleteAll ...
-func (h *SessionHandler) DeleteAll(projectName string, userID string) *errors.Error {
-	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
-	filter := bson.D{
-		{Key: "project_name", Value: projectName},
-		{Key: "user_id", Value: userID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	_, err := col.DeleteMany(ctx, filter)
-	if err != nil {
-		return errors.New("DB failed", "Failed to delete session from mongodb: %v", err)
-	}
-	return nil
-}
-
-// DeleteAllInProject ...
-func (h *SessionHandler) DeleteAllInProject(projectName string) *errors.Error {
+func (h *SessionHandler) DeleteAll(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	filter := bson.D{
 		{Key: "project_name", Value: projectName},
@@ -132,51 +121,28 @@ func (h *SessionHandler) DeleteAllInProject(projectName string) *errors.Error {
 		return errors.New("DB failed", "Failed to delete session from mongodb: %v", err)
 	}
 	return nil
-}
-
-// Get ...
-func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Session, *errors.Error) {
-	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
-	filter := bson.D{
-		{Key: "project_name", Value: projectName},
-		{Key: "session_id", Value: sessionID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	res := &session{}
-	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchSession
-		}
-		return nil, errors.New("DB failed", "Failed to get session from mongodb: %v", err)
-	}
-
-	return &model.Session{
-		UserID:       res.UserID,
-		ProjectName:  res.ProjectName,
-		SessionID:    res.SessionID,
-		CreatedAt:    res.CreatedAt,
-		ExpiresIn:    res.ExpiresIn,
-		FromIP:       res.FromIP,
-		LastAuthTime: res.LastAuthTime,
-	}, nil
 }
 
 // GetList ...
-func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Session, *errors.Error) {
+func (h *SessionHandler) GetList(projectName string, filter *model.SessionFilter) ([]*model.Session, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 
-	filter := bson.D{
+	f := bson.D{
 		{Key: "project_name", Value: projectName},
-		{Key: "user_id", Value: userID},
+	}
+	if filter != nil {
+		if filter.SessionID != "" {
+			f = append(f, bson.E{Key: "session_id", Value: filter.SessionID})
+		}
+		if filter.UserID != "" {
+			f = append(f, bson.E{Key: "user_id", Value: filter.UserID})
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	cursor, err := col.Find(ctx, filter)
+	cursor, err := col.Find(ctx, f)
 	if err != nil {
 		return nil, errors.New("DB failed", "Failed to get session list from mongodb: %v", err)
 	}

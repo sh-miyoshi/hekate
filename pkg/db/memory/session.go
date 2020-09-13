@@ -8,79 +8,79 @@ import (
 // SessionHandler implement db.SessionHandler
 type SessionHandler struct {
 	// sessionList[sessionID] = Session
-	sessionList map[string]*model.Session
+	sessionList []*model.Session
 }
 
 // NewSessionHandler ...
 func NewSessionHandler() *SessionHandler {
-	res := &SessionHandler{
-		sessionList: make(map[string]*model.Session),
-	}
+	res := &SessionHandler{}
 	return res
 }
 
 // Add ...
-func (h *SessionHandler) Add(projectName string, session *model.Session) *errors.Error {
-	h.sessionList[session.SessionID] = session
+func (h *SessionHandler) Add(projectName string, ent *model.Session) *errors.Error {
+	h.sessionList = append(h.sessionList, ent)
 	return nil
 }
 
 // Delete ...
-func (h *SessionHandler) Delete(projectName string, sessionID string) *errors.Error {
-	if res, exists := h.sessionList[sessionID]; exists {
-		if res.ProjectName == projectName {
-			delete(h.sessionList, sessionID)
-			return nil
-		}
+func (h *SessionHandler) Delete(projectName string, filter *model.SessionFilter) *errors.Error {
+	newList := filterSessionList(h.sessionList, filter)
+
+	if len(newList) == len(h.sessionList) {
+		return errors.New("Internal Error", "Failed to delete session by filter %v", filter)
 	}
 
-	return model.ErrNoSuchSession
+	h.sessionList = newList
+	return nil
 }
 
 // DeleteAll ...
-func (h *SessionHandler) DeleteAll(projectName string, userID string) *errors.Error {
-	newList := make(map[string]*model.Session)
+func (h *SessionHandler) DeleteAll(projectName string) *errors.Error {
+	newList := []*model.Session{}
 	for _, s := range h.sessionList {
 		if s.ProjectName != projectName {
-			newList[s.SessionID] = s
-		} else if s.UserID != userID {
-			newList[s.SessionID] = s
+			newList = append(newList, s)
 		}
 	}
 	h.sessionList = newList
 	return nil
-}
-
-// DeleteAllInProject ...
-func (h *SessionHandler) DeleteAllInProject(projectName string) *errors.Error {
-	newList := make(map[string]*model.Session)
-	for _, s := range h.sessionList {
-		if s.ProjectName != projectName {
-			newList[s.SessionID] = s
-		}
-	}
-	h.sessionList = newList
-	return nil
-}
-
-// Get ...
-func (h *SessionHandler) Get(projectName string, sessionID string) (*model.Session, *errors.Error) {
-	res, exists := h.sessionList[sessionID]
-	if !exists || res.ProjectName != projectName {
-		return nil, model.ErrNoSuchSession
-	}
-	return res, nil
 }
 
 // GetList ...
-func (h *SessionHandler) GetList(projectName string, userID string) ([]*model.Session, *errors.Error) {
+func (h *SessionHandler) GetList(projectName string, filter *model.SessionFilter) ([]*model.Session, *errors.Error) {
 	res := []*model.Session{}
 
 	for _, s := range h.sessionList {
-		if s.ProjectName == projectName && s.UserID == userID {
+		if s.ProjectName == projectName {
 			res = append(res, s)
 		}
 	}
 
+	if filter != nil {
+		res = filterSessionList(res, filter)
+	}
+
 	return res, nil
+}
+
+func filterSessionList(data []*model.Session, filter *model.SessionFilter) []*model.Session {
+	if filter == nil {
+		return data
+	}
+	res := []*model.Session{}
+
+	for _, s := range data {
+		if filter.SessionID != "" && s.SessionID != filter.SessionID {
+			// missmatch session id
+			continue
+		}
+		if filter.UserID != "" && s.UserID != filter.UserID {
+			// missmatch user id
+			continue
+		}
+		res = append(res, s)
+	}
+
+	return res
 }

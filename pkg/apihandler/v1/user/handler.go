@@ -83,7 +83,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 				VerifyFailedTimes: user.LockState.VerifyFailedTimes,
 			},
 		}
-		sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
+		sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
 		if err != nil {
 			errors.Print(errors.Append(err, "Failed to get session list"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -286,7 +286,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	sessions, err := db.GetInst().SessionGetList(projectName, user.ID)
+	sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get session list"))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
