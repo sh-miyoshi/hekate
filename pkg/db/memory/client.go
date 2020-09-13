@@ -89,7 +89,7 @@ func filterClientList(data []*model.ClientInfo, filter *model.ClientFilter) []*m
 
 	for _, cli := range data {
 		if filter.ID != "" && cli.ID != filter.ID {
-			// missmatch name
+			// missmatch id
 			continue
 		}
 		res = append(res, cli)

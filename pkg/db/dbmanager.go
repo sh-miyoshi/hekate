@@ -133,10 +133,17 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) *errors.Error {
 		}
 		ent.TokenConfig.SignSecretKey = x509.MarshalPKCS1PrivateKey(key)
 		ent.TokenConfig.SignPublicKey = x509.MarshalPKCS1PublicKey(&key.PublicKey)
+	default:
+		// TODO(return error)
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if _, err := m.project.Get(ent.Name); err != model.ErrNoSuchProject {
+		prjs, err := m.project.GetList(&model.ProjectFilter{Name: ent.Name})
+		if err != nil {
+			return errors.Append(err, "Failed to get current project list")
+		}
+
+		if len(prjs) != 0 {
 			return model.ErrProjectAlreadyExists
 		}
 
@@ -171,10 +178,15 @@ func (m *Manager) ProjectDelete(name string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		prj, err := m.project.Get(name)
+		prjs, err := m.project.GetList(&model.ProjectFilter{Name: name})
 		if err != nil {
 			return errors.Append(err, "Failed to get delete project info")
 		}
+		if len(prjs) == 0 {
+			return model.ErrNoSuchProject
+		}
+
+		prj := prjs[0]
 
 		if !prj.PermitDelete {
 			return errors.Append(model.ErrDeleteBlockedProject, "the project can not delete")
@@ -209,17 +221,27 @@ func (m *Manager) ProjectDelete(name string) *errors.Error {
 }
 
 // ProjectGetList ...
-func (m *Manager) ProjectGetList() ([]*model.ProjectInfo, *errors.Error) {
-	return m.project.GetList()
+func (m *Manager) ProjectGetList(filter *model.ProjectFilter) ([]*model.ProjectInfo, *errors.Error) {
+	if filter != nil {
+		if filter.Name != "" && !model.ValidateProjectName(filter.Name) {
+			return nil, errors.Append(model.ErrProjectValidateFailed, "Invalid project name format")
+		}
+	}
+	return m.project.GetList(filter)
 }
 
 // ProjectGet ...
 func (m *Manager) ProjectGet(name string) (*model.ProjectInfo, *errors.Error) {
-	if !model.ValidateProjectName(name) {
-		return nil, errors.Append(model.ErrProjectValidateFailed, "Invalid project name format")
+	prjs, err := m.ProjectGetList(&model.ProjectFilter{Name: name})
+	if err != nil {
+		return nil, err
 	}
 
-	return m.project.Get(name)
+	if len(prjs) == 0 {
+		return nil, model.ErrNoSuchProject
+	}
+
+	return prjs[0], nil
 }
 
 // ProjectUpdate ...
@@ -461,14 +483,18 @@ func (m *Manager) UserChangePassword(projectName string, userID string, password
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		prjs, err := m.project.GetList(&model.ProjectFilter{Name: projectName})
+		if err != nil {
+			return errors.Append(err, "Failed to get project associated with the user")
+		}
+		if len(prjs) == 0 {
+			return model.ErrNoSuchUser
+		}
+		prj := prjs[0]
+
 		usr, err := m.user.Get(projectName, userID)
 		if err != nil {
 			return errors.Append(err, "Failed to get user of change password")
-		}
-
-		prj, err := m.project.Get(projectName)
-		if err != nil {
-			return errors.Append(err, "Failed to get project associated with the user")
 		}
 
 		if err := pwpol.CheckPassword(usr.Name, password, prj.PasswordPolicy); err != nil {
@@ -600,15 +626,18 @@ func (m *Manager) ClientAdd(projectName string, ent *model.ClientInfo) *errors.E
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if _, err := m.project.Get(projectName); err != nil {
-			return errors.Append(err, "Failed to get project info")
+		prjs, err := m.project.GetList(&model.ProjectFilter{Name: projectName})
+		if err != nil {
+			return errors.Append(err, "Failed to get current project")
+		}
+		if len(prjs) == 0 {
+			return model.ErrNoSuchProject
 		}
 
 		clis, err := m.client.GetList(ent.ProjectName, &model.ClientFilter{ID: ent.ID})
 		if err != nil {
 			return errors.Append(err, "Failed to get current client list")
 		}
-
 		if len(clis) > 0 {
 			return model.ErrClientAlreadyExists
 		}
@@ -697,8 +726,12 @@ func (m *Manager) CustomRoleAdd(projectName string, ent *model.CustomRole) *erro
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if _, err := m.project.Get(projectName); err != nil {
-			return errors.Append(err, "Failed to get project info")
+		prjs, err := m.project.GetList(&model.ProjectFilter{Name: projectName})
+		if err != nil {
+			return errors.Append(err, "Failed to get current project")
+		}
+		if len(prjs) == 0 {
+			return model.ErrNoSuchProject
 		}
 
 		roles, err := m.customRole.GetList(projectName, &model.CustomRoleFilter{

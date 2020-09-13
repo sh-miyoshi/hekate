@@ -7,55 +7,77 @@ import (
 
 // ProjectInfoHandler implement db.ProjectInfoHandler
 type ProjectInfoHandler struct {
-	projectList map[string]*model.ProjectInfo
+	projectList []*model.ProjectInfo
 }
 
 // NewProjectHandler ...
 func NewProjectHandler() *ProjectInfoHandler {
-	res := &ProjectInfoHandler{
-		projectList: make(map[string]*model.ProjectInfo),
-	}
-	return res
+	return &ProjectInfoHandler{}
 }
 
 // Add ...
 func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) *errors.Error {
-	h.projectList[ent.Name] = ent
+	h.projectList = append(h.projectList, ent)
 	return nil
 }
 
 // Delete ...
 func (h *ProjectInfoHandler) Delete(name string) *errors.Error {
-	if _, exists := h.projectList[name]; exists {
-		delete(h.projectList, name)
+	newList := []*model.ProjectInfo{}
+	found := false
+	for _, p := range h.projectList {
+		if p.Name == name {
+			found = true
+		} else {
+			newList = append(newList, p)
+		}
+	}
+
+	if found {
+		h.projectList = newList
 		return nil
 	}
-	return model.ErrNoSuchProject
+	return errors.New("Internal Error", "No such project %s", name)
 }
 
 // GetList ...
-func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, *errors.Error) {
+func (h *ProjectInfoHandler) GetList(filter *model.ProjectFilter) ([]*model.ProjectInfo, *errors.Error) {
 	res := []*model.ProjectInfo{}
 	for _, prj := range h.projectList {
 		res = append(res, prj)
 	}
-	return res, nil
-}
 
-// Get ...
-func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, *errors.Error) {
-	res, ok := h.projectList[name]
-	if ok {
-		return res, nil
+	if filter != nil {
+		res = filterProjectList(res, filter)
 	}
-	return nil, model.ErrNoSuchProject
+
+	return res, nil
 }
 
 // Update ...
 func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) *errors.Error {
-	if _, ok := h.projectList[ent.Name]; ok {
-		h.projectList[ent.Name] = ent
-		return nil
+	for i, p := range h.projectList {
+		if p.Name == ent.Name {
+			h.projectList[i] = ent
+			return nil
+		}
 	}
-	return model.ErrNoSuchProject
+	return errors.New("Internal Error", "No such project %s", ent.Name)
+}
+
+func filterProjectList(data []*model.ProjectInfo, filter *model.ProjectFilter) []*model.ProjectInfo {
+	if filter == nil {
+		return data
+	}
+	res := []*model.ProjectInfo{}
+
+	for _, prj := range data {
+		if filter.Name != "" && prj.Name != filter.Name {
+			// missmatch name
+			continue
+		}
+		res = append(res, prj)
+	}
+
+	return res
 }

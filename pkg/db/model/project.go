@@ -58,6 +58,11 @@ type ProjectInfo struct {
 	UserLock        UserLock
 }
 
+// ProjectFilter ...
+type ProjectFilter struct {
+	Name string
+}
+
 const (
 	// DefaultAccessTokenExpiresTimeSec is default expires time for access token(5 minutes)
 	DefaultAccessTokenExpiresTimeSec = 5 * 60
@@ -116,11 +121,7 @@ var (
 type ProjectInfoHandler interface {
 	Add(ent *ProjectInfo) *errors.Error
 	Delete(name string) *errors.Error
-	GetList() ([]*ProjectInfo, *errors.Error)
-	Get(name string) (*ProjectInfo, *errors.Error)
-
-	// Update method updates existing project
-	// It must return *errors.Error if project is not found
+	GetList(filter *ProjectFilter) ([]*ProjectInfo, *errors.Error)
 	Update(ent *ProjectInfo) *errors.Error
 }
 

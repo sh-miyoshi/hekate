@@ -118,13 +118,19 @@ func (h *ProjectInfoHandler) Delete(name string) *errors.Error {
 }
 
 // GetList ...
-func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, *errors.Error) {
+func (h *ProjectInfoHandler) GetList(filter *model.ProjectFilter) ([]*model.ProjectInfo, *errors.Error) {
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
+	f := bson.D{}
+	if filter != nil {
+		if filter.Name != "" {
+			f = append(f, bson.E{Key: "name", Value: filter.Name})
+		}
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	cursor, err := col.Find(ctx, bson.D{})
+	cursor, err := col.Find(ctx, f)
 	if err != nil {
 		return nil, errors.New("DB failed", "Failed to get project list from mongodb: %v", err)
 	}
@@ -167,59 +173,6 @@ func (h *ProjectInfoHandler) GetList() ([]*model.ProjectInfo, *errors.Error) {
 			info.AllowGrantTypes = append(info.AllowGrantTypes, typ)
 		}
 		res = append(res, info)
-	}
-
-	return res, nil
-}
-
-// Get ...
-func (h *ProjectInfoHandler) Get(name string) (*model.ProjectInfo, *errors.Error) {
-	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
-	filter := bson.D{
-		{Key: "name", Value: name},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	project := &projectInfo{}
-	if err := col.FindOne(ctx, filter).Decode(project); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchProject
-		}
-		return nil, errors.New("DB failed", "Failed to get project from mongodb: %v", err)
-	}
-	logger.Debug("Get project %s data: %v", name, project)
-
-	res := &model.ProjectInfo{
-		Name:         project.Name,
-		CreatedAt:    project.CreatedAt,
-		PermitDelete: project.PermitDelete,
-		TokenConfig: &model.TokenConfig{
-			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
-			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
-			SigningAlgorithm:     project.TokenConfig.SigningAlgorithm,
-			SignPublicKey:        project.TokenConfig.SignPublicKey,
-			SignSecretKey:        project.TokenConfig.SignSecretKey,
-		},
-		PasswordPolicy: model.PasswordPolicy{
-			MinimumLength:       project.PasswordPolicy.MinimumLength,
-			NotUserName:         project.PasswordPolicy.NotUserName,
-			BlackList:           project.PasswordPolicy.BlackList,
-			UseCharacter:        model.CharacterType(project.PasswordPolicy.UseCharacter),
-			UseDigit:            project.PasswordPolicy.UseDigit,
-			UseSpecialCharacter: project.PasswordPolicy.UseSpecialCharacter,
-		},
-		UserLock: model.UserLock{
-			Enabled:          project.UserLock.Enabled,
-			MaxLoginFailure:  project.UserLock.MaxLoginFailure,
-			LockDuration:     project.UserLock.LockDuration,
-			FailureResetTime: project.UserLock.FailureResetTime,
-		},
-	}
-	for _, t := range project.AllowGrantTypes {
-		typ, _ := model.GetGrantType(t)
-		res.AllowGrantTypes = append(res.AllowGrantTypes, typ)
 	}
 
 	return res, nil

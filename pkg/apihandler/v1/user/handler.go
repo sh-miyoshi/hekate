@@ -482,10 +482,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().UserChangePassword(projectName, userID, req.Password); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchUser) {
+		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {

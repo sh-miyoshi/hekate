@@ -24,7 +24,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	projects, err := db.GetInst().ProjectGetList()
+	projects, err := db.GetInst().ProjectGetList(nil)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project list"))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
