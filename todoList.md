@@ -8,10 +8,13 @@
 
 - APIの修正
   - Update Project Secret Info APIの追加
-- ユーザーパスワードロック
-  - APIの追加
+    - 公開鍵などの更新API
+  - ユーザーパスワードロック
     - 強制ロック解除用のAPI
+  - Custom RoleにDescriptionを追加
   - API docの修正
+- API responseのtime formatの見直し
+- http headerの追加
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - http.Error関数の置き換え
@@ -19,11 +22,6 @@
   - email
   - first/last name
 - db manager validationの追加
-- Custom RoleにDescriptionを追加
-  - API docの修正
-  - DBの修正
-  - Validationの追加
-  - APIの修正
 - パスワード以外でのユーザーのログイン
   - 証明書
   - ワンタイムパスワード
@@ -52,7 +50,6 @@
 - kong対応
   - URL: [https://konghq.com/](https://konghq.com/)
 - (project/user) enabledの有効化
-- API responseのtime formatの見直し
 - projectのimport/export
 - Client Secretに証明書を追加できるようにする
 - filterの追加(user, role)
@@ -63,7 +60,6 @@
   - Client IDを表示(optional)
   - Project名を表示
 - LDAP連携？
-- http headerの追加
 - user password変更ページの追加
 
 ## Portal(Admin Console) enhancement
