@@ -40,10 +40,7 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = db.GetInst().SessionDelete(projectName, sessionID); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to delete session"))
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {
@@ -74,10 +71,7 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	s, err := db.GetInst().SessionGet(projectName, sessionID)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get session"))
 			http.Error(w, "No such session", http.StatusNotFound)
 		} else {

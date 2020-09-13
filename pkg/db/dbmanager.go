@@ -627,6 +627,15 @@ func (m *Manager) SessionDelete(projectName string, sessionID string) *errors.Er
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		sessions, err := m.SessionGetList(projectName, &model.SessionFilter{SessionID: sessionID})
+		if err != nil {
+			return errors.Append(err, "Failed to get current session list")
+		}
+
+		if len(sessions) == 0 {
+			return model.ErrNoSuchSession
+		}
+
 		if err := m.session.Delete(projectName, &model.SessionFilter{SessionID: sessionID}); err != nil {
 			return errors.Append(err, "Failed to revoke session")
 		}
