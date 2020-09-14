@@ -27,10 +27,6 @@ func (h *SessionHandler) Add(projectName string, ent *model.Session) *errors.Err
 func (h *SessionHandler) Delete(projectName string, filter *model.SessionFilter) *errors.Error {
 	newList := filterSessionList(h.sessionList, filter)
 
-	if len(newList) == len(h.sessionList) {
-		return errors.New("Internal Error", "Failed to delete session by filter %v", filter)
-	}
-
 	h.sessionList = newList
 	return nil
 }
