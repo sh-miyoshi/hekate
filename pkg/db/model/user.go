@@ -26,6 +26,7 @@ type UserInfo struct {
 
 // UserFilter ...
 type UserFilter struct {
+	ID   string
 	Name string
 }
 
@@ -62,7 +63,6 @@ type UserInfoHandler interface {
 	Add(projectName string, ent *UserInfo) *errors.Error
 	Delete(projectName string, userID string) *errors.Error
 	GetList(projectName string, filter *UserFilter) ([]*UserInfo, *errors.Error)
-	Get(projectName string, userID string) (*UserInfo, *errors.Error)
 	Update(projectName string, ent *UserInfo) *errors.Error
 	DeleteAll(projectName string) *errors.Error
 	AddRole(projectName string, userID string, roleType RoleType, roleID string) *errors.Error

@@ -140,6 +140,9 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 		if filter.Name != "" {
 			f = append(f, bson.E{Key: "name", Value: filter.Name})
 		}
+		if filter.ID != "" {
+			f = append(f, bson.E{Key: "id", Value: filter.ID})
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
@@ -173,40 +176,6 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 	}
 
 	return res, nil
-}
-
-// Get ...
-func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, *errors.Error) {
-	col := h.dbClient.Database(databaseName).Collection(userCollectionName)
-	filter := bson.D{
-		{Key: "project_name", Value: projectName},
-		{Key: "id", Value: userID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	res := &userInfo{}
-	if err := col.FindOne(ctx, filter).Decode(res); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, model.ErrNoSuchUser
-		}
-		return nil, errors.New("DB failed", "Failed to get user from mongodb: %v", err)
-	}
-
-	return &model.UserInfo{
-		ID:           res.ID,
-		ProjectName:  res.ProjectName,
-		Name:         res.Name,
-		CreatedAt:    res.CreatedAt,
-		PasswordHash: res.PasswordHash,
-		SystemRoles:  res.SystemRoles,
-		CustomRoles:  res.CustomRoles,
-		LockState: model.LockState{
-			Locked:            res.LockState.Locked,
-			VerifyFailedTimes: res.LockState.VerifyFailedTimes,
-		},
-	}, nil
 }
 
 // Update ...

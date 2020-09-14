@@ -290,16 +290,16 @@ func (m *Manager) UserAdd(projectName string, ent *model.UserInfo) *errors.Error
 			}
 		}
 
-		_, err := m.user.Get(projectName, ent.ID)
-		if err != model.ErrNoSuchUser {
-			if err == nil {
-				return model.ErrUserAlreadyExists
-			}
+		users, err := m.user.GetList(projectName, &model.UserFilter{ID: ent.ID})
+		if err != nil {
 			return errors.Append(err, "Failed to get user info")
+		}
+		if len(users) != 0 {
+			return model.ErrUserAlreadyExists
 		}
 
 		// Check duplicate user by name
-		users, err := m.user.GetList(ent.ProjectName, &model.UserFilter{Name: ent.Name})
+		users, err = m.user.GetList(ent.ProjectName, &model.UserFilter{Name: ent.Name})
 		if err != nil {
 			return errors.Append(err, "Failed to get user info by name")
 		}
@@ -338,16 +338,29 @@ func (m *Manager) UserDelete(projectName string, userID string) *errors.Error {
 
 // UserGetList ...
 func (m *Manager) UserGetList(projectName string, filter *model.UserFilter) ([]*model.UserInfo, *errors.Error) {
+	if filter != nil {
+		if filter.ID != "" && !model.ValidateUserID(filter.ID) {
+			return nil, errors.Append(model.ErrUserValidateFailed, "Invalid user id format")
+		}
+		if filter.Name != "" && !model.ValidateUserName(filter.Name) {
+			return nil, errors.Append(model.ErrUserValidateFailed, "Invalid user name format")
+		}
+	}
+
 	return m.user.GetList(projectName, filter)
 }
 
 // UserGet ...
 func (m *Manager) UserGet(projectName string, userID string) (*model.UserInfo, *errors.Error) {
-	if !model.ValidateUserID(userID) {
-		return nil, errors.Append(model.ErrUserValidateFailed, "invalid user id format")
+	users, err := m.UserGetList(projectName, &model.UserFilter{ID: userID})
+	if err != nil {
+		return nil, err
+	}
+	if len(users) == 0 {
+		return nil, model.ErrNoSuchUser
 	}
 
-	return m.user.Get(projectName, userID)
+	return users[0], nil
 }
 
 // UserUpdate ...
@@ -405,6 +418,14 @@ func (m *Manager) UserAddRole(projectName string, userID string, roleType model.
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		users, err := m.user.GetList(projectName, &model.UserFilter{ID: userID})
+		if err != nil {
+			return errors.Append(err, "Failed to get current user list")
+		}
+		if len(users) == 0 {
+			return model.ErrNoSuchUser
+		}
+
 		// Validate RoleID
 		if roleType == model.RoleSystem {
 			res, typ, ok := role.GetInst().Parse(roleID)
@@ -412,8 +433,7 @@ func (m *Manager) UserAddRole(projectName string, userID string, roleType model.
 				return errors.Append(model.ErrUserValidateFailed, "Invalid system role")
 			}
 
-			usr, err := m.user.Get(projectName, userID)
-
+			usr := users[0]
 			if *res == role.ResCluster && usr.ProjectName != "master" {
 				return errors.Append(model.ErrUserValidateFailed, "Resource cluster can add to master project user")
 			}
@@ -453,10 +473,14 @@ func (m *Manager) UserDeleteRole(projectName string, userID string, roleID strin
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		usr, err := m.user.Get(projectName, userID)
+		users, err := m.user.GetList(projectName, &model.UserFilter{ID: userID})
 		if err != nil {
-			return errors.Append(err, "Failed to get user system roles")
+			return errors.Append(err, "Failed to get current user list")
 		}
+		if len(users) == 0 {
+			return model.ErrNoSuchUser
+		}
+		usr := users[0]
 
 		res, typ, ok := role.GetInst().Parse(roleID)
 		if ok {
@@ -492,10 +516,14 @@ func (m *Manager) UserChangePassword(projectName string, userID string, password
 		}
 		prj := prjs[0]
 
-		usr, err := m.user.Get(projectName, userID)
+		users, err := m.user.GetList(projectName, &model.UserFilter{ID: userID})
 		if err != nil {
 			return errors.Append(err, "Failed to get user of change password")
 		}
+		if len(users) == 0 {
+			return model.ErrNoSuchUser
+		}
+		usr := users[0]
 
 		if err := pwpol.CheckPassword(usr.Name, password, prj.PasswordPolicy); err != nil {
 			return errors.Append(err, "Failed to check password")
@@ -791,6 +819,7 @@ func (m *Manager) CustomRoleDelete(projectName string, customRoleID string) *err
 			return model.ErrNoSuchCustomRole
 		}
 
+		// Delete custom role from all user
 		if err := m.user.DeleteAllCustomRole(projectName, customRoleID); err != nil {
 			return errors.Append(err, "Failed to delete custom role from user")
 		}

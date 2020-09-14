@@ -32,6 +32,7 @@ func TestFilterUserList(t *testing.T) {
 			FilterName: "adminfake",
 			ExpectNum:  0,
 		},
+		// TODO add test for filtering by ID
 	}
 
 	for _, tc := range tt {

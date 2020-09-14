@@ -53,16 +53,6 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 	return res, nil
 }
 
-// Get ...
-func (h *UserInfoHandler) Get(projectName string, userID string) (*model.UserInfo, *errors.Error) {
-	res, exists := h.userList[userID]
-	if !exists || res.ProjectName != projectName {
-		return nil, model.ErrNoSuchUser
-	}
-
-	return res, nil
-}
-
 // Update ...
 func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *errors.Error {
 	if res, exists := h.userList[ent.ID]; !exists || res.ProjectName != projectName {
@@ -184,6 +174,10 @@ func filterUserList(data []*model.UserInfo, filter *model.UserFilter) []*model.U
 	for _, user := range data {
 		if filter.Name != "" && user.Name != filter.Name {
 			// missmatch name
+			continue
+		}
+		if filter.ID != "" && user.ID != filter.ID {
+			// missmatch id
 			continue
 		}
 		res = append(res, user)
