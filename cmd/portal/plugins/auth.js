@@ -206,6 +206,9 @@ export class AuthHandler {
         console.log(error)
       }
     }
+
+    // remove cookie data
+    document.cookie = 'HEKATE_LOGIN_SESSION=; max-age=0'
     this.RemoveAllData()
   }
 }
