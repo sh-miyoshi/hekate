@@ -269,6 +269,17 @@ class APIClient {
     const res = await this._request(url, 'PUT', info)
     return res
   }
+
+  async SessionGet(projectName, sessionID) {
+    const url =
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/session/' +
+      sessionID
+    const res = await this._request(url, 'GET')
+    return res
+  }
 }
 
 export default (context, inject) => {

@@ -116,11 +116,22 @@
         </button>
         <div v-if="showLoginSessions" class="card-body">
           <div class="form-group row">
-            <div v-if="user">
-              <ul>
-                <li v-for="item in user.sessions" :key="item">{{ item }}</li>
-              </ul>
-            </div>
+            <table class="table table-responsive-sm">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>From IP</th>
+                  <th>Session Start</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="session in loginSessions" :key="session.id">
+                  <td>{{ session.id }}</td>
+                  <td>{{ session.from_ip }}</td>
+                  <td>{{ session.created_at }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -147,6 +158,7 @@ export default {
       assignedCustomRole: null,
       customRoleCandidates: [],
       showLoginSessions: false,
+      loginSessions: [],
       SYSTEM_ROLES: [
         'read-cluster',
         'write-cluster',
@@ -302,12 +314,21 @@ export default {
         }
       }
     },
-    loadLoginSessions() {
+    async loadLoginSessions() {
       this.showLoginSessions = !this.showLoginSessions
+      const projectName = this.$store.state.current_project
 
       // load sessions when open dropdown
-      if (this.showLoginSessions) {
-        // TODO(implement this)
+      if (this.showLoginSessions && this.user) {
+        for (const sid of this.user.sessions) {
+          const res = await this.$api.SessionGet(projectName, sid)
+          if (!res.ok) {
+            console.log('Failed to get session: %o', res)
+            this.error = res.message
+            return
+          }
+          this.loginSessions.push(res.data)
+        }
       }
     }
   }
