@@ -66,7 +66,6 @@
 
 - 各ページの作成
   - User
-    - Login Sessionの表示
     - force password reset
 - validationの追加
   - portal側でリクエストを出す前にはじく
