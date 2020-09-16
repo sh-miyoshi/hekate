@@ -48,7 +48,10 @@ export class AuthHandler {
     const project = 'master'
     window.localStorage.setItem('login_project', project)
 
-    // TODO(consider state)
+    const state = Math.random()
+      .toString(36)
+      .slice(-8)
+    this.context.store.commit('setCurrentProject', state)
 
     let protcol = 'https'
     if (!process.env.https) {
@@ -65,7 +68,8 @@ export class AuthHandler {
         process.env.HEKATE_PORTAL_HOST +
         ':' +
         process.env.HEKATE_PORTAL_PORT +
-        '/callback'
+        '/callback',
+      state
     }
 
     const url =
@@ -118,14 +122,25 @@ export class AuthHandler {
     }
   }
 
-  async AuthCode(authCode) {
+  async AuthCode(authCode, state) {
     const redirect = '/admin'
 
-    // TODO(consider state)
+    const correctState = this.context.store.state.login_state
+    console.log('state: ', correctState, ', received state: ', state)
+    if (correctState !== state) {
+      this.context.error({
+        message:
+          'The state parameters are different. It may have been attacked by CSRF.',
+        statusCode: 500
+      })
+      return
+    }
+
     const opts = {
       grant_type: 'authorization_code',
       client_id: this.client_id,
-      code: authCode
+      code: authCode,
+      state
     }
 
     const res = await this._tokenRequest(opts)
@@ -189,10 +204,11 @@ export class AuthHandler {
       }
 
       // TODO(use param: timeout)
+      const project = window.localStorage.getItem('login_project')
       const url =
         process.env.HEKATE_SERVER_ADDR +
         '/api/v1/project/' +
-        this.project +
+        project +
         '/openid-connect/revoke'
 
       const handler = axios.create({
