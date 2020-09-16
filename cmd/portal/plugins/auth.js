@@ -51,7 +51,7 @@ export class AuthHandler {
     const state = Math.random()
       .toString(36)
       .slice(-8)
-    this.context.store.commit('setCurrentProject', state)
+    window.sessionStorage.setItem('login_state', state)
 
     let protcol = 'https'
     if (!process.env.https) {
@@ -125,7 +125,7 @@ export class AuthHandler {
   async AuthCode(authCode, state) {
     const redirect = '/admin'
 
-    const correctState = this.context.store.state.login_state
+    const correctState = window.sessionStorage.getItem('login_state')
     console.log('state: ', correctState, ', received state: ', state)
     if (correctState !== state) {
       this.context.error({
