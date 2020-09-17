@@ -9,7 +9,8 @@ https:
 db:
   type: "memory"
   connection_string: ""
+logfile: 'server.log'
 
-  # Expires Time of Authorization code in OpenID Connect [sec]
+# Expires Time of Authorization code in OpenID Connect [sec]
 oidc_auth_code_expires_time: 300
 oidc_user_login_page_res: "/hekate/server/login"

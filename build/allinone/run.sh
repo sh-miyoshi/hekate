@@ -1,9 +1,11 @@
 #!/bin/bash
 
 function ExecPortal() {
-  echo "Start Portal"
   cd /hekate/portal
+  echo "Building portal binaries ..."
   npm run build > portal.log 2>&1
+  echo "Start portal"
+  echo "Portal log is in /hekate/portal/portal.log"
   npm run start >> portal.log 2>&1
 }
 
@@ -36,4 +38,6 @@ ExecPortal &
 
 # Run server
 cd /hekate/server
+echo "Start server"
+echo "Server log is in /hekate/server/server.log"
 ./hekate-server --config=./config.yaml
