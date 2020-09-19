@@ -1,4 +1,4 @@
-package pwpol
+package secret
 
 import (
 	"strings"

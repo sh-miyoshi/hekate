@@ -12,8 +12,8 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"github.com/sh-miyoshi/hekate/pkg/pwpol"
 	"github.com/sh-miyoshi/hekate/pkg/role"
+	"github.com/sh-miyoshi/hekate/pkg/secret"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
@@ -256,6 +256,16 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) *errors.Error {
 		}
 		return nil
 	})
+}
+
+// ProjectSecretReset ...
+func (m *Manager) ProjectSecretReset(name string) *errors.Error {
+	// prj, err := m.ProjectGet(name)
+	// if err != nil {
+	// 	return err
+	// }
+
+	return nil
 }
 
 // UserAdd ...
@@ -525,7 +535,7 @@ func (m *Manager) UserChangePassword(projectName string, userID string, password
 		}
 		usr := users[0]
 
-		if err := pwpol.CheckPassword(usr.Name, password, prj.PasswordPolicy); err != nil {
+		if err := secret.CheckPassword(usr.Name, password, prj.PasswordPolicy); err != nil {
 			return errors.Append(err, "Failed to check password")
 		}
 
