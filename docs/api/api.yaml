@@ -386,6 +386,29 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/update-secret':
+    post:
+      summary: "Update secret info"
+      description: |
+        update secret info of the project
+        require role is write-cluster
+      tags:
+        - project
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'successfully updated'
+        '403':
+          description: 'Forbidden'
+        '404':
+          description: 'Project Not Found'
+        '500':
+          description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user':
     post:
       summary: "Create User"
