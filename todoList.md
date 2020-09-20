@@ -7,8 +7,6 @@
 ## server application enhancement
 
 - APIの修正
-  - Update Project Secret Info APIの追加
-    - 公開鍵などの更新API
   - ユーザーパスワードロック
     - 強制ロック解除用のAPI
   - Custom RoleにDescriptionを追加
@@ -71,7 +69,6 @@
   - portal側でリクエストを出す前にはじく
 - user role更新時のvalidation
   - cluster系とそれ以外を同時に付与しようとした場合警告を出す
-- oidc authのstateチェック
 - client_idやproject nameをどうするか(変数化)
 - middleware処理
   - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
