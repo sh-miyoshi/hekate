@@ -66,3 +66,9 @@ jobs:
         cd test
         chmod 755 user_lock_test.sh
         ./user_lock_test.sh
+    
+    - name: Reset Project Secret Test
+      run: |
+        cd test
+        chmod 755 project_secret_reset_test.sh
+        ./project_secret_reset_test.sh
