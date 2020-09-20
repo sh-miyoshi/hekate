@@ -12,8 +12,8 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"github.com/sh-miyoshi/hekate/pkg/pwpol"
 	"github.com/sh-miyoshi/hekate/pkg/role"
+	"github.com/sh-miyoshi/hekate/pkg/secret"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
@@ -129,7 +129,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := pwpol.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
+	if err := secret.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "The password does not much the policy"))
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
@@ -493,7 +493,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 				errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
-		} else if errors.Contains(err, pwpol.ErrPasswordPolicyFailed) {
+		} else if errors.Contains(err, secret.ErrPasswordPolicyFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {

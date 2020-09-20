@@ -386,6 +386,29 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/reset-secret':
+    post:
+      summary: "Reset secret info"
+      description: |
+        reset secret info of the project
+        require role is write-project
+      tags:
+        - project
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'successfully reset'
+        '403':
+          description: 'Forbidden'
+        '404':
+          description: 'Project Not Found'
+        '500':
+          description: 'Internal Server Error'
   '/api/v1/project/{projectName}/user':
     post:
       summary: "Create User"
