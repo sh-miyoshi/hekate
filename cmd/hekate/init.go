@@ -70,6 +70,7 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectDeleteHandler).Methods("DELETE")
 	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectGetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectUpdateHandler).Methods("PUT")
+	r.HandleFunc(basePath+"/project/{projectName}/reset-secret", projectapiv1.ProjectResetSecretHandler).Methods("POST")
 
 	// User API
 	r.HandleFunc(basePath+"/project/{projectName}/user", userapiv1.AllUserGetHandler).Methods("GET")

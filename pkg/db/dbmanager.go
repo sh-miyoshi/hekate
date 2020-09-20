@@ -1,9 +1,6 @@
 package db
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
 	"os"
 
 	"github.com/asaskevich/govalidator"
@@ -125,17 +122,12 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) *errors.Error {
 		return errors.Append(err, "Validate failed")
 	}
 
-	switch ent.TokenConfig.SigningAlgorithm {
-	case "RS256":
-		key, err := rsa.GenerateKey(rand.Reader, 2048) // fixed key length is ok?
-		if err != nil {
-			return errors.New("RSA key generate failed", "Failed to generate RSA private key: %v", err)
-		}
-		ent.TokenConfig.SignSecretKey = x509.MarshalPKCS1PrivateKey(key)
-		ent.TokenConfig.SignPublicKey = x509.MarshalPKCS1PublicKey(&key.PublicKey)
-	default:
-		// TODO(return error)
+	keys, err := secret.GetSignKey(ent.TokenConfig.SigningAlgorithm)
+	if err != nil {
+		return err
 	}
+	ent.TokenConfig.SignSecretKey = keys.Private
+	ent.TokenConfig.SignPublicKey = keys.Public
 
 	return m.transaction.Transaction(func() *errors.Error {
 		prjs, err := m.project.GetList(&model.ProjectFilter{Name: ent.Name})
@@ -260,12 +252,19 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) *errors.Error {
 
 // ProjectSecretReset ...
 func (m *Manager) ProjectSecretReset(name string) *errors.Error {
-	// prj, err := m.ProjectGet(name)
-	// if err != nil {
-	// 	return err
-	// }
+	prj, err := m.ProjectGet(name)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	keys, err := secret.GetSignKey(prj.TokenConfig.SigningAlgorithm)
+	if err != nil {
+		return err
+	}
+	prj.TokenConfig.SignSecretKey = keys.Private
+	prj.TokenConfig.SignPublicKey = keys.Public
+
+	return m.ProjectUpdate(prj)
 }
 
 // UserAdd ...
