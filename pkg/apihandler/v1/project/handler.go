@@ -40,7 +40,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 
 		res = append(res, ProjectGetResponse{
 			Name:      prj.Name,
-			CreatedAt: prj.CreatedAt,
+			CreatedAt: prj.CreatedAt.Format(time.RFC3339),
 			TokenConfig: TokenConfig{
 				AccessTokenLifeSpan:  prj.TokenConfig.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
@@ -143,7 +143,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Return Response
 	res := ProjectGetResponse{
 		Name:      project.Name,
-		CreatedAt: project.CreatedAt,
+		CreatedAt: project.CreatedAt.Format(time.RFC3339),
 		TokenConfig: TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
@@ -230,7 +230,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Return Response
 	res := ProjectGetResponse{
 		Name:      project.Name,
-		CreatedAt: project.CreatedAt,
+		CreatedAt: project.CreatedAt.Format(time.RFC3339),
 		TokenConfig: TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,

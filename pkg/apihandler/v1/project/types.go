@@ -1,9 +1,5 @@
 package projectapi
 
-import (
-	"time"
-)
-
 // TokenConfig ...
 type TokenConfig struct {
 	AccessTokenLifeSpan  uint   `json:"accessTokenLifeSpan"`
@@ -41,7 +37,7 @@ type ProjectCreateRequest struct {
 // ProjectGetResponse ...
 type ProjectGetResponse struct {
 	Name            string         `json:"name"`
-	CreatedAt       time.Time      `json:"createdAt"`
+	CreatedAt       string         `json:"createdAt"`
 	TokenConfig     TokenConfig    `json:"tokenConfig"`
 	PasswordPolicy  PasswordPolicy `json:"passwordPolicy"`
 	AllowGrantTypes []string       `json:"allowGrantTypes"`

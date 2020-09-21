@@ -75,12 +75,12 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		tmp := &UserGetResponse{
 			ID:          user.ID,
 			Name:        user.Name,
-			CreatedAt:   user.CreatedAt.String(),
+			CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 			SystemRoles: user.SystemRoles,
 			CustomRoles: roles,
 			LockState: LockState{
 				Locked:            user.LockState.Locked,
-				VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+				VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
 			},
 		}
 		sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
@@ -181,12 +181,12 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
-		CreatedAt:   user.CreatedAt.String(),
+		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
 		LockState: LockState{
 			Locked:            user.LockState.Locked,
-			VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+			VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
 		},
 	}
 
@@ -277,12 +277,12 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
-		CreatedAt:   user.CreatedAt.String(),
+		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
 		LockState: LockState{
 			Locked:            user.LockState.Locked,
-			VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+			VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
 		},
 	}
 
@@ -537,4 +537,12 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserLogoutHandler method successfully finished")
+}
+
+func convertTimeArray(tms []time.Time) []string {
+	res := []string{}
+	for _, tm := range tms {
+		res = append(res, tm.Format(time.RFC3339))
+	}
+	return res
 }

@@ -41,7 +41,7 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 			ID:                  client.ID,
 			Secret:              client.Secret,
 			AccessType:          client.AccessType,
-			CreatedAt:           client.CreatedAt.String(),
+			CreatedAt:           client.CreatedAt.Format(time.RFC3339),
 			AllowedCallbackURLs: client.AllowedCallbackURLs,
 		})
 	}
@@ -114,7 +114,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 		ID:                  client.ID,
 		Secret:              client.Secret,
 		AccessType:          client.AccessType,
-		CreatedAt:           client.CreatedAt.String(),
+		CreatedAt:           client.CreatedAt.Format(time.RFC3339),
 		AllowedCallbackURLs: client.AllowedCallbackURLs,
 	}
 
@@ -192,7 +192,7 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 		ID:                  client.ID,
 		Secret:              client.Secret,
 		AccessType:          client.AccessType,
-		CreatedAt:           client.CreatedAt.String(),
+		CreatedAt:           client.CreatedAt.Format(time.RFC3339),
 		AllowedCallbackURLs: client.AllowedCallbackURLs,
 	}
 

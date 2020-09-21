@@ -11,7 +11,6 @@
     - 強制ロック解除用のAPI
   - Custom RoleにDescriptionを追加
   - API docの修正
-- API responseのtime formatの見直し
 - http headerの追加
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
@@ -63,8 +62,8 @@
 ## Portal(Admin Console) enhancement
 
 - 各ページの作成
-  - User
-    - force password reset
+  - user force password reset
+  - project secret reset
 - validationの追加
   - portal側でリクエストを出す前にはじく
 - user role更新時のvalidation

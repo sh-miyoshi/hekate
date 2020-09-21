@@ -1,7 +1,5 @@
 package userapi
 
-import "time"
-
 // CustomRole ...
 type CustomRole struct {
 	ID   string `json:"id"`
@@ -10,8 +8,8 @@ type CustomRole struct {
 
 // LockState ...
 type LockState struct {
-	Locked            bool        `json:"locked"`
-	VerifyFailedTimes []time.Time `json:"verifyFailedTimes"`
+	Locked            bool     `json:"locked"`
+	VerifyFailedTimes []string `json:"verifyFailedTimes"`
 }
 
 // UserCreateRequest ...
