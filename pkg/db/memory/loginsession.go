@@ -33,20 +33,8 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 }
 
 // Delete ...
-func (h *LoginSessionHandler) Delete(projectName string, sessionID string) *errors.Error {
-	newList := []*model.LoginSession{}
-	ok := false
-	for _, s := range h.sessionList {
-		if s.ProjectName == projectName && s.SessionID == sessionID {
-			ok = true
-		} else {
-			newList = append(newList, s)
-		}
-	}
-
-	if !ok {
-		return model.ErrNoSuchLoginSession
-	}
+func (h *LoginSessionHandler) Delete(projectName string, filter *model.LoginSessionFilter) *errors.Error {
+	newList := filterLoginSessionList(h.sessionList, projectName, filter)
 
 	h.sessionList = newList
 	return nil
@@ -74,13 +62,11 @@ func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSe
 	return nil, model.ErrNoSuchLoginSession
 }
 
-// DeleteAllInClient ...
-func (h *LoginSessionHandler) DeleteAllInClient(projectName string, clientID string) *errors.Error {
+// DeleteAll ...
+func (h *LoginSessionHandler) DeleteAll(projectName string) *errors.Error {
 	newList := []*model.LoginSession{}
 	for _, s := range h.sessionList {
 		if s.ProjectName != projectName {
-			newList = append(newList, s)
-		} else if s.ClientID != clientID {
 			newList = append(newList, s)
 		}
 	}
@@ -89,30 +75,29 @@ func (h *LoginSessionHandler) DeleteAllInClient(projectName string, clientID str
 	return nil
 }
 
-// DeleteAllInUser ...
-func (h *LoginSessionHandler) DeleteAllInUser(projectName string, userID string) *errors.Error {
-	newList := []*model.LoginSession{}
-	for _, s := range h.sessionList {
-		if s.ProjectName != projectName {
-			newList = append(newList, s)
-		} else if s.UserID != userID {
-			newList = append(newList, s)
+func filterLoginSessionList(data []*model.LoginSession, projectName string, filter *model.LoginSessionFilter) []*model.LoginSession {
+	if filter == nil {
+		return data
+	}
+	res := []*model.LoginSession{}
+
+	for _, s := range data {
+		if projectName == s.ProjectName {
+			if filter.SessionID != "" && s.SessionID != filter.SessionID {
+				// missmatch session id
+				continue
+			}
+			if filter.UserID != "" && s.UserID != filter.UserID {
+				// missmatch user id
+				continue
+			}
+			if filter.ClientID != "" && s.ClientID != filter.ClientID {
+				// missmatch session id
+				continue
+			}
 		}
+		res = append(res, s)
 	}
 
-	h.sessionList = newList
-	return nil
-}
-
-// DeleteAllInProject ...
-func (h *LoginSessionHandler) DeleteAllInProject(projectName string) *errors.Error {
-	newList := []*model.LoginSession{}
-	for _, s := range h.sessionList {
-		if s.ProjectName != projectName {
-			newList = append(newList, s)
-		}
-	}
-
-	h.sessionList = newList
-	return nil
+	return res
 }

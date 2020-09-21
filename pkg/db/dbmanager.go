@@ -184,7 +184,7 @@ func (m *Manager) ProjectDelete(name string) *errors.Error {
 			return errors.Append(model.ErrDeleteBlockedProject, "the project can not delete")
 		}
 
-		if err := m.loginSession.DeleteAllInProject(name); err != nil {
+		if err := m.loginSession.DeleteAll(name); err != nil {
 			return errors.Append(err, "Failed to delete login session data")
 		}
 
@@ -330,7 +330,7 @@ func (m *Manager) UserDelete(projectName string, userID string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.loginSession.DeleteAllInUser(projectName, userID); err != nil {
+		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{UserID: userID}); err != nil {
 			return errors.Append(err, "Delete authoriation code failed")
 		}
 
@@ -589,7 +589,7 @@ func (m *Manager) LoginSessionUpdate(projectName string, ent *model.LoginSession
 func (m *Manager) LoginSessionDelete(projectName string, sessionID string) *errors.Error {
 	// login session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.loginSession.Delete(projectName, sessionID); err != nil {
+		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{SessionID: sessionID}); err != nil {
 			return errors.Append(err, "Failed to delete login session")
 		}
 
@@ -725,7 +725,7 @@ func (m *Manager) ClientDelete(projectName, clientID string) *errors.Error {
 			return model.ErrNoSuchClient
 		}
 
-		if err := m.loginSession.DeleteAllInClient(projectName, clientID); err != nil {
+		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{ClientID: clientID}); err != nil {
 			return errors.Append(err, "Failed to delete login session of the client")
 		}
 

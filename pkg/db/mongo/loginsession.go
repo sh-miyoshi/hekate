@@ -124,17 +124,32 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 }
 
 // Delete ...
-func (h *LoginSessionHandler) Delete(projectName string, sessionID string) *errors.Error {
+func (h *LoginSessionHandler) Delete(projectName string, filter *model.LoginSessionFilter) *errors.Error {
+	if filter == nil {
+		return nil
+	}
+
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
-	filter := bson.D{
+	f := bson.D{
 		{Key: "project_name", Value: projectName},
-		{Key: "session_id", Value: sessionID},
+	}
+
+	if filter != nil {
+		if filter.SessionID != "" {
+			f = append(f, bson.E{Key: "session_id", Value: filter.SessionID})
+		}
+		if filter.UserID != "" {
+			f = append(f, bson.E{Key: "user_id", Value: filter.UserID})
+		}
+		if filter.ClientID != "" {
+			f = append(f, bson.E{Key: "client_id", Value: filter.ClientID})
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	_, err := col.DeleteOne(ctx, filter)
+	_, err := col.DeleteMany(ctx, f)
 	if err != nil {
 		return errors.New("DB failed", "Failed to delete login session from mongodb: %v", err)
 	}
@@ -211,44 +226,8 @@ func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSe
 	}, nil
 }
 
-// DeleteAllInClient ...
-func (h *LoginSessionHandler) DeleteAllInClient(projectName string, clientID string) *errors.Error {
-	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
-	filter := bson.D{
-		{Key: "project_name", Value: projectName},
-		{Key: "client_id", Value: clientID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	_, err := col.DeleteMany(ctx, filter)
-	if err != nil {
-		return errors.New("DB failed", "Failed to delete authcode session from mongodb: %v", err)
-	}
-	return nil
-}
-
-// DeleteAllInUser ...
-func (h *LoginSessionHandler) DeleteAllInUser(projectName string, userID string) *errors.Error {
-	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
-	filter := bson.D{
-		{Key: "project_name", Value: projectName},
-		{Key: "user_id", Value: userID},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
-	defer cancel()
-
-	_, err := col.DeleteMany(ctx, filter)
-	if err != nil {
-		return errors.New("DB failed", "Failed to delete authcode session from mongodb: %v", err)
-	}
-	return nil
-}
-
-// DeleteAllInProject ...
-func (h *LoginSessionHandler) DeleteAllInProject(projectName string) *errors.Error {
+// DeleteAll ...
+func (h *LoginSessionHandler) DeleteAll(projectName string) *errors.Error {
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "project_name", Value: projectName},
