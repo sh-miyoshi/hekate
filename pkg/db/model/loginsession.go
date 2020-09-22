@@ -43,4 +43,5 @@ type LoginSessionHandler interface {
 	DeleteAll(projectName string) *errors.Error
 	GetByCode(projectName string, code string) (*LoginSession, *errors.Error)
 	Get(projectName string, sessionID string) (*LoginSession, *errors.Error)
+	Cleanup(now time.Time) *errors.Error
 }

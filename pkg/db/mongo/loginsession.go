@@ -59,18 +59,19 @@ func NewLoginSessionHandler(dbClient *mongo.Client) (*LoginSessionHandler, *erro
 // Add ...
 func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *errors.Error {
 	v := &loginSession{
-		SessionID:    ent.SessionID,
-		Code:         ent.Code,
-		ExpiresIn:    ent.ExpiresIn,
-		Scope:        ent.Scope,
-		ResponseType: ent.ResponseType,
-		ClientID:     ent.ClientID,
-		RedirectURI:  ent.RedirectURI,
-		Nonce:        ent.Nonce,
-		ProjectName:  ent.ProjectName,
-		ResponseMode: ent.ResponseMode,
-		Prompt:       ent.Prompt,
-		LoginDate:    ent.LoginDate,
+		SessionID:     ent.SessionID,
+		Code:          ent.Code,
+		ExpiresIn:     ent.ExpiresIn,
+		UnixExpiresIn: ent.ExpiresIn.Unix(),
+		Scope:         ent.Scope,
+		ResponseType:  ent.ResponseType,
+		ClientID:      ent.ClientID,
+		RedirectURI:   ent.RedirectURI,
+		Nonce:         ent.Nonce,
+		ProjectName:   ent.ProjectName,
+		ResponseMode:  ent.ResponseMode,
+		Prompt:        ent.Prompt,
+		LoginDate:     ent.LoginDate,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
@@ -95,18 +96,19 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 	}
 
 	v := &loginSession{
-		SessionID:    ent.SessionID,
-		Code:         ent.Code,
-		ExpiresIn:    ent.ExpiresIn,
-		Scope:        ent.Scope,
-		ResponseType: ent.ResponseType,
-		ClientID:     ent.ClientID,
-		RedirectURI:  ent.RedirectURI,
-		Nonce:        ent.Nonce,
-		ProjectName:  ent.ProjectName,
-		ResponseMode: ent.ResponseMode,
-		Prompt:       ent.Prompt,
-		LoginDate:    ent.LoginDate,
+		SessionID:     ent.SessionID,
+		Code:          ent.Code,
+		ExpiresIn:     ent.ExpiresIn,
+		UnixExpiresIn: ent.ExpiresIn.Unix(),
+		Scope:         ent.Scope,
+		ResponseType:  ent.ResponseType,
+		ClientID:      ent.ClientID,
+		RedirectURI:   ent.RedirectURI,
+		Nonce:         ent.Nonce,
+		ProjectName:   ent.ProjectName,
+		ResponseMode:  ent.ResponseMode,
+		Prompt:        ent.Prompt,
+		LoginDate:     ent.LoginDate,
 	}
 
 	updates := bson.D{
@@ -240,5 +242,23 @@ func (h *LoginSessionHandler) DeleteAll(projectName string) *errors.Error {
 	if err != nil {
 		return errors.New("DB failed", "Failed to delete authcode session from mongodb: %v", err)
 	}
+	return nil
+}
+
+// Cleanup ...
+func (h *LoginSessionHandler) Cleanup(now time.Time) *errors.Error {
+	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
+	filter := bson.D{
+		{Key: "unix_expires_in", Value: bson.D{{Key: "$lt", Value: now.Unix()}}},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.New("DB failed", "Failed to delete expired session from mongodb: %v", err)
+	}
+
 	return nil
 }

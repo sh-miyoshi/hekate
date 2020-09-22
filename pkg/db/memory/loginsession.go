@@ -1,6 +1,8 @@
 package memory
 
 import (
+	"time"
+
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
@@ -67,6 +69,19 @@ func (h *LoginSessionHandler) DeleteAll(projectName string) *errors.Error {
 	newList := []*model.LoginSession{}
 	for _, s := range h.sessionList {
 		if s.ProjectName != projectName {
+			newList = append(newList, s)
+		}
+	}
+
+	h.sessionList = newList
+	return nil
+}
+
+// Cleanup ...
+func (h *LoginSessionHandler) Cleanup(now time.Time) *errors.Error {
+	newList := []*model.LoginSession{}
+	for _, s := range h.sessionList {
+		if now.After(s.ExpiresIn) {
 			newList = append(newList, s)
 		}
 	}

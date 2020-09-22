@@ -2,6 +2,7 @@ package db
 
 import (
 	"os"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/sh-miyoshi/hekate/pkg/db/memory"
@@ -895,6 +896,21 @@ func (m *Manager) CustomRoleUpdate(projectName string, ent *model.CustomRole) *e
 		if err := m.customRole.Update(projectName, ent); err != nil {
 			return errors.Append(err, "Failed to update client")
 		}
+		return nil
+	})
+}
+
+// DeleteExpiredSessions ...
+func (m *Manager) DeleteExpiredSessions() *errors.Error {
+	now := time.Now()
+
+	return m.transaction.Transaction(func() *errors.Error {
+		if err := m.loginSession.Cleanup(now); err != nil {
+			return errors.Append(err, "Failed to cleanup login sessions")
+		}
+
+		// TODO cleanup session
+
 		return nil
 	})
 }

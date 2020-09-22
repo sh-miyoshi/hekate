@@ -49,18 +49,19 @@ type session struct {
 }
 
 type loginSession struct {
-	SessionID    string    `bson:"session_id"`
-	Code         string    `bson:"code"`
-	ExpiresIn    time.Time `bson:"expires_in"`
-	Scope        string    `bson:"scope"`
-	ResponseType []string  `bson:"response_type"`
-	ClientID     string    `bson:"client_id"`
-	RedirectURI  string    `bson:"redirect_uri"`
-	Nonce        string    `bson:"nonce"`
-	ProjectName  string    `bson:"project_name"`
-	ResponseMode string    `bson:"response_mode"`
-	Prompt       []string  `bson:"prompt"`
-	LoginDate    time.Time `bson:"login_date"`
+	SessionID     string    `bson:"session_id"`
+	Code          string    `bson:"code"`
+	ExpiresIn     time.Time `bson:"expires_in"`
+	UnixExpiresIn int64     `bson:"unix_expires_in"`
+	Scope         string    `bson:"scope"`
+	ResponseType  []string  `bson:"response_type"`
+	ClientID      string    `bson:"client_id"`
+	RedirectURI   string    `bson:"redirect_uri"`
+	Nonce         string    `bson:"nonce"`
+	ProjectName   string    `bson:"project_name"`
+	ResponseMode  string    `bson:"response_mode"`
+	Prompt        []string  `bson:"prompt"`
+	LoginDate     time.Time `bson:"login_date"`
 }
 
 type lockState struct {
