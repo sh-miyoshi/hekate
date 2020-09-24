@@ -15,8 +15,6 @@
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - http.Error関数の置き換え
 - db manager validationの追加
-- DBGCの追加
-  - Expiredしたsessionなどを一定期間ごとに削除する
 - テストの追加
   - unit test
     - pkg/apiclient

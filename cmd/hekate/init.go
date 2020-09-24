@@ -225,5 +225,8 @@ func initAll(cfg *config.GlobalConfig) *errors.Error {
 		return errors.Append(err, "Failed to initialize audit events database")
 	}
 
+	// Initialize DBGC
+	db.InitGC(cfg.DBGCInterval)
+
 	return nil
 }

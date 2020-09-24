@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/sh-miyoshi/hekate/cmd/hekate/config"
+	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
@@ -33,6 +34,9 @@ func main() {
 	// Setup API
 	r := mux.NewRouter()
 	setAPI(r, cfg)
+
+	// Run Database GC
+	go db.RunGC()
 
 	// Run Server
 	addr := fmt.Sprintf("%s:%d", cfg.BindAddr, cfg.Port)
