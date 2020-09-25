@@ -9,7 +9,7 @@ WORKDIR /hekate/cmd/hekate
 RUN go build -o hekate-server
 
 
-FROM node:13.10 as front-builder
+FROM node:14 as front-builder
 
 WORKDIR /hekate
 COPY ./cmd/portal ./cmd/portal
