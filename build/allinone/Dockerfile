@@ -15,6 +15,7 @@ WORKDIR /hekate
 COPY ./cmd/portal ./cmd/portal
 WORKDIR /hekate/cmd/portal
 RUN npm install
+RUN npm run build
 
 
 FROM ubuntu:18.04
@@ -30,6 +31,8 @@ COPY cmd/hekate/_data/login /hekate/server/login
 
 COPY ./cmd/portal /hekate/portal/
 COPY --from=front-builder /hekate/cmd/portal/node_modules /hekate/portal/node_modules
+COPY --from=front-builder /hekate/cmd/portal/.nuxt /hekate/portal/.nuxt
+COPY --from=front-builder /hekate/cmd/portal/static /hekate/portal/static
 COPY build/allinone/nuxt.config.js /hekate/portal/nuxt.config.js
 
 COPY build/allinone/run.sh .
