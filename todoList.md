@@ -11,9 +11,6 @@
     - 強制ロック解除用のAPI
   - Custom RoleにDescriptionを追加
 - http headerの追加
-- http errorの充実
-  - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
-  - http.Error関数の置き換え
 - db manager validationの追加
 - テストの追加
   - unit test
@@ -23,6 +20,7 @@
     - pkg/db
     - pkg/oidc
   - 結合テスト
+    - DBGCのテスト
 - パスワード以外でのユーザーのログイン
   - 証明書
   - ワンタイムパスワード
@@ -63,6 +61,7 @@
   - project secret reset
 - validationの追加
   - portal側でリクエストを出す前にはじく
+- errorの表示の修正
 - user role更新時のvalidation
   - cluster系とそれ以外を同時に付与しようとした場合警告を出す
 - client_idやproject nameをどうするか(変数化)
@@ -91,7 +90,7 @@
 - outputの修正
   - error出力の方法
   - debug出力
-  - error messageの内容
+- error messageの内容
 - Production向け実行ファイルの作成
 - support authorization code flow
 
