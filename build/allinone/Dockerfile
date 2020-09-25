@@ -29,10 +29,7 @@ COPY --from=server-builder /hekate/cmd/hekate/hekate-server /hekate/server/hekat
 COPY build/allinone/config.yaml /hekate/server/config.yaml
 COPY cmd/hekate/_data/login /hekate/server/login
 
-COPY ./cmd/portal /hekate/portal/
-COPY --from=front-builder /hekate/cmd/portal/node_modules /hekate/portal/node_modules
-COPY --from=front-builder /hekate/cmd/portal/.nuxt /hekate/portal/.nuxt
-COPY --from=front-builder /hekate/cmd/portal/static /hekate/portal/static
+COPY --from=front-builder /hekate/cmd/portal /hekate/portal
 COPY build/allinone/nuxt.config.js /hekate/portal/nuxt.config.js
 
 COPY build/allinone/run.sh .
