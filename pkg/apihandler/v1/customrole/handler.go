@@ -98,10 +98,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().CustomRoleAdd(projectName, &role); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
+		if errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Custom Role %s is already exists", role.Name))
 			http.Error(w, "Custom Role already exists", http.StatusConflict)
 		} else if errors.Contains(err, model.ErrCustomRoleValidateFailed) {

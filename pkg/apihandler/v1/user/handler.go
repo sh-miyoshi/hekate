@@ -39,9 +39,9 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	users, err := db.GetInst().UserGetList(projectName, filter)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrUserValidateFailed) {
-			errors.PrintAsInfo(errors.Append(err, "Project %s is not found", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
+		if errors.Contains(err, model.ErrUserValidateFailed) {
+			errors.PrintAsInfo(errors.Append(err, "User Get List Failed"))
+			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get user"))
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -150,9 +150,6 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		if errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "user validation failed"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
-		} else if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is already exists", user.Name))
 			http.Error(w, "User already exists", http.StatusConflict)
@@ -209,10 +206,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Delete User
 	if err := db.GetInst().UserDelete(projectName, userID); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
@@ -247,10 +241,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
+		if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else {
@@ -325,10 +316,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous User Info
 	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchUser) {
+		if errors.Contains(err, model.ErrNoSuchUser) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
@@ -385,10 +373,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Previous User Info
 	if err := db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchUser) {
+		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrRoleAlreadyAppended) {
@@ -431,10 +416,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get Previous User Info
 	if err := db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrNoSuchUser) {
+		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			http.Error(w, "User Not Found", http.StatusNotFound)
 		} else if errors.Contains(err, model.ErrNoSuchRoleInUser) {

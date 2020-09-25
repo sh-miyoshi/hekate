@@ -93,10 +93,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = db.GetInst().ClientAdd(projectName, &client); err != nil {
-		if errors.Contains(err, model.ErrNoSuchProject) {
-			errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-			http.Error(w, "Project Not Found", http.StatusNotFound)
-		} else if errors.Contains(err, model.ErrClientAlreadyExists) {
+		if errors.Contains(err, model.ErrClientAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Client %s is already exists", client.ID))
 			http.Error(w, "Client already exists", http.StatusConflict)
 		} else if errors.Contains(err, model.ErrClientValidateFailed) {
