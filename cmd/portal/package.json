@@ -18,7 +18,7 @@
     "@nuxtjs/font-awesome": "^1.0.4",
     "bootstrap-vue": "^2.5.0",
     "jwt-decode": "^2.2.0",
-    "nuxt": "^2.0.0",
+    "nuxt": "^2.14.6",
     "uuid": "^7.0.2",
     "validator": "^13.0.0"
   },
@@ -35,6 +35,6 @@
     "jest": "^25.1.0",
     "minimist": "^1.2.5",
     "prettier": "^1.19.1",
-    "vue-jest": "^4.0.0-0"
+    "vue-jest": "^4.0.0-rc.0"
   }
 }
