@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 var logger = log.New(os.Stderr, "[TESTSERVER]", log.LUTC|log.LstdFlags)
@@ -33,7 +34,7 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Length", length)
 	_, err := io.Copy(w, r.Body)
 	if err != nil {
-		http.Error(w, "Internal Server Error ", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 }

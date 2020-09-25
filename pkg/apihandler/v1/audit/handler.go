@@ -21,7 +21,7 @@ func AuditGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -37,16 +37,16 @@ func AuditGetHandler(w http.ResponseWriter, r *http.Request) {
 		fromDate, err = time.Parse(time.RFC3339, queries.Get("from_date"))
 		if err != nil {
 			logger.Info("Failed to parse from_date: %v", err)
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to parse from_date", ""), http.StatusBadRequest)
 			return
 		}
 	}
 	if queries.Get("to_date") != "" {
 		var err error
-		toDate, err = time.Parse(time.RFC3339, queries.Get("from_date"))
+		toDate, err = time.Parse(time.RFC3339, queries.Get("to_date"))
 		if err != nil {
 			logger.Info("Failed to parse to_date: %v", err)
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to parse to_date", ""), http.StatusBadRequest)
 			return
 		}
 	}
@@ -54,7 +54,7 @@ func AuditGetHandler(w http.ResponseWriter, r *http.Request) {
 	audits, err := audit.GetInst().Get(projectName, fromDate, toDate)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get audit events"))
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		return
 	}
 

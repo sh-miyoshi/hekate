@@ -25,7 +25,7 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -39,7 +39,7 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 	roles, err := db.GetInst().CustomRoleGetList(projectName, filter)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get role list"))
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -77,7 +77,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -85,7 +85,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var request CustomRoleCreateRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.Info("Failed to decode role create request: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to decode request", ""), http.StatusBadRequest)
 		return
 	}
 
@@ -100,13 +100,13 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if err := db.GetInst().CustomRoleAdd(projectName, &role); err != nil {
 		if errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Custom Role %s is already exists", role.Name))
-			http.Error(w, "Custom Role already exists", http.StatusConflict)
+			errors.WriteHTTPError(w, "Conflict", err, http.StatusConflict)
 		} else if errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role validation failed"))
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to create role"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -144,17 +144,17 @@ func RoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
 	if err := db.GetInst().CustomRoleDelete(projectName, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", roleID))
-			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete custom role"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -174,7 +174,7 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -182,10 +182,10 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", roleID))
-			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get role"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -221,7 +221,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -229,7 +229,7 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var request CustomRolePutRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		logger.Info("Failed to decode role update request: %v", err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to decode request", ""), http.StatusBadRequest)
 		return
 	}
 
@@ -238,10 +238,10 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchCustomRole) || errors.Contains(err, model.ErrCustomRoleValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Custom role %s is not found", request.Name))
-			http.Error(w, "Custom Role Not Found", http.StatusNotFound)
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update role"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -253,10 +253,10 @@ func RoleUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if err := db.GetInst().CustomRoleUpdate(projectName, role); err != nil {
 		if errors.Contains(err, model.ErrCustomRoleValidateFailed) || errors.Contains(err, model.ErrCustomRoleAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to validate request"))
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update role"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}

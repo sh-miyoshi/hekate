@@ -2,8 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"net/http"
+
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
 // ResponseWrite ...

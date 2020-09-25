@@ -116,6 +116,24 @@ func Contains(all, err *Error) bool {
 	return false
 }
 
+// WriteHTTPError ...
+func WriteHTTPError(w http.ResponseWriter, typ string, err *Error, code int) {
+	res := map[string]interface{}{
+		"type":  typ,
+		"error": err.publicMsg,
+		"code":  code,
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+
+	w.WriteHeader(code)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		logger.Error("Failed to encode response: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
 // WriteOAuthError ...
 func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 	res := map[string]interface{}{

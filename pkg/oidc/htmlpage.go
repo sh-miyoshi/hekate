@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
@@ -12,7 +13,7 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 	tpl, err := template.ParseFiles(userLoginHTML)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		http.Error(w, "User Login Page maybe broken", http.StatusInternalServerError)
+		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Page maybe broken", ""), http.StatusInternalServerError)
 		return
 	}
 
@@ -37,7 +38,7 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 	tpl, err := template.ParseFiles(userLoginErrorHTML)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		http.Error(w, "User Login Error Page maybe broken", http.StatusInternalServerError)
+		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Error Page maybe broken", ""), http.StatusInternalServerError)
 		return
 	}
 
@@ -56,7 +57,7 @@ func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWrite
 	tpl, err := template.ParseFiles(userConsentHTML)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		http.Error(w, "User Consent Page maybe broken", http.StatusInternalServerError)
+		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Consent Page maybe broken", ""), http.StatusInternalServerError)
 		return
 	}
 

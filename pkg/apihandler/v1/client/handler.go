@@ -24,14 +24,14 @@ func AllClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
 	clients, err := db.GetInst().ClientGetList(projectName, nil)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get client"))
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -69,7 +69,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -78,7 +78,7 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
 		err = errors.New("Invalid request", "Failed to decode client create request: %v", e)
 		errors.PrintAsInfo(err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
 	}
 
@@ -95,13 +95,13 @@ func ClientCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().ClientAdd(projectName, &client); err != nil {
 		if errors.Contains(err, model.ErrClientAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Client %s is already exists", client.ID))
-			http.Error(w, "Client already exists", http.StatusConflict)
+			errors.WriteHTTPError(w, "Conflict", err, http.StatusConflict)
 		} else if errors.Contains(err, model.ErrClientValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Bad Request"))
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to create client"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -139,17 +139,17 @@ func ClientDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
 	if err = db.GetInst().ClientDelete(projectName, clientID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "No such client: %s", clientID))
-			http.Error(w, "Client Not Found", http.StatusNotFound)
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete client"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -169,7 +169,7 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -177,10 +177,10 @@ func ClientGetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "No such client: %s", clientID))
-			http.Error(w, "Client Not Found", http.StatusNotFound)
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get client"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -217,7 +217,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
@@ -226,7 +226,7 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
 		err = errors.New("Invalid request", "Failed to decode client update request: %v", e)
 		errors.PrintAsInfo(err)
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
 	}
 
@@ -236,10 +236,10 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "No such client: %s", clientID))
-			http.Error(w, "Client Not Found", http.StatusNotFound)
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update client"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
@@ -253,10 +253,10 @@ func ClientUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().ClientUpdate(projectName, client); err != nil {
 		if errors.Contains(err, model.ErrClientValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Bad Request"))
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		} else {
 			errors.Print(errors.Append(err, "Failed to update client"))
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}

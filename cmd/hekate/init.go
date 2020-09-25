@@ -38,10 +38,10 @@ func loggingMiddleware(next http.Handler) http.Handler {
 			if _, err := db.GetInst().ProjectGet(projectName); err != nil {
 				if errors.Contains(err, model.ErrNoSuchProject) || errors.Contains(err, model.ErrProjectValidateFailed) {
 					errors.PrintAsInfo(errors.Append(err, "No such project %s", projectName))
-					http.Error(w, "Project Not Found", http.StatusNotFound)
+					errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 				} else {
 					errors.Print(errors.Append(err, "Failed to validate project name"))
-					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 				}
 				return
 			}
@@ -107,7 +107,7 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.GetInst().Ping(); err != nil {
-			http.Error(w, "DB Ping Failed", http.StatusInternalServerError)
+			errors.WriteHTTPError(w, "Ping Failed", err, http.StatusInternalServerError)
 			return
 		}
 		w.Write([]byte("ok"))
