@@ -1,4 +1,4 @@
-FROM golang:1.13 as server-builder
+FROM golang:1.15 as server-builder
 
 WORKDIR /hekate
 COPY go.mod .
