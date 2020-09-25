@@ -61,7 +61,7 @@ func AuditGetHandler(w http.ResponseWriter, r *http.Request) {
 	res := []*AuditGetResponse{}
 	for _, a := range audits {
 		res = append(res, &AuditGetResponse{
-			Time:         a.Time,
+			Time:         a.Time.Format(time.RFC3339),
 			ResourceType: a.ResourceType,
 			Method:       a.Method,
 			Path:         a.Path,

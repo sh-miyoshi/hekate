@@ -40,7 +40,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 
 		res = append(res, ProjectGetResponse{
 			Name:      prj.Name,
-			CreatedAt: prj.CreatedAt,
+			CreatedAt: prj.CreatedAt.Format(time.RFC3339),
 			TokenConfig: TokenConfig{
 				AccessTokenLifeSpan:  prj.TokenConfig.AccessTokenLifeSpan,
 				RefreshTokenLifeSpan: prj.TokenConfig.RefreshTokenLifeSpan,
@@ -143,7 +143,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Return Response
 	res := ProjectGetResponse{
 		Name:      project.Name,
-		CreatedAt: project.CreatedAt,
+		CreatedAt: project.CreatedAt.Format(time.RFC3339),
 		TokenConfig: TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
@@ -183,7 +183,10 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := db.GetInst().ProjectDelete(projectName); err != nil {
-		if errors.Contains(err, model.ErrDeleteBlockedProject) {
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "Failed to delete non-exists project"))
+			http.Error(w, "Not Found", http.StatusNotFound)
+		} else if errors.Contains(err, model.ErrDeleteBlockedProject) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to delete blocked project"))
 			http.Error(w, "Forbidden", http.StatusForbidden)
 		} else {
@@ -227,7 +230,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Return Response
 	res := ProjectGetResponse{
 		Name:      project.Name,
-		CreatedAt: project.CreatedAt,
+		CreatedAt: project.CreatedAt.Format(time.RFC3339),
 		TokenConfig: TokenConfig{
 			AccessTokenLifeSpan:  project.TokenConfig.AccessTokenLifeSpan,
 			RefreshTokenLifeSpan: project.TokenConfig.RefreshTokenLifeSpan,
@@ -277,8 +280,13 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get Previous Project Info
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
-		errors.Print(errors.Append(err, "Failed to get project"))
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "Failed to update non-exists project"))
+			http.Error(w, "Not Found", http.StatusNotFound)
+		} else {
+			errors.Print(errors.Append(err, "Failed to get project"))
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -323,4 +331,33 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 	logger.Info("ProjectUpdateHandler method successfully finished")
+}
+
+// ProjectResetSecretHandler ...
+//   require role: write-project
+func ProjectResetSecretHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
+	// Authorize API Request
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	// update project secret
+	if err := db.GetInst().ProjectSecretReset(projectName); err != nil {
+		if errors.Contains(err, model.ErrNoSuchProject) {
+			errors.PrintAsInfo(errors.Append(err, "Failed to reset secret of non-exists project"))
+			http.Error(w, "Not Found", http.StatusNotFound)
+		} else {
+			errors.Print(errors.Append(err, "Failed to reset project secret"))
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	logger.Info("ProjectResetSecretHandler method successfully finished")
 }

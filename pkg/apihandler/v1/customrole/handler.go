@@ -49,7 +49,7 @@ func AllRoleGetHandler(w http.ResponseWriter, r *http.Request) {
 			ID:          role.ID,
 			Name:        role.Name,
 			ProjectName: role.ProjectName,
-			CreatedAt:   role.CreatedAt.String(),
+			CreatedAt:   role.CreatedAt.Format(time.RFC3339),
 		})
 	}
 
@@ -119,7 +119,7 @@ func RoleCreateHandler(w http.ResponseWriter, r *http.Request) {
 		ID:          role.ID,
 		Name:        role.Name,
 		ProjectName: role.ProjectName,
-		CreatedAt:   role.CreatedAt.String(),
+		CreatedAt:   role.CreatedAt.Format(time.RFC3339),
 	}
 
 	jwthttp.ResponseWrite(w, "RoleCreateHandler", &res)
@@ -197,7 +197,7 @@ func RoleGetHandler(w http.ResponseWriter, r *http.Request) {
 		ID:          role.ID,
 		Name:        role.Name,
 		ProjectName: role.ProjectName,
-		CreatedAt:   role.CreatedAt.String(),
+		CreatedAt:   role.CreatedAt.Format(time.RFC3339),
 	}
 
 	jwthttp.ResponseWrite(w, "CustomRoleGetHandler", &res)

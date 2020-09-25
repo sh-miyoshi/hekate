@@ -32,6 +32,7 @@ type GlobalConfig struct {
 	UserLoginResourceDir string      `yaml:"oidc_user_login_page_res"`
 	HTTPSConfig          HTTPSConfig `yaml:"https"`
 	AuditDB              DBInfo      `yaml:"audit_db"`
+	DBGCInterval         uint64      `yaml:"dbgc_interval"`
 }
 
 // Validate ...

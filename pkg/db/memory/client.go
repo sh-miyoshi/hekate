@@ -52,7 +52,7 @@ func (h *ClientInfoHandler) GetList(projectName string, filter *model.ClientFilt
 	}
 
 	if filter != nil {
-		res = filterClientList(res, filter)
+		res = filterClientList(res, projectName, filter)
 	}
 
 	return res, nil
@@ -81,16 +81,18 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) *errors.Error {
 	return nil
 }
 
-func filterClientList(data []*model.ClientInfo, filter *model.ClientFilter) []*model.ClientInfo {
+func filterClientList(data []*model.ClientInfo, projectName string, filter *model.ClientFilter) []*model.ClientInfo {
 	if filter == nil {
 		return data
 	}
 	res := []*model.ClientInfo{}
 
 	for _, cli := range data {
-		if filter.ID != "" && cli.ID != filter.ID {
-			// missmatch id
-			continue
+		if projectName == cli.ProjectName {
+			if filter.ID != "" && cli.ID != filter.ID {
+				// missmatch id
+				continue
+			}
 		}
 		res = append(res, cli)
 	}

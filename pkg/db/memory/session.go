@@ -25,7 +25,7 @@ func (h *SessionHandler) Add(projectName string, ent *model.Session) *errors.Err
 
 // Delete ...
 func (h *SessionHandler) Delete(projectName string, filter *model.SessionFilter) *errors.Error {
-	newList := filterSessionList(h.sessionList, filter)
+	newList := filterSessionList(h.sessionList, projectName, filter)
 
 	h.sessionList = newList
 	return nil
@@ -54,26 +54,28 @@ func (h *SessionHandler) GetList(projectName string, filter *model.SessionFilter
 	}
 
 	if filter != nil {
-		res = filterSessionList(res, filter)
+		res = filterSessionList(res, projectName, filter)
 	}
 
 	return res, nil
 }
 
-func filterSessionList(data []*model.Session, filter *model.SessionFilter) []*model.Session {
+func filterSessionList(data []*model.Session, projectName string, filter *model.SessionFilter) []*model.Session {
 	if filter == nil {
 		return data
 	}
 	res := []*model.Session{}
 
 	for _, s := range data {
-		if filter.SessionID != "" && s.SessionID != filter.SessionID {
-			// missmatch session id
-			continue
-		}
-		if filter.UserID != "" && s.UserID != filter.UserID {
-			// missmatch user id
-			continue
+		if projectName == s.ProjectName {
+			if filter.SessionID != "" && s.SessionID != filter.SessionID {
+				// missmatch session id
+				continue
+			}
+			if filter.UserID != "" && s.UserID != filter.UserID {
+				// missmatch user id
+				continue
+			}
 		}
 		res = append(res, s)
 	}

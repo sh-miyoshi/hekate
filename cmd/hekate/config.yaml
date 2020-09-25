@@ -43,3 +43,6 @@ audit_db:
 oidc_auth_code_expires_time: 300
 
 oidc_user_login_page_res: "_data/login"
+
+# Interval of database garbage collector [sec]
+dbgc_interval: 3600

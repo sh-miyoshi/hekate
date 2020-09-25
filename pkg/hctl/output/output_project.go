@@ -34,7 +34,7 @@ func NewProjectsInfoFormat(projects []*projectapi.ProjectGetResponse) *ProjectsI
 // ToText ...
 func (f *ProjectInfoFormat) ToText() (string, error) {
 	res := fmt.Sprintf("Name:                    %s\n", f.project.Name)
-	res += fmt.Sprintf("Created Time:            %s\n", f.project.CreatedAt.String())
+	res += fmt.Sprintf("Created Time:            %s\n", f.project.CreatedAt)
 	res += fmt.Sprintf("Access Token Life Span:  %d [sec]\n", f.project.TokenConfig.AccessTokenLifeSpan)
 	res += fmt.Sprintf("Refresh Token Life Span: %d [sec]\n", f.project.TokenConfig.RefreshTokenLifeSpan)
 	res += fmt.Sprintf("Token Signing Algorithm: %s\n", f.project.TokenConfig.SigningAlgorithm)

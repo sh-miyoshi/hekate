@@ -12,8 +12,8 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"github.com/sh-miyoshi/hekate/pkg/pwpol"
 	"github.com/sh-miyoshi/hekate/pkg/role"
+	"github.com/sh-miyoshi/hekate/pkg/secret"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
@@ -75,12 +75,12 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		tmp := &UserGetResponse{
 			ID:          user.ID,
 			Name:        user.Name,
-			CreatedAt:   user.CreatedAt.String(),
+			CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 			SystemRoles: user.SystemRoles,
 			CustomRoles: roles,
 			LockState: LockState{
 				Locked:            user.LockState.Locked,
-				VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+				VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
 			},
 		}
 		sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
@@ -129,7 +129,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := pwpol.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
+	if err := secret.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "The password does not much the policy"))
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
@@ -181,12 +181,12 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
-		CreatedAt:   user.CreatedAt.String(),
+		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
 		LockState: LockState{
 			Locked:            user.LockState.Locked,
-			VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+			VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
 		},
 	}
 
@@ -277,12 +277,12 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
-		CreatedAt:   user.CreatedAt.String(),
+		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
 		LockState: LockState{
 			Locked:            user.LockState.Locked,
-			VerifyFailedTimes: user.LockState.VerifyFailedTimes,
+			VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
 		},
 	}
 
@@ -493,7 +493,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 				errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 				http.Error(w, "Bad Request", http.StatusBadRequest)
 			}
-		} else if errors.Contains(err, pwpol.ErrPasswordPolicyFailed) {
+		} else if errors.Contains(err, secret.ErrPasswordPolicyFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 		} else {
@@ -537,4 +537,12 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserLogoutHandler method successfully finished")
+}
+
+func convertTimeArray(tms []time.Time) []string {
+	res := []string{}
+	for _, tm := range tms {
+		res = append(res, tm.Format(time.RFC3339))
+	}
+	return res
 }

@@ -36,9 +36,12 @@ func TestFilterUserList(t *testing.T) {
 	}
 
 	for _, tc := range tt {
+		const project = "master"
+
 		data := []*model.UserInfo{
 			{
-				Name: tc.UserName,
+				ProjectName: project,
+				Name:        tc.UserName,
 			},
 		}
 
@@ -46,7 +49,7 @@ func TestFilterUserList(t *testing.T) {
 			Name: tc.FilterName,
 		}
 
-		res := filterUserList(data, filter)
+		res := filterUserList(data, project, filter)
 		if len(res) != tc.ExpectNum {
 			t.Errorf("Filter User List Failed: expect num: %d, but got %d, %v", tc.ExpectNum, len(res), res)
 		}

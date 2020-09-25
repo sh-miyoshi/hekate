@@ -83,6 +83,10 @@ func (h *SessionHandler) Add(projectName string, s *model.Session) *errors.Error
 
 // Delete ...
 func (h *SessionHandler) Delete(projectName string, filter *model.SessionFilter) *errors.Error {
+	if filter == nil {
+		return nil
+	}
+
 	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
 	f := bson.D{
 		{Key: "project_name", Value: projectName},
@@ -99,7 +103,7 @@ func (h *SessionHandler) Delete(projectName string, filter *model.SessionFilter)
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	_, err := col.DeleteOne(ctx, f)
+	_, err := col.DeleteMany(ctx, f)
 	if err != nil {
 		return errors.New("DB failed", "Failed to delete session from mongodb: %v", err)
 	}

@@ -83,7 +83,7 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	res := SessionGetResponse{
 		ID:        s.SessionID,
-		CreatedAt: s.CreatedAt.String(),
+		CreatedAt: s.CreatedAt.Format(time.RFC3339),
 		ExpiresIn: s.ExpiresIn,
 		FromIP:    s.FromIP,
 	}

@@ -23,6 +23,13 @@ type LoginSession struct {
 	LoginDate    time.Time
 }
 
+// LoginSessionFilter ...
+type LoginSessionFilter struct {
+	SessionID string
+	UserID    string
+	ClientID  string
+}
+
 var (
 	// ErrNoSuchLoginSession ...
 	ErrNoSuchLoginSession = errors.New("No such session", "No such session")
@@ -32,10 +39,9 @@ var (
 type LoginSessionHandler interface {
 	Add(projectName string, ent *LoginSession) *errors.Error
 	Update(projectName string, ent *LoginSession) *errors.Error
-	Delete(projectName string, sessionID string) *errors.Error
+	Delete(projectName string, filter *LoginSessionFilter) *errors.Error
+	DeleteAll(projectName string) *errors.Error
 	GetByCode(projectName string, code string) (*LoginSession, *errors.Error)
 	Get(projectName string, sessionID string) (*LoginSession, *errors.Error)
-	DeleteAllInClient(projectName string, clientID string) *errors.Error
-	DeleteAllInUser(projectName string, userID string) *errors.Error
-	DeleteAllInProject(projectName string) *errors.Error
+	Cleanup(now time.Time) *errors.Error
 }

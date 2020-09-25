@@ -1,10 +1,8 @@
 package db
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
 	"os"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/sh-miyoshi/hekate/pkg/db/memory"
@@ -12,8 +10,8 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"github.com/sh-miyoshi/hekate/pkg/pwpol"
 	"github.com/sh-miyoshi/hekate/pkg/role"
+	"github.com/sh-miyoshi/hekate/pkg/secret"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
@@ -125,17 +123,12 @@ func (m *Manager) ProjectAdd(ent *model.ProjectInfo) *errors.Error {
 		return errors.Append(err, "Validate failed")
 	}
 
-	switch ent.TokenConfig.SigningAlgorithm {
-	case "RS256":
-		key, err := rsa.GenerateKey(rand.Reader, 2048) // fixed key length is ok?
-		if err != nil {
-			return errors.New("RSA key generate failed", "Failed to generate RSA private key: %v", err)
-		}
-		ent.TokenConfig.SignSecretKey = x509.MarshalPKCS1PrivateKey(key)
-		ent.TokenConfig.SignPublicKey = x509.MarshalPKCS1PublicKey(&key.PublicKey)
-	default:
-		// TODO(return error)
+	keys, err := secret.GetSignKey(ent.TokenConfig.SigningAlgorithm)
+	if err != nil {
+		return err
 	}
+	ent.TokenConfig.SignSecretKey = keys.Private
+	ent.TokenConfig.SignPublicKey = keys.Public
 
 	return m.transaction.Transaction(func() *errors.Error {
 		prjs, err := m.project.GetList(&model.ProjectFilter{Name: ent.Name})
@@ -192,7 +185,7 @@ func (m *Manager) ProjectDelete(name string) *errors.Error {
 			return errors.Append(model.ErrDeleteBlockedProject, "the project can not delete")
 		}
 
-		if err := m.loginSession.DeleteAllInProject(name); err != nil {
+		if err := m.loginSession.DeleteAll(name); err != nil {
 			return errors.Append(err, "Failed to delete login session data")
 		}
 
@@ -258,6 +251,23 @@ func (m *Manager) ProjectUpdate(ent *model.ProjectInfo) *errors.Error {
 	})
 }
 
+// ProjectSecretReset ...
+func (m *Manager) ProjectSecretReset(name string) *errors.Error {
+	prj, err := m.ProjectGet(name)
+	if err != nil {
+		return err
+	}
+
+	keys, err := secret.GetSignKey(prj.TokenConfig.SigningAlgorithm)
+	if err != nil {
+		return err
+	}
+	prj.TokenConfig.SignSecretKey = keys.Private
+	prj.TokenConfig.SignPublicKey = keys.Public
+
+	return m.ProjectUpdate(prj)
+}
+
 // UserAdd ...
 func (m *Manager) UserAdd(projectName string, ent *model.UserInfo) *errors.Error {
 	if err := ent.Validate(); err != nil {
@@ -321,7 +331,7 @@ func (m *Manager) UserDelete(projectName string, userID string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.loginSession.DeleteAllInUser(projectName, userID); err != nil {
+		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{UserID: userID}); err != nil {
 			return errors.Append(err, "Delete authoriation code failed")
 		}
 
@@ -525,7 +535,7 @@ func (m *Manager) UserChangePassword(projectName string, userID string, password
 		}
 		usr := users[0]
 
-		if err := pwpol.CheckPassword(usr.Name, password, prj.PasswordPolicy); err != nil {
+		if err := secret.CheckPassword(usr.Name, password, prj.PasswordPolicy); err != nil {
 			return errors.Append(err, "Failed to check password")
 		}
 
@@ -580,7 +590,7 @@ func (m *Manager) LoginSessionUpdate(projectName string, ent *model.LoginSession
 func (m *Manager) LoginSessionDelete(projectName string, sessionID string) *errors.Error {
 	// login session is in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
-		if err := m.loginSession.Delete(projectName, sessionID); err != nil {
+		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{SessionID: sessionID}); err != nil {
 			return errors.Append(err, "Failed to delete login session")
 		}
 
@@ -716,7 +726,7 @@ func (m *Manager) ClientDelete(projectName, clientID string) *errors.Error {
 			return model.ErrNoSuchClient
 		}
 
-		if err := m.loginSession.DeleteAllInClient(projectName, clientID); err != nil {
+		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{ClientID: clientID}); err != nil {
 			return errors.Append(err, "Failed to delete login session of the client")
 		}
 
@@ -886,6 +896,21 @@ func (m *Manager) CustomRoleUpdate(projectName string, ent *model.CustomRole) *e
 		if err := m.customRole.Update(projectName, ent); err != nil {
 			return errors.Append(err, "Failed to update client")
 		}
+		return nil
+	})
+}
+
+// DeleteExpiredSessions ...
+func (m *Manager) DeleteExpiredSessions() *errors.Error {
+	now := time.Now()
+
+	return m.transaction.Transaction(func() *errors.Error {
+		if err := m.loginSession.Cleanup(now); err != nil {
+			return errors.Append(err, "Failed to cleanup login sessions")
+		}
+
+		// TODO cleanup session
+
 		return nil
 	})
 }

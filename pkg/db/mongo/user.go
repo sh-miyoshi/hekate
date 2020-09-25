@@ -121,7 +121,7 @@ func (h *UserInfoHandler) Delete(projectName string, userID string) *errors.Erro
 		{Key: "user_id", Value: userID},
 	}
 
-	if _, err := rcol.DeleteMany(ctx, filter); err != nil {
+	if _, err := rcol.DeleteOne(ctx, filter); err != nil {
 		return errors.New("DB failed", "Failed to delete custom role in user from mongodb: %v", err)
 	}
 

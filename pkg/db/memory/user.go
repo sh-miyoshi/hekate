@@ -47,7 +47,7 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 	}
 
 	if filter != nil {
-		res = filterUserList(res, filter)
+		res = filterUserList(res, projectName, filter)
 	}
 
 	return res, nil
@@ -165,20 +165,22 @@ func (h *UserInfoHandler) DeleteAllCustomRole(projectName string, roleID string)
 	return nil
 }
 
-func filterUserList(data []*model.UserInfo, filter *model.UserFilter) []*model.UserInfo {
+func filterUserList(data []*model.UserInfo, projectName string, filter *model.UserFilter) []*model.UserInfo {
 	if filter == nil {
 		return data
 	}
 	res := []*model.UserInfo{}
 
 	for _, user := range data {
-		if filter.Name != "" && user.Name != filter.Name {
-			// missmatch name
-			continue
-		}
-		if filter.ID != "" && user.ID != filter.ID {
-			// missmatch id
-			continue
+		if projectName == user.ProjectName {
+			if filter.Name != "" && user.Name != filter.Name {
+				// missmatch name
+				continue
+			}
+			if filter.ID != "" && user.ID != filter.ID {
+				// missmatch id
+				continue
+			}
 		}
 		res = append(res, user)
 	}

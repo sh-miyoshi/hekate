@@ -2,33 +2,19 @@
 
 ## Documents
 
-- 構成図
+- 開発者向け構成図
 
 ## server application enhancement
 
 - APIの修正
-  - Update Project Secret Info APIの追加
-    - 公開鍵などの更新API
   - ユーザーパスワードロック
     - 強制ロック解除用のAPI
   - Custom RoleにDescriptionを追加
-  - API docの修正
-- API responseのtime formatの見直し
 - http headerの追加
 - http errorの充実
   - example: [facebook for developers](https://developers.facebook.com/docs/messenger-platform/reference/send-api/error-codes?locale=ja_JP)
   - http.Error関数の置き換え
-- ユーザー情報の追加
-  - email
-  - first/last name
 - db manager validationの追加
-- パスワード以外でのユーザーのログイン
-  - 証明書
-  - ワンタイムパスワード
-  - デバイス認証
-- SQL DBの追加
-- DBGCの追加
-  - Expiredしたsessionなどを一定期間ごとに削除する
 - テストの追加
   - unit test
     - pkg/apiclient
@@ -37,6 +23,12 @@
     - pkg/db
     - pkg/oidc
   - 結合テスト
+- パスワード以外でのユーザーのログイン
+  - 証明書
+  - ワンタイムパスワード
+  - デバイス認証
+- Client Secretに証明書を追加できるようにする
+  - portalのアップデートだけでよい？
 - OpenID Connect部分のエンハンス
   - Consentページの追加
     - TokenHandlerからconsent処理
@@ -47,31 +39,32 @@
   - code認証失敗時、すべてのtokenを無効化
   - subject_types_supportedにpairwiseをサポート
   - RS256以外のSigining Algorithmのサポート
+- user federation
+  - user情報を外部に保存し、それと連携する
+  - LDAP連携？
+- SQL DBの追加
+- ユーザー情報の追加
+  - email
+  - first/last name
 - kong対応
   - URL: [https://konghq.com/](https://konghq.com/)
 - (project/user) enabledの有効化
 - projectのimport/export
-- Client Secretに証明書を追加できるようにする
-- filterの追加(user, role)
-- ~~SAML対応~~
-- user federation
-  - user情報を外部に保存し、それと連携する
 - User Authentication HTMLの拡充
   - Client IDを表示(optional)
   - Project名を表示
-- LDAP連携？
-- user password変更ページの追加
+  - user password変更ページの追加
+- ~~SAML対応~~
 
 ## Portal(Admin Console) enhancement
 
 - 各ページの作成
-  - User
-    - force password reset
+  - user force password reset
+  - project secret reset
 - validationの追加
   - portal側でリクエストを出す前にはじく
 - user role更新時のvalidation
   - cluster系とそれ以外を同時に付与しようとした場合警告を出す
-- oidc authのstateチェック
 - client_idやproject nameをどうするか(変数化)
 - middleware処理
   - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
