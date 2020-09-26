@@ -359,24 +359,43 @@
         </div>
       </div>
 
-      <div class="form-group row">
-        <label for="refreshTokenLifeSpan" class="col-sm-4 control-label">
+      <div class="form-group">
+        <button
+          class="btn btn-link dropdown-toggle h5 ml-n3"
+          @click="showGrantTypes = !showGrantTypes"
+        >
           Allow Grant Types
-        </label>
-        <div class="col-md-7 col-form-label">
-          <div
-            v-for="type in grantTypes"
-            :key="type.value"
-            class="form-check checkbox"
-          >
-            <input
-              class="form-check-input"
-              type="checkbox"
-              :checked="type.checked"
-              @change="type.checked = !type.checked"
-            />
-            <label class="form-check-label">{{ type.name }}</label>
+        </button>
+        <div v-if="showGrantTypes" class="card-body">
+          <div class="col-md-7 col-form-label">
+            <div
+              v-for="type in grantTypes"
+              :key="type.value"
+              class="form-check checkbox"
+            >
+              <input
+                class="form-check-input"
+                type="checkbox"
+                :checked="type.checked"
+                @change="type.checked = !type.checked"
+              />
+              <label class="form-check-label">{{ type.name }}</label>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button
+          class="btn btn-link dropdown-toggle h5 ml-n3"
+          @click="showSecret = !showSecret"
+        >
+          Secrets
+        </button>
+        <div v-if="showSecret" class="card-body">
+          <p>TODO</p>
+          <p>public key</p>
+          <p>reset button</p>
         </div>
       </div>
 
@@ -433,6 +452,7 @@ export default {
         failureResetTime: 0,
         failureResetTimeUnit: 'sec'
       },
+      showGrantTypes: true,
       grantTypes: [
         {
           name: 'Authorization Code',
@@ -454,7 +474,8 @@ export default {
           value: 'password',
           checked: false
         }
-      ]
+      ],
+      showSecret: true
     }
   },
   mounted() {
@@ -541,6 +562,7 @@ export default {
         this.error = res.message
         return
       }
+      console.log(res.data)
 
       let t = this.setUnit(res.data.tokenConfig.accessTokenLifeSpan)
       this.tokenConfig.accessTokenLifeSpan = t.span
