@@ -2,6 +2,6 @@ package keysapi
 
 // KeysGetResponse ...
 type KeysGetResponse struct {
-	Type      string
-	PublicKey string
+	Type      string `json:"type"`
+	PublicKey string `json:"publicKey"`
 }
