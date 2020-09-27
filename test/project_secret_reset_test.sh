@@ -22,7 +22,7 @@ master_access_token=`echo $token_info | jq -r .access_token`
 prev=`curl -k -s -X GET -H "Authorization: Bearer $master_access_token" "$URL/project/master/openid-connect/certs" | jq -r .keys[0].n`
 
 # # Project Secret Reset
-curl -k -s -X POST -H "Authorization: Bearer $master_access_token" "$URL/project/master/reset-secret"
+curl -k -s -X POST -H "Authorization: Bearer $master_access_token" "$URL/project/master/keys/reset"
 
 # Get Public Key Info
 current=`curl -k -s -X GET -H "Authorization: Bearer $master_access_token" "$URL/project/master/openid-connect/certs" | jq -r .keys[0].n`

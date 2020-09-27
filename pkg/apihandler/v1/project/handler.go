@@ -324,27 +324,3 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 	logger.Info("ProjectUpdateHandler method successfully finished")
 }
-
-// ProjectResetSecretHandler ...
-//   require role: write-project
-func ProjectResetSecretHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-
-	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
-		return
-	}
-
-	// update project secret
-	if err := db.GetInst().ProjectSecretReset(projectName); err != nil {
-		errors.Print(errors.Append(err, "Failed to reset project secret"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	logger.Info("ProjectResetSecretHandler method successfully finished")
-}

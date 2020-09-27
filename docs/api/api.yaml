@@ -386,14 +386,37 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/reset-secret':
+  '/api/v1/project/{projectName}/keys':
+    get:
+      summary: "Get project secret info"
+      description: |
+        get secret info of the project
+        require role is read-project
+      tags:
+        - keys
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'successfully get'
+        '403':
+          description: 'Forbidden'
+        '404':
+          description: 'Project Not Found'
+        '500':
+          description: 'Internal Server Error'
+  '/api/v1/project/{projectName}/keys/reset':
     post:
       summary: "Reset secret info"
       description: |
         reset secret info of the project
         require role is write-project
       tags:
-        - project
+        - keys
       parameters:
         - name: projectName
           in: path

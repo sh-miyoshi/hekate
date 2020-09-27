@@ -11,6 +11,7 @@ import (
 	auditapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/audit"
 	clientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	roleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
+	keysapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
 	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
 	projectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 	sessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/session"
@@ -70,7 +71,10 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectDeleteHandler).Methods("DELETE")
 	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectGetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectUpdateHandler).Methods("PUT")
-	r.HandleFunc(basePath+"/project/{projectName}/reset-secret", projectapiv1.ProjectResetSecretHandler).Methods("POST")
+
+	// Keys API
+	r.HandleFunc(basePath+"/project/{projectName}/keys", keysapiv1.KeysGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/keys/reset", keysapiv1.KeysResetHandler).Methods("POST")
 
 	// User API
 	r.HandleFunc(basePath+"/project/{projectName}/user", userapiv1.AllUserGetHandler).Methods("GET")
