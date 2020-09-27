@@ -86,8 +86,12 @@ echo "success to project get"
 test_api "$URL/project/new-project" PUT $master_access_token "inputs/project_update.json"
 echo "success to project update"
 
-# Project Secret Reset
-test_api "$URL/project/new-project/reset-secret" POST $master_access_token
+# Keys Get
+test_api "$URL/project/new-project/keys" GET $master_access_token
+echo "success to get project secret"
+
+# Keys Reset
+test_api "$URL/project/new-project/keys/reset" POST $master_access_token
 echo "success to reset project secret"
 
 # Project Delete
