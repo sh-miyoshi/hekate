@@ -280,6 +280,16 @@ class APIClient {
     const res = await this._request(url, 'GET')
     return res
   }
+
+  async KeysGet(projectName) {
+    const url =
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/keys'
+    const res = await this._request(url, 'GET')
+    return res
+  }
 }
 
 export default (context, inject) => {

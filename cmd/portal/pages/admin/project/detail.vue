@@ -388,13 +388,14 @@
       <div class="form-group">
         <button
           class="btn btn-link dropdown-toggle h5 ml-n3"
-          @click="showSecret = !showSecret"
+          @click="loadSecret()"
         >
           Secrets
         </button>
         <div v-if="showSecret" class="card-body">
           <p>TODO</p>
-          <p>public key</p>
+          <p>type: {{ secret.type }}</p>
+          <p>public key: {{ secret.publicKey }}</p>
           <p>reset button</p>
         </div>
       </div>
@@ -475,7 +476,11 @@ export default {
           checked: false
         }
       ],
-      showSecret: true
+      showSecret: true,
+      secret: {
+        type: '',
+        publicKey: ''
+      }
     }
   },
   mounted() {
@@ -501,7 +506,6 @@ export default {
     },
     async update() {
       const grantTypes = []
-      console.log(this.grantTypes)
       for (const type of this.grantTypes) {
         if (type.checked) {
           grantTypes.push(type.value)
@@ -542,7 +546,6 @@ export default {
           )
         }
       }
-      console.log(data)
 
       const res = await this.$api.ProjectUpdate(
         this.$store.state.current_project,
@@ -562,7 +565,7 @@ export default {
         this.error = res.message
         return
       }
-      console.log(res.data)
+      console.log('project info: ', res.data)
 
       let t = this.setUnit(res.data.tokenConfig.accessTokenLifeSpan)
       this.tokenConfig.accessTokenLifeSpan = t.span
@@ -695,6 +698,20 @@ export default {
         this.passwordPolicy.blackList.push(this.newBlackList)
       }
       this.newBlackList = ''
+    },
+    async loadSecret() {
+      this.showSecret = !this.showSecret
+      if (this.showSecret) {
+        const res = await this.$api.KeysGet(this.$store.state.current_project)
+        console.log(res)
+        if (!res.ok) {
+          console.log('Failed to get secret info: %o', res)
+          this.error = res.message
+          return
+        }
+        this.secret.type = res.data.type
+        this.secret.publicKey = res.data.publicKey
+      }
     }
   }
 }
