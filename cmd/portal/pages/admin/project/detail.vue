@@ -476,7 +476,7 @@ export default {
           checked: false
         }
       ],
-      showSecret: true,
+      showSecret: false, // flip this when mounted
       secret: {
         type: '',
         publicKey: ''
@@ -485,6 +485,7 @@ export default {
   },
   mounted() {
     this.setProjectInfo()
+    this.loadSecret()
   },
   methods: {
     deleteProjectConfirm() {
@@ -703,7 +704,6 @@ export default {
       this.showSecret = !this.showSecret
       if (this.showSecret) {
         const res = await this.$api.KeysGet(this.$store.state.current_project)
-        console.log(res)
         if (!res.ok) {
           console.log('Failed to get secret info: %o', res)
           this.error = res.message
