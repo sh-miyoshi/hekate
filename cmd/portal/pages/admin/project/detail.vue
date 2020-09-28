@@ -26,6 +26,36 @@
         </b-modal>
       </div>
 
+      <div>
+        <b-modal
+          id="view-public-key"
+          ref="view-public-key"
+          title="Public Key"
+          hide-footer
+        >
+          <p class="text-break">
+            {{ secret.publicKey }}
+          </p>
+          <button class="btn btn-primary" @click="hidePublicKey()">
+            OK
+          </button>
+        </b-modal>
+      </div>
+
+      <div>
+        <b-modal
+          id="confirm-reset-secret"
+          ref="confirm-reset-secret"
+          title="Confirm"
+          cancel-variant="outline-dark"
+          ok-variant="danger"
+          ok-title="Reset secret"
+          @ok="resetSecret"
+        >
+          <p class="mb-0">Are you sure to reset the secret ?</p>
+        </b-modal>
+      </div>
+
       <div class="form-group">
         <button
           class="btn btn-link dropdown-toggle h5 ml-n3"
@@ -393,10 +423,31 @@
           Secrets
         </button>
         <div v-if="showSecret" class="card-body">
-          <p>TODO</p>
-          <p>type: {{ secret.type }}</p>
-          <p>public key: {{ secret.publicKey }}</p>
-          <p>reset button</p>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Type
+            </label>
+            <div class="col-sm-5">
+              <input
+                v-model="secret.type"
+                class="form-control"
+                disabled="disabled"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Public Key
+            </label>
+            <div class="col-sm-7">
+              <button class="btn btn-primary" @click="showPublicKey">
+                Show
+              </button>
+              <button class="btn btn-danger ml-3" @click="resetSecretConfirm">
+                Reset
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -712,6 +763,18 @@ export default {
         this.secret.type = res.data.type
         this.secret.publicKey = res.data.publicKey
       }
+    },
+    showPublicKey() {
+      this.$refs['view-public-key'].show()
+    },
+    hidePublicKey() {
+      this.$refs['view-public-key'].hide()
+    },
+    resetSecretConfirm() {
+      this.$refs['confirm-reset-secret'].show()
+    },
+    resetSecret() {
+      console.log('test')
     }
   }
 }
