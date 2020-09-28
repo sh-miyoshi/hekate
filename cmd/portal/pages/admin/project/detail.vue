@@ -773,8 +773,16 @@ export default {
     resetSecretConfirm() {
       this.$refs['confirm-reset-secret'].show()
     },
-    resetSecret() {
-      console.log('test')
+    async resetSecret() {
+      const res = await this.$api.KeysReset(this.$store.state.current_project)
+      if (!res.ok) {
+        console.log('Failed to reset secret info: %o', res)
+        this.error = res.message
+        return
+      }
+      // TODO(logout if master)
+
+      alert('successfully reset secret')
     }
   }
 }
