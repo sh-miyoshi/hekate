@@ -159,15 +159,17 @@ export default {
       customRoleCandidates: [],
       showLoginSessions: false,
       loginSessions: [],
-      SYSTEM_ROLES: [
-        'read-cluster',
-        'write-cluster',
-        'read-project',
-        'write-project'
-      ]
+      SYSTEM_ROLES: []
     }
   },
   async mounted() {
+    if (this.$store.state.current_project === 'master') {
+      this.SYSTEM_ROLES.push('read-cluster')
+      this.SYSTEM_ROLES.push('write-cluster')
+    }
+    this.SYSTEM_ROLES.push('read-project')
+    this.SYSTEM_ROLES.push('write-project')
+
     await this.setUser(this.$route.params.id)
     await this.setCustomRoleCandidates()
   },
