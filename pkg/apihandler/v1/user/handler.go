@@ -371,7 +371,6 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 		roleType = model.RoleSystem
 	}
 
-	// Get Previous User Info
 	if err := db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
