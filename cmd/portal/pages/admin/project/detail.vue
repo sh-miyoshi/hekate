@@ -53,6 +53,7 @@
           @ok="resetSecret"
         >
           <p class="mb-0">Are you sure to reset the secret ?</p>
+          <p class="mb-0">*) all issued token will revoke.</p>
         </b-modal>
       </div>
 
@@ -543,9 +544,14 @@ export default {
       this.$refs['confirm-delete-project'].show()
     },
     async deleteProject() {
-      const res = await this.$api.ProjectDelete(
-        this.$store.state.current_project
-      )
+      const projectName = this.$store.state.current_project
+
+      if (projectName === 'master') {
+        this.error = 'master project can not delete'
+        return
+      }
+
+      const res = await this.$api.ProjectDelete(projectName)
       console.log('project delete result: %o', res)
       if (!res.ok) {
         this.error = res.message
@@ -774,15 +780,19 @@ export default {
       this.$refs['confirm-reset-secret'].show()
     },
     async resetSecret() {
-      const res = await this.$api.KeysReset(this.$store.state.current_project)
+      const projectName = this.$store.state.current_project
+      const res = await this.$api.KeysReset(projectName)
       if (!res.ok) {
         console.log('Failed to reset secret info: %o', res)
         this.error = res.message
         return
       }
-      // TODO(logout if master)
 
       alert('successfully reset secret')
+      if (projectName === 'master') {
+        this.$auth.Logout()
+        this.$router.push('/')
+      }
     }
   }
 }
