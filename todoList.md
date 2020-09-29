@@ -58,7 +58,8 @@
 
 - 各ページの作成
   - user force password reset
-  - project secret reset
+  - audit eventの表示
+  - user lock状態の表示
 - validationの追加
   - portal側でリクエストを出す前にはじく
 - errorの表示の修正
@@ -66,14 +67,12 @@
   - cluster系とそれ以外を同時に付与しようとした場合警告を出す
 - client_idやproject nameをどうするか(変数化)
 - middleware処理
-  - roleが足りない(masterプロジェクトにいない、cluster操作権限がない?)
+  - roleが足りない(cluster操作権限がない)
     - 強制ログアウト or 白紙のページを見せる(こっちが有力)
 - redirect先
   - 前回開いていたページに戻る
 - alert画面のcss修正
 - headerにユーザー名を表示
-- audit eventの表示
-- user lock状態の表示
 - black listに登録されているパスワードでユーザーを作成する際のエラーを修正
   - 現在はBad Requestと表示される
 
