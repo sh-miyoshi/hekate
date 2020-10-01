@@ -321,7 +321,11 @@ export default {
       const projectName = this.$store.state.current_project
 
       // load sessions when open dropdown
-      if (this.showLoginSessions && this.user) {
+      if (
+        this.showLoginSessions &&
+        this.user != null &&
+        this.user.sessions != null
+      ) {
         for (const sid of this.user.sessions) {
           const res = await this.$api.SessionGet(projectName, sid)
           if (!res.ok) {
