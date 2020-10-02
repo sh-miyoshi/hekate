@@ -48,6 +48,27 @@
       </div>
 
       <div class="form-group row">
+        <label for="locked" class="col-sm-2 control-label">
+          Locked
+        </label>
+        <div v-if="user" class="col-sm-5">
+          <label class="c-switch c-switch-label c-switch-pill c-switch-primary">
+            <input
+              v-model="user.locked"
+              class="c-switch-input"
+              type="checkbox"
+              :disabled="!user.locked"
+            />
+            <span
+              class="c-switch-slider"
+              data-checked="On"
+              data-unchecked="Off"
+            ></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group row">
         <label for="system-roles" class="col-sm-2 control-label">
           System Role
         </label>
@@ -218,6 +239,8 @@ export default {
       if (!this.user) {
         return
       }
+
+      // TODO(update lock state)
 
       const roles = []
       for (const r of this.user.custom_roles) {
