@@ -6,12 +6,6 @@ type CustomRole struct {
 	Name string `json:"name"`
 }
 
-// LockState ...
-type LockState struct {
-	Locked            bool     `json:"locked"`
-	VerifyFailedTimes []string `json:"verifyFailedTimes"`
-}
-
 // UserCreateRequest ...
 type UserCreateRequest struct {
 	Name        string   `json:"name"`
@@ -28,7 +22,7 @@ type UserGetResponse struct {
 	SystemRoles []string     `json:"system_roles"`
 	CustomRoles []CustomRole `json:"custom_roles"`
 	Sessions    []string     `json:"sessions"` // Array of session IDs
-	LockState   LockState    `json:"lockState"`
+	Locked      bool         `json:"locked"`
 }
 
 // UserPutRequest ...
