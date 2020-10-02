@@ -59,7 +59,9 @@
 - 各ページの作成
   - user force password reset
   - audit eventの表示
-  - user lock状態の表示
+  - user lock状態の解除
+- ヘルプボタンの追加
+  - tooltipなど
 - validationの追加
   - portal側でリクエストを出す前にはじく
 - errorの表示の修正
