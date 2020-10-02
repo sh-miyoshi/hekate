@@ -26,6 +26,37 @@
         </b-modal>
       </div>
 
+      <div>
+        <b-modal
+          id="view-public-key"
+          ref="view-public-key"
+          title="Public Key"
+          hide-footer
+        >
+          <p class="text-break">
+            {{ secret.publicKey }}
+          </p>
+          <button class="btn btn-primary" @click="hidePublicKey()">
+            OK
+          </button>
+        </b-modal>
+      </div>
+
+      <div>
+        <b-modal
+          id="confirm-reset-secret"
+          ref="confirm-reset-secret"
+          title="Confirm"
+          cancel-variant="outline-dark"
+          ok-variant="danger"
+          ok-title="Reset secret"
+          @ok="resetSecret"
+        >
+          <p class="mb-0">Are you sure to reset the secret ?</p>
+          <p class="mb-0">*) all issued token will revoke.</p>
+        </b-modal>
+      </div>
+
       <div class="form-group">
         <button
           class="btn btn-link dropdown-toggle h5 ml-n3"
@@ -388,14 +419,36 @@
       <div class="form-group">
         <button
           class="btn btn-link dropdown-toggle h5 ml-n3"
-          @click="showSecret = !showSecret"
+          @click="loadSecret()"
         >
           Secrets
         </button>
         <div v-if="showSecret" class="card-body">
-          <p>TODO</p>
-          <p>public key</p>
-          <p>reset button</p>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Type
+            </label>
+            <div class="col-sm-5">
+              <input
+                v-model="secret.type"
+                class="form-control"
+                disabled="disabled"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-4 control-label">
+              Public Key
+            </label>
+            <div class="col-sm-7">
+              <button class="btn btn-primary" @click="showPublicKey">
+                Show
+              </button>
+              <button class="btn btn-danger ml-3" @click="resetSecretConfirm">
+                Reset
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -475,20 +528,30 @@ export default {
           checked: false
         }
       ],
-      showSecret: true
+      showSecret: false, // flip this when mounted
+      secret: {
+        type: '',
+        publicKey: ''
+      }
     }
   },
   mounted() {
     this.setProjectInfo()
+    this.loadSecret()
   },
   methods: {
     deleteProjectConfirm() {
       this.$refs['confirm-delete-project'].show()
     },
     async deleteProject() {
-      const res = await this.$api.ProjectDelete(
-        this.$store.state.current_project
-      )
+      const projectName = this.$store.state.current_project
+
+      if (projectName === 'master') {
+        this.error = 'master project can not delete'
+        return
+      }
+
+      const res = await this.$api.ProjectDelete(projectName)
       console.log('project delete result: %o', res)
       if (!res.ok) {
         this.error = res.message
@@ -501,7 +564,6 @@ export default {
     },
     async update() {
       const grantTypes = []
-      console.log(this.grantTypes)
       for (const type of this.grantTypes) {
         if (type.checked) {
           grantTypes.push(type.value)
@@ -542,7 +604,6 @@ export default {
           )
         }
       }
-      console.log(data)
 
       const res = await this.$api.ProjectUpdate(
         this.$store.state.current_project,
@@ -562,7 +623,7 @@ export default {
         this.error = res.message
         return
       }
-      console.log(res.data)
+      console.log('project info: ', res.data)
 
       let t = this.setUnit(res.data.tokenConfig.accessTokenLifeSpan)
       this.tokenConfig.accessTokenLifeSpan = t.span
@@ -695,6 +756,43 @@ export default {
         this.passwordPolicy.blackList.push(this.newBlackList)
       }
       this.newBlackList = ''
+    },
+    async loadSecret() {
+      this.showSecret = !this.showSecret
+      if (this.showSecret) {
+        const res = await this.$api.KeysGet(this.$store.state.current_project)
+        if (!res.ok) {
+          console.log('Failed to get secret info: %o', res)
+          this.error = res.message
+          return
+        }
+        this.secret.type = res.data.type
+        this.secret.publicKey = res.data.publicKey
+      }
+    },
+    showPublicKey() {
+      this.$refs['view-public-key'].show()
+    },
+    hidePublicKey() {
+      this.$refs['view-public-key'].hide()
+    },
+    resetSecretConfirm() {
+      this.$refs['confirm-reset-secret'].show()
+    },
+    async resetSecret() {
+      const projectName = this.$store.state.current_project
+      const res = await this.$api.KeysReset(projectName)
+      if (!res.ok) {
+        console.log('Failed to reset secret info: %o', res)
+        this.error = res.message
+        return
+      }
+
+      alert('successfully reset secret')
+      if (projectName === 'master') {
+        this.$auth.Logout()
+        this.$router.push('/')
+      }
     }
   }
 }

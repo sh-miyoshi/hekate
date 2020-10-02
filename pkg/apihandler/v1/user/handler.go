@@ -78,10 +78,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 			CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 			SystemRoles: user.SystemRoles,
 			CustomRoles: roles,
-			LockState: LockState{
-				Locked:            user.LockState.Locked,
-				VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
-			},
+			Locked:      user.LockState.Locked,
 		}
 		sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
 		if err != nil {
@@ -181,10 +178,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
-		LockState: LockState{
-			Locked:            user.LockState.Locked,
-			VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
-		},
+		Locked:      user.LockState.Locked,
 	}
 
 	jwthttp.ResponseWrite(w, "UserGetAllUserGetHandlerHandler", &res)
@@ -271,10 +265,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
-		LockState: LockState{
-			Locked:            user.LockState.Locked,
-			VerifyFailedTimes: convertTimeArray(user.LockState.VerifyFailedTimes),
-		},
+		Locked:      user.LockState.Locked,
 	}
 
 	sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
@@ -371,7 +362,6 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 		roleType = model.RoleSystem
 	}
 
-	// Get Previous User Info
 	if err := db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
@@ -519,12 +509,4 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserLogoutHandler method successfully finished")
-}
-
-func convertTimeArray(tms []time.Time) []string {
-	res := []string{}
-	for _, tm := range tms {
-		res = append(res, tm.Format(time.RFC3339))
-	}
-	return res
 }

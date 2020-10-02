@@ -1201,8 +1201,8 @@ components:
                 type: string
               name:
                 type: string
-        lockState:
-          $ref: '#/components/schemas/LockState'
+        locked:
+          type: boolean
     UserPutRequest:
       type: object
       properties:
@@ -1223,16 +1223,6 @@ components:
       properties:
         password:
           type: string
-    LockState:
-      type: object
-      properties:
-        locked:
-          type: boolean
-        veriftFailedTimes:
-          type: array
-          items:
-            type: string
-            format: date
     ClientCreateRequest:
       type: object
       properties:

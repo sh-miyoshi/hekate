@@ -48,6 +48,27 @@
       </div>
 
       <div class="form-group row">
+        <label for="locked" class="col-sm-2 control-label">
+          Locked
+        </label>
+        <div v-if="user" class="col-sm-5">
+          <label class="c-switch c-switch-label c-switch-pill c-switch-primary">
+            <input
+              v-model="user.locked"
+              class="c-switch-input"
+              type="checkbox"
+              :disabled="!user.locked"
+            />
+            <span
+              class="c-switch-slider"
+              data-checked="On"
+              data-unchecked="Off"
+            ></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group row">
         <label for="system-roles" class="col-sm-2 control-label">
           System Role
         </label>
@@ -159,15 +180,17 @@ export default {
       customRoleCandidates: [],
       showLoginSessions: false,
       loginSessions: [],
-      SYSTEM_ROLES: [
-        'read-cluster',
-        'write-cluster',
-        'read-project',
-        'write-project'
-      ]
+      SYSTEM_ROLES: []
     }
   },
   async mounted() {
+    if (this.$store.state.current_project === 'master') {
+      this.SYSTEM_ROLES.push('read-cluster')
+      this.SYSTEM_ROLES.push('write-cluster')
+    }
+    this.SYSTEM_ROLES.push('read-project')
+    this.SYSTEM_ROLES.push('write-project')
+
     await this.setUser(this.$route.params.id)
     await this.setCustomRoleCandidates()
   },
@@ -216,6 +239,8 @@ export default {
       if (!this.user) {
         return
       }
+
+      // TODO(update lock state)
 
       const roles = []
       for (const r of this.user.custom_roles) {
@@ -319,7 +344,11 @@ export default {
       const projectName = this.$store.state.current_project
 
       // load sessions when open dropdown
-      if (this.showLoginSessions && this.user) {
+      if (
+        this.showLoginSessions &&
+        this.user != null &&
+        this.user.sessions != null
+      ) {
         for (const sid of this.user.sessions) {
           const res = await this.$api.SessionGet(projectName, sid)
           if (!res.ok) {
