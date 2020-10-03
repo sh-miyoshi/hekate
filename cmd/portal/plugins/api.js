@@ -164,6 +164,18 @@ class APIClient {
     return res
   }
 
+  async UserUnlock(projectName, userID) {
+    const url =
+      process.env.HEKATE_SERVER_ADDR +
+      '/api/v1/project/' +
+      projectName +
+      '/user/' +
+      userID +
+      '/unlock'
+    const res = await this._request(url, 'POST')
+    return res
+  }
+
   async ClientCreate(projectName, info) {
     const url =
       process.env.HEKATE_SERVER_ADDR +

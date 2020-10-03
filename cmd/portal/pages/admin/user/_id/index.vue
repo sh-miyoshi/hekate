@@ -54,10 +54,10 @@
         <div v-if="user" class="col-sm-5">
           <label class="c-switch c-switch-label c-switch-pill c-switch-primary">
             <input
-              v-model="user.locked"
+              v-model="userLocked"
               class="c-switch-input"
               type="checkbox"
-              :disabled="!user.locked"
+              :disabled="!userLocked"
             />
             <span
               class="c-switch-slider"
@@ -180,7 +180,8 @@ export default {
       customRoleCandidates: [],
       showLoginSessions: false,
       loginSessions: [],
-      SYSTEM_ROLES: []
+      SYSTEM_ROLES: [],
+      userLocked: false
     }
   },
   async mounted() {
@@ -209,6 +210,7 @@ export default {
           this.user.custom_roles = []
         }
         this.currentUserName = res.data.name
+        this.userLocked = res.data.locked
         console.log('User Info: %o', this.user)
         return
       }
@@ -240,7 +242,17 @@ export default {
         return
       }
 
-      // TODO(update lock state)
+      const projectName = this.$store.state.current_project
+      const userID = this.$route.params.id
+
+      if (!this.userLocked && this.user.locked) {
+        // unlock user
+        const res = await this.$api.UserUnlock(projectName, userID)
+        if (!res.ok) {
+          this.error = res.message
+          return
+        }
+      }
 
       const roles = []
       for (const r of this.user.custom_roles) {
@@ -251,8 +263,6 @@ export default {
         system_roles: this.user.system_roles,
         custom_roles: roles
       }
-      const projectName = this.$store.state.current_project
-      const userID = this.$route.params.id
       const res = await this.$api.UserUpdate(projectName, userID, data)
       if (!res.ok) {
         this.error = res.message
