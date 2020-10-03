@@ -6,10 +6,6 @@
 
 ## server application enhancement
 
-- APIの修正
-  - ユーザーパスワードロック
-    - 強制ロック解除用のAPI
-  - Custom RoleにDescriptionを追加
 - http headerの追加
 - db manager validationの追加
 - テストの追加
@@ -21,6 +17,8 @@
     - pkg/oidc
   - 結合テスト
     - DBGCのテスト
+- APIの修正
+  - Custom RoleにDescriptionを追加
 - パスワード以外でのユーザーのログイン
   - 証明書
   - ワンタイムパスワード
