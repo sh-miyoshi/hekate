@@ -479,6 +479,47 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("UserChangePasswordHandler method successfully finished")
 }
 
+// UserUnlockHandler ...
+//   require role: write-project
+func UserUnlockHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		if errors.Contains(err, model.ErrNoSuchUser) {
+			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+		} else if errors.Contains(err, model.ErrUserValidateFailed) {
+			errors.PrintAsInfo(errors.Append(err, "Invalid user ID format"))
+			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		} else {
+			errors.Print(errors.Append(err, "Failed to get user"))
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// clear user lock state
+	user.LockState = model.LockState{}
+	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+		errors.Print(errors.Append(err, "Failed to update user lock state"))
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("UserUnlockHandler method successfully finished")
+}
+
 // UserLogoutHandler ...
 //   require role: <oneself> or write-project
 func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {

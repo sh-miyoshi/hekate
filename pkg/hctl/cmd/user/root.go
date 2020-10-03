@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/user/role"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/user/update"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
@@ -11,6 +12,7 @@ func init() {
 	userCmd.AddCommand(deleteUserCmd)
 	userCmd.AddCommand(getUserCmd)
 	userCmd.AddCommand(role.GetCommand())
+	userCmd.AddCommand(update.GetCommand())
 }
 
 var userCmd = &cobra.Command{
