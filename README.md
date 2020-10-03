@@ -25,15 +25,12 @@ OpenID Foundationの公式テストのbasic certification test planをパスし�
   # デフォルトのport番号以外をbindingする際は、以下の値もdocker起動時に環境変数で指定する必要があります
   #  SERVER_PORT <- API_SERVER側のポート番号を変更したい場合
   #  PORTAL_PORT <- PORTAL側のポート番号を変更したい場合
-  # 例として以下ではportalのポート番号を指定します
-  export PORTAL_PORT=3000
 
   docker run -d --name hekate \
-    -p $PORTAL_PORT:$PORTAL_PORT -p 18443:18443 \
+    -p 3000:3000 -p 18443:18443 \
     -e SERVER_ADDR=$SERVER_ADDR \
     -e HEKATE_ADMIN_NAME=$ADMIN_NAME \
     -e HEKATE_ADMIN_PASSWORD=$ADMIN_PASSWORD \
-    -e PORTAL_PORT=$PORTAL_PORT \
     smiyoshi/hekate:all-in-one
   ```
 
