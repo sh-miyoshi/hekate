@@ -19,5 +19,14 @@ export default async function(context) {
         statusCode: 500
       })
     }
+  } else {
+    // Check role
+    const roles = handler.GetUserSystemRoles()
+    if (!roles.includes('read-cluster')) {
+      context.error({
+        message: 'user do not have permission: read-cluster',
+        statusCode: 500
+      })
+    }
   }
 }

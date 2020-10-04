@@ -227,6 +227,21 @@ export class AuthHandler {
     document.cookie = 'HEKATE_LOGIN_SESSION=; max-age=0'
     this.RemoveAllData()
   }
+
+  GetUserSystemRoles() {
+    const token = window.localStorage.getItem('access_token')
+    if (!token) {
+      console.log('Failed to get access_token from local storage')
+      return []
+    }
+
+    const user = jwtdecode(token)
+    const res = user.resource_access.system_management.roles
+    if (!res) {
+      return []
+    }
+    return res
+  }
 }
 
 export default (context, inject) => {
