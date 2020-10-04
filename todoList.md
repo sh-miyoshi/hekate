@@ -57,24 +57,22 @@
 - 各ページの作成
   - user force password reset
   - audit eventの表示
-  - user lock状態の解除
 - ヘルプボタンの追加
   - tooltipなど
 - validationの追加
   - portal側でリクエストを出す前にはじく
+  - user role更新時のvalidation
+    - cluster系とそれ以外を同時に付与しようとした場合警告を出す
 - errorの表示の修正
-- user role更新時のvalidation
-  - cluster系とそれ以外を同時に付与しようとした場合警告を出す
+  - エラーページの作成
+    - status code: 404, 500
+  - black listに登録されているパスワードでユーザーを作成する際のエラーを修正
+    - 現在はBad Requestと表示される
 - client_idやproject nameをどうするか(変数化)
-- middleware処理
-  - roleが足りない(cluster操作権限がない)
-    - 強制ログアウト or 白紙のページを見せる(こっちが有力)
 - redirect先
   - 前回開いていたページに戻る
 - alert画面のcss修正
 - headerにユーザー名を表示
-- black listに登録されているパスワードでユーザーを作成する際のエラーを修正
-  - 現在はBad Requestと表示される
 
 ## CLI tool(hctl) enhancement
 
