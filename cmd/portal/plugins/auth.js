@@ -45,7 +45,7 @@ export class AuthHandler {
   }
 
   Login() {
-    const project = 'master'
+    const project = process.env.LOGIN_PROJECT
     window.localStorage.setItem('login_project', project)
 
     const state = Math.random()

@@ -98,6 +98,8 @@ export default {
       process.env.HEKATE_SERVER_ADDR || 'http://localhost:18443',
     HEKATE_PORTAL_HOST: process.env.HEKATE_PORTAL_HOST || 'localhost',
     HEKATE_PORTAL_PORT: process.env.HEKATE_PORTAL_PORT || '3000',
+    LOGIN_PROJECT: process.env.HEKATE_MAIN_PROJECT || 'master',
+    CLIENT_ID: process.env.HEKATE_CLIENT_ID || 'portal',
     https: false
   }
 }

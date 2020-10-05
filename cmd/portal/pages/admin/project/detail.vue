@@ -545,9 +545,10 @@ export default {
     },
     async deleteProject() {
       const projectName = this.$store.state.current_project
+      const mainProject = process.env.LOGIN_PROJECT
 
-      if (projectName === 'master') {
-        this.error = 'master project can not delete'
+      if (projectName === mainProject) {
+        this.error = `${mainProject} project can not delete`
         return
       }
 
@@ -559,7 +560,7 @@ export default {
       }
 
       alert('successfully deleted.')
-      this.$store.commit('setCurrentProject', 'master')
+      this.$store.commit('setCurrentProject', mainProject)
       this.$router.push('/admin')
     },
     async update() {
@@ -789,7 +790,7 @@ export default {
       }
 
       alert('successfully reset secret')
-      if (projectName === 'master') {
+      if (projectName === process.env.LOGIN_PROJECT) {
         this.$auth.Logout()
         this.$router.push('/')
       }
