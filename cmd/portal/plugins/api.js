@@ -51,7 +51,7 @@ class APIClient {
         if (error.response.status >= 400 && error.response.status < 500) {
           return {
             ok: false,
-            message: error.response.data,
+            message: error.response.data.error,
             statusCode: error.response.status
           }
         }

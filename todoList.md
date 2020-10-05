@@ -63,9 +63,6 @@
   - portal側でリクエストを出す前にはじく
   - user role更新時のvalidation
     - cluster系とそれ以外を同時に付与しようとした場合警告を出す
-- errorの表示の修正
-  - black listに登録されているパスワードでユーザーを作成する際のエラーを修正
-    - 現在はBad Requestと表示される
 - redirect先
   - 前回開いていたページに戻る
 - alert画面のcss修正
