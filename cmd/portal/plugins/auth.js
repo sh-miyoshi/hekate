@@ -5,7 +5,6 @@ import jwtdecode from 'jwt-decode'
 export class AuthHandler {
   constructor(context) {
     this.context = context
-    this.client_id = 'portal'
   }
 
   _encodeQuery(queryObject) {
@@ -61,7 +60,7 @@ export class AuthHandler {
     const opts = {
       scope: 'openid',
       response_type: 'code',
-      client_id: this.client_id,
+      client_id: process.env.CLIENT_ID,
       redirect_uri:
         protcol +
         '://' +
@@ -138,7 +137,7 @@ export class AuthHandler {
 
     const opts = {
       grant_type: 'authorization_code',
-      client_id: this.client_id,
+      client_id: process.env.CLIENT_ID,
       code: authCode,
       state
     }
@@ -174,7 +173,7 @@ export class AuthHandler {
     // TODO(consider state)
     const opts = {
       grant_type: 'refresh_token',
-      client_id: this.client_id,
+      client_id: process.env.CLIENT_ID,
       refresh_token: refreshToken
     }
 

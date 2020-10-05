@@ -37,7 +37,7 @@
               >
                 edit
               </button>
-              <span v-if="client.id !== 'portal'" class="icon ml-2 h4">
+              <span v-if="client.id !== mainClientID" class="icon ml-2 h4">
                 <i
                   class="fa fa-trash"
                   @click="deleteClientConfirm(client.id)"
@@ -67,6 +67,7 @@ export default {
   middleware: 'auth',
   data() {
     return {
+      mainClientID: process.env.CLIENT_ID,
       clients: [],
       deleteClientID: '',
       error: ''
