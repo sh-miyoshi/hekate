@@ -65,7 +65,6 @@
     - cluster系とそれ以外を同時に付与しようとした場合警告を出す
 - redirect先
   - 前回開いていたページに戻る
-- alert画面のcss修正
 - headerにユーザー名を表示
 
 ## CLI tool(hctl) enhancement
