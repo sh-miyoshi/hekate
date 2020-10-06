@@ -235,7 +235,7 @@ export default {
         this.error = res.message
         return
       }
-      alert('Successfully delete user')
+      await this.$bvModal.msgBoxOk('Successfully delete user')
       this.$router.push('/admin/user')
     },
     async updateUser() {
@@ -269,7 +269,7 @@ export default {
         this.error = res.message
         return
       }
-      alert('Successfully update user')
+      await this.$bvModal.msgBoxOk('Successfully update user')
     },
     getSystemRoleCandidates() {
       const res = [{ value: null, text: 'Please select an assigned role' }]

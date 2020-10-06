@@ -162,7 +162,7 @@ export default {
         this.error = res.message
         return
       }
-      alert('Successfully delete client')
+      await this.$bvModal.msgBoxOk('Successfully delete client')
       this.$router.push('/admin/client')
     },
     async updateClient() {
@@ -186,7 +186,7 @@ export default {
         this.error = res.message
         return
       }
-      alert('Successfully update client')
+      await this.$bvModal.msgBoxOk('Successfully update client')
     },
     generateSecret() {
       if (!this.client) {

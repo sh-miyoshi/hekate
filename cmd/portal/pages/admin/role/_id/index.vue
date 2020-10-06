@@ -85,7 +85,7 @@ export default {
         this.error = res.message
         return
       }
-      alert('Successfully delete role')
+      await this.$bvModal.msgBoxOk('Successfully delete role')
       this.$router.push('/admin/role')
     },
     async updateRole() {
@@ -107,7 +107,7 @@ export default {
         this.error = res.message
         return
       }
-      alert('Successfully update role')
+      await this.$bvModal.msgBoxOk('Successfully update role')
     }
   }
 }

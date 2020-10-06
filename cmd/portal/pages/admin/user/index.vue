@@ -100,7 +100,7 @@ export default {
         return
       }
       this.setUsers()
-      alert('Successfully delete user')
+      await this.$bvModal.msgBoxOk('Successfully delete user')
     }
   }
 }

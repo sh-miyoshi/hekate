@@ -89,7 +89,7 @@ export default {
         return
       }
 
-      alert('successfully created.')
+      await this.$bvModal.msgBoxOk('successfully created.')
       this.$router.push('/admin/user')
     },
     validateUserName() {

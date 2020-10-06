@@ -105,7 +105,7 @@ export default {
         return
       }
       this.setClients()
-      alert('Successfully delete client')
+      await this.$bvModal.msgBoxOk('Successfully delete client')
     }
   }
 }

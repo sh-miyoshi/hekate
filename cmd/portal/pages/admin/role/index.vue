@@ -94,7 +94,7 @@ export default {
         return
       }
       this.setRoles()
-      alert('Successfully delete role')
+      await this.$bvModal.msgBoxOk('Successfully delete role')
     }
   }
 }

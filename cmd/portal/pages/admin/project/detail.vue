@@ -559,7 +559,7 @@ export default {
         return
       }
 
-      alert('successfully deleted.')
+      await this.$bvModal.msgBoxOk('successfully deleted.')
       this.$store.commit('setCurrentProject', mainProject)
       this.$router.push('/admin')
     },
@@ -616,7 +616,7 @@ export default {
       }
 
       this.setProjectInfo()
-      alert('successfully updated.')
+      await this.$bvModal.msgBoxOk('successfully updated.')
     },
     async setProjectInfo() {
       const res = await this.$api.ProjectGet(this.$store.state.current_project)
@@ -789,7 +789,7 @@ export default {
         return
       }
 
-      alert('successfully reset secret')
+      await this.$bvModal.msgBoxOk('successfully reset secret')
       if (projectName === process.env.LOGIN_PROJECT) {
         this.$auth.Logout()
         this.$router.push('/')
