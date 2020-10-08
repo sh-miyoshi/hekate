@@ -26,6 +26,11 @@
       <li class="c-sidebar-nav-item">
         <nuxt-link to="/admin/role" class="c-sidebar-nav-link">Role</nuxt-link>
       </li>
+      <li class="c-sidebar-nav-item">
+        <nuxt-link to="/admin/audit" class="c-sidebar-nav-link"
+          >Audit Events</nuxt-link
+        >
+      </li>
     </ul>
     <button
       class="c-sidebar-minimizer c-class-toggler"
