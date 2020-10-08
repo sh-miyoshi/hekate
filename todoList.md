@@ -56,15 +56,18 @@
 
 - 各ページの作成
   - user force password reset
-  - audit eventの表示
 - ヘルプボタンの追加
   - tooltipなど
 - validationの追加
   - portal側でリクエストを出す前にはじく
   - user role更新時のvalidation
     - cluster系とそれ以外を同時に付与しようとした場合警告を出す
-- redirect先
-  - 前回開いていたページに戻る
+- ~~redirect先~~
+  - ~~前回開いていたページに戻る~~
+- audit eventの表示の修正
+  - 日付で絞れるようにする(from, to)
+  - 最大件数の設定
+  - ページネーション
 - headerにユーザー名を表示
 
 ## CLI tool(hctl) enhancement
