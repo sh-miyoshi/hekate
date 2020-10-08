@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
@@ -103,8 +104,19 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
@@ -112,9 +124,10 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse Request
 	var request UserCreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		logger.Info("Failed to decode user create request: %v", err)
-		errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to decode request", ""), http.StatusBadRequest)
+	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
+		err = errors.New("Invalid request", "Failed to decode user create request: %v", e)
+		errors.PrintAsInfo(err)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
 	}
 
@@ -126,7 +139,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := secret.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
+	if err = secret.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "The password does not much the policy"))
 		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
@@ -143,7 +156,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		CustomRoles:  request.CustomRoles,
 	}
 
-	if err := db.GetInst().UserAdd(projectName, &user); err != nil {
+	if err = db.GetInst().UserAdd(projectName, &user); err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "user validation failed"))
 			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
@@ -191,15 +204,26 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
 	// Delete User
-	if err := db.GetInst().UserDelete(projectName, userID); err != nil {
+	if err = db.GetInst().UserDelete(projectName, userID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
@@ -289,8 +313,19 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
@@ -298,9 +333,10 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse Request
 	var request UserPutRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		logger.Info("Failed to decode user update request: %v", err)
-		errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to decode request", ""), http.StatusBadRequest)
+	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
+		err = errors.New("Invalid request", "Failed to decode user update request: %v", e)
+		errors.PrintAsInfo(err)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
 	}
 
@@ -327,7 +363,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	user.CustomRoles = request.CustomRoles
 
 	// Update DB
-	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+	if err = db.GetInst().UserUpdate(projectName, user); err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) || errors.Contains(err, model.ErrUserAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid user request format"))
 			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
@@ -350,8 +386,19 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	userID := vars["userID"]
 	roleID := vars["roleID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
@@ -362,7 +409,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 		roleType = model.RoleSystem
 	}
 
-	if err := db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
+	if err = db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
@@ -397,15 +444,26 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	userID := vars["userID"]
 	roleID := vars["roleID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
 	// Get Previous User Info
-	if err := db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
+	if err = db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
@@ -438,6 +496,17 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
 	claims, err := jwthttp.ValidateAPIRequest(r)
 	if err != nil || claims.Subject != userID {
@@ -447,13 +516,14 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req UserChangePasswordRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		logger.Info("Failed to decode user change password request: %v", err)
-		errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to decode request", ""), http.StatusBadRequest)
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
+		err = errors.New("Invalid request", "Failed to decode user change password request: %v", e)
+		errors.PrintAsInfo(err)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
 	}
 
-	if err := db.GetInst().UserChangePassword(projectName, userID, req.Password); err != nil {
+	if err = db.GetInst().UserChangePassword(projectName, userID, req.Password); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
 			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
@@ -486,8 +556,19 @@ func UserUnlockHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
@@ -510,7 +591,7 @@ func UserUnlockHandler(w http.ResponseWriter, r *http.Request) {
 
 	// clear user lock state
 	user.LockState = model.LockState{}
-	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+	if err = db.GetInst().UserUpdate(projectName, user); err != nil {
 		errors.Print(errors.Append(err, "Failed to update user lock state"))
 		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		return
@@ -527,8 +608,19 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	projectName := vars["projectName"]
 	userID := vars["userID"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		claims, err := jwthttp.ValidateAPIRequest(r)
 		if err != nil || claims.Subject != userID {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authorize user: don't have permission and not yourself"))
@@ -537,7 +629,7 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := db.GetInst().UserLogout(projectName, userID); err != nil {
+	if err = db.GetInst().UserLogout(projectName, userID); err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) {
 			logger.Info("User ID %s is invalid", userID)
 			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
