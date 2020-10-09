@@ -10,3 +10,6 @@ build-docker:
 run-windows:
 	cd deployments && \
 	run-windows.bat
+create-apidocs:
+	cd docs/api && \
+	redoc-cli bundle api.yaml -o api.html
