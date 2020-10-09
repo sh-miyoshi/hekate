@@ -6,6 +6,11 @@
 
 ## server application enhancement
 
+- Audit Eventの修正
+  - APIの修正
+    - 最大数
+    - Filter Rule
+    - ページネーション
 - http headerの追加
 - db manager validationの追加
 - テストの追加
@@ -56,6 +61,7 @@
 
 - 各ページの作成
   - user force password reset
+  - user revoke session
 - ヘルプボタンの追加
   - tooltipなど
 - validationの追加
