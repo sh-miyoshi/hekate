@@ -68,6 +68,6 @@ func (m *Manager) Save(projectName string, tm time.Time, resType, method, path, 
 }
 
 // Get ...
-func (m *Manager) Get(projectName string, fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
-	return m.handler.Get(projectName, fromDate, toDate)
+func (m *Manager) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
+	return m.handler.Get(projectName, fromDate, toDate, offset)
 }

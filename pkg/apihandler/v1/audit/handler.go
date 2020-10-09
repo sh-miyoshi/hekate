@@ -2,6 +2,8 @@ package auditapi
 
 import (
 	"net/http"
+	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -11,6 +13,47 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/role"
 )
+
+type auditRequest struct {
+	FromDate time.Time
+	ToDate   time.Time
+	Offset   uint
+}
+
+func parseQuery(queries *url.Values) (*auditRequest, *errors.Error) {
+	now := time.Now()
+	res := &auditRequest{
+		FromDate: now.AddDate(0, 0, -1),
+		ToDate:   now,
+		Offset:   0,
+	}
+
+	var err error
+	if queries.Get("from_date") != "" {
+		res.FromDate, err = time.Parse(time.RFC3339, queries.Get("from_date"))
+		if err != nil {
+			return nil, errors.New("Failed to parse from_date", "Failed to parse from_date: %v", err)
+		}
+	}
+	if queries.Get("to_date") != "" {
+		res.ToDate, err = time.Parse(time.RFC3339, queries.Get("to_date"))
+		if err != nil {
+			return nil, errors.New("Failed to parse to_date", "Failed to parse to_date: %v", err)
+		}
+	}
+	if queries.Get("offset") != "" {
+		ofs, err := strconv.Atoi(queries.Get("offset"))
+		if err != nil {
+			return nil, errors.New("Failed to parse offset", "Failed to parse offset: %v", err)
+		}
+		if ofs < 0 {
+			return nil, errors.New("Offset must be a non-negative", "Offset must be a non-negative, but got %d", ofs)
+		}
+		res.Offset = uint(ofs)
+	}
+
+	return res, nil
+}
 
 // AuditGetHandler ...
 //   require role: read-project
@@ -28,30 +71,14 @@ func AuditGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Query
 	queries := r.URL.Query()
 	logger.Debug("Query: %v", queries)
-
-	now := time.Now()
-	fromDate := now.AddDate(0, 0, -1)
-	toDate := now
-	if queries.Get("from_date") != "" {
-		var err error
-		fromDate, err = time.Parse(time.RFC3339, queries.Get("from_date"))
-		if err != nil {
-			logger.Info("Failed to parse from_date: %v", err)
-			errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to parse from_date", ""), http.StatusBadRequest)
-			return
-		}
-	}
-	if queries.Get("to_date") != "" {
-		var err error
-		toDate, err = time.Parse(time.RFC3339, queries.Get("to_date"))
-		if err != nil {
-			logger.Info("Failed to parse to_date: %v", err)
-			errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to parse to_date", ""), http.StatusBadRequest)
-			return
-		}
+	req, err := parseQuery(&queries)
+	if err != nil {
+		errors.PrintAsInfo(errors.Append(err, "Failed to parse query"))
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		return
 	}
 
-	audits, err := audit.GetInst().Get(projectName, fromDate, toDate)
+	audits, err := audit.GetInst().Get(projectName, req.FromDate, req.ToDate, req.Offset)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get audit events"))
 		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)

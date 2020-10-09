@@ -38,7 +38,7 @@ func (h *Handler) Save(projectName string, tm time.Time, resType, method, path, 
 }
 
 // Get ...
-func (h *Handler) Get(projectName string, fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
+func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
 	res := []model.Audit{}
 
 	// if we want to get logs whose date are from "2019-09-19",
@@ -52,6 +52,18 @@ func (h *Handler) Get(projectName string, fromDate, toDate time.Time) ([]model.A
 			}
 		}
 	}
+
+	// set offset
+	start := offset * model.AuditGetMaxNum
+	end := (offset + 1) * model.AuditGetMaxNum
+	size := uint(len(res))
+	if size < start {
+		return []model.Audit{}, nil
+	}
+	if end > size {
+		end = size
+	}
+	res = res[start : end-1]
 
 	return res, nil
 }

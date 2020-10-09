@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 // Audit ...
 type Audit struct {
@@ -13,3 +15,8 @@ type Audit struct {
 	Message      string
 	// TODO(userID, clientID)
 }
+
+const (
+	// AuditGetMaxNum is a max number of audit events at once
+	AuditGetMaxNum = 100
+)

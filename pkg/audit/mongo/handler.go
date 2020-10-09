@@ -8,6 +8,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -66,7 +67,8 @@ func (h *Handler) Save(projectName string, tm time.Time, resType, method, path, 
 }
 
 // Get ...
-func (h *Handler) Get(projectName string, fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
+func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
+	// TODO
 	col := h.dbClient.Database(databaseName).Collection(collectionName)
 
 	filter := bson.D{
@@ -79,15 +81,15 @@ func (h *Handler) Get(projectName string, fromDate, toDate time.Time) ([]model.A
 	toDate = toDate.AddDate(0, 0, 1)
 	filter = append(filter, bson.E{Key: "unixtime", Value: bson.D{{Key: "$lt", Value: toDate.Unix()}}})
 
-	// findOptions := options.Find()
-	// findOptions.SetSort(bson.D{{"time", -1}})
-	// findOptions.SetSkip(int64(offset))
-	// findOptions.SetLimit(int64(100))
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{Key: "unixtime", Value: -1}})
+	findOptions.SetSkip(int64(offset))
+	findOptions.SetLimit(int64(model.AuditGetMaxNum))
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
 	defer cancel()
 
-	cursor, err := col.Find(ctx, filter)
+	cursor, err := col.Find(ctx, filter, findOptions)
 	if err != nil {
 		return nil, errors.New("DB failed", "Failed to get audit list from mongodb: %v", err)
 	}

@@ -26,6 +26,6 @@ func (h *Handler) Save(projectName string, tm time.Time, resType, method, path, 
 }
 
 // Get ...
-func (h *Handler) Get(projectName string, fromDate, toDate time.Time) ([]model.Audit, *errors.Error) {
+func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
 	return []model.Audit{}, nil
 }
