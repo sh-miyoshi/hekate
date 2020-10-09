@@ -3,8 +3,10 @@ package keysapi
 import (
 	"encoding/base64"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
@@ -50,15 +52,26 @@ func KeysResetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "KEYS", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
 	// update project secret
-	if err := db.GetInst().ProjectSecretReset(projectName); err != nil {
+	if err = db.GetInst().ProjectSecretReset(projectName); err != nil {
 		errors.Print(errors.Append(err, "Failed to reset project secret"))
 		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		return
