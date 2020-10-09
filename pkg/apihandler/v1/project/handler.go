@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
@@ -71,8 +72,25 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 // ProjectCreateHandler ...
 //   require role: write-cluster
 func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
+	var err *errors.Error
+	defer func() {
+		// register project is access user project (maybe master)
+		claims, e := jwthttp.ValidateAPIRequest(r)
+		if e != nil {
+			err = e
+		}
+
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(claims.Project, time.Now(), "PROJECT", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, "", role.ResCluster, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
@@ -80,9 +98,10 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse Request
 	var request ProjectCreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		logger.Info("Failed to decode project create request: %v", err)
-		errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to decode request", ""), http.StatusBadRequest)
+	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
+		err = errors.New("Invalid request", "Failed to decode project create request: %v", e)
+		errors.PrintAsInfo(err)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
 	}
 
@@ -126,7 +145,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create New Project
-	if err := db.GetInst().ProjectAdd(&project); err != nil {
+	if err = db.GetInst().ProjectAdd(&project); err != nil {
 		if errors.Contains(err, model.ErrProjectAlreadyExists) {
 			logger.Info("Project %s is already exists", request.Name)
 			errors.WriteHTTPError(w, "Conflict", err, http.StatusConflict)
@@ -175,14 +194,25 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "PROJECT", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResCluster, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResCluster, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
-	if err := db.GetInst().ProjectDelete(projectName); err != nil {
+	if err = db.GetInst().ProjectDelete(projectName); err != nil {
 		if errors.Contains(err, model.ErrDeleteBlockedProject) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to delete blocked project"))
 			errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
@@ -259,8 +289,19 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "PROJECT", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	// Authorize API Request
-	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
@@ -268,9 +309,10 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Parse Request
 	var request ProjectPutRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		logger.Info("Failed to decode project update request: %v", err)
-		errors.WriteHTTPError(w, "Bad Request", errors.New("Failed to decode request", ""), http.StatusBadRequest)
+	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
+		err = errors.New("Invalid request", "Failed to decode project update request: %v", e)
+		errors.PrintAsInfo(err)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
 	}
 
@@ -310,7 +352,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update DB
-	if err := db.GetInst().ProjectUpdate(project); err != nil {
+	if err = db.GetInst().ProjectUpdate(project); err != nil {
 		if errors.Contains(err, model.ErrProjectValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Project info validation failed"))
 			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
