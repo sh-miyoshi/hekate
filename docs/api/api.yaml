@@ -1083,6 +1083,10 @@ paths:
           in: query
           schema:
             type: string
+        - name: offset
+          in: query
+          schema:
+            type: number
       responses:
         '200':
           description: 'Successfully get audit event list'
