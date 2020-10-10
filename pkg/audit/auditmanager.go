@@ -10,6 +10,7 @@ import (
 	dbmongo "github.com/sh-miyoshi/hekate/pkg/db/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/util"
 )
 
 // Manager ...
@@ -69,5 +70,7 @@ func (m *Manager) Save(projectName string, tm time.Time, resType, method, path, 
 
 // Get ...
 func (m *Manager) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
+	fromDate = util.TimeTruncate(fromDate)
+	toDate = util.TimeTruncate(toDate)
 	return m.handler.Get(projectName, fromDate, toDate, offset)
 }
