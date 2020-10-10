@@ -41,13 +41,9 @@ func (h *Handler) Save(projectName string, tm time.Time, resType, method, path, 
 func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
 	res := []model.Audit{}
 
-	// if we want to get logs whose date are from "2019-09-19",
-	// we have to pass "2019-09-20 00:00:00.000" to mongodb.
-	toDate = toDate.AddDate(0, 0, 1)
-
 	for _, d := range h.data {
 		if d.ProjectName == projectName {
-			if fromDate.Before(d.Time) && toDate.After(d.Time) {
+			if !(fromDate.After(d.Time) || toDate.Before(d.Time)) {
 				res = append(res, d)
 			}
 		}
@@ -63,7 +59,7 @@ func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uin
 	if end > size {
 		end = size
 	}
-	res = res[start : end-1]
+	res = res[start:end]
 
 	return res, nil
 }
