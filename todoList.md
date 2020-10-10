@@ -6,12 +6,6 @@
 
 ## server application enhancement
 
-- Audit Eventの修正
-  - APIの修正
-    - 最大数
-    - Filter Rule
-    - ページネーション
-- http headerの追加
 - db manager validationの追加
 - テストの追加
   - unit test
@@ -22,8 +16,11 @@
     - pkg/oidc
   - 結合テスト
     - DBGCのテスト
+  - mongo db test
 - APIの修正
   - Custom RoleにDescriptionを追加
+  - Audit EventにFilter Ruleを追加
+    - Project Name, user ID, など
 - パスワード以外でのユーザーのログイン
   - 証明書
   - ワンタイムパスワード
@@ -72,7 +69,6 @@
   - ~~前回開いていたページに戻る~~
 - audit eventの表示の修正
   - 日付で絞れるようにする(from, to)
-  - 最大件数の設定
   - ページネーション
 - headerにユーザー名を表示
 
