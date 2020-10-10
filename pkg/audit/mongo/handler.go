@@ -79,6 +79,7 @@ func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uin
 	// if we want to get logs whose date are from "2019-09-19",
 	// we have to pass "2019-09-20 00:00:00.000" to mongodb.
 	toDate = toDate.AddDate(0, 0, 1)
+	toDate = toDate.Add(-time.Nanosecond)
 	filter = append(filter, bson.E{Key: "unixtime", Value: bson.D{{Key: "$lt", Value: toDate.Unix()}}})
 
 	findOptions := options.Find()
