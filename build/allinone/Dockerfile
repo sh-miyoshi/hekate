@@ -19,7 +19,7 @@ RUN npm run build
 
 FROM ubuntu:18.04 as mongo-installer
 
-RUN apt update -y && wget
+RUN apt update -y && apt install -y wget
 WORKDIR /hekate
 RUN wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.4.1.tgz
 RUN tar zxf mongodb-linux-x86_64-ubuntu1804-4.4.1.tgz
