@@ -26,7 +26,7 @@ RUN tar zxf mongodb-linux-x86_64-ubuntu1804-4.4.1.tgz
 
 FROM ubuntu:18.04
 
-RUN apt update -y && apt install -y nodejs npm
+RUN apt update -y && apt install -y nodejs npm curl
 WORKDIR /hekate
 RUN mkdir -p server && mkdir -p portal && mkdir -p mongo
 COPY cmd/hekate/_data/testcerts /hekate/secret
