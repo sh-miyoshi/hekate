@@ -31,7 +31,15 @@ export HEKATE_SERVER_ADDR=https://$SERVER_HOST:$SERVER_PORT
 echo "Env:"
 env | grep HEKATE
 
-# Run Portal
+# Run mongodb
+cd /hekate/mongo
+echo "Start mongodb"
+echo "Mongodb log is in /hekate/mongo/mongo.log"
+mkdir -p data
+./mongod --logpath=mongo.log --dbpath="./data" &
+cd -
+
+# Run portal
 ExecPortal &
 
 # Run server

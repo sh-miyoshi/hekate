@@ -7,8 +7,8 @@ https:
   cert-file: "/hekate/secret/tls.crt"
   key-file: "/hekate/secret/tls.key"
 db:
-  type: "memory"
-  connection_string: ""
+  type: "mongo"
+  connection_string: "mongodb://localhost:27017"
 logfile: 'server.log'
 
 # Expires Time of Authorization code in OpenID Connect [sec]
