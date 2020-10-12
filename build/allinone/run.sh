@@ -23,10 +23,14 @@ fi
 SERVER_HOST=`echo $SERVER_ADDR | sed -e 's|^[^/]*//||' -e 's|:.*$||' -e 's|/.*$||'`
 echo "Run Server Host: $SERVER_HOST"
 
-export HEKATE_PORTAL_HOST=$SERVER_HOST
-export HEKATE_PORTAL_PORT=$PORTAL_PORT
 export HEKATE_PORTAL_ADDR=https://$SERVER_HOST:$PORTAL_PORT
 export HEKATE_SERVER_ADDR=https://$SERVER_HOST:$SERVER_PORT
+
+cat << EOF > /hekate/portal/.env
+HEKATE_SERVER_ADDR = ${HEKATE_SERVER_ADDR}
+HEKATE_PORTAL_HOST = ${SERVER_HOST}
+HEKATE_PORTAL_PORT = ${PORTAL_PORT}
+EOF
 
 echo "Env:"
 env | grep HEKATE
