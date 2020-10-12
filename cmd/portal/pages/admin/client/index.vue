@@ -67,7 +67,7 @@ export default {
   middleware: 'auth',
   data() {
     return {
-      mainClientID: process.env.CLIENT_ID,
+      mainClientID: this.$config.get().CLIENT_ID,
       clients: [],
       deleteClientID: '',
       error: ''

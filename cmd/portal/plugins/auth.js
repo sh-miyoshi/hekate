@@ -1,10 +1,12 @@
 import querystring from 'querystring'
 import axios from 'axios'
 import jwtdecode from 'jwt-decode'
+import { Config } from './config'
 
 export class AuthHandler {
   constructor(context) {
     this.context = context
+    this.config = new Config(process.env.CONFIG_FILE)
   }
 
   _encodeQuery(queryObject) {
@@ -44,7 +46,7 @@ export class AuthHandler {
   }
 
   Login() {
-    const project = process.env.LOGIN_PROJECT
+    const project = this.config.get().LOGIN_PROJECT
     window.localStorage.setItem('login_project', project)
 
     const state = Math.random()
@@ -52,27 +54,16 @@ export class AuthHandler {
       .slice(-8)
     window.sessionStorage.setItem('login_state', state)
 
-    let protcol = 'https'
-    if (!process.env.https) {
-      protcol = 'http'
-    }
-
     const opts = {
       scope: 'openid',
       response_type: 'code',
-      client_id: process.env.CLIENT_ID,
-      redirect_uri:
-        protcol +
-        '://' +
-        process.env.HEKATE_PORTAL_HOST +
-        ':' +
-        process.env.HEKATE_PORTAL_PORT +
-        '/callback',
+      client_id: this.config.get().CLIENT_ID,
+      redirect_uri: this.config.get().PORTAL_ADDR + '/callback',
       state
     }
 
     const url =
-      process.env.HEKATE_SERVER_ADDR +
+      this.config.get().SERVER_ADDR +
       '/api/v1/project/' +
       project +
       '/openid-connect/auth?' +
@@ -89,7 +80,7 @@ export class AuthHandler {
 
     const project = window.localStorage.getItem('login_project')
     const url =
-      process.env.HEKATE_SERVER_ADDR +
+      this.config.get().SERVER_ADDR +
       '/api/v1/project/' +
       project +
       '/openid-connect/token'
@@ -137,7 +128,7 @@ export class AuthHandler {
 
     const opts = {
       grant_type: 'authorization_code',
-      client_id: process.env.CLIENT_ID,
+      client_id: this.config.get().CLIENT_ID,
       code: authCode,
       state
     }
@@ -173,7 +164,7 @@ export class AuthHandler {
     // TODO(consider state)
     const opts = {
       grant_type: 'refresh_token',
-      client_id: process.env.CLIENT_ID,
+      client_id: this.config.get().CLIENT_ID,
       refresh_token: refreshToken
     }
 
@@ -205,7 +196,7 @@ export class AuthHandler {
       // TODO(use param: timeout)
       const project = window.localStorage.getItem('login_project')
       const url =
-        process.env.HEKATE_SERVER_ADDR +
+        this.config.get().SERVER_ADDR +
         '/api/v1/project/' +
         project +
         '/openid-connect/revoke'

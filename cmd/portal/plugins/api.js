@@ -1,10 +1,16 @@
 import axios from 'axios'
 import { AuthHandler } from './auth'
+import { Config } from './config'
 
 class APIClient {
+  constructor(context) {
+    this.handler = new AuthHandler(context)
+    const c = new Config(process.env.CONFIG_FILE)
+    this.serverAddr = c.get().SERVER_ADDR
+  }
+
   async _request(url, method, data) {
-    const h = new AuthHandler()
-    let res = await h.GetToken()
+    let res = await this.handler.GetToken()
 
     if (!res.ok) {
       return res
@@ -65,14 +71,13 @@ class APIClient {
   }
 
   async ProjectGetList() {
-    const url = process.env.HEKATE_SERVER_ADDR + '/api/v1/project'
+    const url = this.serverAddr + '/api/v1/project'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ProjectGet(projectName) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR + '/api/v1/project/' + projectName
+    const url = this.serverAddr + '/api/v1/project/' + projectName
     const res = await this._request(url, 'GET')
     return res
   }
@@ -92,81 +97,59 @@ class APIClient {
         'refresh_token'
       ]
     }
-    const url = process.env.HEKATE_SERVER_ADDR + '/api/v1/project'
+    const url = this.serverAddr + '/api/v1/project'
     const res = await this._request(url, 'POST', data)
     return res
   }
 
   async ProjectDelete(projectName) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR + '/api/v1/project/' + projectName
+    const url = this.serverAddr + '/api/v1/project/' + projectName
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async ProjectUpdate(projectName, info) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR + '/api/v1/project/' + projectName
+    const url = this.serverAddr + '/api/v1/project/' + projectName
     const res = await this._request(url, 'PUT', info)
     return res
   }
 
   async UserCreate(projectName, info) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/user'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/user'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async UserGetList(projectName) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/user'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/user'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async UserGet(projectName, userID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/user/' +
-      userID
+      this.serverAddr + '/api/v1/project/' + projectName + '/user/' + userID
     const res = await this._request(url, 'GET')
     return res
   }
 
   async UserDelete(projectName, userID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/user/' +
-      userID
+      this.serverAddr + '/api/v1/project/' + projectName + '/user/' + userID
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async UserUpdate(projectName, userID, info) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/user/' +
-      userID
+      this.serverAddr + '/api/v1/project/' + projectName + '/user/' + userID
     const res = await this._request(url, 'PUT', info)
     return res
   }
 
   async UserUnlock(projectName, userID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
+      this.serverAddr +
       '/api/v1/project/' +
       projectName +
       '/user/' +
@@ -177,114 +160,74 @@ class APIClient {
   }
 
   async ClientCreate(projectName, info) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/client'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/client'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async ClientGetList(projectName) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/client'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/client'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ClientGet(projectName, clientID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/client/' +
-      clientID
+      this.serverAddr + '/api/v1/project/' + projectName + '/client/' + clientID
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ClientDelete(projectName, clientID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/client/' +
-      clientID
+      this.serverAddr + '/api/v1/project/' + projectName + '/client/' + clientID
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async ClientUpdate(projectName, clientID, info) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/client/' +
-      clientID
+      this.serverAddr + '/api/v1/project/' + projectName + '/client/' + clientID
     const res = await this._request(url, 'PUT', info)
     return res
   }
 
   async RoleCreate(projectName, info) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/role'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/role'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async RoleGetList(projectName) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/role'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/role'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async RoleGet(projectName, roleID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/role/' +
-      roleID
+      this.serverAddr + '/api/v1/project/' + projectName + '/role/' + roleID
     const res = await this._request(url, 'GET')
     return res
   }
 
   async RoleDelete(projectName, roleID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/role/' +
-      roleID
+      this.serverAddr + '/api/v1/project/' + projectName + '/role/' + roleID
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async RoleUpdate(projectName, roleID, info) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/role/' +
-      roleID
+      this.serverAddr + '/api/v1/project/' + projectName + '/role/' + roleID
     const res = await this._request(url, 'PUT', info)
     return res
   }
 
   async SessionGet(projectName, sessionID) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
+      this.serverAddr +
       '/api/v1/project/' +
       projectName +
       '/session/' +
@@ -294,32 +237,21 @@ class APIClient {
   }
 
   async KeysGet(projectName) {
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/keys'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/keys'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async KeysReset(projectName) {
     const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/keys/reset'
+      this.serverAddr + '/api/v1/project/' + projectName + '/keys/reset'
     const res = await this._request(url, 'POST')
     return res
   }
 
   async AuditGetList(projectName) {
     // TODO(from, to)
-    const url =
-      process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
-      projectName +
-      '/audit'
+    const url = this.serverAddr + '/api/v1/project/' + projectName + '/audit'
     const res = await this._request(url, 'GET')
     return res
   }

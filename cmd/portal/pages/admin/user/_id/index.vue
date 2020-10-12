@@ -185,7 +185,7 @@ export default {
     }
   },
   async mounted() {
-    const mainProject = process.env.LOGIN_PROJECT
+    const mainProject = this.$config.get().LOGIN_PROJECT
     if (this.$store.state.current_project === mainProject) {
       this.SYSTEM_ROLES.push('read-cluster')
       this.SYSTEM_ROLES.push('write-cluster')

@@ -34,7 +34,12 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/auth.js', '~/plugins/api.js', '~/plugins/validation.js'],
+  plugins: [
+    '~/plugins/auth.js',
+    '~/plugins/api.js',
+    '~/plugins/validation.js',
+    '~/plugins/config.js'
+  ],
   /*
    ** Nuxt.js dev-modules
    */
@@ -83,10 +88,9 @@ export default {
 
   server: {
     host: '0.0.0.0',
-    port: process.env.HEKATE_PORTAL_PORT
+    port: 3000
 
     // set this param if run as https
-    // also set process.env.https: true
     // https: {
     //   key: fs.readFileSync(path.resolve(__dirname, 'assets/testcerts/tls.key')),
     //   cert: fs.readFileSync(path.resolve(__dirname, 'assets/testcerts/tls.crt'))
@@ -94,12 +98,6 @@ export default {
   },
 
   env: {
-    HEKATE_SERVER_ADDR:
-      process.env.HEKATE_SERVER_ADDR || 'http://localhost:18443',
-    HEKATE_PORTAL_HOST: process.env.HEKATE_PORTAL_HOST || 'localhost',
-    HEKATE_PORTAL_PORT: process.env.HEKATE_PORTAL_PORT || '3000',
-    LOGIN_PROJECT: process.env.HEKATE_MAIN_PROJECT || 'master',
-    CLIENT_ID: process.env.HEKATE_CLIENT_ID || 'portal',
-    https: false
+    CONFIG_FILE: process.env.CONFIG_FILE || './settings.yaml'
   }
 }

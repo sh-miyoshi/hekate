@@ -545,7 +545,7 @@ export default {
     },
     async deleteProject() {
       const projectName = this.$store.state.current_project
-      const mainProject = process.env.LOGIN_PROJECT
+      const mainProject = this.$config.get().LOGIN_PROJECT
 
       if (projectName === mainProject) {
         this.error = `${mainProject} project can not delete`
@@ -790,7 +790,7 @@ export default {
       }
 
       await this.$bvModal.msgBoxOk('successfully reset secret')
-      if (projectName === process.env.LOGIN_PROJECT) {
+      if (projectName === this.$config.get().LOGIN_PROJECT) {
         this.$auth.Logout()
         this.$router.push('/')
       }
