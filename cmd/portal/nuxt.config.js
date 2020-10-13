@@ -38,7 +38,8 @@ export default {
     '~/plugins/auth.js',
     '~/plugins/api.js',
     '~/plugins/validation.js',
-    '~/plugins/config.js'
+    '~/plugins/config.js',
+    '~/plugins/persistedstate.js'
   ],
   /*
    ** Nuxt.js dev-modules

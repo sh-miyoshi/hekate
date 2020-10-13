@@ -49,6 +49,7 @@ export default {
   layout: 'index',
   methods: {
     login() {
+      this.$store.commit('setCurrentProject', this.$config.get().LOGIN_PROJECT)
       this.$auth.Login()
     }
   }

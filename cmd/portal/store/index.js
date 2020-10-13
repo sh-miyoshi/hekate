@@ -1,5 +1,5 @@
 export const state = () => ({
-  current_project: process.env.LOGIN_PROJECT
+  current_project: ''
 })
 
 export const mutations = {
