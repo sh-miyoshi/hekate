@@ -9,7 +9,6 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // LoginSessionHandler implement db.LoginSessionHandler
@@ -46,7 +45,6 @@ func NewLoginSessionHandler(dbClient *mongo.Client) (*LoginSessionHandler, *erro
 				"project_name": 1, // index in ascending order
 				"id":           1, // index in ascending order
 			},
-			Options: options.Index().SetUnique(true),
 		}
 		if _, err := iv.CreateOne(ctx, mod); err != nil {
 			return nil, errors.New("DB failed", "Failed to create index: %v", err)
@@ -71,6 +69,7 @@ func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *
 		ProjectName:   ent.ProjectName,
 		ResponseMode:  ent.ResponseMode,
 		Prompt:        ent.Prompt,
+		UserID:        ent.UserID,
 		LoginDate:     ent.LoginDate,
 	}
 
@@ -89,7 +88,7 @@ func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *
 
 // Update ...
 func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession) *errors.Error {
-	col := h.dbClient.Database(databaseName).Collection(authCodeCollectionName)
+	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
 	filter := bson.D{
 		{Key: "project_name", Value: projectName},
 		{Key: "session_id", Value: ent.SessionID},
@@ -108,6 +107,7 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 		ProjectName:   ent.ProjectName,
 		ResponseMode:  ent.ResponseMode,
 		Prompt:        ent.Prompt,
+		UserID:        ent.UserID,
 		LoginDate:     ent.LoginDate,
 	}
 
@@ -189,6 +189,7 @@ func (h *LoginSessionHandler) GetByCode(projectName string, code string) (*model
 		ProjectName:  res.ProjectName,
 		ResponseMode: res.ResponseMode,
 		Prompt:       res.Prompt,
+		UserID:       res.UserID,
 		LoginDate:    res.LoginDate,
 	}, nil
 }
@@ -224,6 +225,7 @@ func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSe
 		ProjectName:  res.ProjectName,
 		ResponseMode: res.ResponseMode,
 		Prompt:       res.Prompt,
+		UserID:       res.UserID,
 		LoginDate:    res.LoginDate,
 	}, nil
 }

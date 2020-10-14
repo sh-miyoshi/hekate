@@ -9,7 +9,6 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // UserInfoHandler implement db.UserInfoHandler
@@ -46,7 +45,6 @@ func NewUserHandler(dbClient *mongo.Client) (*UserInfoHandler, *errors.Error) {
 				"project_name": 1, // index in ascending order
 				"id":           1, // index in ascending order
 			},
-			Options: options.Index().SetUnique(true),
 		}
 		if _, err := iv.CreateOne(ctx, mod); err != nil {
 			return nil, errors.New("DB failed", "Failed to create index: %v", err)

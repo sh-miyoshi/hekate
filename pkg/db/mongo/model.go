@@ -61,6 +61,7 @@ type loginSession struct {
 	ProjectName   string    `bson:"project_name"`
 	ResponseMode  string    `bson:"response_mode"`
 	Prompt        []string  `bson:"prompt"`
+	UserID        string    `bson:"user_id"`
 	LoginDate     time.Time `bson:"login_date"`
 }
 

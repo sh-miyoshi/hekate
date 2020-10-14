@@ -15,7 +15,6 @@ const (
 	userCollectionName            = "user"
 	clientCollectionName          = "client"
 	sessionCollectionName         = "session"
-	authCodeCollectionName        = "code"
 	roleCollectionName            = "customrole"
 	authcodeSessionCollectionName = "authcodesession"
 	roleInUserCollectionName      = "customroleinuser"
