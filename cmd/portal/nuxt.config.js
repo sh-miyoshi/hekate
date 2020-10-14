@@ -38,7 +38,6 @@ export default {
     '~/plugins/auth.js',
     '~/plugins/api.js',
     '~/plugins/validation.js',
-    '~/plugins/config.js',
     '~/plugins/persistedstate.js'
   ],
   /*
@@ -89,7 +88,7 @@ export default {
 
   server: {
     host: '0.0.0.0',
-    port: 3000
+    port: process.env.HEKATE_PORTAL_PORT
 
     // set this param if run as https
     // https: {
@@ -99,6 +98,12 @@ export default {
   },
 
   env: {
-    CONFIG_FILE: process.env.CONFIG_FILE || './settings.yaml'
+    HEKATE_SERVER_ADDR:
+      process.env.HEKATE_SERVER_ADDR || 'http://localhost:18443',
+    HEKATE_PORTAL_ADDR:
+      process.env.HEKATE_PORTAL_ADDR || 'http://localhost:3000',
+    HEKATE_PORTAL_PORT: process.env.HEKATE_PORTAL_PORT || '3000',
+    LOGIN_PROJECT: process.env.HEKATE_MAIN_PROJECT || 'master',
+    CLIENT_ID: process.env.HEKATE_CLIENT_ID || 'portal'
   }
 }

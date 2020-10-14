@@ -1,12 +1,10 @@
 import axios from 'axios'
 import { AuthHandler } from './auth'
-import { Config } from './config'
 
 class APIClient {
   constructor(context) {
     this.handler = new AuthHandler(context)
-    const c = new Config(process.env.CONFIG_FILE)
-    this.serverAddr = c.get().SERVER_ADDR
+    this.serverAddr = process.env.HEKATE_SERVER_ADDR
   }
 
   async _request(url, method, data) {
