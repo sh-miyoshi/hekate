@@ -144,7 +144,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
 				errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, state)
 			} else {
-				errors.Print(errors.Append(err, "Failed to get allowed callbak urls in client"))
+				errors.Print(errors.Append(err, "Failed to get allowed callback urls in client"))
 				errors.WriteOAuthError(w, errors.ErrServerError, state)
 			}
 			return
