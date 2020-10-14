@@ -15,7 +15,6 @@ WORKDIR /hekate
 COPY ./cmd/portal ./cmd/portal
 WORKDIR /hekate/cmd/portal
 RUN npm install
-RUN npm run build
 
 FROM ubuntu:18.04 as mongo-installer
 
