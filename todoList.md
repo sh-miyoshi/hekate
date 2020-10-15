@@ -16,7 +16,11 @@
     - pkg/oidc
   - 結合テスト
     - DBGCのテスト
-  - mongo db test
+    - mongo db test
+      - custom role
+      - login session
+      - session
+      - user
 - APIの修正
   - Custom RoleにDescriptionを追加
   - Audit EventにFilter Ruleを追加
