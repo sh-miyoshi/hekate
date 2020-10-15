@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -13,12 +14,12 @@ import (
 )
 
 func main() {
-	// TODO set from arg
-	mongoAddr := "mongodb://localhost:27017"
 	dbName := "hekate-test"
+	mongoAddr := flag.String("mongo-addr", "mongodb://localhost:27017", "connection string for mongodb")
+	flag.Parse()
 
 	mongo.ChangeDatabase(dbName)
-	dbClient, err := mongo.NewClient(mongoAddr)
+	dbClient, err := mongo.NewClient(*mongoAddr)
 	if err != nil {
 		errors.Print(err)
 		os.Exit(1)
