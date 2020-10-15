@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	databaseName                  = "hekate"
 	projectCollectionName         = "project"
 	userCollectionName            = "user"
 	clientCollectionName          = "client"
@@ -20,6 +19,10 @@ const (
 	roleInUserCollectionName      = "customroleinuser"
 
 	timeoutSecond = 5
+)
+
+var (
+	databaseName = "hekate"
 )
 
 // NewClient ...
@@ -41,4 +44,12 @@ func NewClient(connStr string) (*mongo.Client, *errors.Error) {
 	}
 
 	return cli, nil
+}
+
+// ChangeDatabase changes the database of store data
+// this method should call at first
+func ChangeDatabase(name string) {
+	if len(name) > 0 {
+		databaseName = name
+	}
 }
