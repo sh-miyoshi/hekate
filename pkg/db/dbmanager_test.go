@@ -36,6 +36,4 @@ func TestProjectAdd(t *testing.T) {
 	if !errors.Contains(err, model.ErrProjectAlreadyExists) {
 		t.Errorf("Expect error is %v, but got %v", model.ErrProjectAlreadyExists, err)
 	}
-
-	// TODO(Test Transaction)
 }

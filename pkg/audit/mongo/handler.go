@@ -68,7 +68,7 @@ func (h *Handler) Save(projectName string, tm time.Time, resType, method, path, 
 
 // Get ...
 func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
-	// TODO
+	// TODO(implement this)
 	col := h.dbClient.Database(databaseName).Collection(collectionName)
 
 	filter := bson.D{

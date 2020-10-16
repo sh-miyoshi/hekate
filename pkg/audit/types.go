@@ -11,6 +11,5 @@ import (
 type Handler interface {
 	Ping() *errors.Error
 	Save(projectName string, tm time.Time, resType, method, path, message string) *errors.Error
-	// TODO(maxCount, pageIndex)
 	Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error)
 }
