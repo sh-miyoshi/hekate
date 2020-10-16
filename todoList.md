@@ -68,7 +68,6 @@
   - auth requestをparseする
   - type noneのサポート
   - Support PKCE
-  - validate scope
 - user federation
   - user情報を外部に保存し、それと連携する
   - LDAP連携？
