@@ -21,5 +21,15 @@ func TestContains(t *testing.T) {
 		t.Errorf("Unexpect result: Err2 contains Err3")
 	}
 
-	// TODO nil
+	if Contains(nil, nil) {
+		t.Errorf("Unexpect result: nil contains nil")
+	}
+
+	if Contains(err1, nil) {
+		t.Errorf("Unexpect result: Err1 contains nil")
+	}
+
+	if Contains(nil, err1) {
+		t.Errorf("Unexpect result: nil contains Err1")
+	}
 }
