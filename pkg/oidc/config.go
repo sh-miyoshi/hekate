@@ -38,6 +38,11 @@ func GetSupportedResponseType() []string {
 	}
 }
 
+// GetSupportedScope ...
+func GetSupportedScope() []string {
+	return []string{"openid"}
+}
+
 // GetLoginSessionExpiresTime ...
 func GetLoginSessionExpiresTime() time.Duration {
 	return time.Second * time.Duration(expiresTimeSec)

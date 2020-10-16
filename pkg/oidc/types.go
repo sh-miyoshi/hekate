@@ -81,6 +81,17 @@ func validateResponseMode(mode string) *errors.Error {
 	return nil
 }
 
+func validateScope(scope string, supportedScope []string) *errors.Error {
+	scopes := strings.Split(scope, " ")
+	for _, s := range scopes {
+		if !slice.Contains(scopes, s) {
+			return errors.ErrInvalidScope
+		}
+	}
+
+	return nil
+}
+
 // Validate ...
 func (r *AuthRequest) Validate() *errors.Error {
 	if err := validator.New().Struct(r); err != nil {
@@ -92,7 +103,10 @@ func (r *AuthRequest) Validate() *errors.Error {
 		return errors.ErrRequestNotSupported
 	}
 
-	// TODO(check scope)
+	// Check Scope
+	if err := validateScope(r.Scope, GetSupportedScope()); err != nil {
+		return errors.Append(err, "Failed to validate scope %v", r.Scope)
+	}
 
 	// Check Response Type
 	supportedTypes := GetSupportedResponseType()

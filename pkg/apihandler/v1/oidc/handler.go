@@ -47,7 +47,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 		TokenEndpoint:          issuer + "/openid-connect/token",
 		UserinfoEndpoint:       issuer + "/openid-connect/userinfo",
 		JwksURI:                issuer + "/openid-connect/certs",
-		ScopesSupported:        []string{"openid"},
+		ScopesSupported:        oidc.GetSupportedScope(),
 		ResponseTypesSupported: oidc.GetSupportedResponseType(),
 		SubjectTypesSupported:  []string{"public"},
 		IDTokenSigningAlgValuesSupported: []string{
