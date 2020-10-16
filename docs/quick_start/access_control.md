@@ -75,8 +75,6 @@ docker run --name nginx -p 80:80 -d nginx
 
 今回はAccess Proxyとして[keycloak-gatekeeper](https://github.com/keycloak/keycloak-gatekeeper)を使用します。
 
-#### dockerコンテナを使用する場合
-
 ```bash
 export CLIENT_SECRET="<確認したSecret>"
 export HEKATE_SERVER="http://localhost:18443"
@@ -106,10 +104,6 @@ docker run --name gatekeeper -d --network host -v $PWD:/mnt/conf \
   quay.io/keycloak/keycloak-gatekeeper \
   --config=/mnt/conf/config.yaml
 ```
-
-#### kuberentesを使用する場合
-
-TODO
 
 ### アクセス
 
