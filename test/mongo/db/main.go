@@ -44,8 +44,6 @@ func main() {
 	testSession(dbClient)
 	testUser(dbClient)
 
-	// TODO Test Audit Methods
-
 	fmt.Println("Successfully finished")
 }
 
