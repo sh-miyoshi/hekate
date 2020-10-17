@@ -7,7 +7,6 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/audit/model"
 	"github.com/sh-miyoshi/hekate/pkg/audit/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/audit/none"
-	dbmongo "github.com/sh-miyoshi/hekate/pkg/db/mongo"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/util"
@@ -29,16 +28,16 @@ func Init(dbType string, connStr string) *errors.Error {
 	switch dbType {
 	case "memory":
 		logger.Info("Initialize AuditManager with local memory DB")
-
 		inst = &Manager{
 			handler: memory.NewHandler(),
 		}
 	case "mongo":
 		logger.Info("Initialize AuditManager with mongo DB")
-		dbClient, err := dbmongo.NewClient(connStr)
+		dbClient, err := mongo.NewClient(connStr)
 		if err != nil {
-			return errors.Append(err, "Failed to get db client")
+			return errors.Append(err, "Failed to create mongo handler")
 		}
+
 		inst = &Manager{
 			handler: mongo.NewHandler(dbClient),
 		}

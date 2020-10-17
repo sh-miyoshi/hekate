@@ -12,9 +12,12 @@ import (
 )
 
 const (
-	databaseName   = "hekate"
 	collectionName = "audit"
 	timeoutSecond  = 5
+)
+
+var (
+	databaseName = "hekate"
 )
 
 // Handler ...
@@ -22,10 +25,39 @@ type Handler struct {
 	dbClient *mongo.Client
 }
 
+// NewClient ...
+func NewClient(connStr string) (*mongo.Client, *errors.Error) {
+	cli, err := mongo.NewClient(options.Client().ApplyURI(connStr))
+	if err != nil {
+		return nil, errors.New("DB failed", "Failed to create mongo client: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	if err := cli.Connect(ctx); err != nil {
+		return nil, errors.New("DB failed", "Failed to connect to mongo: %v", err)
+	}
+
+	if err := cli.Ping(ctx, nil); err != nil {
+		return nil, errors.New("DB failed", "Failed to ping to mongo: %v", err)
+	}
+
+	return cli, nil
+}
+
 // NewHandler ...
 func NewHandler(dbClient *mongo.Client) *Handler {
 	return &Handler{
 		dbClient: dbClient,
+	}
+}
+
+// ChangeDatabase changes the database of store data
+// this method should call at first
+func ChangeDatabase(name string) {
+	if len(name) > 0 {
+		databaseName = name
 	}
 }
 
