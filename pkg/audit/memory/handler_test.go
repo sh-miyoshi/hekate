@@ -47,12 +47,12 @@ func TestGet(t *testing.T) {
 	offset := uint(1)
 	res, _ = handler.Get("project1", fromDate, toDate, offset)
 	if !res[0].Time.Equal(handler.data[150].Time) {
-		t.Errorf("Failed to get audit event by offset. expect: %v, but got: %v", handler.data[100].Time, res[0].Time)
+		t.Errorf("Failed to get audit event by offset. expect: %v, but got: %v", handler.data[150].Time, res[0].Time)
 	}
 	offset = uint(2)
 	res, _ = handler.Get("project1", fromDate, toDate, offset)
 	if !res[0].Time.Equal(handler.data[250].Time) {
-		t.Errorf("Failed to get audit event by offset 2. expect: %v, but got: %v", handler.data[100].Time, res[0].Time)
+		t.Errorf("Failed to get audit event by offset 2. expect: %v, but got: %v", handler.data[250].Time, res[0].Time)
 	}
 	if len(res) != 50 {
 		t.Errorf("Failed to get audit event num by offset 2. expect: %d, but got: %d", 50, len(res))
