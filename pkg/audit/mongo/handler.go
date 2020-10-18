@@ -115,8 +115,8 @@ func (h *Handler) Get(projectName string, fromDate, toDate time.Time, offset uin
 	filter = append(filter, bson.E{Key: "unixtime", Value: bson.D{{Key: "$lt", Value: toDate.Unix()}}})
 
 	findOptions := options.Find()
-	findOptions.SetSort(bson.D{{Key: "unixtime", Value: -1}})
-	findOptions.SetSkip(int64(offset))
+	findOptions.SetSort(bson.D{{Key: "unixtime", Value: 1}})
+	findOptions.SetSkip(int64(offset * model.AuditGetMaxNum))
 	findOptions.SetLimit(int64(model.AuditGetMaxNum))
 
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
