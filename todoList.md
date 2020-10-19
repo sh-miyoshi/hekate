@@ -16,8 +16,6 @@
 - db manager validationの追加
 - DBGC
   - session cleanup
-- mongo audit handlerの実装
-  - get method
 - ログインディレクトリの構造チェック
 - masterプロジェクト初期構成時にpassword grantを外す
 - SSOの有効期限をconfigファイルで設定できるようにする
@@ -38,7 +36,6 @@
       - login session
       - session
       - user
-      - audit
     - transaction test
 - APIの修正
   - Custom RoleにDescriptionを追加
