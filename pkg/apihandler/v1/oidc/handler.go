@@ -1,12 +1,10 @@
 package oidc
 
 import (
-	"crypto/x509"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/hekate/pkg/audit"
@@ -389,7 +387,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
+	if err := jwthttp.SetSSOSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
 		errors.Print(errors.Append(err, "Failed to set cookie"))
 		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 		return
@@ -438,7 +436,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := setLoginSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
+		if err := jwthttp.SetSSOSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
 			errors.Print(errors.Append(err, "Failed to set cookie"))
 			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
@@ -609,7 +607,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 		if err != nil {
 			logger.Debug("Failed to get user id from cookie: %v", err)
 		} else {
-			userID, err = getLoginUserIDFromCookie(cookie, projectName)
+			userID, err = jwthttp.GetLoginUserIDFromSSOSessionCookie(cookie, projectName)
 		}
 	}
 
@@ -763,63 +761,4 @@ func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer str
 	}
 
 	return req, nil
-}
-
-func setLoginSessionToCookie(w http.ResponseWriter, projectName, userID, issuer string) *errors.Error {
-	prj, err := db.GetInst().ProjectGet(projectName)
-	if err != nil {
-		return errors.Append(err, "Failed to get project config")
-	}
-
-	// TODO(set new value to config?)
-	lifeSpan := prj.TokenConfig.AccessTokenLifeSpan
-
-	req := token.Request{
-		Issuer:      issuer,
-		ExpiredTime: time.Second * time.Duration(lifeSpan),
-		ProjectName: projectName,
-		UserID:      userID,
-	}
-	tkn, err := token.GenerateSSOToken(req)
-	if err != nil {
-		return errors.Append(err, "Failed to generate SSO token")
-	}
-
-	cookie := &http.Cookie{
-		Name:     "HEKATE_LOGIN_SESSION",
-		Value:    tkn,
-		MaxAge:   int(lifeSpan),
-		Secure:   oidc.IsCookieSecure(),
-		HttpOnly: true,
-	}
-
-	http.SetCookie(w, cookie)
-	return nil
-}
-
-func getLoginUserIDFromCookie(cookie *http.Cookie, projectName string) (string, *errors.Error) {
-	var claims jwt.StandardClaims
-	tkn, err := jwt.ParseWithClaims(cookie.Value, &claims, func(token *jwt.Token) (interface{}, error) {
-		project, err := db.GetInst().ProjectGet(projectName)
-		if err != nil {
-			return nil, errors.Append(err, "Failed to get project")
-		}
-
-		switch token.Method {
-		case jwt.SigningMethodRS256:
-			key, err := x509.ParsePKCS1PublicKey(project.TokenConfig.SignPublicKey)
-			if err != nil {
-				return nil, errors.New("Invalid request", "Failed to parse public key: %v", err)
-			}
-			return key, nil
-		}
-
-		return nil, errors.New("Invalid request", "unknown token sigining method")
-	})
-
-	if err != nil || !tkn.Valid {
-		return "", errors.New("Invalid request", "Token in cookie is not valid: %v", err)
-	}
-
-	return claims.Subject, nil
 }
