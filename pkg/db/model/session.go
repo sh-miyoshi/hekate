@@ -30,6 +30,7 @@ type SessionHandler interface {
 	Delete(projectName string, filter *SessionFilter) *errors.Error
 	DeleteAll(projectName string) *errors.Error
 	GetList(projectName string, filter *SessionFilter) ([]*Session, *errors.Error)
+	Cleanup(now time.Time) *errors.Error
 }
 
 var (

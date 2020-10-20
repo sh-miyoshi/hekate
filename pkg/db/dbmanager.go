@@ -909,7 +909,9 @@ func (m *Manager) DeleteExpiredSessions() *errors.Error {
 			return errors.Append(err, "Failed to cleanup login sessions")
 		}
 
-		// TODO cleanup session
+		if err := m.session.Cleanup(now); err != nil {
+			return errors.Append(err, "Failed to cleanup sessions")
+		}
 
 		return nil
 	})

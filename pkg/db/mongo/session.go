@@ -169,3 +169,21 @@ func (h *SessionHandler) GetList(projectName string, filter *model.SessionFilter
 
 	return res, nil
 }
+
+// Cleanup ...
+func (h *SessionHandler) Cleanup(now time.Time) *errors.Error {
+	col := h.dbClient.Database(databaseName).Collection(sessionCollectionName)
+	filter := bson.D{
+		{Key: "expires_in", Value: bson.D{{Key: "$lt", Value: now.Unix()}}},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteMany(ctx, filter)
+	if err != nil {
+		return errors.New("DB failed", "Failed to delete expired session from mongodb: %v", err)
+	}
+
+	return nil
+}

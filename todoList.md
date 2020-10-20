@@ -14,8 +14,6 @@
 ## server application enhancement
 
 - db manager validationの追加
-- DBGC
-  - session cleanup
 - ログインディレクトリの構造チェック
 - masterプロジェクト初期構成時にpassword grantを外す
 - SSOの有効期限をconfigファイルで設定できるようにする

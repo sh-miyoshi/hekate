@@ -1,6 +1,8 @@
 package memory
 
 import (
+	"time"
+
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
@@ -58,6 +60,20 @@ func (h *SessionHandler) GetList(projectName string, filter *model.SessionFilter
 	}
 
 	return res, nil
+}
+
+// Cleanup ...
+func (h *SessionHandler) Cleanup(now time.Time) *errors.Error {
+	newList := []*model.Session{}
+	for _, s := range h.sessionList {
+		t := time.Unix(s.ExpiresIn, 0)
+		if now.After(t) {
+			newList = append(newList, s)
+		}
+	}
+
+	h.sessionList = newList
+	return nil
 }
 
 func filterSessionList(data []*model.Session, projectName string, filter *model.SessionFilter) []*model.Session {
