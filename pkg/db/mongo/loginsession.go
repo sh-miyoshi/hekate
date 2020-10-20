@@ -257,7 +257,7 @@ func (h *LoginSessionHandler) Cleanup(now time.Time) *errors.Error {
 
 	_, err := col.DeleteMany(ctx, filter)
 	if err != nil {
-		return errors.New("DB failed", "Failed to delete expired session from mongodb: %v", err)
+		return errors.New("DB failed", "Failed to delete expired login session from mongodb: %v", err)
 	}
 
 	return nil
