@@ -16,7 +16,6 @@
 - db manager validationの追加
 - ログインディレクトリの構造チェック
 - masterプロジェクト初期構成時にpassword grantを外す
-- SSOの有効期限をconfigファイルで設定できるようにする
 - errors.WriteOAuthErrorのエラーハンドリング
 - テストの追加
   - unit test
@@ -116,6 +115,7 @@
 - error messageの内容
 - Production向け実行ファイルの作成
 - support authorization code flow
+- client secret未入力時に内部で生成する
 
 ## new commands
 
