@@ -23,7 +23,7 @@ type AuthRequest struct {
 	// Optional
 	Nonce        string
 	Prompt       []string
-	MaxAge       uint
+	MaxAge       int64
 	ResponseMode string
 	IDTokenHint  string
 

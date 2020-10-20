@@ -13,7 +13,7 @@ type Session struct {
 	ProjectName  string
 	SessionID    string
 	CreatedAt    time.Time
-	ExpiresIn    uint
+	ExpiresIn    int64
 	FromIP       string // Used to identify the user using this session
 	LastAuthTime time.Time
 }

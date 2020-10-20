@@ -4,6 +4,6 @@ package sessionapi
 type SessionGetResponse struct {
 	ID        string `json:"id"`
 	CreatedAt string `json:"created_at"`
-	ExpiresIn uint   `json:"expires_in"`
+	ExpiresIn int64  `json:"expires_in"`
 	FromIP    string `json:"from_ip"`
 }

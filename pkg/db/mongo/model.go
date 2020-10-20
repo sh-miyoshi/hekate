@@ -43,26 +43,25 @@ type session struct {
 	ProjectName  string    `bson:"project_name"`
 	SessionID    string    `bson:"session_id"`
 	CreatedAt    time.Time `bson:"created_at"`
-	ExpiresIn    uint      `bson:"expires_in"`
+	ExpiresIn    int64     `bson:"expires_in"`
 	FromIP       string    `bson:"from_ip"`
 	LastAuthTime time.Time `bson:"last_auth_time"`
 }
 
 type loginSession struct {
-	SessionID     string    `bson:"session_id"`
-	Code          string    `bson:"code"`
-	ExpiresIn     time.Time `bson:"expires_in"`
-	UnixExpiresIn int64     `bson:"unix_expires_in"`
-	Scope         string    `bson:"scope"`
-	ResponseType  []string  `bson:"response_type"`
-	ClientID      string    `bson:"client_id"`
-	RedirectURI   string    `bson:"redirect_uri"`
-	Nonce         string    `bson:"nonce"`
-	ProjectName   string    `bson:"project_name"`
-	ResponseMode  string    `bson:"response_mode"`
-	Prompt        []string  `bson:"prompt"`
-	UserID        string    `bson:"user_id"`
-	LoginDate     time.Time `bson:"login_date"`
+	SessionID    string    `bson:"session_id"`
+	Code         string    `bson:"code"`
+	ExpiresIn    int64     `bson:"expires_in"`
+	Scope        string    `bson:"scope"`
+	ResponseType []string  `bson:"response_type"`
+	ClientID     string    `bson:"client_id"`
+	RedirectURI  string    `bson:"redirect_uri"`
+	Nonce        string    `bson:"nonce"`
+	ProjectName  string    `bson:"project_name"`
+	ResponseMode string    `bson:"response_mode"`
+	Prompt       []string  `bson:"prompt"`
+	UserID       string    `bson:"user_id"`
+	LoginDate    time.Time `bson:"login_date"`
 }
 
 type lockState struct {
@@ -88,16 +87,6 @@ type clientInfo struct {
 	AccessType          string    `bson:"access_type"`
 	CreatedAt           time.Time `bson:"created_at"`
 	AllowedCallbackURLs []string  `bson:"allowed_callback_urls"`
-}
-
-type authCode struct {
-	CodeID      string    `bson:"code_id"`
-	ExpiresIn   time.Time `bson:"expires_in"`
-	ClientID    string    `bson:"client_id"`
-	RedirectURL string    `bson:"redirect_url"`
-	UserID      string    `bson:"user_id"`
-	Nonce       string    `bson:"nonce"`
-	MaxAge      uint      `bson:"max_age"`
 }
 
 type customRole struct {

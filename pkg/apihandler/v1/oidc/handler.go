@@ -677,7 +677,7 @@ func handleSSO(method string, projectName string, userID string, tokenIssuer str
 				ResponseMode: authReq.ResponseMode,
 				Scope:        authReq.Scope,
 				Prompt:       authReq.Prompt,
-				ExpiresIn:    time.Now().Add(oidc.GetLoginSessionExpiresTime()),
+				ExpiresIn:    time.Now().Add(oidc.GetLoginSessionExpiresTime()).Unix(),
 			}
 			req, err := createLoginRedirectInfo(ls, authReq.State, tokenIssuer)
 			if err != nil {
