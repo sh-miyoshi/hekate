@@ -33,6 +33,7 @@ type GlobalConfig struct {
 	HTTPSConfig          HTTPSConfig `yaml:"https"`
 	AuditDB              DBInfo      `yaml:"audit_db"`
 	DBGCInterval         uint64      `yaml:"dbgc_interval"`
+	SSOExpiresTime       uint64      `yaml:"sso_expires_time"`
 }
 
 // Validate ...
@@ -51,6 +52,10 @@ func (c *GlobalConfig) Validate() *errors.Error {
 
 	if c.AuthCodeExpiresTime == 0 {
 		return errors.New("Invalid config", "login session expires time is 0")
+	}
+
+	if c.SSOExpiresTime == 0 {
+		return errors.New("Invalid config", "sso expires time is 0")
 	}
 
 	finfo, err := os.Stat(c.UserLoginResourceDir)

@@ -20,6 +20,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
+	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
@@ -203,16 +204,13 @@ func initAll(cfg *config.GlobalConfig) *errors.Error {
 		return errors.Append(err, "Login resource directory is broken")
 	}
 
-	// Initialize Default Role Handler
+	// Initialize settings
 	if err := defaultrole.InitHandler(); err != nil {
 		return errors.Append(err, "Failed to initialize default role handler")
 	}
-
-	// Initialize Token Config
 	token.InitConfig(cfg.HTTPSConfig.Enabled)
-
-	// Initialize OIDC Config
 	oidc.InitConfig(cfg.HTTPSConfig.Enabled, cfg.AuthCodeExpiresTime, cfg.UserLoginResourceDir, authCodeUserLoginResourcePath)
+	jwthttp.SetSSOExpiresTime(cfg.SSOExpiresTime)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {

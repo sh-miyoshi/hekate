@@ -12,19 +12,20 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 )
 
+var (
+	ssoExpiresTimeSec uint64 = 300 // default is 300[sec] = 5[min]
+)
+
+// SetSSOExpiresTime ...
+func SetSSOExpiresTime(expiresTimeSec uint64) {
+	ssoExpiresTimeSec = expiresTimeSec
+}
+
 // SetSSOSessionToCookie ...
 func SetSSOSessionToCookie(w http.ResponseWriter, projectName, userID, issuer string) *errors.Error {
-	prj, err := db.GetInst().ProjectGet(projectName)
-	if err != nil {
-		return errors.Append(err, "Failed to get project config")
-	}
-
-	// TODO(set new value to config?)
-	lifeSpan := prj.TokenConfig.AccessTokenLifeSpan
-
 	req := token.Request{
 		Issuer:      issuer,
-		ExpiredTime: time.Second * time.Duration(lifeSpan),
+		ExpiredTime: time.Second * time.Duration(ssoExpiresTimeSec),
 		ProjectName: projectName,
 		UserID:      userID,
 	}
@@ -36,7 +37,7 @@ func SetSSOSessionToCookie(w http.ResponseWriter, projectName, userID, issuer st
 	cookie := &http.Cookie{
 		Name:     "HEKATE_LOGIN_SESSION",
 		Value:    tkn,
-		MaxAge:   int(lifeSpan),
+		MaxAge:   int(ssoExpiresTimeSec),
 		Secure:   oidc.IsCookieSecure(),
 		HttpOnly: true,
 	}
