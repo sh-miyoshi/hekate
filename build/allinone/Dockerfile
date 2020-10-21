@@ -14,7 +14,7 @@ FROM node:14 as front-builder
 WORKDIR /hekate
 COPY ./cmd/portal ./cmd/portal
 WORKDIR /hekate/cmd/portal
-RUN npm install
+RUN npm install --production
 
 
 FROM mongo as mongo-installer
