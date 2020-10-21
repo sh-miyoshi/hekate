@@ -23,10 +23,9 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 	}
 
 	d := map[string]string{
-		"URL":             url,
-		"CSSResourcePath": userLoginResPath + "/css",
-		"IMGResourcePath": userLoginResPath + "/img",
-		"Error":           errMsg,
+		"URL":                url,
+		"StaticResourcePath": userLoginResPath + "/static",
+		"Error":              errMsg,
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
@@ -43,9 +42,8 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 	}
 
 	d := map[string]string{
-		"CSSResourcePath": userLoginResPath + "/css",
-		"IMGResourcePath": userLoginResPath + "/img",
-		"Error":           errMsg,
+		"StaticResourcePath": userLoginResPath + "/static",
+		"Error":              errMsg,
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
@@ -67,9 +65,8 @@ func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWrite
 	}
 
 	d := map[string]string{
-		"CSSResourcePath": userLoginResPath + "/css",
-		"IMGResourcePath": userLoginResPath + "/img",
-		"URL":             url,
+		"StaticResourcePath": userLoginResPath + "/static",
+		"URL":                url,
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")

@@ -120,12 +120,9 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	}).Methods("GET")
 
 	// File Server for User Login Page
-	fsCSS := http.FileServer(http.Dir(path.Join(cfg.UserLoginResourceDir, "/css")))
-	pt := path.Join(authCodeUserLoginResourcePath, "/css") + "/"
-	r.PathPrefix(pt).Handler(http.StripPrefix(pt, fsCSS))
-	fsImg := http.FileServer(http.Dir(path.Join(cfg.UserLoginResourceDir, "/img")))
-	pt = path.Join(authCodeUserLoginResourcePath, "/img") + "/"
-	r.PathPrefix(pt).Handler(http.StripPrefix(pt, fsImg))
+	fs := http.FileServer(http.Dir(path.Join(cfg.UserLoginResourceDir, "/static")))
+	pt := path.Join(authCodeUserLoginResourcePath, "/static") + "/"
+	r.PathPrefix(pt).Handler(http.StripPrefix(pt, fs))
 
 	r.Use(loggingMiddleware)
 }
