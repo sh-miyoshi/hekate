@@ -47,7 +47,7 @@ func (h *CustomRoleHandler) GetList(projectName string, filter *model.CustomRole
 	}
 
 	if filter != nil {
-		res = filterRoleList(res, projectName, filter)
+		res = matchFilterRoleList(res, projectName, filter)
 	}
 
 	return res, nil
@@ -84,7 +84,8 @@ func (h *CustomRoleHandler) DeleteAll(projectName string) *errors.Error {
 	return nil
 }
 
-func filterRoleList(data []*model.CustomRole, projectName string, filter *model.CustomRoleFilter) []*model.CustomRole {
+// matchFilterRoleList returns a list which matches the filter rules
+func matchFilterRoleList(data []*model.CustomRole, projectName string, filter *model.CustomRoleFilter) []*model.CustomRole {
 	if filter == nil {
 		return data
 	}

@@ -49,7 +49,7 @@ func TestFilterUserList(t *testing.T) {
 			Name: tc.FilterName,
 		}
 
-		res := filterUserList(data, project, filter)
+		res := matchFilterUserList(data, project, filter)
 		if len(res) != tc.ExpectNum {
 			t.Errorf("Filter User List Failed: expect num: %d, but got %d, %v", tc.ExpectNum, len(res), res)
 		}

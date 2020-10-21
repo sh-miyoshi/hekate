@@ -52,7 +52,7 @@ func (h *ClientInfoHandler) GetList(projectName string, filter *model.ClientFilt
 	}
 
 	if filter != nil {
-		res = filterClientList(res, projectName, filter)
+		res = matchFilterClientList(res, projectName, filter)
 	}
 
 	return res, nil
@@ -81,7 +81,8 @@ func (h *ClientInfoHandler) DeleteAll(projectName string) *errors.Error {
 	return nil
 }
 
-func filterClientList(data []*model.ClientInfo, projectName string, filter *model.ClientFilter) []*model.ClientInfo {
+// matchFilterClientList returns a list which matches the filter rules
+func matchFilterClientList(data []*model.ClientInfo, projectName string, filter *model.ClientFilter) []*model.ClientInfo {
 	if filter == nil {
 		return data
 	}

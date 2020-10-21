@@ -48,7 +48,7 @@ func (h *ProjectInfoHandler) GetList(filter *model.ProjectFilter) ([]*model.Proj
 	}
 
 	if filter != nil {
-		res = filterProjectList(res, filter)
+		res = matchFilterProjectList(res, filter)
 	}
 
 	return res, nil
@@ -65,7 +65,7 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) *errors.Error {
 	return errors.New("Internal Error", "No such project %s", ent.Name)
 }
 
-func filterProjectList(data []*model.ProjectInfo, filter *model.ProjectFilter) []*model.ProjectInfo {
+func matchFilterProjectList(data []*model.ProjectInfo, filter *model.ProjectFilter) []*model.ProjectInfo {
 	if filter == nil {
 		return data
 	}
