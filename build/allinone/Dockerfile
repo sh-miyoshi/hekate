@@ -16,12 +16,9 @@ COPY ./cmd/portal ./cmd/portal
 WORKDIR /hekate/cmd/portal
 RUN npm install
 
-FROM ubuntu:18.04 as mongo-installer
 
-RUN apt update -y && apt install -y wget
-WORKDIR /hekate
-RUN wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.4.1.tgz
-RUN tar zxf mongodb-linux-x86_64-ubuntu1804-4.4.1.tgz
+FROM mongo as mongo-installer
+
 
 FROM ubuntu:18.04
 
@@ -30,7 +27,7 @@ WORKDIR /hekate
 RUN mkdir -p server && mkdir -p portal && mkdir -p mongo
 COPY cmd/hekate/_data/testcerts /hekate/secret
 
-COPY --from=mongo-installer /hekate/mongodb-linux-x86_64-ubuntu1804-4.4.1/bin/mongod mongo/mongod
+COPY --from=mongo-installer /usr/bin/mongod mongo/mongod
 
 COPY --from=server-builder /hekate/cmd/hekate/hekate-server /hekate/server/hekate-server
 COPY build/allinone/config.yaml /hekate/server/config.yaml
