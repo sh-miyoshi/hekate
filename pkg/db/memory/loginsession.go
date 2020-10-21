@@ -36,7 +36,7 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 
 // Delete ...
 func (h *LoginSessionHandler) Delete(projectName string, filter *model.LoginSessionFilter) *errors.Error {
-	newList := filterLoginSessionList(h.sessionList, projectName, filter)
+	newList := missMatchFilterLoginSessionList(h.sessionList, projectName, filter)
 
 	h.sessionList = newList
 	return nil
@@ -91,7 +91,7 @@ func (h *LoginSessionHandler) Cleanup(now time.Time) *errors.Error {
 	return nil
 }
 
-func filterLoginSessionList(data []*model.LoginSession, projectName string, filter *model.LoginSessionFilter) []*model.LoginSession {
+func missMatchFilterLoginSessionList(data []*model.LoginSession, projectName string, filter *model.LoginSessionFilter) []*model.LoginSession {
 	if filter == nil {
 		return data
 	}
@@ -99,16 +99,16 @@ func filterLoginSessionList(data []*model.LoginSession, projectName string, filt
 
 	for _, s := range data {
 		if projectName == s.ProjectName {
-			if filter.SessionID != "" && s.SessionID != filter.SessionID {
-				// missmatch session id
+			if filter.SessionID != "" && s.SessionID == filter.SessionID {
+				// matched to session id
 				continue
 			}
-			if filter.UserID != "" && s.UserID != filter.UserID {
-				// missmatch user id
+			if filter.UserID != "" && s.UserID == filter.UserID {
+				// matched to user id
 				continue
 			}
-			if filter.ClientID != "" && s.ClientID != filter.ClientID {
-				// missmatch session id
+			if filter.ClientID != "" && s.ClientID == filter.ClientID {
+				// matched to client id
 				continue
 			}
 		}
