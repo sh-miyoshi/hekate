@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"os"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -13,7 +14,26 @@ import (
 
 // CheckLoginResDirStruct check a struct of login resource directory
 func (c *GlobalConfig) CheckLoginResDirStruct() *errors.Error {
-	// TODO(implement this)
+	// directory struct
+	// .
+	// ├── consent.html  : consent page
+	// ├── error.html    : error page
+	// ├── index.html    : login page
+	// └── static        : directory of static assets
+
+	dir := c.UserLoginResourceDir
+	pubMsg := "invalid login resource directory struct"
+	if _, err := os.Stat(path.Join(dir, "/consent.html")); err != nil {
+		return errors.New(pubMsg, "Failed to get consent page: %v", err)
+	}
+	if _, err := os.Stat(path.Join(dir, "/error.html")); err != nil {
+		return errors.New(pubMsg, "Failed to get error page: %v", err)
+	}
+	if _, err := os.Stat(path.Join(dir, "/index.html")); err != nil {
+		return errors.New(pubMsg, "Failed to get login page: %v", err)
+	}
+	// static directory is option, so does not require check
+
 	return nil
 }
 

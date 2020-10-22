@@ -1,7 +1,9 @@
 package config
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -77,5 +79,67 @@ func TestGetConfigFileName(t *testing.T) {
 		if tc.expectOK && f != tc.fname {
 			t.Errorf("getConfigFileName returns wrong file name. expect %s, but got %s", tc.fname, f)
 		}
+	}
+}
+
+func TestCheckLoginResDirStruct(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	if err != nil {
+		t.Errorf("Failed to create tmp dir: %v", err)
+		return
+	}
+	defer os.RemoveAll(dir)
+
+	c := &GlobalConfig{
+		UserLoginResourceDir: dir,
+	}
+
+	consentFile := filepath.Join(dir, "consent.html")
+	errorFile := filepath.Join(dir, "error.html")
+	indexFile := filepath.Join(dir, "index.html")
+	data := []byte("data")
+
+	// Test no consent page
+	// Error check only once
+	if err := ioutil.WriteFile(errorFile, data, 0644); err != nil {
+		t.Errorf("Failed to create error file: %v", err)
+		return
+	}
+	ioutil.WriteFile(indexFile, data, 0644)
+	if err := c.CheckLoginResDirStruct(); err == nil {
+		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no consent page")
+	}
+	t.Logf("no consent page error: %v", err)
+	// Error check only once
+	if err := os.Remove(errorFile); err != nil {
+		t.Errorf("Failed to delete error file: %v", err)
+		return
+	}
+	os.Remove(indexFile)
+
+	// Test no error page
+	ioutil.WriteFile(consentFile, data, 0644)
+	ioutil.WriteFile(indexFile, data, 0644)
+	if err := c.CheckLoginResDirStruct(); err == nil {
+		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no error page")
+	}
+	os.Remove(consentFile)
+	os.Remove(indexFile)
+
+	// Test no login page
+	ioutil.WriteFile(consentFile, data, 0644)
+	ioutil.WriteFile(errorFile, data, 0644)
+	if err := c.CheckLoginResDirStruct(); err == nil {
+		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no login page")
+	}
+	os.Remove(consentFile)
+	os.Remove(errorFile)
+
+	// Test ok
+	ioutil.WriteFile(consentFile, data, 0644)
+	ioutil.WriteFile(errorFile, data, 0644)
+	ioutil.WriteFile(indexFile, data, 0644)
+	if err := c.CheckLoginResDirStruct(); err != nil {
+		t.Errorf("CheckLoginResDirStruct returns error %v, but expect is nil", err)
 	}
 }
