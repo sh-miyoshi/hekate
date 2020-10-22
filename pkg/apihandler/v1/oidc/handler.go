@@ -180,7 +180,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	case model.GrantTypeAuthorizationCode:
 		code := r.Form.Get("code")
-		tkn, err = oidc.ReqAuthByCode(project, clientID, code, r)
+		codeVerifier := r.Form.Get("code_verifier")
+		tkn, err = oidc.ReqAuthByCode(project, clientID, code, codeVerifier, r)
 	default:
 		logger.Info("Unexpected grant type got: %s", gt.String())
 		errors.WriteOAuthError(w, errors.ErrServerError, state)
