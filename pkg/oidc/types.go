@@ -21,11 +21,13 @@ type AuthRequest struct {
 	State string
 
 	// Optional
-	Nonce        string
-	Prompt       []string
-	MaxAge       int64
-	ResponseMode string
-	IDTokenHint  string
+	Nonce               string
+	Prompt              []string
+	MaxAge              int64
+	ResponseMode        string
+	IDTokenHint         string
+	CodeChallenge       string
+	CodeChallengeMethod string
 
 	Request string
 
@@ -123,6 +125,8 @@ func (r *AuthRequest) Validate() *errors.Error {
 	if err := validateResponseMode(r.ResponseMode); err != nil {
 		return errors.Append(err, "Failed to validate response mode %s", r.ResponseMode)
 	}
+
+	// TODO(Check CodeChallengeMethod)
 
 	return nil
 }

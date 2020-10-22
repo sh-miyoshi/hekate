@@ -57,19 +57,21 @@ func NewLoginSessionHandler(dbClient *mongo.Client) (*LoginSessionHandler, *erro
 // Add ...
 func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *errors.Error {
 	v := &loginSession{
-		SessionID:    ent.SessionID,
-		Code:         ent.Code,
-		ExpiresIn:    ent.ExpiresIn,
-		Scope:        ent.Scope,
-		ResponseType: ent.ResponseType,
-		ClientID:     ent.ClientID,
-		RedirectURI:  ent.RedirectURI,
-		Nonce:        ent.Nonce,
-		ProjectName:  ent.ProjectName,
-		ResponseMode: ent.ResponseMode,
-		Prompt:       ent.Prompt,
-		UserID:       ent.UserID,
-		LoginDate:    ent.LoginDate,
+		SessionID:           ent.SessionID,
+		Code:                ent.Code,
+		ExpiresIn:           ent.ExpiresIn,
+		Scope:               ent.Scope,
+		ResponseType:        ent.ResponseType,
+		ClientID:            ent.ClientID,
+		RedirectURI:         ent.RedirectURI,
+		Nonce:               ent.Nonce,
+		ProjectName:         ent.ProjectName,
+		ResponseMode:        ent.ResponseMode,
+		Prompt:              ent.Prompt,
+		UserID:              ent.UserID,
+		LoginDate:           ent.LoginDate,
+		CodeChallenge:       ent.CodeChallenge,
+		CodeChallengeMethod: ent.CodeChallengeMethod,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(authcodeSessionCollectionName)
@@ -94,19 +96,21 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 	}
 
 	v := &loginSession{
-		SessionID:    ent.SessionID,
-		Code:         ent.Code,
-		ExpiresIn:    ent.ExpiresIn,
-		Scope:        ent.Scope,
-		ResponseType: ent.ResponseType,
-		ClientID:     ent.ClientID,
-		RedirectURI:  ent.RedirectURI,
-		Nonce:        ent.Nonce,
-		ProjectName:  ent.ProjectName,
-		ResponseMode: ent.ResponseMode,
-		Prompt:       ent.Prompt,
-		UserID:       ent.UserID,
-		LoginDate:    ent.LoginDate,
+		SessionID:           ent.SessionID,
+		Code:                ent.Code,
+		ExpiresIn:           ent.ExpiresIn,
+		Scope:               ent.Scope,
+		ResponseType:        ent.ResponseType,
+		ClientID:            ent.ClientID,
+		RedirectURI:         ent.RedirectURI,
+		Nonce:               ent.Nonce,
+		ProjectName:         ent.ProjectName,
+		ResponseMode:        ent.ResponseMode,
+		Prompt:              ent.Prompt,
+		UserID:              ent.UserID,
+		LoginDate:           ent.LoginDate,
+		CodeChallenge:       ent.CodeChallenge,
+		CodeChallengeMethod: ent.CodeChallengeMethod,
 	}
 
 	updates := bson.D{
@@ -176,19 +180,21 @@ func (h *LoginSessionHandler) GetByCode(projectName string, code string) (*model
 	}
 
 	return &model.LoginSession{
-		SessionID:    res.SessionID,
-		Code:         res.Code,
-		ExpiresIn:    res.ExpiresIn,
-		Scope:        res.Scope,
-		ResponseType: res.ResponseType,
-		ClientID:     res.ClientID,
-		RedirectURI:  res.RedirectURI,
-		Nonce:        res.Nonce,
-		ProjectName:  res.ProjectName,
-		ResponseMode: res.ResponseMode,
-		Prompt:       res.Prompt,
-		UserID:       res.UserID,
-		LoginDate:    res.LoginDate,
+		SessionID:           res.SessionID,
+		Code:                res.Code,
+		ExpiresIn:           res.ExpiresIn,
+		Scope:               res.Scope,
+		ResponseType:        res.ResponseType,
+		ClientID:            res.ClientID,
+		RedirectURI:         res.RedirectURI,
+		Nonce:               res.Nonce,
+		ProjectName:         res.ProjectName,
+		ResponseMode:        res.ResponseMode,
+		Prompt:              res.Prompt,
+		UserID:              res.UserID,
+		LoginDate:           res.LoginDate,
+		CodeChallenge:       res.CodeChallenge,
+		CodeChallengeMethod: res.CodeChallengeMethod,
 	}, nil
 }
 
@@ -212,19 +218,21 @@ func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSe
 	}
 
 	return &model.LoginSession{
-		SessionID:    res.SessionID,
-		Code:         res.Code,
-		ExpiresIn:    res.ExpiresIn,
-		Scope:        res.Scope,
-		ResponseType: res.ResponseType,
-		ClientID:     res.ClientID,
-		RedirectURI:  res.RedirectURI,
-		Nonce:        res.Nonce,
-		ProjectName:  res.ProjectName,
-		ResponseMode: res.ResponseMode,
-		Prompt:       res.Prompt,
-		UserID:       res.UserID,
-		LoginDate:    res.LoginDate,
+		SessionID:           res.SessionID,
+		Code:                res.Code,
+		ExpiresIn:           res.ExpiresIn,
+		Scope:               res.Scope,
+		ResponseType:        res.ResponseType,
+		ClientID:            res.ClientID,
+		RedirectURI:         res.RedirectURI,
+		Nonce:               res.Nonce,
+		ProjectName:         res.ProjectName,
+		ResponseMode:        res.ResponseMode,
+		Prompt:              res.Prompt,
+		UserID:              res.UserID,
+		LoginDate:           res.LoginDate,
+		CodeChallenge:       res.CodeChallenge,
+		CodeChallengeMethod: res.CodeChallengeMethod,
 	}, nil
 }
 

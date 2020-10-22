@@ -664,18 +664,20 @@ func handleSSO(method string, projectName string, userID string, tokenIssuer str
 		logger.Debug("Session Info: now %v, valid time %v", now, valid)
 		if now.Before(valid) {
 			ls := &model.LoginSession{
-				SessionID:    uuid.New().String(),
-				ResponseType: authReq.ResponseType,
-				ProjectName:  projectName,
-				UserID:       s.UserID,
-				ClientID:     authReq.ClientID,
-				Nonce:        authReq.Nonce,
-				LoginDate:    s.LastAuthTime,
-				RedirectURI:  authReq.RedirectURI,
-				ResponseMode: authReq.ResponseMode,
-				Scope:        authReq.Scope,
-				Prompt:       authReq.Prompt,
-				ExpiresIn:    time.Now().Add(oidc.GetLoginSessionExpiresTime()).Unix(),
+				SessionID:           uuid.New().String(),
+				ResponseType:        authReq.ResponseType,
+				ProjectName:         projectName,
+				UserID:              s.UserID,
+				ClientID:            authReq.ClientID,
+				Nonce:               authReq.Nonce,
+				LoginDate:           s.LastAuthTime,
+				RedirectURI:         authReq.RedirectURI,
+				ResponseMode:        authReq.ResponseMode,
+				Scope:               authReq.Scope,
+				Prompt:              authReq.Prompt,
+				ExpiresIn:           time.Now().Add(oidc.GetLoginSessionExpiresTime()).Unix(),
+				CodeChallenge:       authReq.CodeChallenge,
+				CodeChallengeMethod: authReq.CodeChallengeMethod,
 			}
 			req, err := createLoginRedirectInfo(ls, authReq.State, tokenIssuer)
 			if err != nil {
