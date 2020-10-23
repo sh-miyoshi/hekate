@@ -180,7 +180,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	case model.GrantTypeAuthorizationCode:
 		code := r.Form.Get("code")
-		tkn, err = oidc.ReqAuthByCode(project, clientID, code, r)
+		codeVerifier := r.Form.Get("code_verifier")
+		tkn, err = oidc.ReqAuthByCode(project, clientID, code, codeVerifier, r)
 	default:
 		logger.Info("Unexpected grant type got: %s", gt.String())
 		errors.WriteOAuthError(w, errors.ErrServerError, state)
@@ -664,18 +665,20 @@ func handleSSO(method string, projectName string, userID string, tokenIssuer str
 		logger.Debug("Session Info: now %v, valid time %v", now, valid)
 		if now.Before(valid) {
 			ls := &model.LoginSession{
-				SessionID:    uuid.New().String(),
-				ResponseType: authReq.ResponseType,
-				ProjectName:  projectName,
-				UserID:       s.UserID,
-				ClientID:     authReq.ClientID,
-				Nonce:        authReq.Nonce,
-				LoginDate:    s.LastAuthTime,
-				RedirectURI:  authReq.RedirectURI,
-				ResponseMode: authReq.ResponseMode,
-				Scope:        authReq.Scope,
-				Prompt:       authReq.Prompt,
-				ExpiresIn:    time.Now().Add(oidc.GetLoginSessionExpiresTime()).Unix(),
+				SessionID:           uuid.New().String(),
+				ResponseType:        authReq.ResponseType,
+				ProjectName:         projectName,
+				UserID:              s.UserID,
+				ClientID:            authReq.ClientID,
+				Nonce:               authReq.Nonce,
+				LoginDate:           s.LastAuthTime,
+				RedirectURI:         authReq.RedirectURI,
+				ResponseMode:        authReq.ResponseMode,
+				Scope:               authReq.Scope,
+				Prompt:              authReq.Prompt,
+				ExpiresIn:           time.Now().Add(oidc.GetLoginSessionExpiresTime()).Unix(),
+				CodeChallenge:       authReq.CodeChallenge,
+				CodeChallengeMethod: authReq.CodeChallengeMethod,
 			}
 			req, err := createLoginRedirectInfo(ls, authReq.State, tokenIssuer)
 			if err != nil {

@@ -8,19 +8,21 @@ import (
 
 // LoginSession ...
 type LoginSession struct {
-	SessionID    string
-	Code         string
-	ExpiresIn    int64
-	Scope        string
-	ResponseType []string
-	ClientID     string
-	RedirectURI  string
-	Nonce        string
-	ProjectName  string
-	ResponseMode string
-	Prompt       []string
-	UserID       string
-	LoginDate    time.Time
+	SessionID           string
+	Code                string
+	ExpiresIn           int64
+	Scope               string
+	ResponseType        []string
+	ClientID            string
+	RedirectURI         string
+	Nonce               string
+	ProjectName         string
+	ResponseMode        string
+	Prompt              []string
+	UserID              string
+	LoginDate           time.Time
+	CodeChallenge       string
+	CodeChallengeMethod string
 }
 
 // LoginSessionFilter ...

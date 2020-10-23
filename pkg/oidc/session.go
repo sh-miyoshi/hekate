@@ -12,15 +12,17 @@ import (
 // StartLoginSession ...
 func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Error) {
 	s := &model.LoginSession{
-		SessionID:    uuid.New().String(),
-		ExpiresIn:    time.Now().Add(GetLoginSessionExpiresTime()).Unix(),
-		ClientID:     req.ClientID,
-		RedirectURI:  req.RedirectURI,
-		Nonce:        req.Nonce,
-		ProjectName:  projectName,
-		ResponseMode: req.ResponseMode,
-		ResponseType: req.ResponseType,
-		Prompt:       req.Prompt,
+		SessionID:           uuid.New().String(),
+		ExpiresIn:           time.Now().Add(GetLoginSessionExpiresTime()).Unix(),
+		ClientID:            req.ClientID,
+		RedirectURI:         req.RedirectURI,
+		Nonce:               req.Nonce,
+		ProjectName:         projectName,
+		ResponseMode:        req.ResponseMode,
+		ResponseType:        req.ResponseType,
+		Prompt:              req.Prompt,
+		CodeChallenge:       req.CodeChallenge,
+		CodeChallengeMethod: req.CodeChallengeMethod,
 	}
 	// *) userID, code will be set in after
 

@@ -1,6 +1,8 @@
 package oidc
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,6 +12,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 	"github.com/sh-miyoshi/hekate/pkg/user"
 )
@@ -65,7 +68,7 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 }
 
 // ReqAuthByCode ...
-func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *http.Request) (*TokenResponse, *errors.Error) {
+func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, codeVerifier string, r *http.Request) (*TokenResponse, *errors.Error) {
 	s, err := db.GetInst().LoginSessionGetByCode(project.Name, code)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchLoginSession) {
@@ -73,6 +76,24 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, r *
 			return nil, errors.Append(errors.ErrInvalidGrant, "no such code")
 		}
 		return nil, errors.Append(err, "Failed to get login session info")
+	}
+
+	// PKCE Code Verify
+	if codeVerifier != "" {
+		challenge := codeVerifier
+		if s.CodeChallengeMethod == "S256" {
+			// BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
+			sum := sha256.Sum256([]byte(codeVerifier))
+			challenge = base64.RawURLEncoding.EncodeToString(sum[:])
+		}
+		if challenge != s.CodeChallenge {
+			logger.Debug("Expect PKCE code challenge: %s, but got %s", s.CodeChallenge, challenge)
+			return nil, errors.Append(errors.ErrInvalidGrant, "code challenge failed")
+		}
+	} else {
+		if s.CodeChallenge != "" {
+			return nil, errors.Append(errors.ErrInvalidGrant, "code challenge is not registed")
+		}
 	}
 
 	// Validate session info

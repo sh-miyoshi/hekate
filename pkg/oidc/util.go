@@ -29,16 +29,18 @@ func NewAuthRequest(values url.Values) *AuthRequest {
 	}
 
 	return &AuthRequest{
-		Scope:        values.Get("scope"),
-		ResponseType: responseTypes,
-		ClientID:     values.Get("client_id"),
-		RedirectURI:  values.Get("redirect_uri"),
-		State:        values.Get("state"),
-		Nonce:        values.Get("nonce"),
-		Prompt:       prompt,
-		MaxAge:       int64(maxAge),
-		ResponseMode: resMode,
-		Request:      request,
-		IDTokenHint:  values.Get("id_token_hint"),
+		Scope:               values.Get("scope"),
+		ResponseType:        responseTypes,
+		ClientID:            values.Get("client_id"),
+		RedirectURI:         values.Get("redirect_uri"),
+		State:               values.Get("state"),
+		Nonce:               values.Get("nonce"),
+		Prompt:              prompt,
+		MaxAge:              int64(maxAge),
+		ResponseMode:        resMode,
+		CodeChallenge:       values.Get("code_challenge"),
+		CodeChallengeMethod: values.Get("code_challenge_method"),
+		Request:             request,
+		IDTokenHint:         values.Get("id_token_hint"),
 	}
 }

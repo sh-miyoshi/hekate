@@ -49,19 +49,21 @@ type session struct {
 }
 
 type loginSession struct {
-	SessionID    string    `bson:"session_id"`
-	Code         string    `bson:"code"`
-	ExpiresIn    int64     `bson:"expires_in"`
-	Scope        string    `bson:"scope"`
-	ResponseType []string  `bson:"response_type"`
-	ClientID     string    `bson:"client_id"`
-	RedirectURI  string    `bson:"redirect_uri"`
-	Nonce        string    `bson:"nonce"`
-	ProjectName  string    `bson:"project_name"`
-	ResponseMode string    `bson:"response_mode"`
-	Prompt       []string  `bson:"prompt"`
-	UserID       string    `bson:"user_id"`
-	LoginDate    time.Time `bson:"login_date"`
+	SessionID           string    `bson:"session_id"`
+	Code                string    `bson:"code"`
+	ExpiresIn           int64     `bson:"expires_in"`
+	Scope               string    `bson:"scope"`
+	ResponseType        []string  `bson:"response_type"`
+	ClientID            string    `bson:"client_id"`
+	RedirectURI         string    `bson:"redirect_uri"`
+	Nonce               string    `bson:"nonce"`
+	ProjectName         string    `bson:"project_name"`
+	ResponseMode        string    `bson:"response_mode"`
+	Prompt              []string  `bson:"prompt"`
+	UserID              string    `bson:"user_id"`
+	LoginDate           time.Time `bson:"login_date"`
+	CodeChallenge       string    `bson:"code_challenge"`
+	CodeChallengeMethod string    `bson:"code_challenge_method"`
 }
 
 type lockState struct {
