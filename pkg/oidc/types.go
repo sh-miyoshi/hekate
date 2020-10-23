@@ -94,6 +94,20 @@ func validateScope(scope string, supportedScope []string) *errors.Error {
 	return nil
 }
 
+func validateCodeChallenge(challenge string, method string) *errors.Error {
+	if challenge == "" {
+		if method != "" {
+			return errors.ErrInvalidRequest
+		}
+	} else {
+		methods := []string{"plain", "S256"}
+		if !slice.Contains(methods, method) {
+			return errors.ErrInvalidRequest
+		}
+	}
+	return nil
+}
+
 // Validate ...
 func (r *AuthRequest) Validate() *errors.Error {
 	if err := validator.New().Struct(r); err != nil {
@@ -126,7 +140,10 @@ func (r *AuthRequest) Validate() *errors.Error {
 		return errors.Append(err, "Failed to validate response mode %s", r.ResponseMode)
 	}
 
-	// TODO(Check CodeChallengeMethod)
+	// Check CodeChallengeMethod
+	if err := validateCodeChallenge(r.CodeChallenge, r.CodeChallengeMethod); err != nil {
+		return errors.Append(err, "Failed to validate code challenge %s with method %s", r.CodeChallenge, r.CodeChallengeMethod)
+	}
 
 	return nil
 }
