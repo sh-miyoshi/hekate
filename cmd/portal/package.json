@@ -17,6 +17,7 @@
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/font-awesome": "^1.0.4",
+    "base64url": "^3.0.1",
     "bootstrap-vue": "^2.5.0",
     "jwt-decode": "^2.2.0",
     "nuxt": "^2.14.6",

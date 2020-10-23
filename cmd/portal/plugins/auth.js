@@ -1,6 +1,8 @@
 import querystring from 'querystring'
+import crypto from 'crypto'
 import axios from 'axios'
 import jwtdecode from 'jwt-decode'
+import base64url from 'base64url'
 
 export class AuthHandler {
   constructor(context) {
@@ -34,6 +36,28 @@ export class AuthHandler {
     window.localStorage.setItem('user', data.preferred_username)
   }
 
+  _genRandom(length) {
+    // 1 byte = 2 characters in hex
+    const buf = crypto.randomBytes(length / 2)
+    return buf.toString('hex')
+  }
+
+  _createCodeChallenge(verifier, method) {
+    switch (method) {
+      case 'PLANE':
+        return verifier
+      case 'S256': {
+        const hash = crypto
+          .createHash('sha256')
+          .update(verifier, 'ascii')
+          .digest()
+        return base64url.encode(hash)
+      }
+    }
+    console.log('Invalid code challnge method ', method)
+    return ''
+  }
+
   RemoveAllData() {
     window.localStorage.removeItem('access_token')
     window.localStorage.removeItem('refresh_token')
@@ -47,16 +71,20 @@ export class AuthHandler {
     const project = process.env.LOGIN_PROJECT
     window.localStorage.setItem('login_project', project)
 
-    const state = Math.random()
-      .toString(36)
-      .slice(-8)
+    const state = this._genRandom(8)
     window.sessionStorage.setItem('login_state', state)
+
+    const verifier = this._genRandom(128)
+    window.sessionStorage.setItem('code_verifier', verifier)
+    const challenge = this._createCodeChallenge(verifier, 'S256')
 
     const opts = {
       scope: 'openid',
       response_type: 'code',
       client_id: process.env.CLIENT_ID,
       redirect_uri: process.env.HEKATE_PORTAL_ADDR + '/callback',
+      code_challenge: challenge,
+      code_challenge_method: 'S256',
       state
     }
 
@@ -123,11 +151,13 @@ export class AuthHandler {
       })
       return
     }
+    const verifier = window.sessionStorage.getItem('code_verifier')
 
     const opts = {
       grant_type: 'authorization_code',
       client_id: process.env.CLIENT_ID,
       code: authCode,
+      code_verifier: verifier,
       state
     }
 
