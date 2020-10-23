@@ -84,7 +84,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, cod
 		if s.CodeChallengeMethod == "S256" {
 			// BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
 			sum := sha256.Sum256([]byte(codeVerifier))
-			challenge = base64.URLEncoding.EncodeToString(sum[:])
+			challenge = base64.RawURLEncoding.EncodeToString(sum[:])
 		}
 		if challenge != s.CodeChallenge {
 			logger.Debug("Expect PKCE code challenge: %s, but got %s", s.CodeChallenge, challenge)
