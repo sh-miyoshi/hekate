@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/google/uuid"
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
 	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
@@ -54,8 +55,8 @@ var addClientCmd = &cobra.Command{
 			accessType, _ := cmd.Flags().GetString("accessType")
 
 			if accessType == "confidential" && secret == "" {
-				print.Error("Please set client secret if access type is confidential")
-				os.Exit(1)
+				// generate the secret internally
+				secret = uuid.New().String()
 			}
 
 			req.ID = id
