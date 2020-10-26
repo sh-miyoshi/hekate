@@ -49,7 +49,7 @@ func (h *Handler) ProjectAdd(req *projectapi.ProjectCreateRequest) (*projectapi.
 	case 400:
 		return nil, fmt.Errorf("Invalid request. Message: %s", message)
 	case 403:
-		return nil, fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
 	case 409:
 		return nil, fmt.Errorf("Project %s is already exists", req.Name)
 	case 500:
@@ -129,7 +129,7 @@ func (h *Handler) ProjectGetList() ([]*projectapi.ProjectGetResponse, error) {
 
 	switch httpRes.StatusCode {
 	case 403:
-		return nil, fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
 	case 500:
 		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
@@ -169,7 +169,7 @@ func (h *Handler) ProjectGet(projectName string) (*projectapi.ProjectGetResponse
 
 	switch httpRes.StatusCode {
 	case 403:
-		return nil, fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
 	case 404:
 		return nil, fmt.Errorf("Project %s is not found", projectName)
 	case 500:
@@ -213,7 +213,7 @@ func (h *Handler) ProjectUpdate(projectName string, req *projectapi.ProjectPutRe
 	case 400:
 		return fmt.Errorf("Invalid request. Message: %s", message)
 	case 403:
-		return fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
 	case 404:
 		return fmt.Errorf("Project %s is not found", projectName)
 	case 500:
