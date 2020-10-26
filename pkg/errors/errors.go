@@ -18,13 +18,6 @@ type info struct {
 }
 
 // Error ...
-type Error struct {
-	privateInfo      []info
-	publicMsg        string
-	httpResponseCode int
-}
-
-// Error ...
 func (e *Error) Error() string {
 	return e.publicMsg
 }
@@ -118,10 +111,10 @@ func Contains(all, err *Error) bool {
 
 // WriteHTTPError ...
 func WriteHTTPError(w http.ResponseWriter, typ string, err *Error, code int) {
-	res := map[string]interface{}{
-		"type":  typ,
-		"error": err.publicMsg,
-		"code":  code,
+	res := HTTPError{
+		Type:  typ,
+		Error: err.publicMsg,
+		Code:  code,
 	}
 
 	w.Header().Add("Content-Type", "application/json")
