@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // ProjectAdd ...
@@ -28,18 +29,31 @@ func (h *Handler) ProjectAdd(req *projectapi.ProjectCreateRequest) (*projectapi.
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res projectapi.ProjectGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return &res, nil
+	}
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return nil, fmt.Errorf("Invalid request. Message: %s", message)
 	case 403:
 		return nil, fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
 	case 409:
 		return nil, fmt.Errorf("Project %s is already exists", req.Name)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -58,13 +72,28 @@ func (h *Handler) ProjectDelete(projectName string) error {
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
 	case 403:
-		return fmt.Errorf("The project cannot be deleted")
+		return fmt.Errorf("Do not have permission. Message: %s", message)
+	case 404:
+		return fmt.Errorf("Project %s is not found", projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+
 }
 
 // ProjectGetList ...
@@ -82,14 +111,27 @@ func (h *Handler) ProjectGetList() ([]*projectapi.ProjectGetResponse, error) {
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res []*projectapi.ProjectGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return res, nil
+	}
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -109,14 +151,29 @@ func (h *Handler) ProjectGet(projectName string) (*projectapi.ProjectGetResponse
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res projectapi.ProjectGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return &res, nil
+	}
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Project %s is not found", projectName)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -140,9 +197,27 @@ func (h *Handler) ProjectUpdate(projectName string, req *projectapi.ProjectPutRe
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return fmt.Errorf("Loggined user did not have write-cluster role. Please login with other user")
+	case 404:
+		return fmt.Errorf("Project %s is not found", projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
