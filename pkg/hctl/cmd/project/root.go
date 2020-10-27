@@ -1,6 +1,7 @@
 package project
 
 import (
+	"github.com/sh-miyoshi/hekate/pkg/hctl/cmd/project/secret"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"
 )
@@ -10,6 +11,7 @@ func init() {
 	projectCmd.AddCommand(deleteProjectCmd)
 	projectCmd.AddCommand(getProjectCmd)
 	projectCmd.AddCommand(updateProjectCmd)
+	projectCmd.AddCommand(secret.GetCommand())
 }
 
 var projectCmd = &cobra.Command{

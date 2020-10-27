@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	keysapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
@@ -220,4 +221,46 @@ func (h *Handler) ProjectUpdate(projectName string, req *projectapi.ProjectPutRe
 		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
+}
+
+// ProjectKeysGet ...
+func (h *Handler) ProjectKeysGet(projectName string) (*keysapi.KeysGetResponse, error) {
+	url := fmt.Sprintf("%s/api/v1/project/%s/keys", h.serverAddr, projectName)
+	httpReq, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	httpRes, err := h.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer httpRes.Body.Close()
+
+	if httpRes.StatusCode == http.StatusOK {
+		var res keysapi.KeysGetResponse
+		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
+			return nil, err
+		}
+
+		return &res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Project %s is not found", projectName)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
+	}
+	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
