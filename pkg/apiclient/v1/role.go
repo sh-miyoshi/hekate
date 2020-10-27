@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 
 	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 // RoleAdd ...
@@ -23,20 +26,42 @@ func (h *Handler) RoleAdd(projectName string, req *roleapi.CustomRoleCreateReque
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, true)
+	print.Debug("Role add method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res roleapi.CustomRoleGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return &res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return nil, fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Project %s is not found", projectName)
+	case 409:
+		return nil, fmt.Errorf("Role %s is already exists", req.Name)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -62,6 +87,8 @@ func (h *Handler) RoleDelete(projectName string, roleName string) error {
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Role delete method request\n---\n %s\n---\n", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
@@ -69,9 +96,25 @@ func (h *Handler) RoleDelete(projectName string, roleName string) error {
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("Role %s in project %s is not found", roleID, projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -93,20 +136,38 @@ func (h *Handler) RoleGetList(projectName string, roleName string) ([]*roleapi.C
 		httpReq.URL.RawQuery = values.Encode()
 	}
 
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Role get list method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res []*roleapi.CustomRoleGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Role %s in project %s is not found", roleName, projectName)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
