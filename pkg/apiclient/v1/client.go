@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 
 	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 // ClientAdd ...
@@ -23,6 +25,8 @@ func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateReque
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, true)
+	print.Debug("Client add method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -69,6 +73,8 @@ func (h *Handler) ClientDelete(projectName string, clientID string) error {
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Client delete method request\n---\n %s\n---\n", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
@@ -108,6 +114,8 @@ func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetRespo
 	}
 
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Client get list method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -151,6 +159,8 @@ func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetR
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Client get method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -197,7 +207,8 @@ func (h *Handler) ClientUpdate(projectName, clientID string, req *clientapi.Clie
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-
+	dump, _ := httputil.DumpRequest(httpReq, true)
+	print.Debug("Client update method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return err
