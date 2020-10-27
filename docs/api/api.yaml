@@ -381,7 +381,7 @@ paths:
         '204':
           description: 'Deleted'
         '403':
-          description: 'Forbidden'
+          description: 'Do not have permission or blocked project'
         '404':
           description: 'Project Not Found'
         '500':
@@ -779,6 +779,8 @@ paths:
                 type: array
                 items:
                   type: string
+        '404':
+          description: 'Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
