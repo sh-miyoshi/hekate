@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"net/http/httputil"
+
 	keysapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
 	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 // ProjectAdd ...
@@ -24,6 +27,8 @@ func (h *Handler) ProjectAdd(req *projectapi.ProjectCreateRequest) (*projectapi.
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, true)
+	print.Debug("Project add method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -67,6 +72,8 @@ func (h *Handler) ProjectDelete(projectName string) error {
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Project delete method request\n---\n %s---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return err
@@ -106,6 +113,8 @@ func (h *Handler) ProjectGetList() ([]*projectapi.ProjectGetResponse, error) {
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Project get list method request\n---\n %s---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -146,6 +155,8 @@ func (h *Handler) ProjectGet(projectName string) (*projectapi.ProjectGetResponse
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Project get method request\n---\n %s---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -192,6 +203,8 @@ func (h *Handler) ProjectUpdate(projectName string, req *projectapi.ProjectPutRe
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, true)
+	print.Debug("Project update method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return err
@@ -231,6 +244,8 @@ func (h *Handler) ProjectKeysGet(projectName string) (*keysapi.KeysGetResponse, 
 		return nil, err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("Project Get List method request\n---\n %s---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
