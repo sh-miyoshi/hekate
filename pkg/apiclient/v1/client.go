@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // ClientAdd ...
@@ -28,14 +29,34 @@ func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateReque
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res clientapi.ClientGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return &res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return nil, fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Project %s is not found", projectName)
+	case 409:
+		return nil, fmt.Errorf("Client %s is already exists", req.ID)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -55,9 +76,25 @@ func (h *Handler) ClientDelete(projectName string, clientID string) error {
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("Client %s in project %s is not found", clientID, projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -77,14 +114,30 @@ func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetRespo
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res []*clientapi.ClientGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Project %s is not found", projectName)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -104,14 +157,30 @@ func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetR
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res clientapi.ClientGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return &res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Client %s in project %s is not found", clientID, projectName)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -135,9 +204,27 @@ func (h *Handler) ClientUpdate(projectName, clientID string, req *clientapi.Clie
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("Client %s in project %s is not found", clientID, projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
