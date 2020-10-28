@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 
 	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 // UserAdd ...
@@ -24,6 +26,8 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, true)
+	print.Debug("User add method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
@@ -64,7 +68,8 @@ func (h *Handler) UserDelete(projectName string, userName string) error {
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("User delete method request\n---\n %s\n---\n", dump)
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return err
@@ -93,6 +98,8 @@ func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.U
 		values.Set("name", userName)
 		httpReq.URL.RawQuery = values.Encode()
 	}
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("User get list method request\n---\n %s\n---\n", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
@@ -150,6 +157,8 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("User role add method request\n---\n %s\n---\n", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
@@ -200,6 +209,8 @@ func (h *Handler) UserRoleDelete(projectName string, userName string, roleName s
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("User role delete method request\n---\n %s\n---\n", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
@@ -240,6 +251,8 @@ func (h *Handler) UserChangePassword(projectName string, userName string, newPas
 	}
 	httpReq.Header.Add("Content-Type", "application/json")
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, true)
+	print.Debug("User change password method request\n---\n %s\n---\n", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
@@ -275,6 +288,8 @@ func (h *Handler) UserUnlock(projectName string, userName string) error {
 		return err
 	}
 	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	dump, _ := httputil.DumpRequest(httpReq, false)
+	print.Debug("User unlock method request\n---\n %s\n---\n", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
