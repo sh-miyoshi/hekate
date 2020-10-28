@@ -14,7 +14,6 @@
 ## server application enhancement
 
 - db manager validationの追加
-- ログインディレクトリの構造チェック
 - masterプロジェクト初期構成時にpassword grantを外す
 - errors.WriteOAuthErrorのエラーハンドリング
 - テストの追加
@@ -34,6 +33,10 @@
       - session
       - user
     - transaction test
+    - PKCE
+      - 正常系
+      - challengeなしの正常系
+      - challnge失敗
 - APIの修正
   - Custom RoleにDescriptionを追加
   - Audit EventにFilter Ruleを追加
@@ -61,7 +64,6 @@
   - RS256以外のSigining Algorithmのサポート
   - auth requestをparseする
   - type noneのサポート
-  - Support PKCE
 - user federation
   - user情報を外部に保存し、それと連携する
   - LDAP連携？
@@ -109,13 +111,13 @@
   - customrole
     - update
   - audit event
+  - project
+    - reset secret
 - outputの修正
   - error出力の方法
   - debug出力
-- error messageの内容
 - Production向け実行ファイルの作成
 - support authorization code flow
-- client secret未入力時に内部で生成する
 
 ## new commands
 
