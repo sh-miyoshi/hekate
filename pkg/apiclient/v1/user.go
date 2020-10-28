@@ -10,6 +10,7 @@ import (
 
 	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
+	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
@@ -34,16 +35,34 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res userapi.UserGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return &res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return nil, fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return nil, fmt.Errorf("Project %s is not found", projectName)
 	case 409:
 		return nil, fmt.Errorf("User %s is already exists", req.Name)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -76,9 +95,25 @@ func (h *Handler) UserDelete(projectName string, userName string) error {
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("User %s in project %s is not found", userName, projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -107,16 +142,30 @@ func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.U
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		var res []*userapi.UserGetResponse
 		if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 			return nil, err
 		}
 
 		return res, nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return nil, fmt.Errorf("Loggined user did not have permission. Please login with other user")
 	case 404:
-		return nil, fmt.Errorf("No such user in the project")
+		return nil, fmt.Errorf("User %s in project %s is not found", userName, projectName)
+	case 500:
+		return nil, fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return nil, fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -166,9 +215,29 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("User %s in project %s is not found", userName, projectName)
+	case 409:
+		return fmt.Errorf("Role %s is already appended", roleName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -218,9 +287,27 @@ func (h *Handler) UserRoleDelete(projectName string, userName string, roleName s
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("User %s in project %s is not found", userName, projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -260,9 +347,27 @@ func (h *Handler) UserChangePassword(projectName string, userName string, newPas
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 200:
+	if httpRes.StatusCode == http.StatusOK {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 400:
+		return fmt.Errorf("Invalid request. Message: %s", message)
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("User %s in project %s is not found", userName, projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
@@ -297,9 +402,25 @@ func (h *Handler) UserUnlock(projectName string, userName string) error {
 	}
 	defer httpRes.Body.Close()
 
-	switch httpRes.StatusCode {
-	case 204:
+	if httpRes.StatusCode == http.StatusNoContent {
 		return nil
+	}
+
+	message := ""
+	var res errors.HTTPError
+	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
+		message = res.Error
+	} else {
+		message = "No messages."
+	}
+
+	switch httpRes.StatusCode {
+	case 403:
+		return fmt.Errorf("Loggined user did not have permission. Please login with other user")
+	case 404:
+		return fmt.Errorf("User %s in project %s is not found", userName, projectName)
+	case 500:
+		return fmt.Errorf("Internal server error occuered. Message: %s", message)
 	}
 	return fmt.Errorf("Unexpected http response got. Message: %s", httpRes.Status)
 }
