@@ -16,6 +16,7 @@ var updateUserCmd = &cobra.Command{
 
 func init() {
 	updateUserCmd.AddCommand(unlockUserCmd)
+	updateUserCmd.AddCommand(passwordChangeCmd)
 
 	updateUserCmd.Flags().String("project", "", "name of the project to which the user belongs")
 	updateUserCmd.Flags().StringP("file", "f", "", "file path for update user info")

@@ -107,7 +107,6 @@
   - user
     - update
     - session revoke
-    - password change
   - customrole
     - update
   - audit event
