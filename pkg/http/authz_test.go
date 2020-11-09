@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestParseHTTPHeaderToken(t *testing.T) {
+func TestGetTokenFromHeader(t *testing.T) {
 	token := "testtokenstring"
 	tt := []struct {
 		tokenString   string
@@ -29,7 +29,7 @@ func TestParseHTTPHeaderToken(t *testing.T) {
 	}
 
 	for _, target := range tt {
-		_, err := parseHTTPHeaderToken(target.tokenString)
+		_, err := getTokenFromHeader(target.tokenString)
 		if target.expectSuccess && err != nil {
 			t.Errorf("Parse token %s returns wrong status. got %v, want nil", target.tokenString, err)
 		}

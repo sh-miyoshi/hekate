@@ -13,6 +13,7 @@
 
 ## server application enhancement
 
+- support device flow
 - db manager validationの追加
 - masterプロジェクト初期構成時にpassword grantを外す
 - errors.WriteOAuthErrorのエラーハンドリング

@@ -1,16 +1,19 @@
-package oidc
+package login
 
 import (
 	"html/template"
 	"net/http"
 
+	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
 // WriteUserLoginPage ...
 func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.ResponseWriter) {
-	tpl, err := template.ParseFiles(userLoginHTML)
+	cfg := config.Get()
+
+	tpl, err := template.ParseFiles(cfg.LoginResource.IndexPage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
 		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Page maybe broken", ""), http.StatusInternalServerError)
@@ -24,7 +27,7 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 
 	d := map[string]string{
 		"URL":                url,
-		"StaticResourcePath": userLoginResPath + "/static",
+		"StaticResourcePath": cfg.UserLoginResourceDir + "/static",
 		"Error":              errMsg,
 	}
 
@@ -34,7 +37,9 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 
 // WriteErrorPage ...
 func WriteErrorPage(errMsg string, w http.ResponseWriter) {
-	tpl, err := template.ParseFiles(userLoginErrorHTML)
+	cfg := config.Get()
+
+	tpl, err := template.ParseFiles(cfg.LoginResource.ErrorPage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
 		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Error Page maybe broken", ""), http.StatusInternalServerError)
@@ -42,7 +47,7 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 	}
 
 	d := map[string]string{
-		"StaticResourcePath": userLoginResPath + "/static",
+		"StaticResourcePath": cfg.UserLoginResourceDir + "/static",
 		"Error":              errMsg,
 	}
 
@@ -52,7 +57,9 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 
 // WriteConsentPage ...
 func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWriter) {
-	tpl, err := template.ParseFiles(userConsentHTML)
+	cfg := config.Get()
+
+	tpl, err := template.ParseFiles(cfg.LoginResource.ConsentPage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
 		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Consent Page maybe broken", ""), http.StatusInternalServerError)
@@ -65,7 +72,7 @@ func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWrite
 	}
 
 	d := map[string]string{
-		"StaticResourcePath": userLoginResPath + "/static",
+		"StaticResourcePath": cfg.UserLoginResourceDir + "/static",
 		"URL":                url,
 	}
 

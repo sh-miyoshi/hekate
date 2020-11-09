@@ -68,8 +68,8 @@ func (m *Manager) Save(projectName string, tm time.Time, resType, method, path, 
 }
 
 // Get ...
-func (m *Manager) Get(projectName string, fromDate, toDate time.Time, offset uint) ([]model.Audit, *errors.Error) {
-	fromDate = util.TimeTruncate(fromDate)
-	toDate = util.TimeTruncate(toDate)
-	return m.handler.Get(projectName, fromDate, toDate, offset)
+func (m *Manager) Get(projectName string, query Query) ([]model.Audit, *errors.Error) {
+	fromDate := util.TimeTruncate(query.FromDate)
+	toDate := util.TimeTruncate(query.ToDate)
+	return m.handler.Get(projectName, fromDate, toDate, query.Offset)
 }

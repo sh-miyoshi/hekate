@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"github.com/sh-miyoshi/hekate/cmd/hekate/config"
+	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
@@ -18,25 +18,26 @@ const (
 )
 
 func main() {
-	// Get config
-	cfg, err := config.InitConfig(os.Args)
-	if err != nil {
-		errors.Print(errors.Append(err, "Failed to set config"))
+	// initialize config
+	if err := config.InitConfig(os.Args); err != nil {
+		errors.Print(errors.Append(err, "Failed to init config"))
 		os.Exit(1)
 	}
 
 	// Initialize server
-	if err := initAll(cfg); err != nil {
+	if err := initAll(); err != nil {
 		errors.Print(errors.Append(err, "Failed to init server"))
 		os.Exit(1)
 	}
 
 	// Setup API
 	r := mux.NewRouter()
-	setAPI(r, cfg)
+	setAPI(r)
 
 	// Run Database GC
 	go db.RunGC()
+
+	cfg := config.Get()
 
 	// Run Server
 	addr := fmt.Sprintf("%s:%d", cfg.BindAddr, cfg.Port)

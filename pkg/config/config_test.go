@@ -106,7 +106,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 		return
 	}
 	ioutil.WriteFile(indexFile, data, 0644)
-	if err := c.CheckLoginResDirStruct(); err == nil {
+	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no consent page")
 	}
 	t.Logf("no consent page error: %v", err)
@@ -120,7 +120,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	// Test no error page
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(indexFile, data, 0644)
-	if err := c.CheckLoginResDirStruct(); err == nil {
+	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no error page")
 	}
 	os.Remove(consentFile)
@@ -129,7 +129,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	// Test no login page
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(errorFile, data, 0644)
-	if err := c.CheckLoginResDirStruct(); err == nil {
+	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no login page")
 	}
 	os.Remove(consentFile)
@@ -139,7 +139,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(errorFile, data, 0644)
 	ioutil.WriteFile(indexFile, data, 0644)
-	if err := c.CheckLoginResDirStruct(); err != nil {
+	if err := c.setLoginResource(); err != nil {
 		t.Errorf("CheckLoginResDirStruct returns error %v, but expect is nil", err)
 	}
 }

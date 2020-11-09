@@ -1,4 +1,4 @@
-package user
+package login
 
 import (
 	"time"
@@ -60,8 +60,8 @@ func inclementFailedNum(state *model.LockState, setting model.UserLock) {
 	}
 }
 
-// Verify ...
-func Verify(projectName string, name string, password string) (*model.UserInfo, *errors.Error) {
+// UserVerifyByPassword ...
+func UserVerifyByPassword(projectName string, name string, password string) (*model.UserInfo, *errors.Error) {
 	prj, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		return nil, err

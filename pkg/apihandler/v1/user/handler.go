@@ -248,7 +248,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
-		claims, err := jwthttp.ValidateAPIRequest(r)
+		claims, err := jwthttp.ValidateAPIToken(r)
 		// Check if the requester is the user
 		if err != nil || claims.Subject != userID {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
@@ -508,7 +508,7 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Authorize API Request
-	claims, err := jwthttp.ValidateAPIRequest(r)
+	claims, err := jwthttp.ValidateAPIToken(r)
 	if err != nil || claims.Subject != userID {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize user"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
@@ -621,7 +621,7 @@ func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		claims, err := jwthttp.ValidateAPIRequest(r)
+		claims, err := jwthttp.ValidateAPIToken(r)
 		if err != nil || claims.Subject != userID {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authorize user: don't have permission and not yourself"))
 			errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)

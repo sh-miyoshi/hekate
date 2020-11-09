@@ -1,19 +1,21 @@
-package oidc
+package login
 
 import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
+	"github.com/sh-miyoshi/hekate/pkg/oidc"
 )
 
 // StartLoginSession ...
-func StartLoginSession(projectName string, req *AuthRequest) (string, *errors.Error) {
+func StartLoginSession(projectName string, req *oidc.AuthRequest) (string, *errors.Error) {
 	s := &model.LoginSession{
 		SessionID:           uuid.New().String(),
-		ExpiresIn:           time.Now().Add(GetLoginSessionExpiresTime()).Unix(),
+		ExpiresIn:           time.Now().Add(config.Get().LoginSessionExpiresTime).Unix(),
 		ClientID:            req.ClientID,
 		RedirectURI:         req.RedirectURI,
 		Nonce:               req.Nonce,

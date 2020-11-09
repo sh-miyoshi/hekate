@@ -9,7 +9,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/role"
 )
 
-func parseHTTPHeaderToken(tokenString string) (string, *errors.Error) {
+func getTokenFromHeader(tokenString string) (string, *errors.Error) {
 	var splitToken []string
 	if strings.Contains(tokenString, "bearer ") {
 		splitToken = strings.Split(tokenString, "bearer ")
@@ -22,13 +22,13 @@ func parseHTTPHeaderToken(tokenString string) (string, *errors.Error) {
 	return reqToken, nil
 }
 
-// ValidateAPIRequest ...
-func ValidateAPIRequest(req *http.Request) (*token.AccessTokenClaims, *errors.Error) {
+// ValidateAPIToken ...
+func ValidateAPIToken(req *http.Request) (*token.AccessTokenClaims, *errors.Error) {
 	auth, ok := req.Header["Authorization"]
 	if !ok || len(auth) != 1 {
 		return nil, errors.New("Failed to get Authorization header", "Failed to get Authorization header")
 	}
-	tokenString, err := parseHTTPHeaderToken(auth[0])
+	tokenString, err := getTokenFromHeader(auth[0])
 	if err != nil {
 		return nil, errors.Append(err, "Failed to get token from header")
 	}
@@ -42,7 +42,7 @@ func ValidateAPIRequest(req *http.Request) (*token.AccessTokenClaims, *errors.Er
 
 // Authorize ...
 func Authorize(req *http.Request, projectName string, reqTrgRes role.Resource, reqRoleType role.Type) *errors.Error {
-	claims, err := ValidateAPIRequest(req)
+	claims, err := ValidateAPIToken(req)
 	if err != nil {
 		return errors.Append(err, "Failed to validate token")
 	}

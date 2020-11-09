@@ -75,7 +75,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	var err *errors.Error
 	defer func() {
 		// register project is access user project (maybe master)
-		claims, e := jwthttp.ValidateAPIRequest(r)
+		claims, e := jwthttp.ValidateAPIToken(r)
 		if e != nil {
 			err = e
 		}

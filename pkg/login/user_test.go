@@ -1,4 +1,4 @@
-package user
+package login
 
 import (
 	"testing"
@@ -63,7 +63,7 @@ func TestVerify(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		_, err := Verify(tc.projectName, tc.userName, tc.password)
+		_, err := UserVerifyByPassword(tc.projectName, tc.userName, tc.password)
 		if tc.expectOk && err != nil {
 			t.Errorf("Verify returns wrong response. got %v, want nil", err)
 		}

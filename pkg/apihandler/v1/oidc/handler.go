@@ -5,18 +5,19 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/hekate/pkg/audit"
-	"github.com/sh-miyoshi/hekate/pkg/client"
+	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/login"
 	"github.com/sh-miyoshi/hekate/pkg/oidc"
+	"github.com/sh-miyoshi/hekate/pkg/oidc/authn"
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
-	"github.com/sh-miyoshi/hekate/pkg/user"
+	"github.com/sh-miyoshi/hekate/pkg/sso"
 	"github.com/stretchr/stew/slice"
 )
 
@@ -39,14 +40,15 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 		grantTypes = append(grantTypes, t.String())
 	}
 
+	cfg := config.Get()
 	res := Config{
 		Issuer:                 issuer,
 		AuthorizationEndpoint:  issuer + "/openid-connect/auth",
 		TokenEndpoint:          issuer + "/openid-connect/token",
 		UserinfoEndpoint:       issuer + "/openid-connect/userinfo",
 		JwksURI:                issuer + "/openid-connect/certs",
-		ScopesSupported:        oidc.GetSupportedScope(),
-		ResponseTypesSupported: oidc.GetSupportedResponseType(),
+		ScopesSupported:        cfg.SupportedScore,
+		ResponseTypesSupported: cfg.SupportedResponseType,
 		SubjectTypesSupported:  []string{"public"},
 		IDTokenSigningAlgValuesSupported: []string{
 			"RS256",
@@ -137,8 +139,8 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Form.Get("redirect_uri") != "" {
 		// existence of client is already checked in oidc.ClientAuth
-		if err = client.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
-			if errors.Contains(err, client.ErrNoRedirectURL) {
+		if err = oidc.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
+			if errors.Contains(err, oidc.ErrNoRedirectURL) {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
 				errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, state)
 			} else {
@@ -164,14 +166,14 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch gt {
 	case model.GrantTypeClientCredentials:
-		tkn, err = oidc.ReqAuthByClientCredentials(project, clientID, r)
+		tkn, err = authn.ReqAuthByClientCredentials(project, clientID, r)
 	case model.GrantTypePassword:
 		uname := r.Form.Get("username")
 		passwd := r.Form.Get("password")
-		tkn, err = oidc.ReqAuthByPassword(project, uname, passwd, r)
+		tkn, err = authn.ReqAuthByPassword(project, uname, passwd, r)
 	case model.GrantTypeRefreshToken:
 		refreshToken := r.Form.Get("refresh_token")
-		tkn, err = oidc.ReqAuthByRefreshToken(project, clientID, refreshToken, r)
+		tkn, err = authn.ReqAuthByRefreshToken(project, clientID, refreshToken, r)
 
 		if err != nil && errors.Contains(err, model.ErrNoSuchSession) {
 			logger.Info("Refresh token is already revoked")
@@ -181,7 +183,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	case model.GrantTypeAuthorizationCode:
 		code := r.Form.Get("code")
 		codeVerifier := r.Form.Get("code_verifier")
-		tkn, err = oidc.ReqAuthByCode(project, clientID, code, codeVerifier, r)
+		tkn, err = authn.ReqAuthByCode(project, clientID, code, codeVerifier, r)
 	default:
 		logger.Info("Unexpected grant type got: %s", gt.String())
 		errors.WriteOAuthError(w, errors.ErrServerError, state)
@@ -265,198 +267,12 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	authHandler(w, r, projectName, r.Form)
 }
 
-// UserLoginHandler ...
-func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-
-	var err *errors.Error
-
-	// Get data form Form
-	if err := r.ParseForm(); err != nil {
-		logger.Info("Failed to parse form: %v", err)
-		errMsg := "Request failed. invalid form value"
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	logger.Debug("Form: %v", r.Form)
-	state := r.Form.Get("state")
-
-	sessionID := r.Form.Get("login_session_id")
-
-	defer func() {
-		msg := ""
-		if err != nil {
-			msg = err.Error()
-			// delete session if login failed
-			db.GetInst().LoginSessionDelete(projectName, sessionID)
-		}
-
-		if err = audit.GetInst().Save(projectName, time.Now(), "USER_LOGIN", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit event"))
-		}
-	}()
-
-	// Verify user login session code
-	s, err := oidc.VerifySession(projectName, sessionID)
-	if err != nil {
-		errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
-		errMsg := "Request failed. internal server error occured."
-		if errors.Contains(err, errors.ErrSessionExpired) {
-			errMsg = "Request failed. the session was already expired."
-		}
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	// Verify user
-	uname := r.Form.Get("username")
-	passwd := r.Form.Get("password")
-	usr, err := user.Verify(projectName, uname, passwd)
-	if err != nil {
-		if errors.Contains(err, user.ErrAuthFailed) || errors.Contains(err, user.ErrUserLocked) {
-			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate user %s", uname))
-
-			// delete old session and create new code for relogin
-			if err := db.GetInst().LoginSessionDelete(projectName, sessionID); err != nil {
-				errors.Print(errors.Append(err, "Failed to delete previous login session"))
-				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-				return
-			}
-
-			authReq := &oidc.AuthRequest{
-				Scope:        s.Scope,
-				ResponseType: s.ResponseType,
-				ClientID:     s.ClientID,
-				RedirectURI:  s.RedirectURI,
-				State:        state,
-				Nonce:        s.Nonce,
-				ResponseMode: s.ResponseMode,
-				Prompt:       s.Prompt,
-			}
-
-			lsID, err := oidc.StartLoginSession(projectName, authReq)
-			if err != nil {
-				errors.Print(errors.Append(err, "Failed to register login session"))
-				oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-				return
-			}
-			oidc.WriteUserLoginPage(projectName, lsID, "invalid user name or password", state, w)
-			err = nil // do not delete session in defer function
-		} else {
-			errors.Print(errors.Append(err, "Failed to verify user"))
-			errMsg := "Request failed. internal server error occuerd"
-			oidc.WriteErrorPage(errMsg, w)
-		}
-		return
-	}
-
-	s.UserID = usr.ID
-	s.LoginDate = time.Now()
-
-	if ok := slice.Contains(s.Prompt, "consent"); ok {
-		// save user id to session info
-		if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
-			errors.Print(errors.Append(err, "Failed to update login session"))
-			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-			return
-		}
-
-		// show consent page
-		oidc.WriteConsentPage(projectName, sessionID, state, w)
-		return
-	}
-
-	issuer := token.GetFullIssuer(r)
-	req, err := createLoginRedirectInfo(s, state, issuer)
-	if err != nil {
-		errors.Print(err)
-		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-		return
-	}
-
-	if ok := slice.Contains(s.ResponseType, "code"); !ok {
-		// delete session
-		err = errors.New("Session end", "Session end")
-	} else {
-		// Update login session info
-		if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
-			errors.Print(errors.Append(err, "Failed to update login session"))
-			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-			return
-		}
-	}
-
-	if err := jwthttp.SetSSOSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
-		errors.Print(errors.Append(err, "Failed to set cookie"))
-		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-		return
-	}
-	http.Redirect(w, req, req.URL.String(), http.StatusFound)
-}
-
-// ConsentHandler ...
-func ConsentHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-
-	sel := r.FormValue("select")
-	logger.Info("Consent select: %s", sel)
-
-	// Get data form Form
-	if err := r.ParseForm(); err != nil {
-		logger.Info("Failed to parse form: %v", err)
-		errMsg := "Request failed. invalid form value"
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	logger.Debug("Form: %v", r.Form)
-	state := r.Form.Get("state")
-
-	sessionID := r.Form.Get("login_session_id")
-	s, err := oidc.VerifySession(projectName, sessionID)
-	if err != nil {
-		errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
-		errMsg := "Request failed. internal server error occured."
-		if errors.Contains(err, errors.ErrSessionExpired) {
-			errMsg = "Request failed. the session was already expired."
-		}
-		oidc.WriteErrorPage(errMsg, w)
-		return
-	}
-
-	switch sel {
-	case "yes":
-		issuer := token.GetFullIssuer(r)
-		req, err := createLoginRedirectInfo(s, state, issuer)
-		if err != nil {
-			errors.Print(err)
-			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-			return
-		}
-
-		if err := jwthttp.SetSSOSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
-			errors.Print(errors.Append(err, "Failed to set cookie"))
-			oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-			return
-		}
-		http.Redirect(w, req, req.URL.String(), http.StatusFound)
-	case "no":
-		errors.RedirectWithOAuthError(w, errors.ErrConsentRequired, r.Method, s.RedirectURI, state)
-	default:
-		logger.Info("Invalid select type %s. consent page maybe broken.", sel)
-		oidc.WriteErrorPage("Request failed. internal server error occuerd", w)
-	}
-}
-
 // UserInfoHandler ...
 func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
-	claims, err := jwthttp.ValidateAPIRequest(r)
+	claims, err := jwthttp.ValidateAPIToken(r)
 	if err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to validate header"))
 		errors.WriteOAuthError(w, errors.ErrInvalidRequest, "")
@@ -544,8 +360,8 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 	logger.Debug("Auth Request: %v", authReq)
 
 	// Check Redirect URL
-	if err = client.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
-		if errors.Contains(err, client.ErrNoRedirectURL) {
+	if err = oidc.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
+		if errors.Contains(err, oidc.ErrNoRedirectURL) {
 			errors.PrintAsInfo(errors.Append(err, "Redirect URL %s is not in Allowed list", authReq.RedirectURI))
 			errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, authReq.State)
 		} else if errors.Contains(err, model.ErrNoSuchClient) {
@@ -582,14 +398,14 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 
 	if slice.Contains(authReq.Prompt, "login") || slice.Contains(authReq.Prompt, "select_account") || slice.Contains(authReq.Prompt, "consent") {
 		// Start session for login flow
-		lsID, err := oidc.StartLoginSession(projectName, authReq)
+		lsID, err := login.StartLoginSession(projectName, authReq)
 		if err != nil {
 			errors.Print(errors.Append(err, "Failed to start login session"))
 			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
 			return
 		}
 
-		oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
+		login.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
 		return
 	}
 
@@ -608,12 +424,12 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 		if err != nil {
 			logger.Debug("Failed to get user id from cookie: %v", err)
 		} else {
-			userID, err = jwthttp.GetLoginUserIDFromSSOSessionCookie(cookie, projectName)
+			userID, err = sso.GetLoginUserIDFromSSOSessionCookie(cookie, projectName)
 		}
 	}
 
 	if userID != "" {
-		req, err := handleSSO(r.Method, projectName, userID, tokenIssuer, authReq)
+		req, err := sso.Handle(r.Method, projectName, userID, tokenIssuer, authReq)
 		if err == nil {
 			http.Redirect(w, req, req.URL.String(), http.StatusFound)
 			return
@@ -632,7 +448,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 	}
 
 	// Start session for login flow
-	lsID, err := oidc.StartLoginSession(projectName, authReq)
+	lsID, err := login.StartLoginSession(projectName, authReq)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to start login session"))
 		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
@@ -640,128 +456,5 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 	}
 
 	// Return login page
-	oidc.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
-}
-
-func handleSSO(method string, projectName string, userID string, tokenIssuer string, authReq *oidc.AuthRequest) (*http.Request, *errors.Error) {
-	sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: userID})
-	if err != nil {
-		return nil, errors.Append(err, "Failed to get session list")
-	}
-	if len(sessions) == 0 {
-		return nil, errors.Append(errors.ErrLoginRequired, "No sessions, so return login_required")
-	}
-
-	// check max_age
-	// if now > auth_time + max_age return login_required
-	now := time.Now()
-	for _, s := range sessions {
-		lifeSpan := s.ExpiresIn
-		if authReq.MaxAge > 0 {
-			lifeSpan = authReq.MaxAge
-		}
-
-		valid := s.LastAuthTime.Add(time.Second * time.Duration(lifeSpan))
-		logger.Debug("Session Info: now %v, valid time %v", now, valid)
-		if now.Before(valid) {
-			ls := &model.LoginSession{
-				SessionID:           uuid.New().String(),
-				ResponseType:        authReq.ResponseType,
-				ProjectName:         projectName,
-				UserID:              s.UserID,
-				ClientID:            authReq.ClientID,
-				Nonce:               authReq.Nonce,
-				LoginDate:           s.LastAuthTime,
-				RedirectURI:         authReq.RedirectURI,
-				ResponseMode:        authReq.ResponseMode,
-				Scope:               authReq.Scope,
-				Prompt:              authReq.Prompt,
-				ExpiresIn:           time.Now().Add(oidc.GetLoginSessionExpiresTime()).Unix(),
-				CodeChallenge:       authReq.CodeChallenge,
-				CodeChallengeMethod: authReq.CodeChallengeMethod,
-			}
-			req, err := createLoginRedirectInfo(ls, authReq.State, tokenIssuer)
-			if err != nil {
-				return nil, errors.Append(err, "Failed to create login redirect info")
-			}
-			if err := db.GetInst().LoginSessionAdd(projectName, ls); err != nil {
-				return nil, errors.Append(err, "Failed to register login session")
-			}
-			return req, nil
-		}
-	}
-
-	return nil, errors.Append(errors.ErrLoginRequired, "No valid session, so return login_required")
-}
-
-func createLoginRedirectInfo(session *model.LoginSession, state, tokenIssuer string) (*http.Request, *errors.Error) {
-	values := url.Values{}
-	if state != "" {
-		values.Set("state", state)
-	}
-
-	for _, typ := range session.ResponseType {
-		switch typ {
-		case "code":
-			code := uuid.New().String()
-			session.Code = code
-			values.Set("code", code)
-		case "id_token":
-			prj, err := db.GetInst().ProjectGet(session.ProjectName)
-			if err != nil {
-				return nil, errors.Append(err, "Failed to get token lifespan in project")
-			}
-
-			audiences := []string{session.UserID, session.ClientID}
-			tokenReq := token.Request{
-				Issuer:          tokenIssuer,
-				ExpiredTime:     time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
-				ProjectName:     session.ProjectName,
-				UserID:          session.UserID,
-				Nonce:           session.Nonce,
-				EndUserAuthTime: session.LoginDate,
-			}
-			tkn, err := token.GenerateIDToken(audiences, tokenReq)
-			if err != nil {
-				return nil, errors.Append(err, "Failed to generate id token")
-			}
-			values.Set("id_token", tkn)
-		case "token":
-			prj, err := db.GetInst().ProjectGet(session.ProjectName)
-			if err != nil {
-				return nil, errors.Append(err, "Failed to get token lifespan in project")
-			}
-
-			audiences := []string{session.UserID, session.ClientID}
-			tokenReq := token.Request{
-				Issuer:      tokenIssuer,
-				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
-				ProjectName: session.ProjectName,
-				UserID:      session.UserID,
-			}
-			tkn, err := token.GenerateAccessToken(audiences, tokenReq)
-			if err != nil {
-				return nil, errors.Append(err, "Failed to generate access token")
-			}
-			values.Set("access_token", tkn)
-		default:
-			return nil, errors.New("Unknown response type", "Unknown response type %s", typ)
-		}
-	}
-
-	req, err := http.NewRequest("GET", session.RedirectURI, nil)
-	if err != nil {
-		return nil, errors.New("Internal server error", "Failed to create response: %v", err)
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	if session.ResponseMode == "query" {
-		req.URL.RawQuery = values.Encode()
-	} else if session.ResponseMode == "fragment" {
-		req.URL.Fragment = values.Encode()
-	} else {
-		return nil, errors.New("Internal server error", "Invalid response mode %s is specified", session.ResponseMode)
-	}
-
-	return req, nil
+	login.WriteUserLoginPage(projectName, lsID, "", authReq.State, w)
 }
