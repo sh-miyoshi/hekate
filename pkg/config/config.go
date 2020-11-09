@@ -139,8 +139,18 @@ func InitConfig(osArgs []string) *errors.Error {
 	flag.StringVar(&inst.AuditDB.ConnectionString, "audit-db-conn-str", inst.AuditDB.ConnectionString, "audit database connection string")
 	flag.Parse()
 
-	// TODO
-	// set supported type
+	// Set supported type
+	inst.SupportedResponseType = []string{
+		"code",
+		"id_token",
+		"token",
+		"code id_token",
+		"code token",
+		"id_token token",
+		"code id_token token",
+		// TODO(support type "none")
+	}
+	inst.SupportedScore = []string{"openid"}
 
 	// Validate config
 	if err := inst.Validate(); err != nil {
