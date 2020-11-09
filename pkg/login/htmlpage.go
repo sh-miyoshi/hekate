@@ -20,7 +20,7 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 		return
 	}
 
-	url := "/api/v1/project/" + projectName + "/openid-connect/login?login_session_id=" + sessionID
+	url := "/api/v1/project/" + projectName + "/authn/login?login_session_id=" + sessionID
 	if state != "" {
 		url += "&state=" + state
 	}
@@ -66,7 +66,7 @@ func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWrite
 		return
 	}
 
-	url := "/api/v1/project/" + projectName + "/openid-connect/consent?login_session_id=" + sessionID
+	url := "/api/v1/project/" + projectName + "/authn/consent?login_session_id=" + sessionID
 	if state != "" {
 		url += "&state=" + state
 	}
