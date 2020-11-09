@@ -28,12 +28,16 @@ func (c *GlobalConfig) Validate() *errors.Error {
 		return errors.New("Invalid config", "admin password is empty")
 	}
 
-	if c.AuthCodeExpiresTime == 0 {
+	if c.LoginSessionExpiresTime == 0 {
 		return errors.New("Invalid config", "login session expires time is 0")
 	}
 
 	if c.SSOExpiresTime == 0 {
 		return errors.New("Invalid config", "sso expires time is 0")
+	}
+
+	if c.DBGCInterval == 0 {
+		return errors.New("Invalid config", "interval of db gc is 0")
 	}
 
 	finfo, err := os.Stat(c.UserLoginResourceDir)
@@ -95,7 +99,7 @@ func InitConfig(osArgs []string) *errors.Error {
 	}
 
 	// Set by os.Env
-	var port, env string
+	var port, env, interval string
 	setEnvVar("HEKATE_ADMIN_NAME", &inst.AdminName)
 	setEnvVar("HEKATE_ADMIN_PASSWORD", &inst.AdminPassword)
 	setEnvVar("HEKATE_SERVER_PORT", &port)
@@ -116,6 +120,14 @@ func InitConfig(osArgs []string) *errors.Error {
 	setEnvVar("HEKATE_LOGIN_PAGE_RES", &inst.UserLoginResourceDir)
 	setEnvVar("HEKATE_AUDIT_DB_TYPE", &inst.AuditDB.Type)
 	setEnvVar("HEKATE_AUDIT_DB_CONNECT_STRING", &inst.AuditDB.ConnectionString)
+	setEnvVar("HEKATE_DBGC_INTERVAL", &interval)
+	if interval != "" {
+		i, err := strconv.Atoi(interval)
+		if err != nil {
+			return errors.New("Invalid os env", "Failed to get db gc interval: %v", err)
+		}
+		inst.DBGCInterval = uint64(i)
+	}
 
 	// Set by command line args
 
@@ -137,6 +149,7 @@ func InitConfig(osArgs []string) *errors.Error {
 	flag.StringVar(&inst.UserLoginResourceDir, "login-res", inst.UserLoginResourceDir, "directory path for user login")
 	flag.StringVar(&inst.AuditDB.Type, "audit-db-type", inst.AuditDB.Type, "type of audit events database")
 	flag.StringVar(&inst.AuditDB.ConnectionString, "audit-db-conn-str", inst.AuditDB.ConnectionString, "audit database connection string")
+	flag.Uint64Var(&inst.DBGCInterval, "dbgc-interval", inst.DBGCInterval, "interval time of garbage collector for expired sessions [sec]")
 	flag.Parse()
 
 	// Set supported type

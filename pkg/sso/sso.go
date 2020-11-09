@@ -34,7 +34,7 @@ func SetSSOSessionToCookie(w http.ResponseWriter, projectName, userID, issuer st
 	cookie := &http.Cookie{
 		Name:     "HEKATE_LOGIN_SESSION",
 		Value:    tkn,
-		MaxAge:   int(cfg.SSOExpiresTime),
+		MaxAge:   int(req.ExpiredTime),
 		Secure:   cfg.HTTPSConfig.Enabled,
 		HttpOnly: true,
 	}
@@ -93,6 +93,8 @@ func Handle(method string, projectName string, userID string, tokenIssuer string
 		valid := s.LastAuthTime.Add(time.Second * time.Duration(lifeSpan))
 		logger.Debug("Session Info: now %v, valid time %v", now, valid)
 		if now.Before(valid) {
+			expires := time.Second * time.Duration(config.Get().LoginSessionExpiresTime)
+
 			ls := &model.LoginSession{
 				SessionID:           uuid.New().String(),
 				ResponseType:        authReq.ResponseType,
@@ -105,7 +107,7 @@ func Handle(method string, projectName string, userID string, tokenIssuer string
 				ResponseMode:        authReq.ResponseMode,
 				Scope:               authReq.Scope,
 				Prompt:              authReq.Prompt,
-				ExpiresIn:           time.Now().Add(config.Get().LoginSessionExpiresTime).Unix(),
+				ExpiresIn:           time.Now().Add(expires).Unix(),
 				CodeChallenge:       authReq.CodeChallenge,
 				CodeChallengeMethod: authReq.CodeChallengeMethod,
 			}

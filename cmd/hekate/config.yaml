@@ -39,8 +39,9 @@ audit_db:
   type: "none"
   connection_string: ""
 
-# Expires Time of Authorization code in OpenID Connect [sec]
-oidc_auth_code_expires_time: 300
+# Expires Time of a session for login [sec]
+# This is a time from login page request to user verify
+login_session_expires_time: 300
 
 oidc_user_login_page_res: "_data/login"
 

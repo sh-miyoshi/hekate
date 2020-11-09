@@ -13,9 +13,11 @@ import (
 
 // StartLoginSession ...
 func StartLoginSession(projectName string, req *oidc.AuthRequest) (string, *errors.Error) {
+	expires := time.Second * time.Duration(config.Get().LoginSessionExpiresTime)
+
 	s := &model.LoginSession{
 		SessionID:           uuid.New().String(),
-		ExpiresIn:           time.Now().Add(config.Get().LoginSessionExpiresTime).Unix(),
+		ExpiresIn:           time.Now().Add(expires).Unix(),
 		ClientID:            req.ClientID,
 		RedirectURI:         req.RedirectURI,
 		Nonce:               req.Nonce,
