@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	validator "github.com/go-playground/validator/v10"
+	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/stretchr/stew/slice"
 )
@@ -119,14 +120,15 @@ func (r *AuthRequest) Validate() *errors.Error {
 		return errors.ErrRequestNotSupported
 	}
 
+	cfg := config.Get()
+
 	// Check Scope
-	if err := validateScope(r.Scope, GetSupportedScope()); err != nil {
+	if err := validateScope(r.Scope, cfg.SupportedScore); err != nil {
 		return errors.Append(err, "Failed to validate scope %v", r.Scope)
 	}
 
 	// Check Response Type
-	supportedTypes := GetSupportedResponseType()
-	if err := validateResponseType(r.ResponseType, supportedTypes); err != nil {
+	if err := validateResponseType(r.ResponseType, cfg.SupportedResponseType); err != nil {
 		return errors.Append(err, "Failed to validate response type %v", r.ResponseType)
 	}
 

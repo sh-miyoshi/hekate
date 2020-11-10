@@ -1,4 +1,4 @@
-package oidc
+package authn
 
 import (
 	"crypto/sha256"
@@ -13,8 +13,9 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/login"
+	"github.com/sh-miyoshi/hekate/pkg/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
-	"github.com/sh-miyoshi/hekate/pkg/user"
 )
 
 type option struct {
@@ -25,30 +26,11 @@ type option struct {
 	endUserAuthTime time.Time
 }
 
-// ClientAuth authenticates client with id and secret
-func ClientAuth(projectName string, clientID string, clientSecret string) *errors.Error {
-	client, err := db.GetInst().ClientGet(projectName, clientID)
-	if err != nil {
-		if errors.Contains(err, model.ErrNoSuchClient) || errors.Contains(err, model.ErrClientValidateFailed) {
-			return errors.Append(errors.ErrInvalidClient, err.Error())
-		}
-		return errors.Append(err, "Failed to get client")
-	}
-
-	if client.AccessType != "public" {
-		if client.Secret != clientSecret {
-			return errors.Append(errors.ErrInvalidClient, "client auth failed")
-		}
-	}
-
-	return nil
-}
-
 // ReqAuthByPassword ...
-func ReqAuthByPassword(project *model.ProjectInfo, userName string, password string, r *http.Request) (*TokenResponse, *errors.Error) {
-	usr, err := user.Verify(project.Name, userName, password)
+func ReqAuthByPassword(project *model.ProjectInfo, userName string, password string, r *http.Request) (*oidc.TokenResponse, *errors.Error) {
+	usr, err := login.UserVerifyByPassword(project.Name, userName, password)
 	if err != nil {
-		if errors.Contains(err, user.ErrAuthFailed) || errors.Contains(err, user.ErrUserLocked) {
+		if errors.Contains(err, login.ErrAuthFailed) || errors.Contains(err, login.ErrUserLocked) {
 			return nil, errors.Append(errors.ErrRequestUnauthorized, err.Error())
 		}
 		return nil, err
@@ -68,7 +50,7 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 }
 
 // ReqAuthByCode ...
-func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, codeVerifier string, r *http.Request) (*TokenResponse, *errors.Error) {
+func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, codeVerifier string, r *http.Request) (*oidc.TokenResponse, *errors.Error) {
 	s, err := db.GetInst().LoginSessionGetByCode(project.Name, code)
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchLoginSession) {
@@ -125,7 +107,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, cod
 }
 
 // ReqAuthByRefreshToken ...
-func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshToken string, r *http.Request) (*TokenResponse, *errors.Error) {
+func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshToken string, r *http.Request) (*oidc.TokenResponse, *errors.Error) {
 	claims := &token.RefreshTokenClaims{}
 	issuer := token.GetExpectIssuer(r)
 	if err := token.ValidateRefreshToken(claims, refreshToken, issuer); err != nil {
@@ -162,7 +144,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 }
 
 // ReqAuthByClientCredentials ...
-func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *http.Request) (*TokenResponse, *errors.Error) {
+func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *http.Request) (*oidc.TokenResponse, *errors.Error) {
 	cli, err := db.GetInst().ClientGet(project.Name, clientID)
 	if err != nil {
 		return nil, errors.Append(err, "Get client info failed")
@@ -179,9 +161,9 @@ func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *
 	})
 }
 
-func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*TokenResponse, *errors.Error) {
+func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*oidc.TokenResponse, *errors.Error) {
 	// Generate JWT Token
-	res := TokenResponse{
+	res := oidc.TokenResponse{
 		TokenType: "Bearer",
 		ExpiresIn: project.TokenConfig.AccessTokenLifeSpan,
 	}

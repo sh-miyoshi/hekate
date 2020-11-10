@@ -7,6 +7,13 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
+// Query ...
+type Query struct {
+	FromDate time.Time
+	ToDate   time.Time
+	Offset   uint
+}
+
 // Handler ...
 type Handler interface {
 	Ping() *errors.Error

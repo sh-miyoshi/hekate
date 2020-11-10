@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/sh-miyoshi/hekate/cmd/hekate/config"
 	auditapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/audit"
+	authnapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/authn"
 	clientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	roleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
 	keysapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
@@ -17,13 +17,11 @@ import (
 	sessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/session"
 	userapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/audit"
+	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
-	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"github.com/sh-miyoshi/hekate/pkg/oidc"
-	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 	defaultrole "github.com/sh-miyoshi/hekate/pkg/role"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
@@ -52,8 +50,9 @@ func loggingMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
+func setAPI(r *mux.Router) {
 	const basePath = "/api/v1"
+	cfg := config.Get()
 
 	// OpenID Connect API
 	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", oidcapiv1.ConfigGetHandler).Methods("GET")
@@ -63,8 +62,10 @@ func setAPI(r *mux.Router, cfg *config.GlobalConfig) {
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", oidcapiv1.AuthPOSTHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/userinfo", oidcapiv1.UserInfoHandler).Methods("GET", "POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", oidcapiv1.RevokeHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/login", oidcapiv1.UserLoginHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/consent", oidcapiv1.ConsentHandler).Methods("POST")
+
+	// Authenticate API
+	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
@@ -191,23 +192,17 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 	return nil
 }
 
-func initAll(cfg *config.GlobalConfig) *errors.Error {
+func initAll() *errors.Error {
+	cfg := config.Get()
+
 	// Initialize logger
 	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
 	logger.Debug("Start with config: %v", *cfg)
-
-	// Check login resource directory struct
-	if err := cfg.CheckLoginResDirStruct(); err != nil {
-		return errors.Append(err, "Login resource directory is broken")
-	}
 
 	// Initialize settings
 	if err := defaultrole.InitHandler(); err != nil {
 		return errors.Append(err, "Failed to initialize default role handler")
 	}
-	token.InitConfig(cfg.HTTPSConfig.Enabled)
-	oidc.InitConfig(cfg.HTTPSConfig.Enabled, cfg.AuthCodeExpiresTime, cfg.UserLoginResourceDir, authCodeUserLoginResourcePath)
-	jwthttp.SetSSOExpiresTime(cfg.SSOExpiresTime)
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {

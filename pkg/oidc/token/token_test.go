@@ -6,8 +6,6 @@ import (
 )
 
 func TestGetExpectIssuer(t *testing.T) {
-	InitConfig(false)
-
 	tt := []struct {
 		url    string
 		expect string

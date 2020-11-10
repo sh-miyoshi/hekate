@@ -10,23 +10,11 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
-
-var (
-	protoSchema string
-)
-
-// InitConfig ...
-func InitConfig(useHTTPS bool) {
-	if useHTTPS {
-		protoSchema = "https"
-	} else {
-		protoSchema = "http"
-	}
-}
 
 func signToken(projectName string, claims jwt.Claims) (string, *errors.Error) {
 	project, err := db.GetInst().ProjectGet(projectName)
@@ -305,13 +293,23 @@ func ValidateIDToken(claims *IDTokenClaims, tokenString string, projectName stri
 
 // GetFullIssuer ...
 func GetFullIssuer(r *http.Request) string {
+	proto := "http"
+	if config.Get().HTTPSConfig.Enabled {
+		proto = "https"
+	}
+
 	re := regexp.MustCompile(`/api/v1/project/[^/]+`)
 	url := re.FindString(r.URL.Path)
-	res := fmt.Sprintf("%s://%s%s", protoSchema, r.Host, url)
+	res := fmt.Sprintf("%s://%s%s", proto, r.Host, url)
 	return strings.TrimSuffix(res, "/")
 }
 
 // GetExpectIssuer ...
 func GetExpectIssuer(r *http.Request) string {
-	return fmt.Sprintf("%s://%s", protoSchema, r.Host)
+	proto := "http"
+	if config.Get().HTTPSConfig.Enabled {
+		proto = "https"
+	}
+
+	return fmt.Sprintf("%s://%s", proto, r.Host)
 }
