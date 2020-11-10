@@ -99,16 +99,11 @@ func InitConfig(osArgs []string) *errors.Error {
 	}
 
 	// Set by os.Env
-	var port, env, interval string
+	var env string
 	setEnvVar("HEKATE_ADMIN_NAME", &inst.AdminName)
 	setEnvVar("HEKATE_ADMIN_PASSWORD", &inst.AdminPassword)
-	setEnvVar("HEKATE_SERVER_PORT", &port)
-	if port != "" {
-		var err error
-		inst.Port, err = strconv.Atoi(port)
-		if err != nil {
-			return errors.New("Invalid os env", "Failed to get port number: %v", err)
-		}
+	if err := setEnvInt("HEKATE_SERVER_PORT", &inst.Port); err != nil {
+		return errors.New("Invalid os env", "Failed to get port number: %v", err)
 	}
 	setEnvVar("HEKATE_SERVER_BIND_ADDR", &inst.BindAddr)
 	setEnvVar("HEKATE_SERVER_ENV", &env)
@@ -117,16 +112,18 @@ func InitConfig(osArgs []string) *errors.Error {
 	}
 	setEnvVar("HEKATE_DB_TYPE", &inst.DB.Type)
 	setEnvVar("HEKATE_DB_CONNECT_STRING", &inst.DB.ConnectionString)
-	setEnvVar("HEKATE_LOGIN_PAGE_RES", &inst.UserLoginResourceDir)
 	setEnvVar("HEKATE_AUDIT_DB_TYPE", &inst.AuditDB.Type)
 	setEnvVar("HEKATE_AUDIT_DB_CONNECT_STRING", &inst.AuditDB.ConnectionString)
-	setEnvVar("HEKATE_DBGC_INTERVAL", &interval)
-	if interval != "" {
-		i, err := strconv.Atoi(interval)
-		if err != nil {
-			return errors.New("Invalid os env", "Failed to get db gc interval: %v", err)
-		}
-		inst.DBGCInterval = uint64(i)
+	setEnvVar("HEKATE_LOGIN_PAGE_RES", &inst.UserLoginResourceDir)
+	if err := setEnvUint("HEKATE_LOGIN_SESSION_EXPIRES_TIME", &inst.LoginSessionExpiresTime); err != nil {
+		return errors.New("Invalid os env", "Failed to get login session expires time: %v", err)
+	}
+	if err := setEnvUint("HEKATE_SSO_EXPIRES_TIME", &inst.SSOExpiresTime); err != nil {
+		return errors.New("Invalid os env", "Failed to get sso expires time: %v", err)
+	}
+	setEnvVar("HEKATE_LOGIN_PAGE_RES", &inst.UserLoginResourceDir)
+	if err := setEnvUint("HEKATE_DBGC_INTERVAL", &inst.DBGCInterval); err != nil {
+		return errors.New("Invalid os env", "Failed to get db gc interval: %v", err)
 	}
 
 	// Set by command line args
@@ -146,9 +143,11 @@ func InitConfig(osArgs []string) *errors.Error {
 	flag.BoolVar(&inst.ModeDebug, "debug", inst.ModeDebug, "output debug log")
 	flag.StringVar(&inst.DB.Type, "db-type", inst.DB.Type, "type of database")
 	flag.StringVar(&inst.DB.ConnectionString, "db-conn-str", inst.DB.ConnectionString, "database connection string")
-	flag.StringVar(&inst.UserLoginResourceDir, "login-res", inst.UserLoginResourceDir, "directory path for user login")
 	flag.StringVar(&inst.AuditDB.Type, "audit-db-type", inst.AuditDB.Type, "type of audit events database")
 	flag.StringVar(&inst.AuditDB.ConnectionString, "audit-db-conn-str", inst.AuditDB.ConnectionString, "audit database connection string")
+	flag.Uint64Var(&inst.LoginSessionExpiresTime, "login-session-expires", inst.LoginSessionExpiresTime, "expires time of login session [sec]")
+	flag.Uint64Var(&inst.SSOExpiresTime, "sso-expires", inst.SSOExpiresTime, "expires time of single sign on [sec]")
+	flag.StringVar(&inst.UserLoginResourceDir, "login-res", inst.UserLoginResourceDir, "directory path for user login")
 	flag.Uint64Var(&inst.DBGCInterval, "dbgc-interval", inst.DBGCInterval, "interval time of garbage collector for expired sessions [sec]")
 	flag.Parse()
 
@@ -187,6 +186,30 @@ func setEnvVar(key string, target *string) {
 	if len(val) > 0 {
 		*target = val
 	}
+}
+
+func setEnvInt(key string, target *int) error {
+	var tmp string
+	setEnvVar(key, &tmp)
+	if tmp != "" {
+		var err error
+		*target, err = strconv.Atoi(tmp)
+		return err
+	}
+
+	return nil
+}
+
+func setEnvUint(key string, target *uint64) error {
+	var tmp string
+	setEnvVar(key, &tmp)
+	if tmp != "" {
+		var err error
+		*target, err = strconv.ParseUint(tmp, 10, 64)
+		return err
+	}
+
+	return nil
 }
 
 // getConfigFileName return config file name if -config is in os.Args
