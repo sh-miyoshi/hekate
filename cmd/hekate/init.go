@@ -12,6 +12,7 @@ import (
 	clientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	roleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
 	keysapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
+	oauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oauth"
 	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
 	projectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 	sessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/session"
@@ -63,9 +64,13 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/userinfo", oidcapiv1.UserInfoHandler).Methods("GET", "POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", oidcapiv1.RevokeHandler).Methods("POST")
 
+	// OAuth
+	r.HandleFunc(basePath+"/project/{projectName}/oauth/device", oauthapiv1.DeviceHandler).Methods("POST")
+
 	// Authenticate API
 	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/authn/devicelogin", authnapiv1.DeviceLoginHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")

@@ -201,3 +201,8 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		login.WriteErrorPage("Request failed. internal server error occuerd", w)
 	}
 }
+
+// DeviceLoginHandler ...
+func DeviceLoginHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO implement this
+}
