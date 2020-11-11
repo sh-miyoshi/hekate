@@ -162,7 +162,7 @@ func InitConfig(osArgs []string) *errors.Error {
 		"code id_token token",
 		// TODO(support type "none")
 	}
-	inst.SupportedScore = []string{"openid"}
+	inst.SupportedScope = []string{"openid"}
 
 	// Validate config
 	if err := inst.Validate(); err != nil {

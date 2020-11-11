@@ -123,7 +123,7 @@ func (r *AuthRequest) Validate() *errors.Error {
 	cfg := config.Get()
 
 	// Check Scope
-	if err := validateScope(r.Scope, cfg.SupportedScore); err != nil {
+	if err := validateScope(r.Scope, cfg.SupportedScope); err != nil {
 		return errors.Append(err, "Failed to validate scope %v", r.Scope)
 	}
 
