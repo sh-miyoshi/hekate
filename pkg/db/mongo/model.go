@@ -103,3 +103,11 @@ type customRoleInUser struct {
 	UserID       string `bson:"user_id"`
 	CustomRoleID string `bson:"custom_role_id"`
 }
+
+type device struct {
+	DeviceCode  string    `bson:"device_code"`
+	UserCode    string    `bson:"user_code"`
+	ProjectName string    `bson:"project_name"`
+	ExpiresIn   int64     `bson:"expires_in"`
+	CreatedAt   time.Time `bson:"created_at"`
+}

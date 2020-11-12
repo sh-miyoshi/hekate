@@ -25,6 +25,7 @@ type Manager struct {
 	loginSession model.LoginSessionHandler
 	transaction  model.TransactionManager
 	ping         model.PingHandler
+	device       model.DeviceHandler
 
 	portalAddr string
 }
@@ -49,6 +50,7 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 			loginSession: memory.NewLoginSessionHandler(),
 			transaction:  memory.NewTransactionManager(),
 			ping:         memory.NewPingHandler(),
+			device:       memory.NewDeviceHandler(),
 		}
 	case "mongo":
 		logger.Info("Initialize with mongo DB")
@@ -81,6 +83,10 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 		if err != nil {
 			return errors.Append(err, "Failed to create login session handler")
 		}
+		deviceHandler, err := mongo.NewDeviceHandler(dbClient)
+		if err != nil {
+			return errors.Append(err, "Failed to create device handler")
+		}
 
 		inst = &Manager{
 			project:      prjHandler,
@@ -91,6 +97,7 @@ func InitDBManager(dbType string, connStr string) *errors.Error {
 			loginSession: loginSessionHandler,
 			transaction:  mongo.NewTransactionManager(dbClient),
 			ping:         mongo.NewPingHandler(dbClient),
+			device:       deviceHandler,
 		}
 	default:
 		return errors.New("Internal server error", "Database Type %s is not implemented yet", dbType)
@@ -203,6 +210,10 @@ func (m *Manager) ProjectDelete(name string) *errors.Error {
 
 		if err := m.user.DeleteAll(name); err != nil {
 			return errors.Append(err, "Failed to delete user data")
+		}
+
+		if err := m.device.DeleteAll(name); err != nil {
+			return errors.Append(err, "Failed to delete device data")
 		}
 
 		if err := m.project.Delete(name); err != nil {
@@ -900,6 +911,20 @@ func (m *Manager) CustomRoleUpdate(projectName string, ent *model.CustomRole) *e
 	})
 }
 
+// DeviceAdd ...
+func (m *Manager) DeviceAdd(projectName string, ent *model.Device) *errors.Error {
+	if err := ent.Validate(); err != nil {
+		return errors.Append(err, "Failed to validate entry")
+	}
+
+	return m.transaction.Transaction(func() *errors.Error {
+		if err := m.device.Add(projectName, ent); err != nil {
+			return errors.Append(err, "Failed to add device")
+		}
+		return nil
+	})
+}
+
 // DeleteExpiredSessions ...
 func (m *Manager) DeleteExpiredSessions() *errors.Error {
 	now := time.Now()
@@ -911,6 +936,10 @@ func (m *Manager) DeleteExpiredSessions() *errors.Error {
 
 		if err := m.session.Cleanup(now); err != nil {
 			return errors.Append(err, "Failed to cleanup sessions")
+		}
+
+		if err := m.device.Cleanup(now); err != nil {
+			return errors.Append(err, "Failed to cleanup devices")
 		}
 
 		return nil
