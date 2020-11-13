@@ -170,7 +170,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	accessTokenReq := token.Request{
 		Issuer:      token.GetFullIssuer(r),
-		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+		ExpiresIn:   int64(project.TokenConfig.AccessTokenLifeSpan),
 		ProjectName: project.Name,
 		UserID:      userID,
 	}
@@ -190,10 +190,9 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	if opt.genRefreshToken {
 		res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
-		// doNext
 		refreshTokenReq := token.Request{
 			Issuer:      token.GetFullIssuer(r),
-			ExpiredTime: time.Second * time.Duration(res.RefreshExpiresIn),
+			ExpiresIn:   int64(res.RefreshExpiresIn),
 			ProjectName: project.Name,
 			UserID:      userID,
 		}
@@ -227,7 +226,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 	if opt.genIDToken {
 		idTokenReq := token.Request{
 			Issuer:          token.GetFullIssuer(r),
-			ExpiredTime:     time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+			ExpiresIn:       int64(project.TokenConfig.AccessTokenLifeSpan),
 			ProjectName:     project.Name,
 			UserID:          userID,
 			Nonce:           opt.nonce,

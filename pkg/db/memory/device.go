@@ -40,7 +40,7 @@ func (h *DeviceHandler) DeleteAll(projectName string) *errors.Error {
 func (h *DeviceHandler) Cleanup(now time.Time) *errors.Error {
 	newList := []*model.Device{}
 	for _, s := range h.devices {
-		expire := s.CreatedAt.Add(time.Duration(s.ExpiresIn))
+		expire := s.CreatedAt.Add(time.Second * time.Duration(s.ExpiresIn))
 		if now.Before(expire) {
 			newList = append(newList, s)
 		}

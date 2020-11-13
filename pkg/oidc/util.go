@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/sh-miyoshi/hekate/pkg/db"
@@ -75,7 +74,7 @@ func CreateLoggedInResponse(session *model.LoginSession, state, tokenIssuer stri
 			audiences := []string{session.UserID, session.ClientID}
 			tokenReq := token.Request{
 				Issuer:          tokenIssuer,
-				ExpiredTime:     time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
+				ExpiresIn:       int64(prj.TokenConfig.AccessTokenLifeSpan),
 				ProjectName:     session.ProjectName,
 				UserID:          session.UserID,
 				Nonce:           session.Nonce,
@@ -95,7 +94,7 @@ func CreateLoggedInResponse(session *model.LoginSession, state, tokenIssuer stri
 			audiences := []string{session.UserID, session.ClientID}
 			tokenReq := token.Request{
 				Issuer:      tokenIssuer,
-				ExpiredTime: time.Second * time.Duration(prj.TokenConfig.AccessTokenLifeSpan),
+				ExpiresIn:   int64(prj.TokenConfig.AccessTokenLifeSpan),
 				ProjectName: session.ProjectName,
 				UserID:      session.UserID,
 			}

@@ -22,7 +22,7 @@ func SetSSOSessionToCookie(w http.ResponseWriter, projectName, userID, issuer st
 
 	req := token.Request{
 		Issuer:      issuer,
-		ExpiredTime: time.Second * time.Duration(cfg.SSOExpiresIn),
+		ExpiresIn:   int64(cfg.SSOExpiresIn),
 		ProjectName: projectName,
 		UserID:      userID,
 	}
@@ -34,7 +34,7 @@ func SetSSOSessionToCookie(w http.ResponseWriter, projectName, userID, issuer st
 	cookie := &http.Cookie{
 		Name:     "HEKATE_LOGIN_SESSION",
 		Value:    tkn,
-		MaxAge:   int(req.ExpiredTime),
+		MaxAge:   int(req.ExpiresIn),
 		Secure:   cfg.HTTPSConfig.Enabled,
 		HttpOnly: true,
 	}
@@ -95,7 +95,6 @@ func Handle(method string, projectName string, userID string, tokenIssuer string
 		if now.Before(valid) {
 			expires := time.Second * time.Duration(config.Get().LoginSessionExpiresIn)
 
-			// doNext
 			ls := &model.LoginSession{
 				SessionID:           uuid.New().String(),
 				ResponseType:        authReq.ResponseType,
