@@ -18,8 +18,8 @@ func TestVerify(t *testing.T) {
 	db.GetInst().ProjectAdd(&model.ProjectInfo{
 		Name: "master",
 		TokenConfig: &model.TokenConfig{
-			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresTimeSec,
-			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresTimeSec,
+			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresInSec,
+			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresInSec,
 			SigningAlgorithm:     "RS256",
 		},
 	})

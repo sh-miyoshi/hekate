@@ -22,7 +22,7 @@ func SetSSOSessionToCookie(w http.ResponseWriter, projectName, userID, issuer st
 
 	req := token.Request{
 		Issuer:      issuer,
-		ExpiredTime: time.Second * time.Duration(cfg.SSOExpiresTime),
+		ExpiredTime: time.Second * time.Duration(cfg.SSOExpiresIn),
 		ProjectName: projectName,
 		UserID:      userID,
 	}
@@ -93,8 +93,9 @@ func Handle(method string, projectName string, userID string, tokenIssuer string
 		valid := s.LastAuthTime.Add(time.Second * time.Duration(lifeSpan))
 		logger.Debug("Session Info: now %v, valid time %v", now, valid)
 		if now.Before(valid) {
-			expires := time.Second * time.Duration(config.Get().LoginSessionExpiresTime)
+			expires := time.Second * time.Duration(config.Get().LoginSessionExpiresIn)
 
+			// doNext
 			ls := &model.LoginSession{
 				SessionID:           uuid.New().String(),
 				ResponseType:        authReq.ResponseType,
@@ -107,7 +108,7 @@ func Handle(method string, projectName string, userID string, tokenIssuer string
 				ResponseMode:        authReq.ResponseMode,
 				Scope:               authReq.Scope,
 				Prompt:              authReq.Prompt,
-				ExpiresIn:           time.Now().Add(expires).Unix(),
+				ExpiresDate:         time.Now().Add(expires),
 				CodeChallenge:       authReq.CodeChallenge,
 				CodeChallengeMethod: authReq.CodeChallengeMethod,
 			}

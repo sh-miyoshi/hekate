@@ -59,7 +59,7 @@ func (h *LoginSessionHandler) Add(projectName string, ent *model.LoginSession) *
 	v := &loginSession{
 		SessionID:           ent.SessionID,
 		Code:                ent.Code,
-		ExpiresIn:           ent.ExpiresIn,
+		ExpiresDate:         ent.ExpiresDate,
 		Scope:               ent.Scope,
 		ResponseType:        ent.ResponseType,
 		ClientID:            ent.ClientID,
@@ -98,7 +98,7 @@ func (h *LoginSessionHandler) Update(projectName string, ent *model.LoginSession
 	v := &loginSession{
 		SessionID:           ent.SessionID,
 		Code:                ent.Code,
-		ExpiresIn:           ent.ExpiresIn,
+		ExpiresDate:         ent.ExpiresDate,
 		Scope:               ent.Scope,
 		ResponseType:        ent.ResponseType,
 		ClientID:            ent.ClientID,
@@ -182,7 +182,7 @@ func (h *LoginSessionHandler) GetByCode(projectName string, code string) (*model
 	return &model.LoginSession{
 		SessionID:           res.SessionID,
 		Code:                res.Code,
-		ExpiresIn:           res.ExpiresIn,
+		ExpiresDate:         res.ExpiresDate,
 		Scope:               res.Scope,
 		ResponseType:        res.ResponseType,
 		ClientID:            res.ClientID,
@@ -220,7 +220,7 @@ func (h *LoginSessionHandler) Get(projectName string, id string) (*model.LoginSe
 	return &model.LoginSession{
 		SessionID:           res.SessionID,
 		Code:                res.Code,
-		ExpiresIn:           res.ExpiresIn,
+		ExpiresDate:         res.ExpiresDate,
 		Scope:               res.Scope,
 		ResponseType:        res.ResponseType,
 		ClientID:            res.ClientID,

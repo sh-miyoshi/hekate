@@ -144,8 +144,8 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 		CreatedAt:    time.Now(),
 		PermitDelete: false,
 		TokenConfig: &model.TokenConfig{
-			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresTimeSec,
-			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresTimeSec,
+			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresInSec,
+			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresInSec,
 			SigningAlgorithm:     "RS256",
 		},
 		AllowGrantTypes: []model.GrantType{

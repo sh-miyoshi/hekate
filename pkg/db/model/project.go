@@ -64,11 +64,11 @@ type ProjectFilter struct {
 }
 
 const (
-	// DefaultAccessTokenExpiresTimeSec is default expires time for access token(5 minutes)
-	DefaultAccessTokenExpiresTimeSec = 5 * 60
+	// DefaultAccessTokenExpiresInSec is default expires time for access token(5 minutes)
+	DefaultAccessTokenExpiresInSec = 5 * 60
 
-	// DefaultRefreshTokenExpiresTimeSec is default expires time for refresh token(14 days)
-	DefaultRefreshTokenExpiresTimeSec = 14 * 24 * 60 * 60
+	// DefaultRefreshTokenExpiresInSec is default expires time for refresh token(14 days)
+	DefaultRefreshTokenExpiresInSec = 14 * 24 * 60 * 60
 
 	// DefaultMaxLoginFailure ...
 	DefaultMaxLoginFailure = 5

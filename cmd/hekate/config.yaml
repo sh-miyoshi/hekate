@@ -41,10 +41,10 @@ audit_db:
 
 # Expires Time of a session for login [sec]
 # This is a time from login page request to user verify
-login_session_expires_time: 300
+login_session_expires_in: 300
 
 # Expires Time of Single Sign On(SSO) [sec]
-sso_expires_time: 300
+sso_expires_in: 300
 
 user_login_page_res: "_data/login"
 

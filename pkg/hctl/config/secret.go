@@ -18,22 +18,23 @@ type Secret struct {
 	ProjectName             string    `json:"projectName"`
 	UserName                string    `json:"userName"`
 	AccessToken             string    `json:"accessToken"`
-	AccessTokenExpiresTime  time.Time `json:"accessTokenExpiresTime"`
+	AccessTokenExpiresDate  time.Time `json:"accessTokenExpiresDate"`
 	RefreshToken            string    `json:"refreshToken"`
-	RefreshTokenExpiresTime time.Time `json:"refreshTokenExpiresTime"`
+	RefreshTokenExpiresDate time.Time `json:"refreshTokenExpiresDate"`
 }
 
 // SetSecret ...
 func SetSecret(projectName string, userName string, token *oidcapi.TokenResponse) {
 	secretFile := filepath.Join(configDir, "secret")
 
+	// doNext
 	v := Secret{
 		ProjectName:             projectName,
 		UserName:                userName,
 		AccessToken:             token.AccessToken,
-		AccessTokenExpiresTime:  time.Now().Add(time.Second * time.Duration(token.ExpiresIn)),
+		AccessTokenExpiresDate:  time.Now().Add(time.Second * time.Duration(token.ExpiresIn)),
 		RefreshToken:            token.RefreshToken,
-		RefreshTokenExpiresTime: time.Now().Add(time.Second * time.Duration(token.RefreshExpiresIn)),
+		RefreshTokenExpiresDate: time.Now().Add(time.Second * time.Duration(token.RefreshExpiresIn)),
 	}
 
 	bytes, _ := json.MarshalIndent(v, "", "  ")
@@ -61,11 +62,11 @@ func GetAccessToken() (string, error) {
 		return "", err
 	}
 
-	if time.Now().After(s.RefreshTokenExpiresTime) {
+	if time.Now().After(s.RefreshTokenExpiresDate) {
 		return "", fmt.Errorf("Token is expired\nPlease run `hctl login`")
 	}
 
-	if time.Now().After(s.AccessTokenExpiresTime) {
+	if time.Now().After(s.AccessTokenExpiresDate) {
 		// Refresh token by using refresh-token
 		res, err := login.DoWithRefresh(sysConf.ServerAddr, login.Info{
 			ProjectName:  s.ProjectName,

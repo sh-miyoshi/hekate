@@ -79,7 +79,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, cod
 	}
 
 	// Validate session info
-	if time.Now().Unix() >= s.ExpiresIn {
+	if time.Now().After(s.ExpiresDate) {
 		return nil, errors.Append(errors.ErrInvalidRequest, "code is already expired")
 	}
 
@@ -190,6 +190,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	if opt.genRefreshToken {
 		res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
+		// doNext
 		refreshTokenReq := token.Request{
 			Issuer:      token.GetFullIssuer(r),
 			ExpiredTime: time.Second * time.Duration(res.RefreshExpiresIn),

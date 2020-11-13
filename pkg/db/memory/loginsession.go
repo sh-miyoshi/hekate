@@ -81,8 +81,7 @@ func (h *LoginSessionHandler) DeleteAll(projectName string) *errors.Error {
 func (h *LoginSessionHandler) Cleanup(now time.Time) *errors.Error {
 	newList := []*model.LoginSession{}
 	for _, s := range h.sessionList {
-		t := time.Unix(s.ExpiresIn, 0)
-		if now.After(t) {
+		if now.Before(s.ExpiresDate) {
 			newList = append(newList, s)
 		}
 	}

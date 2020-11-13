@@ -51,7 +51,7 @@ type session struct {
 type loginSession struct {
 	SessionID           string    `bson:"session_id"`
 	Code                string    `bson:"code"`
-	ExpiresIn           int64     `bson:"expires_in"`
+	ExpiresDate         time.Time `bson:"expires_in"`
 	Scope               string    `bson:"scope"`
 	ResponseType        []string  `bson:"response_type"`
 	ClientID            string    `bson:"client_id"`
