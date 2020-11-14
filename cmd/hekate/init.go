@@ -116,6 +116,9 @@ func setAPI(r *mux.Router) {
 	// Audit API
 	r.HandleFunc(basePath+"/project/{projectName}/audit", auditapiv1.AuditGetHandler).Methods("GET")
 
+	// Device Login HTML Page
+	r.HandleFunc("/project/{projectName}/devicelogin", oauthapiv1.DeviceLoginPageHandler).Methods("GET")
+
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.GetInst().Ping(); err != nil {

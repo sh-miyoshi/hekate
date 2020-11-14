@@ -13,6 +13,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/login"
 	"github.com/sh-miyoshi/hekate/pkg/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 	"github.com/stretchr/stew/slice"
@@ -29,7 +30,7 @@ func DeviceHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			msg = err.Error()
 		}
-		if err = audit.GetInst().Save(projectName, time.Now(), "TOKEN", r.Method, r.URL.String(), msg); err != nil {
+		if err = audit.GetInst().Save(projectName, time.Now(), "DEVICE", r.Method, r.URL.String(), msg); err != nil {
 			errors.Print(errors.Append(err, "Failed to save audit event"))
 		}
 	}()
@@ -104,4 +105,13 @@ func DeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug("Device Authorization Response: %v", res)
 	jwthttp.ResponseWrite(w, "DeviceHandler", &res)
+}
+
+// DeviceLoginPageHandler ...
+func DeviceLoginPageHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+
+	// TODO get error
+	login.WriteDeviceLoginPage(projectName, "", w)
 }
