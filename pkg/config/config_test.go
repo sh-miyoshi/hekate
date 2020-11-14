@@ -97,6 +97,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	consentFile := filepath.Join(dir, "consent.html")
 	errorFile := filepath.Join(dir, "error.html")
 	indexFile := filepath.Join(dir, "index.html")
+	deviceFile := filepath.Join(dir, "devicelogin.html")
 	data := []byte("data")
 
 	// Test no consent page
@@ -106,6 +107,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 		return
 	}
 	ioutil.WriteFile(indexFile, data, 0644)
+	ioutil.WriteFile(deviceFile, data, 0644)
 	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no consent page")
 	}
@@ -116,30 +118,51 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 		return
 	}
 	os.Remove(indexFile)
+	os.Remove(deviceFile)
 
 	// Test no error page
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(indexFile, data, 0644)
+	ioutil.WriteFile(deviceFile, data, 0644)
 	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no error page")
 	}
 	os.Remove(consentFile)
 	os.Remove(indexFile)
+	os.Remove(deviceFile)
 
 	// Test no login page
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(errorFile, data, 0644)
+	ioutil.WriteFile(deviceFile, data, 0644)
 	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no login page")
 	}
 	os.Remove(consentFile)
 	os.Remove(errorFile)
+	os.Remove(deviceFile)
+
+	// Test no device login page
+	ioutil.WriteFile(consentFile, data, 0644)
+	ioutil.WriteFile(errorFile, data, 0644)
+	ioutil.WriteFile(indexFile, data, 0644)
+	if err := c.setLoginResource(); err == nil {
+		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no device login page")
+	}
+	os.Remove(consentFile)
+	os.Remove(errorFile)
+	os.Remove(indexFile)
 
 	// Test ok
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(errorFile, data, 0644)
 	ioutil.WriteFile(indexFile, data, 0644)
+	ioutil.WriteFile(deviceFile, data, 0644)
 	if err := c.setLoginResource(); err != nil {
 		t.Errorf("CheckLoginResDirStruct returns error %v, but expect is nil", err)
 	}
+	os.Remove(consentFile)
+	os.Remove(errorFile)
+	os.Remove(indexFile)
+	os.Remove(deviceFile)
 }
