@@ -163,6 +163,7 @@ func InitConfig(osArgs []string) *errors.Error {
 		// TODO(support type "none")
 	}
 	inst.SupportedScore = []string{"openid"}
+	inst.LoginStaticResourceURL = "/resource/login"
 
 	// Validate config
 	if err := inst.Validate(); err != nil {

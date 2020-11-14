@@ -27,7 +27,7 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 
 	d := map[string]string{
 		"URL":                url,
-		"StaticResourcePath": cfg.UserLoginResourceDir + "/static",
+		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
 		"Error":              errMsg,
 	}
 
@@ -47,7 +47,7 @@ func WriteErrorPage(errMsg string, w http.ResponseWriter) {
 	}
 
 	d := map[string]string{
-		"StaticResourcePath": cfg.UserLoginResourceDir + "/static",
+		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
 		"Error":              errMsg,
 	}
 
@@ -72,7 +72,7 @@ func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWrite
 	}
 
 	d := map[string]string{
-		"StaticResourcePath": cfg.UserLoginResourceDir + "/static",
+		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
 		"URL":                url,
 	}
 

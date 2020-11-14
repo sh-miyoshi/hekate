@@ -122,7 +122,7 @@ func setAPI(r *mux.Router) {
 
 	// File Server for User Login Page
 	fs := http.FileServer(http.Dir(path.Join(cfg.UserLoginResourceDir, "/static")))
-	pt := path.Join(authCodeUserLoginResourcePath, "/static") + "/"
+	pt := path.Join(cfg.LoginStaticResourceURL, "/static") + "/"
 	r.PathPrefix(pt).Handler(http.StripPrefix(pt, fs))
 
 	r.Use(loggingMiddleware)
