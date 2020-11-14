@@ -38,7 +38,7 @@ type GlobalConfig struct {
 	DBGCInterval          uint64      `yaml:"dbgc_interval"`
 
 	SupportedResponseType  []string
-	SupportedScore         []string
+	SupportedScope         []string
 	LoginResource          LoginResource
 	LoginStaticResourceURL string
 }
