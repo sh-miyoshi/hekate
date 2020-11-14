@@ -105,9 +105,10 @@ type customRoleInUser struct {
 }
 
 type device struct {
-	DeviceCode  string    `bson:"device_code"`
-	UserCode    string    `bson:"user_code"`
-	ProjectName string    `bson:"project_name"`
-	ExpiresIn   int64     `bson:"expires_in"`
-	CreatedAt   time.Time `bson:"created_at"`
+	DeviceCode     string    `bson:"device_code"`
+	UserCode       string    `bson:"user_code"`
+	ProjectName    string    `bson:"project_name"`
+	ExpiresIn      int64     `bson:"expires_in"`
+	CreatedAt      time.Time `bson:"created_at"`
+	LoginSessionID string    `bson:"login_session_id"`
 }

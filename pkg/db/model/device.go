@@ -8,11 +8,12 @@ import (
 
 // Device ...
 type Device struct {
-	DeviceCode  string
-	UserCode    string
-	ProjectName string
-	ExpiresIn   int64
-	CreatedAt   time.Time
+	DeviceCode     string
+	UserCode       string
+	ProjectName    string
+	ExpiresIn      int64
+	CreatedAt      time.Time
+	LoginSessionID string
 }
 
 // DeviceHandler ...

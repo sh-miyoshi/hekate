@@ -19,8 +19,8 @@ import (
 	"github.com/stretchr/stew/slice"
 )
 
-// DeviceHandler ...
-func DeviceHandler(w http.ResponseWriter, r *http.Request) {
+// DeviceRegisterHandler ...
+func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
@@ -76,17 +76,31 @@ func DeviceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	authReq := &oidc.AuthRequest{
+		Scope:       scope,
+		ClientID:    clientID,
+		RedirectURI: "http://localhost:8080/device/complete", // TODO
+	}
+
+	lsID, err := login.StartLoginSession(projectName, authReq)
+	if err != nil {
+		errors.Print(errors.Append(err, "Failed to start device login session"))
+		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		return
+	}
+
 	length := 8 // TODO use const value
 	deviceCode := uuid.New().String()
 	userCode := util.RandomString(length, util.CharTypeUpper)
 	expires := int64(600) // TODO set corrent value
 
 	ent := &model.Device{
-		DeviceCode:  deviceCode,
-		UserCode:    userCode,
-		ProjectName: projectName,
-		CreatedAt:   time.Now(),
-		ExpiresIn:   expires,
+		DeviceCode:     deviceCode,
+		UserCode:       userCode,
+		ProjectName:    projectName,
+		CreatedAt:      time.Now(),
+		ExpiresIn:      expires,
+		LoginSessionID: lsID,
 	}
 
 	if err := db.GetInst().DeviceAdd(projectName, ent); err != nil {
@@ -98,7 +112,7 @@ func DeviceHandler(w http.ResponseWriter, r *http.Request) {
 	res := DeviceAuthorizationResponse{
 		DeviceCode:      deviceCode,
 		UserCode:        userCode,
-		VerificationURI: "http://localhost:8080/device", // TODO set correct value
+		VerificationURI: "http://localhost:8080/project/" + projectName + "/devicelogin", // TODO set correct value
 		ExpiresIn:       int(expires),
 		Interval:        5, // TODO set correct value
 	}
@@ -107,11 +121,19 @@ func DeviceHandler(w http.ResponseWriter, r *http.Request) {
 	jwthttp.ResponseWrite(w, "DeviceHandler", &res)
 }
 
-// DeviceLoginPageHandler ...
+// DeviceLoginPageHandler return html page for input user code
 func DeviceLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
-	// TODO get error
+	// TODO get error from query
 	login.WriteDeviceLoginPage(projectName, "", w)
+}
+
+// DeviceUserCodeVerifyHandler ...
+func DeviceUserCodeVerifyHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO
+	// get user_code, projectName
+	// if ok return login page
+	w.Write([]byte("ok"))
 }

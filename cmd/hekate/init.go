@@ -65,7 +65,7 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", oidcapiv1.RevokeHandler).Methods("POST")
 
 	// OAuth
-	r.HandleFunc(basePath+"/project/{projectName}/oauth/device", oauthapiv1.DeviceHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/oauth/device", oauthapiv1.DeviceRegisterHandler).Methods("POST")
 
 	// Authenticate API
 	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
@@ -117,7 +117,9 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/audit", auditapiv1.AuditGetHandler).Methods("GET")
 
 	// Device Login HTML Page
-	r.HandleFunc("/project/{projectName}/devicelogin", oauthapiv1.DeviceLoginPageHandler).Methods("GET")
+	r.HandleFunc("/resource/project/{projectName}/devicelogin", oauthapiv1.DeviceLoginPageHandler).Methods("GET")
+	r.HandleFunc("/resource/project/{projectName}/deviceverify", oauthapiv1.DeviceUserCodeVerifyHandler).Methods("POST")
+	//r.HandleFunc("/resource/project/{projectName}/complete", oauthapiv1.DeviceCompleteHandler).Methods("GET")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {

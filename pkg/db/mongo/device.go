@@ -57,11 +57,12 @@ func NewDeviceHandler(dbClient *mongo.Client) (*DeviceHandler, *errors.Error) {
 // Add ...
 func (h *DeviceHandler) Add(projectName string, ent *model.Device) *errors.Error {
 	v := &device{
-		DeviceCode:  ent.DeviceCode,
-		UserCode:    ent.UserCode,
-		ProjectName: ent.ProjectName,
-		ExpiresIn:   ent.ExpiresIn,
-		CreatedAt:   ent.CreatedAt,
+		DeviceCode:     ent.DeviceCode,
+		UserCode:       ent.UserCode,
+		ProjectName:    ent.ProjectName,
+		ExpiresIn:      ent.ExpiresIn,
+		CreatedAt:      ent.CreatedAt,
+		LoginSessionID: ent.LoginSessionID,
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(deviceCollectionName)

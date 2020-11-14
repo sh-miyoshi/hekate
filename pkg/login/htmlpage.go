@@ -91,10 +91,11 @@ func WriteDeviceLoginPage(projectName, errMsg string, w http.ResponseWriter) {
 		return
 	}
 
+	url := "/resource/project/" + projectName + "/deviceverify"
 	d := map[string]string{
-		"StaticResourcePath": cfg.UserLoginResourceDir + "/static",
+		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
 		"Error":              errMsg,
-		"URL":                "http://localhost", // TODO
+		"URL":                url,
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
