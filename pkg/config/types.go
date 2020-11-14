@@ -37,7 +37,8 @@ type GlobalConfig struct {
 	UserLoginResourceDir  string      `yaml:"user_login_page_res"`
 	DBGCInterval          uint64      `yaml:"dbgc_interval"`
 
-	SupportedResponseType []string
-	SupportedScope        []string
-	LoginResource         LoginResource
+	SupportedResponseType  []string
+	SupportedScore         []string
+	LoginResource          LoginResource
+	LoginStaticResourceURL string
 }

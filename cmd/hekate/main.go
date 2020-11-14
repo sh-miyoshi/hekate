@@ -13,10 +13,6 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
-const (
-	authCodeUserLoginResourcePath = "/resource/login"
-)
-
 func main() {
 	// initialize config
 	if err := config.InitConfig(os.Args); err != nil {

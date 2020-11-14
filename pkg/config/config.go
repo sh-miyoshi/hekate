@@ -166,7 +166,8 @@ func InitConfig(osArgs []string) *errors.Error {
 		"code id_token token",
 		// TODO(support type "none")
 	}
-	inst.SupportedScope = []string{"openid"}
+	inst.SupportedScore = []string{"openid"}
+	inst.LoginStaticResourceURL = "/resource/login"
 
 	// Validate config
 	if err := inst.Validate(); err != nil {
