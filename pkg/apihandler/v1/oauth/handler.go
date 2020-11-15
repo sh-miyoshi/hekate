@@ -76,10 +76,12 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	url := "http://localhost:18443/resource/project/" + projectName + "/devicecomplete" // TODO
 	authReq := &oidc.AuthRequest{
-		Scope:       scope,
-		ClientID:    clientID,
-		RedirectURI: "http://localhost:8080/device/complete", // TODO
+		Scope:        scope,
+		ClientID:     clientID,
+		RedirectURI:  url,
+		ResponseMode: "query",
 	}
 
 	lsID, err := login.StartLoginSession(projectName, authReq)
