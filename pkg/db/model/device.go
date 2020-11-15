@@ -16,12 +16,18 @@ type Device struct {
 	LoginSessionID string
 }
 
+// DeviceFilter ...
+type DeviceFilter struct {
+	DeviceCode string
+	UserCode   string
+}
+
 // DeviceHandler ...
 type DeviceHandler interface {
 	Add(projectName string, ent *Device) *errors.Error
 	DeleteAll(projectName string) *errors.Error
 	Cleanup(now time.Time) *errors.Error
-
+	GetList(projectName string, filter *DeviceFilter) ([]*Device, *errors.Error)
 	// TODO add other methods
 }
 

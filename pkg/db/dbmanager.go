@@ -925,6 +925,12 @@ func (m *Manager) DeviceAdd(projectName string, ent *model.Device) *errors.Error
 	})
 }
 
+// DeviceGetList ...
+func (m *Manager) DeviceGetList(projectName string, filter *model.DeviceFilter) ([]*model.Device, *errors.Error) {
+	// TODO validate filter
+	return m.device.GetList(projectName, filter)
+}
+
 // DeleteExpiredSessions ...
 func (m *Manager) DeleteExpiredSessions() *errors.Error {
 	now := time.Now()

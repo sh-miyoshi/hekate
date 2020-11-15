@@ -49,3 +49,46 @@ func (h *DeviceHandler) Cleanup(now time.Time) *errors.Error {
 	h.devices = newList
 	return nil
 }
+
+// GetList ...
+func (h *DeviceHandler) GetList(projectName string, filter *model.DeviceFilter) ([]*model.Device, *errors.Error) {
+	res := []*model.Device{}
+
+	for _, role := range h.devices {
+		if role.ProjectName == projectName {
+			res = append(res, role)
+		}
+	}
+
+	if filter != nil {
+		res = matchFilterDeviceList(res, projectName, filter)
+	}
+
+	return res, nil
+}
+
+// matchFilterDeviceList returns a list which matches the filter rules
+func matchFilterDeviceList(data []*model.Device, projectName string, filter *model.DeviceFilter) []*model.Device {
+	if filter == nil {
+		return data
+	}
+	res := []*model.Device{}
+
+	for _, d := range data {
+		if projectName == d.ProjectName {
+			if filter.DeviceCode != "" && d.DeviceCode != filter.DeviceCode {
+				// missmatch device code
+				continue
+			}
+
+			if filter.UserCode != "" && d.UserCode != filter.UserCode {
+				// missmatch device code
+				continue
+			}
+		}
+
+		res = append(res, d)
+	}
+
+	return res
+}

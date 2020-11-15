@@ -112,3 +112,48 @@ func (h *DeviceHandler) Cleanup(now time.Time) *errors.Error {
 
 	return nil
 }
+
+// GetList ...
+func (h *DeviceHandler) GetList(projectName string, filter *model.DeviceFilter) ([]*model.Device, *errors.Error) {
+	col := h.dbClient.Database(databaseName).Collection(deviceCollectionName)
+
+	f := bson.D{
+		{Key: "project_name", Value: projectName},
+	}
+
+	if filter != nil {
+		if filter.DeviceCode != "" {
+			f = append(f, bson.E{Key: "device_code", Value: filter.DeviceCode})
+		}
+		if filter.UserCode != "" {
+			f = append(f, bson.E{Key: "user_code", Value: filter.UserCode})
+		}
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	cursor, err := col.Find(ctx, f)
+	if err != nil {
+		return nil, errors.New("DB failed", "Failed to get device list from mongodb: %v", err)
+	}
+
+	devices := []device{}
+	if err := cursor.All(ctx, &devices); err != nil {
+		return nil, errors.New("DB failed", "Failed to get device list from mongodb: %v", err)
+	}
+
+	res := []*model.Device{}
+	for _, ent := range devices {
+		res = append(res, &model.Device{
+			DeviceCode:     ent.DeviceCode,
+			UserCode:       ent.UserCode,
+			ProjectName:    ent.ProjectName,
+			ExpiresIn:      ent.ExpiresIn,
+			CreatedAt:      ent.CreatedAt,
+			LoginSessionID: ent.LoginSessionID,
+		})
+	}
+
+	return res, nil
+}

@@ -112,7 +112,7 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 	res := DeviceAuthorizationResponse{
 		DeviceCode:      deviceCode,
 		UserCode:        userCode,
-		VerificationURI: "http://localhost:8080/project/" + projectName + "/devicelogin", // TODO set correct value
+		VerificationURI: "http://localhost:18443/resource/project/" + projectName + "/devicelogin", // TODO set correct value
 		ExpiresIn:       int(expires),
 		Interval:        5, // TODO set correct value
 	}
@@ -132,8 +132,26 @@ func DeviceLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // DeviceUserCodeVerifyHandler ...
 func DeviceUserCodeVerifyHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO
-	// get user_code, projectName
-	// if ok return login page
-	w.Write([]byte("ok"))
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	if err := r.ParseForm(); err != nil {
+		logger.Info("Failed to parse form: %v", err)
+		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
+		return
+	}
+	userCode := r.Form.Get("code")
+	devices, err := db.GetInst().DeviceGetList(projectName, &model.DeviceFilter{UserCode: userCode})
+	if err != nil {
+		errors.Print(errors.Append(err, "Failed to get device"))
+		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		return
+	}
+	if len(devices) == 0 {
+		logger.Info("No valid device for user code: %s", userCode)
+		login.WriteDeviceLoginPage(projectName, "The code is invalid", w)
+		return
+	}
+
+	// ok to verify user code, next is user authentication
+	login.WriteUserLoginPage(projectName, devices[0].LoginSessionID, "", "", w)
 }
