@@ -1,6 +1,9 @@
 package util
 
-import "math/rand"
+import (
+	"crypto/rand"
+	"math/big"
+)
 
 const (
 	// CharTypeDigit ...
@@ -30,7 +33,8 @@ func RandomString(n int, typ uint) string {
 
 	b := make([]byte, n)
 	for i := 0; i < n; i++ {
-		b[i] += letter[rand.Intn(len(letter))]
+		n, _ := rand.Int(rand.Reader, big.NewInt(int64(len(letter))))
+		b[i] += letter[n.Int64()]
 	}
 	return string(b)
 }
