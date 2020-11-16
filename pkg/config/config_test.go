@@ -98,6 +98,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	errorFile := filepath.Join(dir, "error.html")
 	indexFile := filepath.Join(dir, "index.html")
 	deviceFile := filepath.Join(dir, "devicelogin.html")
+	deviceCompFile := filepath.Join(dir, "devicelogin_complete.html")
 	data := []byte("data")
 
 	// Test no consent page
@@ -108,6 +109,7 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	}
 	ioutil.WriteFile(indexFile, data, 0644)
 	ioutil.WriteFile(deviceFile, data, 0644)
+	ioutil.WriteFile(deviceCompFile, data, 0644)
 	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no consent page")
 	}
@@ -119,45 +121,66 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	}
 	os.Remove(indexFile)
 	os.Remove(deviceFile)
+	os.Remove(deviceCompFile)
 
 	// Test no error page
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(indexFile, data, 0644)
 	ioutil.WriteFile(deviceFile, data, 0644)
+	ioutil.WriteFile(deviceCompFile, data, 0644)
 	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no error page")
 	}
 	os.Remove(consentFile)
 	os.Remove(indexFile)
 	os.Remove(deviceFile)
+	os.Remove(deviceCompFile)
 
 	// Test no login page
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(errorFile, data, 0644)
 	ioutil.WriteFile(deviceFile, data, 0644)
+	ioutil.WriteFile(deviceCompFile, data, 0644)
 	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no login page")
 	}
 	os.Remove(consentFile)
 	os.Remove(errorFile)
 	os.Remove(deviceFile)
+	os.Remove(deviceCompFile)
 
 	// Test no device login page
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(errorFile, data, 0644)
 	ioutil.WriteFile(indexFile, data, 0644)
+	ioutil.WriteFile(deviceCompFile, data, 0644)
 	if err := c.setLoginResource(); err == nil {
 		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no device login page")
 	}
 	os.Remove(consentFile)
 	os.Remove(errorFile)
 	os.Remove(indexFile)
+	os.Remove(deviceCompFile)
+
+	// Test no device login complete page
+	ioutil.WriteFile(consentFile, data, 0644)
+	ioutil.WriteFile(errorFile, data, 0644)
+	ioutil.WriteFile(indexFile, data, 0644)
+	ioutil.WriteFile(deviceFile, data, 0644)
+	if err := c.setLoginResource(); err == nil {
+		t.Errorf("CheckLoginResDirStruct returns nil, but expect is no device login complete page")
+	}
+	os.Remove(consentFile)
+	os.Remove(errorFile)
+	os.Remove(indexFile)
+	os.Remove(deviceFile)
 
 	// Test ok
 	ioutil.WriteFile(consentFile, data, 0644)
 	ioutil.WriteFile(errorFile, data, 0644)
 	ioutil.WriteFile(indexFile, data, 0644)
 	ioutil.WriteFile(deviceFile, data, 0644)
+	ioutil.WriteFile(deviceCompFile, data, 0644)
 	if err := c.setLoginResource(); err != nil {
 		t.Errorf("CheckLoginResDirStruct returns error %v, but expect is nil", err)
 	}
@@ -165,4 +188,5 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	os.Remove(errorFile)
 	os.Remove(indexFile)
 	os.Remove(deviceFile)
+	os.Remove(deviceCompFile)
 }
