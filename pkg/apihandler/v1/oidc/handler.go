@@ -37,7 +37,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	grantTypes := []string{}
 	for _, t := range prj.AllowGrantTypes {
-		grantTypes = append(grantTypes, t.String())
+		grantTypes = append(grantTypes, string(t))
 	}
 
 	cfg := config.Get()
@@ -184,10 +184,6 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		code := r.Form.Get("code")
 		codeVerifier := r.Form.Get("code_verifier")
 		tkn, err = authn.ReqAuthByCode(project, clientID, code, codeVerifier, r)
-	default:
-		logger.Info("Unexpected grant type got: %s", gt.String())
-		errors.WriteOAuthError(w, errors.ErrServerError, state)
-		return
 	}
 
 	if err != nil {

@@ -84,7 +84,7 @@ func (h *ProjectInfoHandler) Add(ent *model.ProjectInfo) *errors.Error {
 		},
 	}
 	for _, t := range ent.AllowGrantTypes {
-		v.AllowGrantTypes = append(v.AllowGrantTypes, t.String())
+		v.AllowGrantTypes = append(v.AllowGrantTypes, string(t))
 	}
 
 	col := h.dbClient.Database(databaseName).Collection(projectCollectionName)
@@ -169,8 +169,7 @@ func (h *ProjectInfoHandler) GetList(filter *model.ProjectFilter) ([]*model.Proj
 			},
 		}
 		for _, t := range prj.AllowGrantTypes {
-			typ, _ := model.GetGrantType(t)
-			info.AllowGrantTypes = append(info.AllowGrantTypes, typ)
+			info.AllowGrantTypes = append(info.AllowGrantTypes, model.GrantType(t))
 		}
 		res = append(res, info)
 	}
@@ -212,7 +211,7 @@ func (h *ProjectInfoHandler) Update(ent *model.ProjectInfo) *errors.Error {
 		},
 	}
 	for _, t := range ent.AllowGrantTypes {
-		v.AllowGrantTypes = append(v.AllowGrantTypes, t.String())
+		v.AllowGrantTypes = append(v.AllowGrantTypes, string(t))
 	}
 
 	updates := bson.D{

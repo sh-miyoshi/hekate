@@ -8,14 +8,7 @@ import (
 )
 
 // GrantType ...
-type GrantType struct {
-	value string
-}
-
-// String method returns a name of grant type
-func (t GrantType) String() string {
-	return t.value
-}
+type GrantType string
 
 // CharacterType ...
 type CharacterType string
@@ -95,13 +88,13 @@ var (
 	// Grant Types
 
 	// GrantTypeClientCredentials ...
-	GrantTypeClientCredentials = GrantType{"client_credentials"}
+	GrantTypeClientCredentials = GrantType("client_credentials")
 	// GrantTypeAuthorizationCode ...
-	GrantTypeAuthorizationCode = GrantType{"authorization_code"}
+	GrantTypeAuthorizationCode = GrantType("authorization_code")
 	// GrantTypeRefreshToken ...
-	GrantTypeRefreshToken = GrantType{"refresh_token"}
+	GrantTypeRefreshToken = GrantType("refresh_token")
 	// GrantTypePassword ...
-	GrantTypePassword = GrantType{"password"}
+	GrantTypePassword = GrantType("password")
 
 	// Character Types
 
@@ -159,18 +152,16 @@ func (p *ProjectInfo) Validate() *errors.Error {
 
 // GetGrantType ...
 func GetGrantType(str string) (GrantType, *errors.Error) {
-	if str == GrantTypeClientCredentials.String() {
+	switch GrantType(str) {
+	case GrantTypeClientCredentials:
 		return GrantTypeClientCredentials, nil
-	}
-	if str == GrantTypeAuthorizationCode.String() {
+	case GrantTypeAuthorizationCode:
 		return GrantTypeAuthorizationCode, nil
-	}
-	if str == GrantTypeRefreshToken.String() {
+	case GrantTypeRefreshToken:
 		return GrantTypeRefreshToken, nil
-	}
-	if str == GrantTypePassword.String() {
+	case GrantTypePassword:
 		return GrantTypePassword, nil
 	}
 
-	return GrantType{}, errors.New("No such grant type", "No such grant type")
+	return GrantType(""), errors.New("No such grant type", "No such grant type")
 }
