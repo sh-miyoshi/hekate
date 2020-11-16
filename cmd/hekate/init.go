@@ -23,6 +23,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/login"
 	defaultrole "github.com/sh-miyoshi/hekate/pkg/role"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
@@ -119,7 +120,9 @@ func setAPI(r *mux.Router) {
 	// Device Login HTML Page
 	r.HandleFunc("/resource/project/{projectName}/devicelogin", oauthapiv1.DeviceLoginPageHandler).Methods("GET")
 	r.HandleFunc("/resource/project/{projectName}/deviceverify", oauthapiv1.DeviceUserCodeVerifyHandler).Methods("POST")
-	//r.HandleFunc("/resource/project/{projectName}/complete", oauthapiv1.DeviceCompleteHandler).Methods("GET")
+	r.HandleFunc("/resource/project/{projectName}/devicecomplete", func(w http.ResponseWriter, r *http.Request) {
+		login.WriteDeviceLoginCompletePage(w)
+	}).Methods("GET")
 
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {

@@ -77,6 +77,10 @@ func (c *GlobalConfig) setLoginResource() *errors.Error {
 	if _, err := os.Stat(c.LoginResource.DeviceLoginPage); err != nil {
 		return errors.New(pubMsg, "Failed to get device login page: %v", err)
 	}
+	c.LoginResource.DeviceLoginCompletePage = path.Join(dir, "devicelogin_complete.html")
+	if _, err := os.Stat(c.LoginResource.DeviceLoginCompletePage); err != nil {
+		return errors.New(pubMsg, "Failed to get device login complete page: %v", err)
+	}
 	// static directory is option, so does not require check
 
 	return nil

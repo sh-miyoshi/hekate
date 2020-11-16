@@ -15,10 +15,11 @@ type HTTPSConfig struct {
 
 // LoginResource ...
 type LoginResource struct {
-	IndexPage       string
-	ErrorPage       string
-	ConsentPage     string
-	DeviceLoginPage string
+	IndexPage               string
+	ErrorPage               string
+	ConsentPage             string
+	DeviceLoginPage         string
+	DeviceLoginCompletePage string
 }
 
 // GlobalConfig ...
