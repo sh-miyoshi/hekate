@@ -28,12 +28,14 @@ type DeviceHandler interface {
 	DeleteAll(projectName string) *errors.Error
 	Cleanup(now time.Time) *errors.Error
 	GetList(projectName string, filter *DeviceFilter) ([]*Device, *errors.Error)
-	// TODO add other methods
+	Delete(projectName string, deviceCode string) *errors.Error
 }
 
 var (
 	// ErrDeviceValidateFailed ...
 	ErrDeviceValidateFailed = errors.New("Device validation failed", "Device validation failed")
+	// ErrNoSuchDevice ...
+	ErrNoSuchDevice = errors.New("No such device", "No such device")
 )
 
 // Validate ...

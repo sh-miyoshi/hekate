@@ -925,6 +925,27 @@ func (m *Manager) DeviceAdd(projectName string, ent *model.Device) *errors.Error
 	})
 }
 
+// DeviceDelete ...
+func (m *Manager) DeviceDelete(projectName string, deviceCode string) *errors.Error {
+	// TODO validate deviceCode
+
+	return m.transaction.Transaction(func() *errors.Error {
+		devices, err := m.device.GetList(projectName, &model.DeviceFilter{DeviceCode: deviceCode})
+		if err != nil {
+			return errors.Append(err, "Failed to get current device list")
+		}
+		if len(devices) == 0 {
+			return model.ErrNoSuchDevice
+		}
+
+		if err := m.device.Delete(projectName, deviceCode); err != nil {
+			return errors.Append(err, "Failed to delete device")
+		}
+
+		return nil
+	})
+}
+
 // DeviceGetList ...
 func (m *Manager) DeviceGetList(projectName string, filter *model.DeviceFilter) ([]*model.Device, *errors.Error) {
 	// TODO validate filter

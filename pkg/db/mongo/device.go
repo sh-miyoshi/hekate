@@ -157,3 +157,21 @@ func (h *DeviceHandler) GetList(projectName string, filter *model.DeviceFilter) 
 
 	return res, nil
 }
+
+// Delete ...
+func (h *DeviceHandler) Delete(projectName string, deviceCode string) *errors.Error {
+	col := h.dbClient.Database(databaseName).Collection(deviceCollectionName)
+	filter := bson.D{
+		{Key: "project_name", Value: projectName},
+		{Key: "device_code", Value: deviceCode},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)
+	defer cancel()
+
+	_, err := col.DeleteOne(ctx, filter)
+	if err != nil {
+		return errors.New("DB failed", "Failed to delete device from mongodb: %v", err)
+	}
+	return nil
+}

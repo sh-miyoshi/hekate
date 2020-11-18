@@ -67,6 +67,25 @@ func (h *DeviceHandler) GetList(projectName string, filter *model.DeviceFilter) 
 	return res, nil
 }
 
+// Delete ...
+func (h *DeviceHandler) Delete(projectName string, deviceCode string) *errors.Error {
+	newList := []*model.Device{}
+	found := false
+	for _, d := range h.devices {
+		if d.ProjectName == projectName && d.DeviceCode == deviceCode {
+			found = true
+		} else {
+			newList = append(newList, d)
+		}
+	}
+
+	if found {
+		h.devices = newList
+		return nil
+	}
+	return errors.New("Internal Error", "No such device %s", deviceCode)
+}
+
 // matchFilterDeviceList returns a list which matches the filter rules
 func matchFilterDeviceList(data []*model.Device, projectName string, filter *model.DeviceFilter) []*model.Device {
 	if filter == nil {
