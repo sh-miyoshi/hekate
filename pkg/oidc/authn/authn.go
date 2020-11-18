@@ -161,6 +161,48 @@ func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *
 	})
 }
 
+// ReqAuthByDeviceCode ...
+func ReqAuthByDeviceCode(project *model.ProjectInfo, clientID string, deviceCode string, r *http.Request) (*oidc.TokenResponse, *errors.Error) {
+	devices, err := db.GetInst().DeviceGetList(project.Name, &model.DeviceFilter{DeviceCode: deviceCode})
+	if err != nil {
+		return nil, errors.Append(err, "Get device failed")
+	}
+	if len(devices) == 0 {
+		return nil, errors.ErrInvalidRequest
+	}
+
+	device := devices[0]
+
+	// get login session
+	s, err := db.GetInst().LoginSessionGet(project.Name, device.LoginSessionID)
+	if err != nil {
+		return nil, errors.Append(err, "Failed to get login session info")
+	}
+	if s.LoginDate.IsZero() {
+		logger.Debug("user is not logged in yet")
+		return nil, errors.ErrAuthorizationPending
+	}
+
+	// user already logged in, so delete login session and return token
+	if err := db.GetInst().DeviceDelete(project.Name, device.DeviceCode); err != nil {
+		return nil, errors.Append(err, "Failed to delete device")
+	}
+
+	if time.Now().After(s.ExpiresDate) {
+		logger.Info("the device session was already expired")
+		return nil, errors.ErrExpiredToken
+	}
+
+	audiences := []string{
+		clientID,
+	}
+	return genTokenRes("", project, r, option{
+		audiences:       audiences,
+		genRefreshToken: true,
+		endUserAuthTime: s.LoginDate,
+	})
+}
+
 func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*oidc.TokenResponse, *errors.Error) {
 	// Generate JWT Token
 	res := oidc.TokenResponse{

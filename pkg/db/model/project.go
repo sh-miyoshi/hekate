@@ -95,6 +95,8 @@ var (
 	GrantTypeRefreshToken = GrantType("refresh_token")
 	// GrantTypePassword ...
 	GrantTypePassword = GrantType("password")
+	// GrantTypeDevice ...
+	GrantTypeDevice = GrantType("urn:ietf:params:oauth:grant-type:device_code")
 
 	// Character Types
 
@@ -161,6 +163,8 @@ func GetGrantType(str string) (GrantType, *errors.Error) {
 		return GrantTypeRefreshToken, nil
 	case GrantTypePassword:
 		return GrantTypePassword, nil
+	case GrantTypeDevice:
+		return GrantTypeDevice, nil
 	}
 
 	return GrantType(""), errors.New("No such grant type", "No such grant type")

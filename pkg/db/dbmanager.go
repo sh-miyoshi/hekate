@@ -938,6 +938,9 @@ func (m *Manager) DeviceDelete(projectName string, deviceCode string) *errors.Er
 			return model.ErrNoSuchDevice
 		}
 
+		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{SessionID: devices[0].LoginSessionID}); err != nil {
+			return errors.Append(err, "Failed to delete login session")
+		}
 		if err := m.device.Delete(projectName, deviceCode); err != nil {
 			return errors.Append(err, "Failed to delete device")
 		}

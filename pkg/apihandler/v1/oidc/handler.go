@@ -184,6 +184,9 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		code := r.Form.Get("code")
 		codeVerifier := r.Form.Get("code_verifier")
 		tkn, err = authn.ReqAuthByCode(project, clientID, code, codeVerifier, r)
+	case model.GrantTypeDevice:
+		deviceCode := r.Form.Get("device_code")
+		tkn, err = authn.ReqAuthByDeviceCode(project, clientID, deviceCode, r)
 	}
 
 	if err != nil {
