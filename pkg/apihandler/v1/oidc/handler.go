@@ -162,6 +162,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if ok := slice.Contains(project.AllowGrantTypes, gt); !ok {
 		logger.Info("Grant Type %s is not in allowed list %v", gtStr, project.AllowGrantTypes)
 		errors.WriteOAuthError(w, errors.ErrUnsupportedGrantType, state)
+		return
 	}
 
 	switch gt {

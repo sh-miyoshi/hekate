@@ -174,6 +174,7 @@ func ReqAuthByDeviceCode(project *model.ProjectInfo, clientID string, deviceCode
 	device := devices[0]
 
 	// get login session
+	logger.Debug("login session ID of device authentication: %s", device.LoginSessionID)
 	s, err := db.GetInst().LoginSessionGet(project.Name, device.LoginSessionID)
 	if err != nil {
 		return nil, errors.Append(err, "Failed to get login session info")
@@ -196,7 +197,7 @@ func ReqAuthByDeviceCode(project *model.ProjectInfo, clientID string, deviceCode
 	audiences := []string{
 		clientID,
 	}
-	return genTokenRes("", project, r, option{
+	return genTokenRes(s.UserID, project, r, option{
 		audiences:       audiences,
 		genRefreshToken: true,
 		endUserAuthTime: s.LoginDate,

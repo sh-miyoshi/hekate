@@ -127,7 +127,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ok := slice.Contains(s.ResponseType, "code"); !ok {
+	if ok := slice.Contains(s.ResponseType, "code"); !ok && len(s.ResponseType) > 0 {
 		// delete session
 		err = errors.New("Session end", "Session end")
 	} else {

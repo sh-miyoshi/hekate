@@ -160,6 +160,7 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 			model.GrantTypeAuthorizationCode,
 			model.GrantTypeClientCredentials,
 			model.GrantTypeRefreshToken,
+			model.GrantTypeDevice,
 			model.GrantTypePassword, // TODO(for debug)
 		},
 		UserLock: model.UserLock{
