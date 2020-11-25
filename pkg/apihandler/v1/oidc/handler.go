@@ -37,7 +37,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	grantTypes := []string{}
 	for _, t := range prj.AllowGrantTypes {
-		grantTypes = append(grantTypes, t.String())
+		grantTypes = append(grantTypes, string(t))
 	}
 
 	cfg := config.Get()
@@ -47,7 +47,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 		TokenEndpoint:          issuer + "/openid-connect/token",
 		UserinfoEndpoint:       issuer + "/openid-connect/userinfo",
 		JwksURI:                issuer + "/openid-connect/certs",
-		ScopesSupported:        cfg.SupportedScore,
+		ScopesSupported:        cfg.SupportedScope,
 		ResponseTypesSupported: cfg.SupportedResponseType,
 		SubjectTypesSupported:  []string{"public"},
 		IDTokenSigningAlgValuesSupported: []string{
@@ -162,6 +162,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if ok := slice.Contains(project.AllowGrantTypes, gt); !ok {
 		logger.Info("Grant Type %s is not in allowed list %v", gtStr, project.AllowGrantTypes)
 		errors.WriteOAuthError(w, errors.ErrUnsupportedGrantType, state)
+		return
 	}
 
 	switch gt {
@@ -184,10 +185,9 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		code := r.Form.Get("code")
 		codeVerifier := r.Form.Get("code_verifier")
 		tkn, err = authn.ReqAuthByCode(project, clientID, code, codeVerifier, r)
-	default:
-		logger.Info("Unexpected grant type got: %s", gt.String())
-		errors.WriteOAuthError(w, errors.ErrServerError, state)
-		return
+	case model.GrantTypeDevice:
+		deviceCode := r.Form.Get("device_code")
+		tkn, err = authn.ReqAuthByDeviceCode(project, clientID, deviceCode, r)
 	}
 
 	if err != nil {

@@ -24,7 +24,7 @@
 | DB接続文字列 | db.connection_string | HEKATE_DB_CONNECT_STRING | db-conn-str | DBに接続するための接続文字列 |
 | 監査ログのDBタイプ | audit_db.type | HEKATE_AUDIT_DB_TYPE | audit-db-type | 監査ログのDBのタイプ。設定されていない場合はDBタイプと同様のDBを使用する |
 | 監査ログのDB接続文字列 | audit_db.connection_string | HEKATE_AUDIT_DB_CONNECT_STRING | audit-db-conn-str | 監査ログのDBに接続する際の文字列。監査ログのDbタイプが設定されてない場合は無視される |
-|| login_session_expires_time | HEKATE_LOGIN_SESSION_EXPIRES_TIME | login-session-expires ||
-|| sso_expires_time | HEKATE_SSO_EXPIRES_TIME | sso-expires ||
+| ログインセッション有効期限 | login_session_expires_in | HEKATE_LOGIN_SESSION_EXPIRES_IN | login-session-expires | ログインのためのセッションが切れる時間(秒) |
+| シングルサインオン有効期限 | sso_expires_in | HEKATE_SSO_EXPIRES_IN | sso-expires | シングルサインオンの有効期限(秒) |
 | ログインページリソースパス | user_login_page_res | HEKATE_LOGIN_PAGE_RES | login-res | ユーザーログインページのリソースへのパス |
 | DBGCのインターバル | dbgc_interval | HEKATE_DBGC_INTERVAL | dbgc-interval | 期限切れのsessionを削除するためのGC(Garbage Collector)を動作させる間隔 |

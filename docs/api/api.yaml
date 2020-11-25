@@ -216,6 +216,33 @@ paths:
           description: "unsupported token type"
         '500':
           description: "Internal server error"
+  '/api/v1/project/{projectName}/oauth/device':
+    post:
+      summary: "Device Authorization Endpoint"
+      tags:
+        - oauth
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeviceAuthorizationRequest'
+      responses:
+        '200':
+          description: "Return Device Authorization Response"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAuthorizationResponse'
+        '400':
+          description: "Invalid request"
+        '500':
+          description: "Internal server error"
   '/api/v1/project/{projectName}/authn/login':
     post:
       summary: "Login to hekate"
@@ -260,6 +287,27 @@ paths:
           description: "Return error page"
         '302':
           description: "Return error or success to callback URL"
+  '/api/v1/project/{projectName}/authn/devicelogin':
+    post:
+      summary: "Device Authentication Endpoint"
+      tags:
+        - authentication
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DeviceLoginRequest'
+      responses:
+        '200':
+          description: "Return ok page or error page or consent page"
+        '500':
+          description: "Internal server error"
   '/api/v1/project':
     post:
       summary: "Create Project"
@@ -1491,4 +1539,38 @@ components:
         success:
           type: boolean
         message:
+          type: string
+    DeviceAuthorizationRequest:
+      type: object
+      properties:
+        scope:
+          type: string
+        client_id:
+          type: string
+    DeviceAuthorizationResponse:
+      type: object
+      properties:
+        device_code:
+          type: string
+        user_code:
+          type: string
+        verification_uri:
+          type: string
+        verification_uri_complete:
+          type: string
+        expires_in:
+          type: integer
+          description: "The lifetime in seconds of the 'device_code' and 'user_code'"
+        interval:
+          type: integer
+    DeviceLoginRequest:
+      type: object
+      properties:
+        login_verify_code:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        user_code:
           type: string

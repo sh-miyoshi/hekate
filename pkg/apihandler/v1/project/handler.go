@@ -36,7 +36,7 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	for _, prj := range projects {
 		grantTypes := []string{}
 		for _, t := range prj.AllowGrantTypes {
-			grantTypes = append(grantTypes, t.String())
+			grantTypes = append(grantTypes, string(t))
 		}
 
 		res = append(res, ProjectGetResponse{
@@ -251,7 +251,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	grantTypes := []string{}
 	for _, t := range project.AllowGrantTypes {
-		grantTypes = append(grantTypes, t.String())
+		grantTypes = append(grantTypes, string(t))
 	}
 
 	// Return Response

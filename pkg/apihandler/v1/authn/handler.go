@@ -127,7 +127,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ok := slice.Contains(s.ResponseType, "code"); !ok {
+	if ok := slice.Contains(s.ResponseType, "code"); !ok && len(s.ResponseType) > 0 {
 		// delete session
 		err = errors.New("Session end", "Session end")
 	} else {
@@ -200,4 +200,9 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Info("Invalid select type %s. consent page maybe broken.", sel)
 		login.WriteErrorPage("Request failed. internal server error occuerd", w)
 	}
+}
+
+// DeviceLoginHandler ...
+func DeviceLoginHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO implement this
 }

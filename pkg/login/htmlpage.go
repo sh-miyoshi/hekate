@@ -79,3 +79,44 @@ func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWrite
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
 	tpl.Execute(w, d)
 }
+
+// WriteDeviceLoginPage ...
+func WriteDeviceLoginPage(projectName, errMsg string, w http.ResponseWriter) {
+	cfg := config.Get()
+
+	tpl, err := template.ParseFiles(cfg.LoginResource.DeviceLoginPage)
+	if err != nil {
+		logger.Error("Failed to parse template: %v", err)
+		errors.WriteHTTPError(w, "Page Broken", errors.New("User Device Login Page maybe broken", ""), http.StatusInternalServerError)
+		return
+	}
+
+	url := "/resource/project/" + projectName + "/deviceverify"
+	d := map[string]string{
+		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
+		"Error":              errMsg,
+		"URL":                url,
+	}
+
+	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
+	tpl.Execute(w, d)
+}
+
+// WriteDeviceLoginCompletePage ...
+func WriteDeviceLoginCompletePage(w http.ResponseWriter) {
+	cfg := config.Get()
+
+	tpl, err := template.ParseFiles(cfg.LoginResource.DeviceLoginCompletePage)
+	if err != nil {
+		logger.Error("Failed to parse template: %v", err)
+		errors.WriteHTTPError(w, "Page Broken", errors.New("User Device Login Complete Page maybe broken", ""), http.StatusInternalServerError)
+		return
+	}
+
+	d := map[string]string{
+		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
+	}
+
+	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
+	tpl.Execute(w, d)
+}

@@ -33,12 +33,6 @@ var (
 		httpResponseCode: http.StatusBadRequest,
 	}
 
-	// ErrAccessDenied ...
-	ErrAccessDenied = &Error{
-		publicMsg:        "access_denied",
-		httpResponseCode: http.StatusForbidden,
-	}
-
 	// ErrUnsupportedResponseType ...
 	ErrUnsupportedResponseType = &Error{
 		publicMsg:        "unsupported_response_type",
@@ -150,6 +144,34 @@ var (
 	// ErrUnsupportedTokenType ...
 	ErrUnsupportedTokenType = &Error{
 		publicMsg:        "unsupported_token_type",
+		httpResponseCode: http.StatusBadRequest,
+	}
+
+	//-------------------------------------
+	// RFC 8628
+	//-------------------------------------
+
+	// ErrAuthorizationPending ...
+	ErrAuthorizationPending = &Error{
+		publicMsg:        "authorization_pending",
+		httpResponseCode: http.StatusBadRequest,
+	}
+
+	// ErrSlowDown ...
+	ErrSlowDown = &Error{
+		publicMsg:        "slow_down",
+		httpResponseCode: http.StatusBadRequest,
+	}
+
+	// ErrAccessDenied ...
+	ErrAccessDenied = &Error{
+		publicMsg:        "access_denied",
+		httpResponseCode: http.StatusBadRequest,
+	}
+
+	// ErrExpiredToken ...
+	ErrExpiredToken = &Error{
+		publicMsg:        "expired_token",
 		httpResponseCode: http.StatusBadRequest,
 	}
 

@@ -66,8 +66,8 @@ func (h *SessionHandler) GetList(projectName string, filter *model.SessionFilter
 func (h *SessionHandler) Cleanup(now time.Time) *errors.Error {
 	newList := []*model.Session{}
 	for _, s := range h.sessionList {
-		t := time.Unix(s.ExpiresIn, 0)
-		if now.After(t) {
+		expire := s.CreatedAt.Add(time.Second * time.Duration(s.ExpiresIn))
+		if now.Before(expire) {
 			newList = append(newList, s)
 		}
 	}

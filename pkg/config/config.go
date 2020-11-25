@@ -28,11 +28,11 @@ func (c *GlobalConfig) Validate() *errors.Error {
 		return errors.New("Invalid config", "admin password is empty")
 	}
 
-	if c.LoginSessionExpiresTime == 0 {
+	if c.LoginSessionExpiresIn == 0 {
 		return errors.New("Invalid config", "login session expires time is 0")
 	}
 
-	if c.SSOExpiresTime == 0 {
+	if c.SSOExpiresIn == 0 {
 		return errors.New("Invalid config", "sso expires time is 0")
 	}
 
@@ -72,6 +72,14 @@ func (c *GlobalConfig) setLoginResource() *errors.Error {
 	c.LoginResource.IndexPage = path.Join(dir, "/index.html")
 	if _, err := os.Stat(c.LoginResource.IndexPage); err != nil {
 		return errors.New(pubMsg, "Failed to get login page: %v", err)
+	}
+	c.LoginResource.DeviceLoginPage = path.Join(dir, "/devicelogin.html")
+	if _, err := os.Stat(c.LoginResource.DeviceLoginPage); err != nil {
+		return errors.New(pubMsg, "Failed to get device login page: %v", err)
+	}
+	c.LoginResource.DeviceLoginCompletePage = path.Join(dir, "devicelogin_complete.html")
+	if _, err := os.Stat(c.LoginResource.DeviceLoginCompletePage); err != nil {
+		return errors.New(pubMsg, "Failed to get device login complete page: %v", err)
 	}
 	// static directory is option, so does not require check
 
@@ -115,10 +123,10 @@ func InitConfig(osArgs []string) *errors.Error {
 	setEnvVar("HEKATE_AUDIT_DB_TYPE", &inst.AuditDB.Type)
 	setEnvVar("HEKATE_AUDIT_DB_CONNECT_STRING", &inst.AuditDB.ConnectionString)
 	setEnvVar("HEKATE_LOGIN_PAGE_RES", &inst.UserLoginResourceDir)
-	if err := setEnvUint("HEKATE_LOGIN_SESSION_EXPIRES_TIME", &inst.LoginSessionExpiresTime); err != nil {
+	if err := setEnvUint("HEKATE_LOGIN_SESSION_EXPIRES_IN", &inst.LoginSessionExpiresIn); err != nil {
 		return errors.New("Invalid os env", "Failed to get login session expires time: %v", err)
 	}
-	if err := setEnvUint("HEKATE_SSO_EXPIRES_TIME", &inst.SSOExpiresTime); err != nil {
+	if err := setEnvUint("HEKATE_SSO_EXPIRES_IN", &inst.SSOExpiresIn); err != nil {
 		return errors.New("Invalid os env", "Failed to get sso expires time: %v", err)
 	}
 	setEnvVar("HEKATE_LOGIN_PAGE_RES", &inst.UserLoginResourceDir)
@@ -145,8 +153,8 @@ func InitConfig(osArgs []string) *errors.Error {
 	flag.StringVar(&inst.DB.ConnectionString, "db-conn-str", inst.DB.ConnectionString, "database connection string")
 	flag.StringVar(&inst.AuditDB.Type, "audit-db-type", inst.AuditDB.Type, "type of audit events database")
 	flag.StringVar(&inst.AuditDB.ConnectionString, "audit-db-conn-str", inst.AuditDB.ConnectionString, "audit database connection string")
-	flag.Uint64Var(&inst.LoginSessionExpiresTime, "login-session-expires", inst.LoginSessionExpiresTime, "expires time of login session [sec]")
-	flag.Uint64Var(&inst.SSOExpiresTime, "sso-expires", inst.SSOExpiresTime, "expires time of single sign on [sec]")
+	flag.Uint64Var(&inst.LoginSessionExpiresIn, "login-session-expires", inst.LoginSessionExpiresIn, "expires time of login session [sec]")
+	flag.Uint64Var(&inst.SSOExpiresIn, "sso-expires", inst.SSOExpiresIn, "expires time of single sign on [sec]")
 	flag.StringVar(&inst.UserLoginResourceDir, "login-res", inst.UserLoginResourceDir, "directory path for user login")
 	flag.Uint64Var(&inst.DBGCInterval, "dbgc-interval", inst.DBGCInterval, "interval time of garbage collector for expired sessions [sec]")
 	flag.Parse()
@@ -162,7 +170,7 @@ func InitConfig(osArgs []string) *errors.Error {
 		"code id_token token",
 		// TODO(support type "none")
 	}
-	inst.SupportedScore = []string{"openid"}
+	inst.SupportedScope = []string{"openid"}
 	inst.LoginStaticResourceURL = "/resource/login"
 
 	// Validate config

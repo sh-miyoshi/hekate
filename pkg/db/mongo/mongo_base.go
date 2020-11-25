@@ -17,6 +17,7 @@ const (
 	roleCollectionName            = "customrole"
 	authcodeSessionCollectionName = "authcodesession"
 	roleInUserCollectionName      = "customroleinuser"
+	deviceCollectionName          = "device"
 
 	timeoutSecond = 5
 )

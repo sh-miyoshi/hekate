@@ -79,7 +79,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, cod
 	}
 
 	// Validate session info
-	if time.Now().Unix() >= s.ExpiresIn {
+	if time.Now().After(s.ExpiresDate) {
 		return nil, errors.Append(errors.ErrInvalidRequest, "code is already expired")
 	}
 
@@ -161,6 +161,49 @@ func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *
 	})
 }
 
+// ReqAuthByDeviceCode ...
+func ReqAuthByDeviceCode(project *model.ProjectInfo, clientID string, deviceCode string, r *http.Request) (*oidc.TokenResponse, *errors.Error) {
+	devices, err := db.GetInst().DeviceGetList(project.Name, &model.DeviceFilter{DeviceCode: deviceCode})
+	if err != nil {
+		return nil, errors.Append(err, "Get device failed")
+	}
+	if len(devices) == 0 {
+		return nil, errors.ErrInvalidRequest
+	}
+
+	device := devices[0]
+
+	// get login session
+	logger.Debug("login session ID of device authentication: %s", device.LoginSessionID)
+	s, err := db.GetInst().LoginSessionGet(project.Name, device.LoginSessionID)
+	if err != nil {
+		return nil, errors.Append(err, "Failed to get login session info")
+	}
+	if s.LoginDate.IsZero() {
+		logger.Debug("user is not logged in yet")
+		return nil, errors.ErrAuthorizationPending
+	}
+
+	// user already logged in, so delete login session and return token
+	if err := db.GetInst().DeviceDelete(project.Name, device.DeviceCode); err != nil {
+		return nil, errors.Append(err, "Failed to delete device")
+	}
+
+	if time.Now().After(s.ExpiresDate) {
+		logger.Info("the device session was already expired")
+		return nil, errors.ErrExpiredToken
+	}
+
+	audiences := []string{
+		clientID,
+	}
+	return genTokenRes(s.UserID, project, r, option{
+		audiences:       audiences,
+		genRefreshToken: true,
+		endUserAuthTime: s.LoginDate,
+	})
+}
+
 func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt option) (*oidc.TokenResponse, *errors.Error) {
 	// Generate JWT Token
 	res := oidc.TokenResponse{
@@ -170,7 +213,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 
 	accessTokenReq := token.Request{
 		Issuer:      token.GetFullIssuer(r),
-		ExpiredTime: time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+		ExpiresIn:   int64(project.TokenConfig.AccessTokenLifeSpan),
 		ProjectName: project.Name,
 		UserID:      userID,
 	}
@@ -192,7 +235,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 		res.RefreshExpiresIn = project.TokenConfig.RefreshTokenLifeSpan
 		refreshTokenReq := token.Request{
 			Issuer:      token.GetFullIssuer(r),
-			ExpiredTime: time.Second * time.Duration(res.RefreshExpiresIn),
+			ExpiresIn:   int64(res.RefreshExpiresIn),
 			ProjectName: project.Name,
 			UserID:      userID,
 		}
@@ -226,7 +269,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 	if opt.genIDToken {
 		idTokenReq := token.Request{
 			Issuer:          token.GetFullIssuer(r),
-			ExpiredTime:     time.Second * time.Duration(project.TokenConfig.AccessTokenLifeSpan),
+			ExpiresIn:       int64(project.TokenConfig.AccessTokenLifeSpan),
 			ProjectName:     project.Name,
 			UserID:          userID,
 			Nonce:           opt.nonce,

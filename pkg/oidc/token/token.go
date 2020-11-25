@@ -46,12 +46,13 @@ func GenerateAccessToken(audiences []string, request Request) (string, *errors.E
 	}
 
 	now := time.Now()
+	expires := time.Second * time.Duration(request.ExpiresIn)
 	claims := AccessTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
 			Issuer:    request.Issuer,
 			IssuedAt:  now.Unix(),
-			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+			ExpiresAt: now.Add(expires).Unix(),
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
@@ -83,12 +84,13 @@ func GenerateAccessToken(audiences []string, request Request) (string, *errors.E
 // GenerateRefreshToken ...
 func GenerateRefreshToken(sessionID string, audiences []string, request Request) (string, *errors.Error) {
 	now := time.Now()
+	expires := time.Second * time.Duration(request.ExpiresIn)
 	claims := &RefreshTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
 			Issuer:    request.Issuer,
 			IssuedAt:  now.Unix(),
-			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+			ExpiresAt: now.Add(expires).Unix(),
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
@@ -104,12 +106,13 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 // GenerateIDToken ...
 func GenerateIDToken(audiences []string, request Request) (string, *errors.Error) {
 	now := time.Now()
+	expires := time.Second * time.Duration(request.ExpiresIn)
 	claims := &IDTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
 			Issuer:    request.Issuer,
 			IssuedAt:  now.Unix(),
-			ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+			ExpiresAt: now.Add(expires).Unix(),
 			NotBefore: 0,
 			Subject:   request.UserID,
 		},
@@ -125,11 +128,12 @@ func GenerateIDToken(audiences []string, request Request) (string, *errors.Error
 // GenerateSSOToken ...
 func GenerateSSOToken(request Request) (string, *errors.Error) {
 	now := time.Now()
+	expires := time.Second * time.Duration(request.ExpiresIn)
 	claims := jwt.StandardClaims{
 		Id:        uuid.New().String(),
 		Issuer:    request.Issuer,
 		IssuedAt:  now.Unix(),
-		ExpiresAt: now.Add(request.ExpiredTime).Unix(),
+		ExpiresAt: now.Add(expires).Unix(),
 		NotBefore: 0,
 		Subject:   request.UserID,
 	}

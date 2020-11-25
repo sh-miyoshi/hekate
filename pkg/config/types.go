@@ -15,29 +15,31 @@ type HTTPSConfig struct {
 
 // LoginResource ...
 type LoginResource struct {
-	IndexPage   string
-	ErrorPage   string
-	ConsentPage string
+	IndexPage               string
+	ErrorPage               string
+	ConsentPage             string
+	DeviceLoginPage         string
+	DeviceLoginCompletePage string
 }
 
 // GlobalConfig ...
 type GlobalConfig struct {
-	AdminName               string      `yaml:"admin_name"`
-	AdminPassword           string      `yaml:"admin_password"`
-	Port                    int         `yaml:"server_port"`
-	BindAddr                string      `yaml:"server_bind_address"`
-	HTTPSConfig             HTTPSConfig `yaml:"https"`
-	LogFile                 string      `yaml:"logfile"`
-	ModeDebug               bool        `yaml:"debug_mode"`
-	DB                      DBInfo      `yaml:"db"`
-	AuditDB                 DBInfo      `yaml:"audit_db"`
-	LoginSessionExpiresTime uint64      `yaml:"login_session_expires_time"`
-	SSOExpiresTime          uint64      `yaml:"sso_expires_time"`
-	UserLoginResourceDir    string      `yaml:"user_login_page_res"`
-	DBGCInterval            uint64      `yaml:"dbgc_interval"`
+	AdminName             string      `yaml:"admin_name"`
+	AdminPassword         string      `yaml:"admin_password"`
+	Port                  int         `yaml:"server_port"`
+	BindAddr              string      `yaml:"server_bind_address"`
+	HTTPSConfig           HTTPSConfig `yaml:"https"`
+	LogFile               string      `yaml:"logfile"`
+	ModeDebug             bool        `yaml:"debug_mode"`
+	DB                    DBInfo      `yaml:"db"`
+	AuditDB               DBInfo      `yaml:"audit_db"`
+	LoginSessionExpiresIn uint64      `yaml:"login_session_expires_in"`
+	SSOExpiresIn          uint64      `yaml:"sso_expires_in"`
+	UserLoginResourceDir  string      `yaml:"user_login_page_res"`
+	DBGCInterval          uint64      `yaml:"dbgc_interval"`
 
 	SupportedResponseType  []string
-	SupportedScore         []string
+	SupportedScope         []string
 	LoginResource          LoginResource
 	LoginStaticResourceURL string
 }

@@ -12,6 +12,7 @@ import (
 	clientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	roleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
 	keysapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
+	oauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oauth"
 	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
 	projectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
 	sessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/session"
@@ -22,6 +23,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/login"
 	defaultrole "github.com/sh-miyoshi/hekate/pkg/role"
 	"github.com/sh-miyoshi/hekate/pkg/util"
 )
@@ -63,9 +65,13 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/userinfo", oidcapiv1.UserInfoHandler).Methods("GET", "POST")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", oidcapiv1.RevokeHandler).Methods("POST")
 
+	// OAuth
+	r.HandleFunc(basePath+"/project/{projectName}/oauth/device", oauthapiv1.DeviceRegisterHandler).Methods("POST")
+
 	// Authenticate API
 	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/authn/devicelogin", authnapiv1.DeviceLoginHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
@@ -111,6 +117,13 @@ func setAPI(r *mux.Router) {
 	// Audit API
 	r.HandleFunc(basePath+"/project/{projectName}/audit", auditapiv1.AuditGetHandler).Methods("GET")
 
+	// Device Login HTML Page
+	r.HandleFunc("/resource/project/{projectName}/devicelogin", oauthapiv1.DeviceLoginPageHandler).Methods("GET")
+	r.HandleFunc("/resource/project/{projectName}/deviceverify", oauthapiv1.DeviceUserCodeVerifyHandler).Methods("POST")
+	r.HandleFunc("/resource/project/{projectName}/devicecomplete", func(w http.ResponseWriter, r *http.Request) {
+		login.WriteDeviceLoginCompletePage(w)
+	}).Methods("GET")
+
 	// Health Check
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.GetInst().Ping(); err != nil {
@@ -139,14 +152,15 @@ func initDB(dbType, connStr, adminName, adminPassword string) *errors.Error {
 		CreatedAt:    time.Now(),
 		PermitDelete: false,
 		TokenConfig: &model.TokenConfig{
-			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresTimeSec,
-			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresTimeSec,
+			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresInSec,
+			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresInSec,
 			SigningAlgorithm:     "RS256",
 		},
 		AllowGrantTypes: []model.GrantType{
 			model.GrantTypeAuthorizationCode,
 			model.GrantTypeClientCredentials,
 			model.GrantTypeRefreshToken,
+			model.GrantTypeDevice,
 			model.GrantTypePassword, // TODO(for debug)
 		},
 		UserLock: model.UserLock{

@@ -10,7 +10,7 @@ import (
 type LoginSession struct {
 	SessionID           string
 	Code                string
-	ExpiresIn           int64
+	ExpiresDate         time.Time
 	Scope               string
 	ResponseType        []string
 	ClientID            string
