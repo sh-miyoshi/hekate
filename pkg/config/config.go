@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"net/http"
 	"os"
 	"path"
 	"regexp"
@@ -188,6 +189,20 @@ func InitConfig(osArgs []string) *errors.Error {
 // Get ...
 func Get() *GlobalConfig {
 	return &inst
+}
+
+// GetServerAddr ...
+func GetServerAddr(r *http.Request) string {
+	if os.Getenv("HEKATE_SERVER_ADDR") != "" {
+		return os.Getenv("HEKATE_SERVER_ADDR")
+	}
+
+	// get from request
+	scheme := "http"
+	if inst.HTTPSConfig.Enabled {
+		scheme = "https"
+	}
+	return scheme + "://" + r.Host
 }
 
 func setEnvVar(key string, target *string) {
