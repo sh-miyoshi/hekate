@@ -12,8 +12,8 @@ import (
 	"time"
 
 	oauthapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oauth"
+	"github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
 	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
-	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
@@ -150,16 +150,16 @@ func Do(info Info) (*oidcapi.TokenResponse, error) {
 				}
 				return res, nil
 			case 400:
-				var res errors.HTTPError
+				var res oidc.ErrorResponse
 				if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 					return nil, fmt.Errorf("<Program Bug> Failed to parse http response: %v", err)
 				}
 
 				// waiting authorization
-				if res.Error == "authorization_pending" {
+				if res.ErrorCode == "authorization_pending" {
 					return nil, nil
 				}
-				if res.Error == "slow_down" {
+				if res.ErrorCode == "slow_down" {
 					interval++
 					return nil, nil
 				}
