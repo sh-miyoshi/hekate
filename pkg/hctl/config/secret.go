@@ -16,7 +16,6 @@ import (
 // Secret ...
 type Secret struct {
 	ProjectName             string    `json:"projectName"`
-	UserName                string    `json:"userName"`
 	AccessToken             string    `json:"accessToken"`
 	AccessTokenExpiresDate  time.Time `json:"accessTokenExpiresDate"`
 	RefreshToken            string    `json:"refreshToken"`
@@ -24,13 +23,11 @@ type Secret struct {
 }
 
 // SetSecret ...
-func SetSecret(projectName string, userName string, token *oidcapi.TokenResponse) {
+func SetSecret(projectName string, token *oidcapi.TokenResponse) {
 	secretFile := filepath.Join(configDir, "secret")
 
-	// doNext
 	v := Secret{
 		ProjectName:             projectName,
-		UserName:                userName,
 		AccessToken:             token.AccessToken,
 		AccessTokenExpiresDate:  time.Now().Add(time.Second * time.Duration(token.ExpiresIn)),
 		RefreshToken:            token.RefreshToken,
@@ -80,7 +77,7 @@ func GetAccessToken() (string, error) {
 			return "", err
 		}
 
-		SetSecret(s.ProjectName, s.UserName, res)
+		SetSecret(s.ProjectName, res)
 		s.AccessToken = res.AccessToken
 	}
 
