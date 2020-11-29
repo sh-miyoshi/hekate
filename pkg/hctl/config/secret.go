@@ -68,12 +68,14 @@ func GetAccessToken() (string, error) {
 
 	if time.Now().After(s.AccessTokenExpiresDate) {
 		// Refresh token by using refresh-token
-		res, err := login.DoWithRefresh(sysConf.ServerAddr, login.Info{
+		res, err := login.DoWithRefresh(s.RefreshToken, login.Info{
+			ServerAddr:   sysConf.ServerAddr,
 			ProjectName:  s.ProjectName,
-			RefreshToken: s.RefreshToken,
 			ClientID:     sysConf.ClientID,
 			ClientSecret: sysConf.ClientSecret,
-		}, sysConf.Insecure, sysConf.RequestTimeout)
+			Insecure:     sysConf.Insecure,
+			Timeout:      sysConf.RequestTimeout,
+		})
 		if err != nil {
 			return "", err
 		}

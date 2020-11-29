@@ -46,13 +46,14 @@ var loginCmd = &cobra.Command{
 		}
 
 		c := config.Get()
-		res, err := login.Do(c.ServerAddr, login.Info{
+		res, err := login.Do(userName, password, login.Info{
+			ServerAddr:   c.ServerAddr,
 			ProjectName:  projectName,
 			ClientID:     config.Get().ClientID,
 			ClientSecret: config.Get().ClientSecret,
-			UserName:     userName,
-			Password:     password,
-		}, c.Insecure, c.RequestTimeout)
+			Insecure:     c.Insecure,
+			Timeout:      c.RequestTimeout,
+		})
 		if err != nil {
 			print.Fatal("Failed to login: %v", err)
 		}
