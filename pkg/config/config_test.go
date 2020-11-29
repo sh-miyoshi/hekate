@@ -2,6 +2,7 @@ package config
 
 import (
 	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -189,4 +190,43 @@ func TestCheckLoginResDirStruct(t *testing.T) {
 	os.Remove(indexFile)
 	os.Remove(deviceFile)
 	os.Remove(deviceCompFile)
+}
+
+func TestGetServerAddr(t *testing.T) {
+	tt := []struct {
+		Env    string
+		Host   string
+		Expect string
+	}{
+		{
+			Env:    "",
+			Host:   "localhost",
+			Expect: "http://localhost",
+		},
+		{
+			Env:    "http://localhost",
+			Host:   "",
+			Expect: "http://localhost",
+		},
+		{
+			Env:    "http://localhost:8080",
+			Host:   "localhost",
+			Expect: "http://localhost:8080",
+		},
+	}
+
+	for _, tc := range tt {
+		if tc.Env != "" {
+			os.Setenv("HEKATE_SERVER_ADDR", tc.Env)
+		}
+
+		r, _ := http.NewRequest("GET", "http://"+tc.Host, nil)
+		res := GetServerAddr(r)
+
+		if res != tc.Expect {
+			t.Errorf("GetServerAddr returns wrong addr. expect %s, but got %s", tc.Expect, res)
+		}
+
+		os.Clearenv()
+	}
 }
