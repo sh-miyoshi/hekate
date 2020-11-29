@@ -203,3 +203,22 @@ func DoWithRefresh(refreshToken string, info Info) (*oidcapi.TokenResponse, erro
 
 	return tokenRequest(httpReq, info.Insecure, info.Timeout)
 }
+
+// DoWithClient ...
+func DoWithClient(info Info) (*oidcapi.TokenResponse, error) {
+	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+
+	form := neturl.Values{}
+	form.Add("grant_type", "client_credentials")
+	form.Add("client_id", info.ClientID)
+	form.Add("client_secret", info.ClientSecret)
+
+	body := strings.NewReader(form.Encode())
+	httpReq, err := http.NewRequest("POST", u, body)
+	if err != nil {
+		return nil, fmt.Errorf("<Program Bug> Failed to create http request: %v", err)
+	}
+	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	return tokenRequest(httpReq, info.Insecure, info.Timeout)
+}
