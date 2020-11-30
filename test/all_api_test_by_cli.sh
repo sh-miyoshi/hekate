@@ -28,7 +28,7 @@ token=`curl --insecure -s -X POST $SERVER_ADDR/api/v1/project/master/openid-conn
 
 curl --insecure -s -X POST -H "Authorization: Bearer $token" \
   "$SERVER_ADDR/api/v1/project/master/client" \
-  -d "@inputs/client_create.json"
+  -d "@inputs/cli_client_create.json"
 echo "Successfully create client for cli"
 
 cd $CLI_DIR

@@ -1,0 +1,5 @@
+{
+    "id": "cli-test",
+    "secret": "mysecretkey",
+    "access_type": "confidential"
+}
