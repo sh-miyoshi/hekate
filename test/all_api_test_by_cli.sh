@@ -18,21 +18,22 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-cd $CLI_DIR
-go build
-echo "Successfully build binary"
-
 # Register confidential client for cli login
-token=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+token=`curl --insecure -s -X POST $SERVER_ADDR/api/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \
   -d "client_id=portal" \
   -d 'grant_type=password' | jq -r .access_token`
+
 curl --insecure -s -X POST -H "Authorization: Bearer $token" \
   "$SERVER_ADDR/api/v1/project/master/client" \
   -d "@inputs/client_create.json"
-echo "Successfully create client"
+echo "Successfully create client for cli"
+
+cd $CLI_DIR
+go build
+echo "Successfully build binary"
 
 # config
 ## set
