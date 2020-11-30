@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SERVER_ADDR=$1
+
 token=`curl --insecure -s -X POST $SERVER_ADDR/api/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
@@ -12,10 +14,9 @@ status=`curl --insecure -s -X POST -H "Authorization: Bearer $token" \
   -d "@inputs/cli_client_create.json" \
   -o /dev/null -w '%{http_code}'`
 
-if [ $status = 409 ]; then
-  echo "The client for cli is already exists."
-elif [ $status -ge 300 ]; then
-  echo "Failed to create client for cli"
+if [ $status = 409 ] || [ $status = 200 ]; then
+  echo "ok."
 else
-  echo "Successfully create client for cli"
+  echo "Failed to create client for cli: $status"
+  exit 1
 fi

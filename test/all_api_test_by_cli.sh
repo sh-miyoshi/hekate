@@ -19,16 +19,7 @@ if [ $? != 0 ]; then
 fi
 
 # Register confidential client for cli login
-token=`curl --insecure -s -X POST $SERVER_ADDR/api/v1/project/master/openid-connect/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=admin" \
-  -d "password=password" \
-  -d "client_id=portal" \
-  -d 'grant_type=password' | jq -r .access_token`
-
-curl --insecure -s -X POST -H "Authorization: Bearer $token" \
-  "$SERVER_ADDR/api/v1/project/master/client" \
-  -d "@inputs/cli_client_create.json"
+./register_cli_client.sh $SERVER_ADDR
 echo "Successfully create client for cli"
 
 cd $CLI_DIR
