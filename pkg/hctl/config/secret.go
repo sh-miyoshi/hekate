@@ -59,27 +59,30 @@ func GetAccessToken() (string, error) {
 		return "", err
 	}
 
-	if time.Now().After(s.RefreshTokenExpiresDate) {
+	now := time.Now()
+	if now.Before(s.AccessTokenExpiresDate) {
+		return s.AccessToken, nil
+	}
+
+	if now.After(s.RefreshTokenExpiresDate) {
 		return "", fmt.Errorf("Token is expired\nPlease run `hctl login`")
 	}
 
-	if time.Now().After(s.AccessTokenExpiresDate) {
-		// Refresh token by using refresh-token
-		res, err := login.DoWithRefresh(s.RefreshToken, login.Info{
-			ServerAddr:   sysConf.ServerAddr,
-			ProjectName:  s.ProjectName,
-			ClientID:     sysConf.ClientID,
-			ClientSecret: sysConf.ClientSecret,
-			Insecure:     sysConf.Insecure,
-			Timeout:      sysConf.RequestTimeout,
-		})
-		if err != nil {
-			return "", err
-		}
-
-		SetSecret(s.ProjectName, res)
-		s.AccessToken = res.AccessToken
+	// Refresh token by using refresh-token
+	res, err := login.DoWithRefresh(s.RefreshToken, login.Info{
+		ServerAddr:   sysConf.ServerAddr,
+		ProjectName:  s.ProjectName,
+		ClientID:     sysConf.ClientID,
+		ClientSecret: sysConf.ClientSecret,
+		Insecure:     sysConf.Insecure,
+		Timeout:      sysConf.RequestTimeout,
+	})
+	if err != nil {
+		return "", err
 	}
+
+	SetSecret(s.ProjectName, res)
+	s.AccessToken = res.AccessToken
 
 	return s.AccessToken, nil
 }
