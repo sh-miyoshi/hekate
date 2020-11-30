@@ -43,7 +43,7 @@ test_command config set --server $SERVER_ADDR --project master --timeout 10
 test_command config get
 
 # login
-test_command login --project master --client-id oidc-client --client-secret mysecretkey
+test_command login --project master --client-id cli-test --client-secret mysecretkey
 
 # project
 ## create
