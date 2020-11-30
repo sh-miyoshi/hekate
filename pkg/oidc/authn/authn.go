@@ -150,7 +150,7 @@ func ReqAuthByClientCredentials(project *model.ProjectInfo, clientID string, r *
 		return nil, errors.Append(err, "Get client info failed")
 	}
 	if cli.AccessType != "confidential" {
-		return nil, errors.ErrInvalidRequest
+		return nil, errors.Append(errors.ErrInvalidRequest, "client type is not confidential")
 	}
 
 	audiences := []string{

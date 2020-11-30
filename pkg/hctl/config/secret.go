@@ -16,7 +16,6 @@ import (
 // Secret ...
 type Secret struct {
 	ProjectName             string    `json:"projectName"`
-	UserName                string    `json:"userName"`
 	AccessToken             string    `json:"accessToken"`
 	AccessTokenExpiresDate  time.Time `json:"accessTokenExpiresDate"`
 	RefreshToken            string    `json:"refreshToken"`
@@ -24,13 +23,11 @@ type Secret struct {
 }
 
 // SetSecret ...
-func SetSecret(projectName string, userName string, token *oidcapi.TokenResponse) {
+func SetSecret(projectName string, token *oidcapi.TokenResponse) {
 	secretFile := filepath.Join(configDir, "secret")
 
-	// doNext
 	v := Secret{
 		ProjectName:             projectName,
-		UserName:                userName,
 		AccessToken:             token.AccessToken,
 		AccessTokenExpiresDate:  time.Now().Add(time.Second * time.Duration(token.ExpiresIn)),
 		RefreshToken:            token.RefreshToken,
@@ -62,25 +59,30 @@ func GetAccessToken() (string, error) {
 		return "", err
 	}
 
-	if time.Now().After(s.RefreshTokenExpiresDate) {
+	now := time.Now()
+	if now.Before(s.AccessTokenExpiresDate) {
+		return s.AccessToken, nil
+	}
+
+	if now.After(s.RefreshTokenExpiresDate) {
 		return "", fmt.Errorf("Token is expired\nPlease run `hctl login`")
 	}
 
-	if time.Now().After(s.AccessTokenExpiresDate) {
-		// Refresh token by using refresh-token
-		res, err := login.DoWithRefresh(sysConf.ServerAddr, login.Info{
-			ProjectName:  s.ProjectName,
-			RefreshToken: s.RefreshToken,
-			ClientID:     sysConf.ClientID,
-			ClientSecret: sysConf.ClientSecret,
-		}, sysConf.Insecure, sysConf.RequestTimeout)
-		if err != nil {
-			return "", err
-		}
-
-		SetSecret(s.ProjectName, s.UserName, res)
-		s.AccessToken = res.AccessToken
+	// Refresh token by using refresh-token
+	res, err := login.DoWithRefresh(s.RefreshToken, login.Info{
+		ServerAddr:   sysConf.ServerAddr,
+		ProjectName:  s.ProjectName,
+		ClientID:     sysConf.ClientID,
+		ClientSecret: sysConf.ClientSecret,
+		Insecure:     sysConf.Insecure,
+		Timeout:      sysConf.RequestTimeout,
+	})
+	if err != nil {
+		return "", err
 	}
+
+	SetSecret(s.ProjectName, res)
+	s.AccessToken = res.AccessToken
 
 	return s.AccessToken, nil
 }

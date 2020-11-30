@@ -18,8 +18,13 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
+# Register confidential client for cli login
+./register_cli_client.sh $SERVER_ADDR
+echo "Successfully create client for cli"
+
 cd $CLI_DIR
 go build
+echo "Successfully build binary"
 
 # config
 ## set
@@ -29,7 +34,7 @@ test_command config set --server $SERVER_ADDR --project master --timeout 10
 test_command config get
 
 # login
-test_command login --project master --name admin --password password
+test_command login --project master --client-id cli-test --client-secret mysecretkey
 
 # project
 ## create

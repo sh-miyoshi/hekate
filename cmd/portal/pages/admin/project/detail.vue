@@ -523,6 +523,11 @@ export default {
           checked: false
         },
         {
+          name: 'Device Code',
+          value: 'urn:ietf:params:oauth:grant-type:device_code',
+          checked: false
+        },
+        {
           name: 'Password',
           value: 'password',
           checked: false

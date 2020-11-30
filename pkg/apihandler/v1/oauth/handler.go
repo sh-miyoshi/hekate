@@ -19,6 +19,11 @@ import (
 	"github.com/stretchr/stew/slice"
 )
 
+const (
+	userCodeLength      = 8
+	tokenReqIntervalSec = 5
+)
+
 // DeviceRegisterHandler ...
 func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -76,7 +81,7 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := "http://localhost:18443/resource/project/" + projectName + "/devicecomplete" // TODO
+	url := config.GetServerAddr(r) + "/resource/project/" + projectName + "/devicecomplete"
 	authReq := &oidc.AuthRequest{
 		Scope:        scope,
 		ClientID:     clientID,
@@ -91,17 +96,16 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	length := 8 // TODO use const value
 	deviceCode := uuid.New().String()
-	userCode := util.RandomString(length, util.CharTypeUpper)
-	expires := int64(600) // TODO set corrent value
+	userCode := util.RandomString(userCodeLength, util.CharTypeUpper)
+	expires := config.Get().LoginSessionExpiresIn
 
 	ent := &model.Device{
 		DeviceCode:     deviceCode,
 		UserCode:       userCode,
 		ProjectName:    projectName,
 		CreatedAt:      time.Now(),
-		ExpiresIn:      expires,
+		ExpiresIn:      int64(expires),
 		LoginSessionID: lsID,
 	}
 
@@ -111,12 +115,13 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	url = config.GetServerAddr(r) + "/resource/project/" + projectName + "/devicelogin"
 	res := DeviceAuthorizationResponse{
 		DeviceCode:      deviceCode,
 		UserCode:        userCode,
-		VerificationURI: "http://localhost:18443/resource/project/" + projectName + "/devicelogin", // TODO set correct value
+		VerificationURI: url,
 		ExpiresIn:       int(expires),
-		Interval:        5, // TODO set correct value
+		Interval:        tokenReqIntervalSec,
 	}
 
 	logger.Debug("Device Authorization Response: %v", res)
@@ -128,14 +133,29 @@ func DeviceLoginPageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 
-	// TODO get error from query
-	login.WriteDeviceLoginPage(projectName, "", w)
+	// set error if exists
+	queries := r.URL.Query()
+	err := queries.Get("error")
+
+	login.WriteDeviceLoginPage(projectName, err, w)
 }
 
 // DeviceUserCodeVerifyHandler ...
 func DeviceUserCodeVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
+
+	var err *errors.Error
+	defer func() {
+		msg := ""
+		if err != nil {
+			msg = err.Error()
+		}
+		if err = audit.GetInst().Save(projectName, time.Now(), "DEVICE", r.Method, r.URL.String(), msg); err != nil {
+			errors.Print(errors.Append(err, "Failed to save audit event"))
+		}
+	}()
+
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
 		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
