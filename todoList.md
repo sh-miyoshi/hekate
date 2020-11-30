@@ -13,8 +13,6 @@
 
 ## server application enhancement
 
-- support device flow
-  - audit log
 - add debug log
 - db manager validationの追加
 - masterプロジェクト初期構成時にpassword grantを外す
