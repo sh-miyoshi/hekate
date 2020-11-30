@@ -20,6 +20,19 @@ fi
 
 cd $CLI_DIR
 go build
+echo "Successfully build binary"
+
+# Register confidential client for cli login
+token=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin" \
+  -d "password=password" \
+  -d "client_id=portal" \
+  -d 'grant_type=password' | jq -r .access_token`
+curl --insecure -s -X POST -H "Authorization: Bearer $token" \
+  "$SERVER_ADDR/api/v1/project/master/client" \
+  -d "@inputs/client_create.json"
+echo "Successfully create client"
 
 # config
 ## set
@@ -29,7 +42,7 @@ test_command config set --server $SERVER_ADDR --project master --timeout 10
 test_command config get
 
 # login
-test_command login --project master --name admin --password password
+test_command login --project master --client-id oidc-client --client-secret mysecretkey
 
 # project
 ## create
