@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 
 	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
-	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 // ClientAdd ...
@@ -19,15 +17,8 @@ func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateReque
 	if err != nil {
 		return nil, err
 	}
-	httpReq, err := http.NewRequest("POST", url, bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Add("Content-Type", "application/json")
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, true)
-	print.Debug("Client add method request\n---\n %s\n---\n", dump)
-	httpRes, err := h.client.Do(httpReq)
+
+	httpRes, err := h.request("POST", url, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -67,16 +58,8 @@ func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateReque
 
 // ClientDelete ...
 func (h *Handler) ClientDelete(projectName string, clientID string) error {
-	u := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
-	httpReq, err := http.NewRequest("DELETE", u, nil)
-	if err != nil {
-		return err
-	}
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("Client delete method request\n---\n %s\n---\n", dump)
-
-	httpRes, err := h.client.Do(httpReq)
+	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
+	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
 	}
@@ -108,15 +91,7 @@ func (h *Handler) ClientDelete(projectName string, clientID string) error {
 // ClientGetList ...
 func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetResponse, error) {
 	url := fmt.Sprintf("%s/api/v1/project/%s/client", h.serverAddr, projectName)
-	httpReq, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("Client get list method request\n---\n %s\n---\n", dump)
-	httpRes, err := h.client.Do(httpReq)
+	httpRes, err := h.request("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -153,15 +128,7 @@ func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetRespo
 // ClientGet ...
 func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetResponse, error) {
 	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
-	httpReq, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Add("Content-Type", "application/json")
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("Client get method request\n---\n %s\n---\n", dump)
-	httpRes, err := h.client.Do(httpReq)
+	httpRes, err := h.request("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -197,19 +164,12 @@ func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetR
 
 // ClientUpdate ...
 func (h *Handler) ClientUpdate(projectName, clientID string, req *clientapi.ClientPutRequest) error {
-	u := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
+	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return err
 	}
-	httpReq, err := http.NewRequest("PUT", u, bytes.NewReader(body))
-	if err != nil {
-		return err
-	}
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, true)
-	print.Debug("Client update method request\n---\n %s\n---\n", dump)
-	httpRes, err := h.client.Do(httpReq)
+	httpRes, err := h.request("PUT", url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}

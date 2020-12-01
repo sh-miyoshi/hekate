@@ -2,9 +2,14 @@ package apiclient
 
 import (
 	"crypto/tls"
+	"fmt"
+	"io"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 	"time"
+
+	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
 // Handler ...
@@ -52,4 +57,27 @@ func createClient(serverAddr string, insecure bool, timeout time.Duration) *http
 		Timeout:   timeout,
 	}
 	return client
+}
+
+func (h *Handler) request(method string, url string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
+	if body != nil {
+		req.Header.Add("Content-Type", "application/json")
+	}
+
+	dump, _ := httputil.DumpRequest(req, false)
+	print.Debug("server request dump: %q", dump)
+
+	res, err := h.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	dump, _ = httputil.DumpResponse(res, false)
+	print.Debug("server response dump: %q", dump)
+	return res, nil
 }
