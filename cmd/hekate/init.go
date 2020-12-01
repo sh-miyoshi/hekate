@@ -211,17 +211,19 @@ func initAll() *errors.Error {
 
 	// Initialize logger
 	logger.InitLogger(cfg.ModeDebug, cfg.LogFile)
-	logger.Debug("Start with config: %v", *cfg)
+	logger.Debug("Start with config: %+v", *cfg)
 
 	// Initialize settings
 	if err := defaultrole.InitHandler(); err != nil {
 		return errors.Append(err, "Failed to initialize default role handler")
 	}
+	logger.Debug("Successfully initialize system role")
 
 	// Initalize Database
 	if err := initDB(cfg.DB.Type, cfg.DB.ConnectionString, cfg.AdminName, cfg.AdminPassword); err != nil {
 		return errors.Append(err, "Failed to initialize database")
 	}
+	logger.Debug("Successfully initialize database")
 
 	// Initialize Audit Events Database
 	typ := cfg.AuditDB.Type
@@ -233,9 +235,11 @@ func initAll() *errors.Error {
 	if err := audit.Init(typ, connStr); err != nil {
 		return errors.Append(err, "Failed to initialize audit events database")
 	}
+	logger.Debug("Successfully initialize audit db with type: %s", typ)
 
 	// Initialize DBGC
 	db.InitGC(cfg.DBGCInterval)
+	logger.Debug("Start database GC per %d [sec]", cfg.DBGCInterval)
 
 	return nil
 }
