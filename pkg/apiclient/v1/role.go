@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
+	neturl "net/url"
 
 	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
@@ -35,20 +35,12 @@ func (h *Handler) getRoleID(projectName, roleName string, roleType model.RoleTyp
 
 // RoleAdd ...
 func (h *Handler) RoleAdd(projectName string, req *roleapi.CustomRoleCreateRequest) (*roleapi.CustomRoleGetResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/role", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/api/v1/project/%s/role", h.serverAddr, projectName)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
-	httpReq, err := http.NewRequest("POST", u, bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Add("Content-Type", "application/json")
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, true)
-	print.Debug("Role add method request\n---\n %s\n---\n", dump)
-	httpRes, err := h.client.Do(httpReq)
+	httpRes, err := h.request("POST", url, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -88,29 +80,13 @@ func (h *Handler) RoleAdd(projectName string, req *roleapi.CustomRoleCreateReque
 
 // RoleDelete ...
 func (h *Handler) RoleDelete(projectName string, roleName string) error {
-	role, err := h.RoleGetList(projectName, roleName)
+	roleID, err := h.getRoleID(projectName, roleName, model.RoleCustom)
 	if err != nil {
 		return err
 	}
-	if len(role) != 1 {
-		if len(role) == 0 {
-			return fmt.Errorf("No such role")
-		}
-		return fmt.Errorf("Unexpect the number of role %s, expect 1, but got %d", roleName, len(role))
-	}
 
-	roleID := role[0].ID
-
-	u := fmt.Sprintf("%s/api/v1/project/%s/role/%s", h.serverAddr, projectName, roleID)
-	httpReq, err := http.NewRequest("DELETE", u, nil)
-	if err != nil {
-		return err
-	}
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("Role delete method request\n---\n %s\n---\n", dump)
-
-	httpRes, err := h.client.Do(httpReq)
+	url := fmt.Sprintf("%s/api/v1/project/%s/role/%s", h.serverAddr, projectName, roleID)
+	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
 	}
@@ -141,8 +117,8 @@ func (h *Handler) RoleDelete(projectName string, roleName string) error {
 
 // RoleGetList ...
 func (h *Handler) RoleGetList(projectName string, roleName string) ([]*roleapi.CustomRoleGetResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/role", h.serverAddr, projectName)
-	httpReq, err := http.NewRequest("GET", u, nil)
+	url := fmt.Sprintf("%s/api/v1/project/%s/role", h.serverAddr, projectName)
+	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -151,18 +127,22 @@ func (h *Handler) RoleGetList(projectName string, roleName string) ([]*roleapi.C
 
 	if roleName != "" {
 		httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		values := url.Values{}
+		values := neturl.Values{}
 		values.Set("name", roleName)
 		httpReq.URL.RawQuery = values.Encode()
 	}
 
 	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("Role get list method request\n---\n %s\n---\n", dump)
+	print.Debug("server request dump: %q", dump)
+
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}
 	defer httpRes.Body.Close()
+
+	dump, _ = httputil.DumpResponse(httpRes, false)
+	print.Debug("server response dump: %q", dump)
 
 	if httpRes.StatusCode == http.StatusOK {
 		var res []*roleapi.CustomRoleGetResponse
