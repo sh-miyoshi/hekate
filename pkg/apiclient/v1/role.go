@@ -9,9 +9,29 @@ import (
 	"net/url"
 
 	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
+
+func (h *Handler) getRoleID(projectName, roleName string, roleType model.RoleType) (string, error) {
+	if roleType == model.RoleSystem {
+		return roleName, nil
+	}
+
+	role, err := h.RoleGetList(projectName, roleName)
+	if err != nil {
+		return "", err
+	}
+	if len(role) != 1 {
+		if len(role) == 0 {
+			return "", fmt.Errorf("No such role")
+		}
+		return "", fmt.Errorf("Unexpect the number of role %s, expect 1, but got %d", roleName, len(role))
+	}
+
+	return role[0].ID, nil
+}
 
 // RoleAdd ...
 func (h *Handler) RoleAdd(projectName string, req *roleapi.CustomRoleCreateRequest) (*roleapi.CustomRoleGetResponse, error) {

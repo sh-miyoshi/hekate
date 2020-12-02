@@ -6,13 +6,27 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
+	neturl "net/url"
 
 	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
+
+func (h *Handler) getUserID(projectName string, userName string) (string, error) {
+	user, err := h.UserGetList(projectName, userName)
+	if err != nil {
+		return "", err
+	}
+	if len(user) != 1 {
+		if len(user) == 0 {
+			return "", fmt.Errorf("No such user")
+		}
+		return "", fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
+	}
+	return user[0].ID, nil
+}
 
 // UserAdd ...
 func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*userapi.UserGetResponse, error) {
@@ -21,15 +35,7 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	httpReq, err := http.NewRequest("POST", url, bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	httpReq.Header.Add("Content-Type", "application/json")
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, true)
-	print.Debug("User add method request\n---\n %s\n---\n", dump)
-	httpRes, err := h.client.Do(httpReq)
+	httpRes, err := h.request("POST", url, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -69,27 +75,13 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 
 // UserDelete ...
 func (h *Handler) UserDelete(projectName string, userName string) error {
-	user, err := h.UserGetList(projectName, userName)
+	userID, err := h.getUserID(projectName, userName)
 	if err != nil {
 		return err
-	}
-	if len(user) != 1 {
-		if len(user) == 0 {
-			return fmt.Errorf("No such user")
-		}
-		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
 	}
 
-	userID := user[0].ID
-	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s", h.serverAddr, projectName, userID)
-	httpReq, err := http.NewRequest("DELETE", u, nil)
-	if err != nil {
-		return err
-	}
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("User delete method request\n---\n %s\n---\n", dump)
-	httpRes, err := h.client.Do(httpReq)
+	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s", h.serverAddr, projectName, userID)
+	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
 	}
@@ -120,8 +112,8 @@ func (h *Handler) UserDelete(projectName string, userName string) error {
 
 // UserGetList ...
 func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.UserGetResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
-	httpReq, err := http.NewRequest("GET", u, nil)
+	url := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
+	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -129,18 +121,21 @@ func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.U
 
 	if userName != "" {
 		httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		values := url.Values{}
+		values := neturl.Values{}
 		values.Set("name", userName)
 		httpReq.URL.RawQuery = values.Encode()
 	}
 	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("User get list method request\n---\n %s\n---\n", dump)
+	print.Debug("server request dump: %q", dump)
 
 	httpRes, err := h.client.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}
 	defer httpRes.Body.Close()
+
+	dump, _ = httputil.DumpResponse(httpRes, false)
+	print.Debug("server response dump: %q", dump)
 
 	if httpRes.StatusCode == http.StatusOK {
 		var res []*userapi.UserGetResponse
@@ -172,44 +167,18 @@ func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.U
 
 // UserRoleAdd ...
 func (h *Handler) UserRoleAdd(projectName string, userName string, roleName string, roleType model.RoleType) error {
-	user, err := h.UserGetList(projectName, userName)
+	userID, err := h.getUserID(projectName, userName)
 	if err != nil {
 		return err
 	}
-	if len(user) != 1 {
-		if len(user) == 0 {
-			return fmt.Errorf("No such user")
-		}
-		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
-	}
 
-	roleID := roleName
-	if roleType == model.RoleCustom {
-		role, err := h.RoleGetList(projectName, roleName)
-		if err != nil {
-			return err
-		}
-		if len(role) != 1 {
-			if len(role) == 0 {
-				return fmt.Errorf("No such role")
-			}
-			return fmt.Errorf("Unexpect the number of role %s, expect 1, but got %d", roleName, len(role))
-		}
-
-		roleID = role[0].ID
-	}
-
-	userID := user[0].ID
-	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
-	httpReq, err := http.NewRequest("POST", u, nil)
+	roleID, err := h.getRoleID(projectName, roleName, roleType)
 	if err != nil {
 		return err
 	}
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("User role add method request\n---\n %s\n---\n", dump)
 
-	httpRes, err := h.client.Do(httpReq)
+	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
+	httpRes, err := h.request("POST", url, nil)
 	if err != nil {
 		return err
 	}
@@ -244,44 +213,18 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 
 // UserRoleDelete ...
 func (h *Handler) UserRoleDelete(projectName string, userName string, roleName string, roleType model.RoleType) error {
-	user, err := h.UserGetList(projectName, userName)
+	userID, err := h.getUserID(projectName, userName)
 	if err != nil {
 		return err
 	}
-	if len(user) != 1 {
-		if len(user) == 0 {
-			return fmt.Errorf("No such user")
-		}
-		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
-	}
 
-	roleID := roleName
-	if roleType == model.RoleCustom {
-		role, err := h.RoleGetList(projectName, roleName)
-		if err != nil {
-			return err
-		}
-		if len(role) != 1 {
-			if len(role) == 0 {
-				return fmt.Errorf("No such role")
-			}
-			return fmt.Errorf("Unexpect the number of role %s, expect 1, but got %d", roleName, len(role))
-		}
-
-		roleID = role[0].ID
-	}
-
-	userID := user[0].ID
-	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
-	httpReq, err := http.NewRequest("DELETE", u, nil)
+	roleID, err := h.getRoleID(projectName, roleName, roleType)
 	if err != nil {
 		return err
 	}
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("User role delete method request\n---\n %s\n---\n", dump)
 
-	httpRes, err := h.client.Do(httpReq)
+	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
+	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
 	}
@@ -314,34 +257,17 @@ func (h *Handler) UserRoleDelete(projectName string, userName string, roleName s
 
 // UserChangePassword ...
 func (h *Handler) UserChangePassword(projectName string, userName string, newPassword string) error {
-	user, err := h.UserGetList(projectName, userName)
+	userID, err := h.getUserID(projectName, userName)
 	if err != nil {
 		return err
 	}
-	if len(user) != 1 {
-		if len(user) == 0 {
-			return fmt.Errorf("No such user")
-		}
-		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
-	}
 
-	userID := user[0].ID
-	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s/change-password", h.serverAddr, projectName, userID)
-
+	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/change-password", h.serverAddr, projectName, userID)
 	body, _ := json.Marshal(&userapi.UserChangePasswordRequest{
 		Password: newPassword,
 	})
 
-	httpReq, err := http.NewRequest("POST", u, bytes.NewReader(body))
-	if err != nil {
-		return err
-	}
-	httpReq.Header.Add("Content-Type", "application/json")
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, true)
-	print.Debug("User change password method request\n---\n %s\n---\n", dump)
-
-	httpRes, err := h.client.Do(httpReq)
+	httpRes, err := h.request("POST", url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
@@ -374,29 +300,13 @@ func (h *Handler) UserChangePassword(projectName string, userName string, newPas
 
 // UserUnlock ...
 func (h *Handler) UserUnlock(projectName string, userName string) error {
-	user, err := h.UserGetList(projectName, userName)
+	userID, err := h.getUserID(projectName, userName)
 	if err != nil {
 		return err
 	}
-	if len(user) != 1 {
-		if len(user) == 0 {
-			return fmt.Errorf("No such user")
-		}
-		return fmt.Errorf("Unexpect the number of user %s, expect 1, but got %d", userName, len(user))
-	}
 
-	userID := user[0].ID
-	u := fmt.Sprintf("%s/api/v1/project/%s/user/%s/unlock", h.serverAddr, projectName, userID)
-
-	httpReq, err := http.NewRequest("POST", u, nil)
-	if err != nil {
-		return err
-	}
-	httpReq.Header.Add("Authorization", fmt.Sprintf("bearer %s", h.accessToken))
-	dump, _ := httputil.DumpRequest(httpReq, false)
-	print.Debug("User unlock method request\n---\n %s\n---\n", dump)
-
-	httpRes, err := h.client.Do(httpReq)
+	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/unlock", h.serverAddr, projectName, userID)
+	httpRes, err := h.request("POST", url, nil)
 	if err != nil {
 		return err
 	}
