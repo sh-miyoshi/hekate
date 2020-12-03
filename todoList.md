@@ -79,7 +79,6 @@
 - User Authentication HTMLの拡充
   - Client IDを表示(optional)
   - Project名を表示
-  - user password変更ページの追加
 - ~~SAML対応~~
 
 ## Portal(Admin Console) enhancement
@@ -117,7 +116,6 @@
   - error出力の方法
   - debug出力
 - Production向け実行ファイルの作成
-- support authorization code flow
 
 ## new commands
 
