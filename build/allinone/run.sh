@@ -2,9 +2,16 @@
 
 function ExecPortal() {
   cd /hekate/portal
+  echo "Run building page server"
+  ./portal-building -port $PORTAL_PORT &
+  pid=$!
+
   echo "Build portal binaries"
   echo "Please wait for a while ..."
   npm run build > portal.log 2>&1
+
+  echo "Stop building page server"
+  kill $pid
 
   echo "Start portal"
   echo "Portal log is in /hekate/portal/portal.log"
