@@ -11,6 +11,7 @@ db:
   connection_string: "mongodb://localhost:27017"
 logfile: 'server.log'
 
-# Expires Time of Authorization code in OpenID Connect [sec]
-oidc_auth_code_expires_time: 300
-oidc_user_login_page_res: "/hekate/server/login"
+user_login_page_res: "/hekate/server/login"
+login_session_expires_in: 300
+sso_expires_in: 300
+dbgc_interval: 3600
