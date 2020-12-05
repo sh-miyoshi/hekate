@@ -37,7 +37,7 @@ COPY cmd/hekate/_data/login /hekate/server/login
 
 COPY --from=front-builder /hekate/cmd/portal /hekate/portal
 COPY build/allinone/nuxt.config.js /hekate/portal/nuxt.config.js
-COPY --from=go-builder /helate/cmd/portal-building/portal-building /hekate/portal/portal-building
+COPY --from=go-builder /hekate/cmd/portal-building/portal-building /hekate/portal/portal-building
 
 COPY build/allinone/run.sh .
 
