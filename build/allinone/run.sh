@@ -1,9 +1,10 @@
 #!/bin/bash
 
 function ExecPortal() {
+  port=$1
   cd /hekate/portal
   echo "Run building page server"
-  ./portal-building -port $PORTAL_PORT &
+  ./portal-building -port $port &
   pid=$!
 
   echo "Build portal binaries"
@@ -55,7 +56,7 @@ mkdir -p data
 cd -
 
 # Run portal
-ExecPortal &
+ExecPortal $PORTAL_PORT &
 
 # Run server
 cd /hekate/server
