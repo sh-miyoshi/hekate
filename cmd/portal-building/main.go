@@ -5,22 +5,32 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	tpl, err := template.ParseFiles("./index.html")
-	if err != nil {
-		return
-	}
+	data := []byte(`
+<html>
 
-	d := map[string]string{}
+<head>
+  <meta charset="UTF-8">
+  <title>Hekate Portal</title>
+</head>
+
+<body>
+  <div style="text-align: center;margin-top: 100px;">
+    <p>Currently building a portal resource.</p>
+    <p>Please wait for a minutes.</p>
+  </div>
+</body>
+
+</html>
+	`)
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
-	tpl.Execute(w, d)
+	w.Write(data)
 }
 
 func main() {
