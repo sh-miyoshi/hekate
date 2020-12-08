@@ -4,7 +4,7 @@ function ExecPortal() {
   port=$1
   cd /hekate/portal
   echo "Run building page server"
-  ./portal-building -port $port &
+  ./portal-building -port $port -https-cert-file="/hekate/secret/tls.crt" -https-key-file="/hekate/secret/tls.key" &
   pid=$!
 
   echo "Build portal binaries"
