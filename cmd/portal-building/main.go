@@ -37,9 +37,12 @@ func main() {
 	var port int
 	var bindAddr string
 	var logfile string
+	var certFile, keyFile string
 	flag.IntVar(&port, "port", 3000, "port number of server")
 	flag.StringVar(&bindAddr, "addr", "0.0.0.0", "bind address of server")
 	flag.StringVar(&logfile, "logfile", "", "file path for log, output to STDOUT if empty")
+	flag.StringVar(&certFile, "https-cert-file", "", "cert file path of https")
+	flag.StringVar(&keyFile, "https-key-file", "", "key file path of https")
 	flag.Parse()
 
 	if err := logger.InitLogger(true, logfile); err != nil {
@@ -53,8 +56,22 @@ func main() {
 	addr := fmt.Sprintf("%s:%d", bindAddr, port)
 	logger.Info("Run server as %s", addr)
 
-	if err := http.ListenAndServe(addr, r); err != nil {
-		logger.Error("Failed to run server: %v", err)
-		os.Exit(1)
+	if certFile != "" || keyFile != "" {
+		if certFile == "" || keyFile == "" {
+			logger.Error("Please set both --https-cert-file and --https-key-file")
+			os.Exit(1)
+		}
+
+		logger.Info("Run as https server")
+		if err := http.ListenAndServeTLS(addr, certFile, keyFile, r); err != nil {
+			logger.Error("Failed to run server: %v", err)
+			os.Exit(1)
+		}
+	} else {
+		logger.Info("Run as http server")
+		if err := http.ListenAndServe(addr, r); err != nil {
+			logger.Error("Failed to run server: %v", err)
+			os.Exit(1)
+		}
 	}
 }
