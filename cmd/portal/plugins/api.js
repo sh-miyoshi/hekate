@@ -157,6 +157,18 @@ class APIClient {
     return res
   }
 
+  async UserResetPassword(projectName, userID, newPassword) {
+    const url =
+      this.serverAddr +
+      '/api/v1/project/' +
+      projectName +
+      '/user/' +
+      userID +
+      '/change-password'
+    const res = await this._request(url, 'POST', { password: newPassword })
+    return res
+  }
+
   async ClientCreate(projectName, info) {
     const url = this.serverAddr + '/api/v1/project/' + projectName + '/client'
     const res = await this._request(url, 'POST', info)

@@ -24,3 +24,8 @@ h1 {
   transform: scale(1.2);
   display:inline-block;
 }
+
+.required {
+  color: #ee2222;
+  font-size: 18px;
+}

@@ -9,160 +9,249 @@
       </h3>
     </div>
 
-    <div class="card-body">
-      <div>
-        <b-modal
-          id="confirm-delete-user"
-          ref="confirm-delete-user"
-          title="Confirm"
-          cancel-variant="outline-dark"
-          ok-variant="danger"
-          ok-title="Delete user"
-          @ok="deleteUser"
-        >
-          <p class="mb-0">Are you sure to delete the user ?</p>
-        </b-modal>
-      </div>
+    <div class="nav-tabs-boxed">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            :class="{ active: activePanel == 'home' }"
+            @click="activate('home')"
+          >
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            :class="{ active: activePanel == 'credentials' }"
+            @click="activate('credentials')"
+          >
+            Credentials
+          </a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane" :class="{ active: activePanel == 'home' }">
+          <div class="card-body">
+            <div>
+              <b-modal
+                id="confirm-delete-user"
+                ref="confirm-delete-user"
+                title="Confirm"
+                cancel-variant="outline-dark"
+                ok-variant="danger"
+                ok-title="Delete user"
+                @ok="deleteUser"
+              >
+                <p class="mb-0">Are you sure to delete the user ?</p>
+              </b-modal>
+            </div>
 
-      <div class="form-group row">
-        <label for="id" class="col-sm-2 control-label">
-          ID
-        </label>
-        <div class="col-sm-5">
-          <input
-            v-if="user"
-            v-model="user.id"
-            class="form-control"
-            disabled="disabled"
-          />
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="name" class="col-sm-2 control-label">
-          Name
-        </label>
-        <div class="col-sm-5">
-          <input v-if="user" v-model="user.name" class="form-control" />
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="locked" class="col-sm-2 control-label">
-          Locked
-        </label>
-        <div v-if="user" class="col-sm-5">
-          <label class="c-switch c-switch-label c-switch-pill c-switch-primary">
-            <input
-              v-model="userLocked"
-              class="c-switch-input"
-              type="checkbox"
-              :disabled="!userLocked"
-            />
-            <span
-              class="c-switch-slider"
-              data-checked="On"
-              data-unchecked="Off"
-            ></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="system-roles" class="col-sm-2 control-label">
-          System Role
-        </label>
-        <div v-if="user" class="col-sm-5">
-          <div v-if="user.system_roles.length > 0">
-            <div v-for="item in user.system_roles" :key="item">
-              <div class="mb-1 input-group-text role-item">
-                <span class="icon">
-                  <i class="fa fa-remove" @click="removeSystemRole(item)"></i>
-                </span>
-                {{ item }}
+            <div class="form-group row">
+              <label for="id" class="col-sm-2 control-label">
+                ID
+              </label>
+              <div class="col-sm-5">
+                <input
+                  v-if="user"
+                  v-model="user.id"
+                  class="form-control"
+                  disabled="disabled"
+                />
               </div>
             </div>
-          </div>
-          <div v-else>
-            No assigned roles
-          </div>
-        </div>
-        <div class="col-sm-5">
-          <b-form-select
-            v-model="assignedSystemRole"
-            :options="getSystemRoleCandidates()"
-          ></b-form-select>
-          <button class="btn btn-primary mt-2" @click="assignSystemRole()">
-            Assign
-          </button>
-        </div>
-      </div>
 
-      <div class="form-group row">
-        <label for="custom-roles" class="col-sm-2 control-label">
-          Custom Role
-        </label>
-        <div v-if="user" class="col-sm-5">
-          <div v-if="user.custom_roles.length > 0">
-            <div v-for="role in user.custom_roles" :key="role.id">
-              <div class="mb-1 input-group-text role-item">
-                <span class="icon">
-                  <i class="fa fa-remove" @click="removeCustomRole(role)"></i>
-                </span>
-                {{ role.name }}
+            <div class="form-group row">
+              <label for="name" class="col-sm-2 control-label">
+                Name
+              </label>
+              <div class="col-sm-5">
+                <input v-if="user" v-model="user.name" class="form-control" />
               </div>
             </div>
-          </div>
-          <div v-else>
-            No assigned roles
-          </div>
-        </div>
-        <div class="col-sm-5">
-          <b-form-select
-            v-model="assignedCustomRole"
-            :options="customRoleCandidates"
-          ></b-form-select>
-          <button class="btn btn-primary mt-2" @click="assignCustomRole()">
-            Assign
-          </button>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <button
-          class="btn btn-link dropdown-toggle ml-n3"
-          @click="loadLoginSessions()"
-        >
-          Login Sessions
-        </button>
-        <div v-if="showLoginSessions" class="card-body">
-          <div class="form-group row">
-            <table class="table table-responsive-sm">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>From IP</th>
-                  <th>Session Start</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="session in loginSessions" :key="session.id">
-                  <td>{{ session.id }}</td>
-                  <td>{{ session.from_ip }}</td>
-                  <td>{{ session.created_at }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="form-group row">
+              <label for="locked" class="col-sm-2 control-label">
+                Locked
+              </label>
+              <div v-if="user" class="col-sm-5">
+                <label
+                  class="c-switch c-switch-label c-switch-pill c-switch-primary"
+                >
+                  <input
+                    v-model="userLocked"
+                    class="c-switch-input"
+                    type="checkbox"
+                    :disabled="!userLocked"
+                  />
+                  <span
+                    class="c-switch-slider"
+                    data-checked="On"
+                    data-unchecked="Off"
+                  ></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="system-roles" class="col-sm-2 control-label">
+                System Role
+              </label>
+              <div v-if="user" class="col-sm-5">
+                <div v-if="user.system_roles.length > 0">
+                  <div v-for="item in user.system_roles" :key="item">
+                    <div class="mb-1 input-group-text role-item">
+                      <span class="icon">
+                        <i
+                          class="fa fa-remove"
+                          @click="removeSystemRole(item)"
+                        ></i>
+                      </span>
+                      {{ item }}
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+                  No assigned roles
+                </div>
+              </div>
+              <div class="col-sm-5">
+                <b-form-select
+                  v-model="assignedSystemRole"
+                  :options="getSystemRoleCandidates()"
+                ></b-form-select>
+                <button
+                  class="btn btn-primary mt-2"
+                  @click="assignSystemRole()"
+                >
+                  Assign
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="custom-roles" class="col-sm-2 control-label">
+                Custom Role
+              </label>
+              <div v-if="user" class="col-sm-5">
+                <div v-if="user.custom_roles.length > 0">
+                  <div v-for="role in user.custom_roles" :key="role.id">
+                    <div class="mb-1 input-group-text role-item">
+                      <span class="icon">
+                        <i
+                          class="fa fa-remove"
+                          @click="removeCustomRole(role)"
+                        ></i>
+                      </span>
+                      {{ role.name }}
+                    </div>
+                  </div>
+                </div>
+                <div v-else>
+                  No assigned roles
+                </div>
+              </div>
+              <div class="col-sm-5">
+                <b-form-select
+                  v-model="assignedCustomRole"
+                  :options="customRoleCandidates"
+                ></b-form-select>
+                <button
+                  class="btn btn-primary mt-2"
+                  @click="assignCustomRole()"
+                >
+                  Assign
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <button
+                class="btn btn-link dropdown-toggle ml-n3"
+                @click="loadLoginSessions()"
+              >
+                Login Sessions
+              </button>
+              <div v-if="showLoginSessions" class="card-body">
+                <div class="form-group row">
+                  <table class="table table-responsive-sm">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>From IP</th>
+                        <th>Session Start</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="session in loginSessions" :key="session.id">
+                        <td>{{ session.id }}</td>
+                        <td>{{ session.from_ip }}</td>
+                        <td>{{ session.created_at }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div v-if="error" class="alert alert-danger">
+                {{ error }}
+              </div>
+
+              <button class="btn btn-primary" @click="updateUser">
+                Update
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+        <div class="tab-pane" :class="{ active: activePanel == 'credentials' }">
+          <div class="card-body">
+            <div class=" ml-3">
+              <div class="form-group row">
+                <h4>Force Reset Password</h4>
+              </div>
 
-      <div class="card-footer">
-        <div v-if="error" class="alert alert-danger">
-          {{ error }}
+              <div class="form-group row">
+                <label for="password" class="col-sm-2 control-label">
+                  Password
+                  <span class="required">*</span>
+                </label>
+                <div class="col-sm-5">
+                  <input
+                    v-model="password"
+                    class="form-control"
+                    type="password"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="confirm-password" class="col-sm-2 control-label">
+                  Confirm Password
+                  <span class="required">*</span>
+                </label>
+                <div class="col-sm-5">
+                  <input
+                    v-model="confirmPassword"
+                    class="form-control"
+                    type="password"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div v-if="error" class="alert alert-danger">
+                {{ error }}
+              </div>
+
+              <button class="btn btn-danger" @click="resetPassword">
+                Reset
+              </button>
+            </div>
+          </div>
         </div>
-
-        <button class="btn btn-primary" @click="updateUser">Update</button>
       </div>
     </div>
   </div>
@@ -173,6 +262,7 @@ export default {
   data() {
     return {
       currentUserName: '',
+      activePanel: 'home',
       user: null,
       error: '',
       assignedSystemRole: null,
@@ -181,7 +271,9 @@ export default {
       showLoginSessions: false,
       loginSessions: [],
       SYSTEM_ROLES: [],
-      userLocked: false
+      userLocked: false,
+      password: '',
+      confirmPassword: ''
     }
   },
   async mounted() {
@@ -370,6 +462,35 @@ export default {
           this.loginSessions.push(res.data)
         }
       }
+    },
+    activate(panel) {
+      this.activePanel = panel
+    },
+    async resetPassword() {
+      if (this.password === '') {
+        this.error = 'Please set password'
+        return
+      }
+      if (this.password !== this.confirmPassword) {
+        this.error = 'Password and confirmation are not same'
+        return
+      }
+
+      const projectName = this.$store.state.current_project
+      const userID = this.$route.params.id
+      const res = await this.$api.UserResetPassword(
+        projectName,
+        userID,
+        this.password
+      )
+      this.password = ''
+      this.confirmPassword = ''
+
+      if (!res.ok) {
+        this.error = res.message
+        return
+      }
+      await this.$bvModal.msgBoxOk('Successfully reset password')
     }
   }
 }

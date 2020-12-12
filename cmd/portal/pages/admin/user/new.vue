@@ -103,10 +103,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.required {
-  color: #ee2222;
-  font-size: 18px;
-}
-</style>
