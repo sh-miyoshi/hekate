@@ -89,12 +89,6 @@ export default {
   server: {
     host: '0.0.0.0',
     port: process.env.HEKATE_PORTAL_PORT
-
-    // set this param if run as https
-    // https: {
-    //   key: fs.readFileSync(path.resolve(__dirname, 'assets/testcerts/tls.key')),
-    //   cert: fs.readFileSync(path.resolve(__dirname, 'assets/testcerts/tls.crt'))
-    // }
   },
 
   env: {
