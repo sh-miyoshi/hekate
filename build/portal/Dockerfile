@@ -16,6 +16,7 @@ COPY cmd/hekate/_data/testcerts /hekate/secret
 COPY --from=builder /hekate/cmd/portal /hekate/portal
 COPY build/portal/nuxt.config.js /hekate/portal/nuxt.config.js
 
+COPY build/portal/run.sh /hekate/run.sh
 
 
-CMD ["npm", "run", "start"]
+CMD ["./run.sh"]
