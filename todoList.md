@@ -84,7 +84,6 @@
 ## Portal(Admin Console) enhancement
 
 - 各ページの作成
-  - user force password reset
   - user revoke session
 - ヘルプボタンの追加
   - tooltipなど
