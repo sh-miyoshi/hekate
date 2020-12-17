@@ -37,6 +37,12 @@ spec:
               value: "3000"
             - name: HEKATE_SERVER_ADDR
               value: "https://hekate.default.svc.cluster.local:18443"
-            - name: HEKATE_PORTAL_HOST
-              value: "http://localhost:3000"
-
+            - name: HEKATE_PORTAL_ADDR
+              value: "https://localhost:3000"
+      #     volumeMounts:
+      #       - name: tls-certs
+      #         mountPath: "/etc/hekate/secret"
+      # volumes:
+      #   - name: tls-certs
+      #     secret:
+      #       name: hekate-secret

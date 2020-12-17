@@ -81,7 +81,12 @@ spec:
             - name: config
               mountPath: "/etc/hekate/config"
               readOnly: true
+            # - name: tls-certs
+            #   mountPath: "/etc/hekate/secret"
       volumes:
         - name: config
           configMap:
             name: hekate
+        # - name: tls-certs
+        #   secret:
+        #     name: hekate-secret

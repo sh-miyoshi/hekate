@@ -14,6 +14,34 @@ kubectl apply -f https://github.com/sh-miyoshi/hekate/raw/master/deployments/kub
 kubectl apply -f https://github.com/sh-miyoshi/hekate/raw/master/deployments/kubernetes/mongo.yaml
 ```
 
+## (Optional)証明書の準備
+
+ServerおよびPortalを独自の証明書で運用することができます。  
+※container内に内蔵されているデフォルトのオレオレ証明書を使う場合や、前段でTLS終端するためhttpサーバーとして運用する場合はこの手順をスキップしてください。
+
+```bash
+# 証明書を作成
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=hekate.localhost"
+
+# Kubernetes yamlの作成
+crt_value=`base64 tls.crt | tr -d '\n'`
+key_value=`base64 tls.key | tr -d '\n'`
+
+cat << EOF > hekate-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hekate-tls
+type: kubernetes.io/tls
+data:
+  tls.crt: ${crt_value}
+  tls.key: ${key_value}
+EOF
+
+# kubectl apply
+kubectl apply -f hekate-secret.yaml
+```
+
 ## Serverの構築
 
 Mongo DBへの接続文字列やサーバー管理者のパスワードなど必要に応じてyamlファイルを修正してください。  
@@ -26,10 +54,11 @@ wget https://github.com/sh-miyoshi/hekate/raw/master/deployments/kubernetes/serv
 vi server.yaml
 # db_conn_str, admin_passwordなどの秘密情報を修正
 # portalもデプロイする場合はHEKATE_PORTAL_ADDRも設定
+# 独自証明書を使用する場合はvolumesの部分とvolumeMountsの部分のコメントを外して有効化してください
 kubectl apply -f server.yaml
 ```
 
-## Portalの構築
+## (Optional)Portalの構築
 
 Portalのデプロイは必須ではありません。
 もしCLIツールを使う場合など必要なければデプロイしなくても問題ありません。
@@ -37,6 +66,15 @@ Portalのデプロイは必須ではありません。
 
 ```bash
 wget https://github.com/sh-miyoshi/hekate/raw/master/deployments/kubernetes/portal.yaml
+vi portal.yaml
+# https://localhost:3000以外のアドレスを使用する場合は適宜修正してください。
+# 独自証明書を使用する場合はvolumesの部分とvolumeMountsの部分のコメントを外して有効化してください
+
+kubectl apply -f portal.yaml
 ```
+
+Pod起動後、[https://localhost:3000](https://localhost:3000)でアクセスできます。
+ただし、portalの起動にはビルド処理を含むため少し時間がかかります。
+`kubectl logs`コマンドなどでログを確認しつつ、気長に待ってください。
 
 TODO(現在執筆中です・・・)
