@@ -342,6 +342,10 @@ func (m *Manager) UserDelete(projectName string, userID string) *errors.Error {
 	}
 
 	return m.transaction.Transaction(func() *errors.Error {
+		if _, err := m.UserGet(projectName, userID); err != nil {
+			return errors.Append(err, "Failed to get user info")
+		}
+
 		if err := m.loginSession.Delete(projectName, &model.LoginSessionFilter{UserID: userID}); err != nil {
 			return errors.Append(err, "Delete authoriation code failed")
 		}
