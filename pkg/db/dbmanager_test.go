@@ -31,6 +31,12 @@ func TestProjectAdd(t *testing.T) {
 		t.Errorf("Failed to add correct project: %v", err)
 	}
 
+	// Check portal client exists
+	clis, _ := mgr.client.GetList(prjInfo.Name, &model.ClientFilter{ID: "portal"})
+	if len(clis) != 1 {
+		t.Errorf("Failed to register portal client, expect 1 client, but got %d", len(clis))
+	}
+
 	// Test Duplicate Project Name
 	err := mgr.ProjectAdd(prjInfo)
 	if !errors.Contains(err, model.ErrProjectAlreadyExists) {
