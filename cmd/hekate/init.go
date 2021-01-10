@@ -71,7 +71,6 @@ func setAPI(r *mux.Router) {
 	// Authenticate API
 	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/authn/devicelogin", authnapiv1.DeviceLoginHandler).Methods("POST")
 
 	// Project API
 	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")

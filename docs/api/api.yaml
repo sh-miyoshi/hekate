@@ -287,27 +287,6 @@ paths:
           description: "Return error page"
         '302':
           description: "Return error or success to callback URL"
-  '/api/v1/project/{projectName}/authn/devicelogin':
-    post:
-      summary: "Device Authentication Endpoint"
-      tags:
-        - authentication
-      parameters:
-        - name: projectName
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/DeviceLoginRequest'
-      responses:
-        '200':
-          description: "Return ok page or error page or consent page"
-        '500':
-          description: "Internal server error"
   '/api/v1/project':
     post:
       summary: "Create Project"
