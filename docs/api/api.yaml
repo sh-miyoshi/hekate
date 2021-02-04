@@ -672,9 +672,9 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/user/{userID}/change-password':
+  '/api/v1/project/{projectName}/user/{userID}/reset-password':
     post:
-      summary: "Change User Password"
+      summary: "Force reset user password"
       tags:
         - user
       parameters:
@@ -692,7 +692,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserChangePasswordRequest'
+              $ref: '#/components/schemas/UserResetPasswordRequest'
       responses:
         '200':
           description: 'Success'
@@ -749,7 +749,7 @@ paths:
         '204':
           description: 'Success'
         '404':
-          description: 'User Not Found'
+          description: 'User or Project Not Found'
         '403':
           description: 'Forbidden'
         '500':
@@ -1276,7 +1276,7 @@ components:
           type: array
           items:
             type: string
-    UserChangePasswordRequest:
+    UserResetPasswordRequest:
       type: object
       properties:
         password:
