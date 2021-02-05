@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/copier"
 	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
@@ -76,18 +77,11 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			authReq := &oidc.AuthRequest{
-				Scope:        s.Scope,
-				ResponseType: s.ResponseType,
-				ClientID:     s.ClientID,
-				RedirectURI:  s.RedirectURI,
-				State:        state,
-				Nonce:        s.Nonce,
-				ResponseMode: s.ResponseMode,
-				Prompt:       s.Prompt,
-			}
+			var authReq oidc.AuthRequest
+			copier.Copy(&authReq, &s)
+			authReq.State = state
 
-			lsID, err := login.StartLoginSession(projectName, authReq)
+			lsID, err := login.StartLoginSession(projectName, &authReq)
 			if err != nil {
 				errors.Print(errors.Append(err, "Failed to register login session"))
 				login.WriteErrorPage("Request failed. internal server error occuerd", w)
