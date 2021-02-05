@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
+	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/project"
 	"github.com/stretchr/stew/slice"
 )
 

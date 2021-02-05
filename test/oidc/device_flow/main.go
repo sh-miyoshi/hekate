@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"strings"
 
-	oauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oauth"
-	"github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
+	oauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oauth"
+	"github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oidc"
 )
 
 func main() {

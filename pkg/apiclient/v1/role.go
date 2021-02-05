@@ -8,7 +8,7 @@ import (
 	"net/http/httputil"
 	neturl "net/url"
 
-	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
+	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/customrole"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	keysapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
-	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
+	keysapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/keys"
+	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/project"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 

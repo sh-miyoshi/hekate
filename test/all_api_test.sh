@@ -154,7 +154,7 @@ echo "success to delete user role"
 test_api "$URL/project/master/user/$userID/role/$roleID" POST $master_access_token
 
 # User Password Change
-test_api "$URL/project/master/user/$userID/change-password" POST $user_access_token 'inputs/change-password.json'
+test_api "$URL/project/master/user/$userID/reset-password" POST $user_access_token 'inputs/change-password.json'
 echo "success to change password"
 
 # Get Session

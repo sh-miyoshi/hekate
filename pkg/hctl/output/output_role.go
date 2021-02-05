@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
+	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/customrole"
 )
 
 // CustomRoleFormat ...

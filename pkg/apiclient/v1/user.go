@@ -8,7 +8,7 @@ import (
 	"net/http/httputil"
 	neturl "net/url"
 
-	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
+	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
@@ -262,8 +262,8 @@ func (h *Handler) UserChangePassword(projectName string, userName string, newPas
 		return err
 	}
 
-	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/change-password", h.serverAddr, projectName, userID)
-	body, _ := json.Marshal(&userapi.UserChangePasswordRequest{
+	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/reset-password", h.serverAddr, projectName, userID)
+	body, _ := json.Marshal(&userapi.UserResetPasswordRequest{
 		Password: newPassword,
 	})
 

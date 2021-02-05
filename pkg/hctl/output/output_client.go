@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
+	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/client"
 )
 
 // ClientInfoFormat ...

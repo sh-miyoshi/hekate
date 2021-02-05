@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	oauthapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oauth"
-	"github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
-	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
+	oauthapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oauth"
+	"github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oidc"
+	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
+	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/user"
 )
 
 // UserInfoFormat ...
