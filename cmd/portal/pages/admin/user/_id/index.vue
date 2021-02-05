@@ -491,6 +491,7 @@ export default {
         return
       }
       await this.$bvModal.msgBoxOk('Successfully reset password')
+      await this.setUser(userID)
     }
   }
 }
