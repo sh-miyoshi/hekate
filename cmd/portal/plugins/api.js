@@ -164,7 +164,7 @@ class APIClient {
       projectName +
       '/user/' +
       userID +
-      '/change-password'
+      '/reset-password'
     const res = await this._request(url, 'POST', { password: newPassword })
     return res
   }

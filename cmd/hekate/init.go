@@ -91,7 +91,7 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.UserUpdateHandler).Methods("PUT")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", userapiv1.UserRoleAddHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", userapiv1.UserRoleDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/change-password", userapiv1.UserChangePasswordHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/reset-password", userapiv1.UserResetPasswordHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/unlock", userapiv1.UserUnlockHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/logout", userapiv1.UserLogoutHandler).Methods("POST")
 

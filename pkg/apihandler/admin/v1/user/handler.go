@@ -489,9 +489,9 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Info("UserRoleDeleteHandler method successfully finished")
 }
 
-// UserChangePasswordHandler ...
-//   require role: <oneself>
-func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
+// UserResetPasswordHandler ...
+//   require role: write-project
+func UserResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
 	userID := vars["userID"]
@@ -508,16 +508,15 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Authorize API Request
-	claims, err := jwthttp.ValidateAPIToken(r)
-	if err != nil || claims.Subject != userID {
-		errors.PrintAsInfo(errors.Append(err, "Failed to authorize user"))
+	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
 		return
 	}
 
-	var req UserChangePasswordRequest
+	var req UserResetPasswordRequest
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
-		err = errors.New("Invalid request", "Failed to decode user change password request: %v", e)
+		err = errors.New("Invalid request", "Failed to decode user reset password request: %v", e)
 		errors.PrintAsInfo(err)
 		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		return
@@ -539,14 +538,14 @@ func UserChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
 		} else {
-			errors.Print(errors.Append(err, "Failed to change yser password"))
+			errors.Print(errors.Append(err, "Failed to reset user password"))
 			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	logger.Info("UserChangePasswordHandler method successfully finished")
+	logger.Info("UserResetPasswordHandler method successfully finished")
 }
 
 // UserUnlockHandler ...
