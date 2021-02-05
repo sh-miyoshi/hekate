@@ -58,6 +58,16 @@ export class AuthHandler {
     return ''
   }
 
+  _setRedirectTo() {
+    let url = '/admin'
+    const path = this.context.from.path
+    if (path.startsWith('/user/')) {
+      url = path
+    }
+
+    window.localStorage.setItem('redirect_to', url)
+  }
+
   RemoveAllData() {
     window.localStorage.removeItem('access_token')
     window.localStorage.removeItem('refresh_token')
@@ -65,9 +75,12 @@ export class AuthHandler {
     window.localStorage.removeItem('refresh_expires_in')
     window.localStorage.removeItem('user')
     window.localStorage.removeItem('login_project')
+    window.localStorage.removeItem('redirect_to')
   }
 
   Login() {
+    this._setRedirectTo()
+
     const project = process.env.LOGIN_PROJECT
     window.localStorage.setItem('login_project', project)
 
@@ -139,7 +152,7 @@ export class AuthHandler {
   }
 
   async AuthCode(authCode, state) {
-    const redirect = '/admin'
+    const redirect = window.localStorage.getItem('redirect_to')
 
     const correctState = window.sessionStorage.getItem('login_state')
     console.log('state: ', correctState, ', received state: ', state)
