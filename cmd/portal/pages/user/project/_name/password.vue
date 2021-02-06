@@ -1,11 +1,12 @@
 <template>
   <div>
-    <h4>User Top Page</h4>
+    <h4>Password</h4>
   </div>
 </template>
 
 <script>
 export default {
-  layout: 'index'
+  layout: 'user',
+  middleware: 'userAuth'
 }
 </script>
