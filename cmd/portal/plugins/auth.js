@@ -73,6 +73,10 @@ export class AuthHandler {
   }
 
   RemoveAllData() {
+    // remove cookie data
+    document.cookie = 'HEKATE_LOGIN_SESSION=; max-age=0'
+
+    // remove local storage data
     window.localStorage.removeItem('access_token')
     window.localStorage.removeItem('refresh_token')
     window.localStorage.removeItem('expires_in')
@@ -257,10 +261,6 @@ export class AuthHandler {
         console.log(error)
       }
     }
-
-    // remove cookie data
-    document.cookie = 'HEKATE_LOGIN_SESSION=; max-age=0'
-    this.RemoveAllData()
   }
 
   GetUserSystemRoles() {
