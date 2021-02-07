@@ -1,11 +1,20 @@
 <template>
   <div>
-    <h4>User Top Page</h4>
+    <h4>Welcome to Hekate!</h4>
+    <button class="btn btn-primary" @click="login">
+      Login
+    </button>
   </div>
 </template>
 
 <script>
 export default {
-  layout: 'index'
+  layout: 'index',
+  methods: {
+    login() {
+      this.$store.commit('setCurrentProject', this.$route.params.id)
+      this.$auth.Login()
+    }
+  }
 }
 </script>

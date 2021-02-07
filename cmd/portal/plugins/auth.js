@@ -62,7 +62,11 @@ export class AuthHandler {
     let url = '/admin'
     const path = this.context.from.path
     if (path.startsWith('/user/')) {
-      url = path
+      const re = /\/user\/project\/[^/]+/g
+      const found = path.match(re)
+      if (found.length > 0) {
+        url = found[0] + '/info'
+      }
     }
 
     window.localStorage.setItem('redirect_to', url)

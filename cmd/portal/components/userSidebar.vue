@@ -56,7 +56,7 @@ export default {
   data() {
     return {
       showSidebar: true,
-      project: this.$store.state.current_project
+      project: window.localStorage.getItem('login_project')
     }
   }
 }
