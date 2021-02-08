@@ -50,7 +50,8 @@ export default {
   methods: {
     login() {
       this.$store.commit('setCurrentProject', process.env.LOGIN_PROJECT)
-      this.$auth.Login()
+      const project = process.env.LOGIN_PROJECT
+      this.$auth.Login(project)
     }
   }
 }

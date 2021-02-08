@@ -86,10 +86,9 @@ export class AuthHandler {
     window.localStorage.removeItem('redirect_to')
   }
 
-  Login() {
+  Login(project) {
     this._setRedirectTo()
 
-    const project = process.env.LOGIN_PROJECT
     window.localStorage.setItem('login_project', project)
 
     const state = this._genRandom(8)

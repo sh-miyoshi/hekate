@@ -17,8 +17,7 @@ export default {
   layout: 'index',
   methods: {
     login() {
-      this.$store.commit('setCurrentProject', this.$route.params.id)
-      this.$auth.Login()
+      this.$auth.Login(this.$route.params.name)
     }
   }
 }
