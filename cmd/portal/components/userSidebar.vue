@@ -5,13 +5,7 @@
   >
     <ul v-if="showSidebar" class="c-sidebar-nav">
       <li class="c-sidebar-nav-item">
-        <nuxt-link
-          :to="{ name: 'user-project-name-info', params: { name: project } }"
-          class="c-sidebar-nav-link project"
-        >
-          <span class="mr-2">{{ project }}</span>
-          <i class="fa fa-edit"></i>
-        </nuxt-link>
+        <div class="c-sidebar-nav-link project">&nbsp;</div>
       </li>
       <li class="c-sidebar-nav-item">
         <nuxt-link
@@ -55,8 +49,7 @@
 export default {
   data() {
     return {
-      showSidebar: true,
-      project: window.localStorage.getItem('login_project')
+      showSidebar: true
     }
   }
 }
