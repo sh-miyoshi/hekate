@@ -69,13 +69,13 @@ class APIClient {
   }
 
   async ProjectGetList() {
-    const url = this.serverAddr + '/api/v1/project'
+    const url = this.serverAddr + '/adminapi/v1/project'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ProjectGet(projectName) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName
     const res = await this._request(url, 'GET')
     return res
   }
@@ -95,52 +95,52 @@ class APIClient {
         'refresh_token'
       ]
     }
-    const url = this.serverAddr + '/api/v1/project'
+    const url = this.serverAddr + '/adminapi/v1/project'
     const res = await this._request(url, 'POST', data)
     return res
   }
 
   async ProjectDelete(projectName) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async ProjectUpdate(projectName, info) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName
     const res = await this._request(url, 'PUT', info)
     return res
   }
 
   async UserCreate(projectName, info) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/user'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/user'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async UserGetList(projectName) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/user'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/user'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async UserGet(projectName, userID) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/user/' + userID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/user/' + userID
     const res = await this._request(url, 'GET')
     return res
   }
 
   async UserDelete(projectName, userID) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/user/' + userID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/user/' + userID
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async UserUpdate(projectName, userID, info) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/user/' + userID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/user/' + userID
     const res = await this._request(url, 'PUT', info)
     return res
   }
@@ -148,7 +148,7 @@ class APIClient {
   async UserUnlock(projectName, userID) {
     const url =
       this.serverAddr +
-      '/api/v1/project/' +
+      '/adminapi/v1/project/' +
       projectName +
       '/user/' +
       userID +
@@ -160,7 +160,7 @@ class APIClient {
   async UserResetPassword(projectName, userID, newPassword) {
     const url =
       this.serverAddr +
-      '/api/v1/project/' +
+      '/adminapi/v1/project/' +
       projectName +
       '/user/' +
       userID +
@@ -170,67 +170,67 @@ class APIClient {
   }
 
   async ClientCreate(projectName, info) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/client'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/client'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async ClientGetList(projectName) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/client'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/client'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ClientGet(projectName, clientID) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/client/' + clientID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/client/' + clientID
     const res = await this._request(url, 'GET')
     return res
   }
 
   async ClientDelete(projectName, clientID) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/client/' + clientID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/client/' + clientID
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async ClientUpdate(projectName, clientID, info) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/client/' + clientID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/client/' + clientID
     const res = await this._request(url, 'PUT', info)
     return res
   }
 
   async RoleCreate(projectName, info) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/role'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/role'
     const res = await this._request(url, 'POST', info)
     return res
   }
 
   async RoleGetList(projectName) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/role'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/role'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async RoleGet(projectName, roleID) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/role/' + roleID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/role/' + roleID
     const res = await this._request(url, 'GET')
     return res
   }
 
   async RoleDelete(projectName, roleID) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/role/' + roleID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/role/' + roleID
     const res = await this._request(url, 'DELETE')
     return res
   }
 
   async RoleUpdate(projectName, roleID, info) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/role/' + roleID
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/role/' + roleID
     const res = await this._request(url, 'PUT', info)
     return res
   }
@@ -238,7 +238,7 @@ class APIClient {
   async SessionGet(projectName, sessionID) {
     const url =
       this.serverAddr +
-      '/api/v1/project/' +
+      '/adminapi/v1/project/' +
       projectName +
       '/session/' +
       sessionID
@@ -247,21 +247,21 @@ class APIClient {
   }
 
   async KeysGet(projectName) {
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/keys'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/keys'
     const res = await this._request(url, 'GET')
     return res
   }
 
   async KeysReset(projectName) {
     const url =
-      this.serverAddr + '/api/v1/project/' + projectName + '/keys/reset'
+      this.serverAddr + '/adminapi/v1/project/' + projectName + '/keys/reset'
     const res = await this._request(url, 'POST')
     return res
   }
 
   async AuditGetList(projectName) {
     // TODO(from, to, pagenation)
-    const url = this.serverAddr + '/api/v1/project/' + projectName + '/audit'
+    const url = this.serverAddr + '/adminapi/v1/project/' + projectName + '/audit'
     const res = await this._request(url, 'GET')
     return res
   }

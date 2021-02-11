@@ -21,7 +21,7 @@ func main() {
 	values := neturl.Values{}
 	values.Set("scope", "openid")
 	values.Set("client_id", clientID)
-	url := serverAddr + "/api/v1/project/master/oauth/device"
+	url := serverAddr + "/adminapi/v1/project/master/oauth/device"
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		fmt.Printf("Failed to create new request: %v\n", err)
@@ -107,7 +107,7 @@ func main() {
 	values.Set("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
 	values.Set("client_id", clientID)
 	values.Set("device_code", res.DeviceCode)
-	url = serverAddr + "/api/v1/project/master/openid-connect/token"
+	url = serverAddr + "/adminapi/v1/project/master/openid-connect/token"
 	req, _ = http.NewRequest("POST", url, nil)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.URL.RawQuery = values.Encode()

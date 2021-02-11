@@ -16,7 +16,7 @@ import (
 
 func main() {
 	serverAddr := "http://localhost:18443"
-	issuer := serverAddr + "/api/v1/project/master"
+	issuer := serverAddr + "/adminapi/v1/project/master"
 	clientID := "portal"
 	clientSecret := ""
 	state := "mystate"

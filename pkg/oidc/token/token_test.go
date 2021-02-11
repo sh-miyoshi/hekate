@@ -11,7 +11,7 @@ func TestGetExpectIssuer(t *testing.T) {
 		expect string
 	}{
 		{
-			"http://localhost:18443/api/v1/project/master/.well-known/openid-configuration",
+			"http://localhost:18443/adminapi/v1/project/master/.well-known/openid-configuration",
 			"http://localhost:18443",
 		},
 	}

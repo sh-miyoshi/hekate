@@ -15,7 +15,7 @@ cd ../../test/gatekeeper
 # wait server up
 sleep 1
 
-URL="http://localhost:18443/api/v1"
+URL="http://localhost:18443/adminapi/v1"
 
 # Get Master Token
 token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \

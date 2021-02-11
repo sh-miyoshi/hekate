@@ -30,7 +30,7 @@ func (h *Handler) getUserID(projectName string, userName string) (string, error)
 
 // UserAdd ...
 func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*userapi.UserGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/user", h.serverAddr, projectName)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (h *Handler) UserDelete(projectName string, userName string) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s", h.serverAddr, projectName, userID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/user/%s", h.serverAddr, projectName, userID)
 	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (h *Handler) UserDelete(projectName string, userName string) error {
 
 // UserGetList ...
 func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.UserGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/user", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/user", h.serverAddr, projectName)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -177,7 +177,7 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 		return err
 	}
 
-	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
 	httpRes, err := h.request("POST", url, nil)
 	if err != nil {
 		return err
@@ -223,7 +223,7 @@ func (h *Handler) UserRoleDelete(projectName string, userName string, roleName s
 		return err
 	}
 
-	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/user/%s/role/%s", h.serverAddr, projectName, userID, roleID)
 	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
@@ -262,7 +262,7 @@ func (h *Handler) UserChangePassword(projectName string, userName string, newPas
 		return err
 	}
 
-	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/reset-password", h.serverAddr, projectName, userID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/user/%s/reset-password", h.serverAddr, projectName, userID)
 	body, _ := json.Marshal(&userapi.UserResetPasswordRequest{
 		Password: newPassword,
 	})
@@ -305,7 +305,7 @@ func (h *Handler) UserUnlock(projectName string, userName string) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s/api/v1/project/%s/user/%s/unlock", h.serverAddr, projectName, userID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/user/%s/unlock", h.serverAddr, projectName, userID)
 	httpRes, err := h.request("POST", url, nil)
 	if err != nil {
 		return err

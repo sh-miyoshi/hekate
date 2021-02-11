@@ -92,7 +92,7 @@ func reqHandler(method string, url string, form neturl.Values, insecure bool, ti
 //   show device login page and user code
 //   polling to token endpoint until user login by web browser
 func Do(info Info) (*oidcapi.TokenResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/oauth/device", info.ServerAddr, info.ProjectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/oauth/device", info.ServerAddr, info.ProjectName)
 	form := neturl.Values{}
 	form.Add("scope", "openid")
 	form.Add("client_id", info.ClientID)
@@ -131,7 +131,7 @@ func Do(info Info) (*oidcapi.TokenResponse, error) {
 		interval = res.Interval
 	}
 
-	url = fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+	url = fmt.Sprintf("%s/adminapi/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
 	form.Add("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
 	form.Add("device_code", res.DeviceCode)
 
@@ -184,7 +184,7 @@ func Do(info Info) (*oidcapi.TokenResponse, error) {
 
 // DoWithRefresh ...
 func DoWithRefresh(refreshToken string, info Info) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+	u := fmt.Sprintf("%s/adminapi/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
 
 	form := neturl.Values{}
 	form.Add("refresh_token", refreshToken)
@@ -206,7 +206,7 @@ func DoWithRefresh(refreshToken string, info Info) (*oidcapi.TokenResponse, erro
 
 // DoWithClient ...
 func DoWithClient(info Info) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+	u := fmt.Sprintf("%s/adminapi/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
 
 	form := neturl.Values{}
 	form.Add("grant_type", "client_credentials")

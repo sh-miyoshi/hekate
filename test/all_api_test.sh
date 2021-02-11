@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVER_ADDR="http://localhost:18443"
-URL="$SERVER_ADDR/api/v1"
+URL="$SERVER_ADDR/adminapi/v1"
 
 function test_api() {
 	url=$1
@@ -197,7 +197,3 @@ echo "success to client delete"
 # Audit Events Get
 test_api "$URL/project/master/audit" GET $master_access_token
 echo "success to get audit events"
-
-# User Logout
-test_api "$URL/project/master/user/$userID/logout" POST $master_access_token
-echo "success to user logout"

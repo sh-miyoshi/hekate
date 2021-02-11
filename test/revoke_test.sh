@@ -1,6 +1,6 @@
 #!/bin/bash
 
-URL="http://localhost:18443/api/v1"
+URL="http://localhost:18443/adminapi/v1"
 PROJECT_NAME="master"
 
 token_info=`curl --insecure -s -X POST $URL/project/$PROJECT_NAME/openid-connect/token \

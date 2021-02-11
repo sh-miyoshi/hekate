@@ -110,7 +110,7 @@ export class AuthHandler {
 
     const url =
       process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
+      '/adminapi/v1/project/' +
       project +
       '/openid-connect/auth?' +
       this._encodeQuery(opts)
@@ -127,7 +127,7 @@ export class AuthHandler {
     const project = window.localStorage.getItem('login_project')
     const url =
       process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
+      '/adminapi/v1/project/' +
       project +
       '/openid-connect/token'
 
@@ -245,7 +245,7 @@ export class AuthHandler {
       const project = window.localStorage.getItem('login_project')
       const url =
         process.env.HEKATE_SERVER_ADDR +
-        '/api/v1/project/' +
+        '/adminapi/v1/project/' +
         project +
         '/openid-connect/revoke'
 

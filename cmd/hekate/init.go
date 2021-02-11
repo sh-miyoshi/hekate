@@ -59,7 +59,7 @@ func setAPI(r *mux.Router) {
 	//------------------------------
 	// Admin APIs
 	//------------------------------
-	const basePath = "/api/v1"
+	const basePath = "/adminapi/v1"
 
 	// OpenID Connect API
 	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", adminoidcapiv1.ConfigGetHandler).Methods("GET")

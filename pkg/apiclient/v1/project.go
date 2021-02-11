@@ -13,7 +13,7 @@ import (
 
 // ProjectAdd ...
 func (h *Handler) ProjectAdd(req *projectapi.ProjectCreateRequest) (*projectapi.ProjectGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project", h.serverAddr)
+	url := fmt.Sprintf("%s/adminapi/v1/project", h.serverAddr)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (h *Handler) ProjectAdd(req *projectapi.ProjectCreateRequest) (*projectapi.
 
 // ProjectDelete ...
 func (h *Handler) ProjectDelete(projectName string) error {
-	url := fmt.Sprintf("%s/api/v1/project/%s", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s", h.serverAddr, projectName)
 	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
@@ -88,7 +88,7 @@ func (h *Handler) ProjectDelete(projectName string) error {
 
 // ProjectGetList ...
 func (h *Handler) ProjectGetList() ([]*projectapi.ProjectGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project", h.serverAddr)
+	url := fmt.Sprintf("%s/adminapi/v1/project", h.serverAddr)
 	httpRes, err := h.request("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func (h *Handler) ProjectGetList() ([]*projectapi.ProjectGetResponse, error) {
 
 // ProjectGet ...
 func (h *Handler) ProjectGet(projectName string) (*projectapi.ProjectGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s", h.serverAddr, projectName)
 	httpRes, err := h.request("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -158,7 +158,7 @@ func (h *Handler) ProjectGet(projectName string) (*projectapi.ProjectGetResponse
 
 // ProjectUpdate ...
 func (h *Handler) ProjectUpdate(projectName string, req *projectapi.ProjectPutRequest) error {
-	url := fmt.Sprintf("%s/api/v1/project/%s", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s", h.serverAddr, projectName)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return err
@@ -196,7 +196,7 @@ func (h *Handler) ProjectUpdate(projectName string, req *projectapi.ProjectPutRe
 
 // ProjectKeysGet ...
 func (h *Handler) ProjectKeysGet(projectName string) (*keysapi.KeysGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/keys", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/keys", h.serverAddr, projectName)
 	httpRes, err := h.request("GET", url, nil)
 	if err != nil {
 		return nil, err

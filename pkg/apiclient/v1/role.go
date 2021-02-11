@@ -35,7 +35,7 @@ func (h *Handler) getRoleID(projectName, roleName string, roleType model.RoleTyp
 
 // RoleAdd ...
 func (h *Handler) RoleAdd(projectName string, req *roleapi.CustomRoleCreateRequest) (*roleapi.CustomRoleGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/role", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/role", h.serverAddr, projectName)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func (h *Handler) RoleDelete(projectName string, roleName string) error {
 		return err
 	}
 
-	url := fmt.Sprintf("%s/api/v1/project/%s/role/%s", h.serverAddr, projectName, roleID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/role/%s", h.serverAddr, projectName, roleID)
 	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
@@ -117,7 +117,7 @@ func (h *Handler) RoleDelete(projectName string, roleName string) error {
 
 // RoleGetList ...
 func (h *Handler) RoleGetList(projectName string, roleName string) ([]*roleapi.CustomRoleGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/role", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/role", h.serverAddr, projectName)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

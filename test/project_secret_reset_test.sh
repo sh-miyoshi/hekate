@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVER_ADDR="http://localhost:18443"
-URL="$SERVER_ADDR/api/v1"
+URL="$SERVER_ADDR/adminapi/v1"
 
 curl $SERVER_ADDR/healthz -s -o /dev/null
 if [ $? != 0 ]; then
