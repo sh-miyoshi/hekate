@@ -240,7 +240,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UserGetHandler ...
-//   require role: read-project, or <oneself>
+//   require role: read-project
 func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectName := vars["projectName"]
@@ -248,13 +248,9 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
-		claims, err := jwthttp.ValidateAPIToken(r)
-		// Check if the requester is the user
-		if err != nil || claims.Subject != userID {
-			errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-			errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
-			return
-		}
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
 	}
 
 	user, err := db.GetInst().UserGet(projectName, userID)
@@ -598,47 +594,4 @@ func UserUnlockHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 	logger.Info("UserUnlockHandler method successfully finished")
-}
-
-// UserLogoutHandler ...
-//   require role: <oneself> or write-project
-func UserLogoutHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	projectName := vars["projectName"]
-	userID := vars["userID"]
-
-	var err *errors.Error
-	defer func() {
-		msg := ""
-		if err != nil {
-			msg = err.Error()
-		}
-		if err = audit.GetInst().Save(projectName, time.Now(), "USER", r.Method, r.URL.String(), msg); err != nil {
-			errors.Print(errors.Append(err, "Failed to save audit event"))
-		}
-	}()
-
-	// Authorize API Request
-	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
-		claims, err := jwthttp.ValidateAPIToken(r)
-		if err != nil || claims.Subject != userID {
-			errors.PrintAsInfo(errors.Append(err, "Failed to authorize user: don't have permission and not yourself"))
-			errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
-			return
-		}
-	}
-
-	if err = db.GetInst().UserLogout(projectName, userID); err != nil {
-		if errors.Contains(err, model.ErrUserValidateFailed) {
-			logger.Info("User ID %s is invalid", userID)
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
-		} else {
-			errors.Print(errors.Append(err, "Failed to logout"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
-		}
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	logger.Info("UserLogoutHandler method successfully finished")
 }

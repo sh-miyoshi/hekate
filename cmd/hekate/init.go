@@ -98,7 +98,6 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", adminuserapiv1.UserRoleDeleteHandler).Methods("DELETE")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/reset-password", adminuserapiv1.UserResetPasswordHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/unlock", adminuserapiv1.UserUnlockHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/logout", adminuserapiv1.UserLogoutHandler).Methods("POST")
 
 	// Client API
 	r.HandleFunc(basePath+"/project/{projectName}/client", adminclientapiv1.AllClientGetHandler).Methods("GET")
@@ -125,6 +124,7 @@ func setAPI(r *mux.Router) {
 	// User APIs
 	//------------------------------
 	r.HandleFunc("/userapi/v1/project/{projectName}/user/{userID}/change-password", userapiv1.ChangePasswordHandler)
+	r.HandleFunc("/userapi/v1/project/{projectName}/user/{userID}/logout", userapiv1.LogoutHandler).Methods("POST")
 
 	//------------------------------
 	// Other APIs
