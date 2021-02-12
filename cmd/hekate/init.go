@@ -59,7 +59,8 @@ func setAPI(r *mux.Router) {
 	//------------------------------
 	// Auth APIs
 	//------------------------------
-	basePath := "authapi/v1"
+	basePath := "/authapi/v1"
+
 	// OpenID Connect API
 	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", oidcapiv1.ConfigGetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/token", oidcapiv1.TokenHandler).Methods("POST")
