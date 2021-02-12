@@ -1,5 +1,15 @@
 # TODO List
 
+## User APIの追加
+
+- 既存APIの修正
+  - revoke tokenを使っている場所をすべてuser logout APIを使う
+    - portalを二つ開いて意図通り動くかテスト
+  - API docsの修正
+- portalでpasswordを変更する
+- OTPの追加
+  - 未着手
+
 ## Documents
 
 - login pageの修正方法
@@ -13,6 +23,8 @@
 
 ## server application enhancement
 
+- ユーザーのPassword設定ミス時に理由を返す
+  - 例: minimun length 8
 - add debug log
 - db manager validationの追加
 - masterプロジェクト初期構成時にpassword grantを外す
