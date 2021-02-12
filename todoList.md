@@ -2,11 +2,6 @@
 
 ## User APIの追加
 
-- 既存APIの修正
-  - revoke tokenを使っている場所をすべてuser logout APIを使う
-    - portalを二つ開いて意図通り動くかテスト
-  - API docsの修正
-- portalでpasswordを変更する
 - OTPの追加
   - 未着手
 
