@@ -70,8 +70,13 @@ token_info=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/master/op
   -d 'grant_type=password'`
 token=`echo $token_info | jq -r .access_token`
 
+# get user id
+userID=`curl --insecure -s -H "Authorization: Bearer $token" $SERVER_ADDR/adminapi/v1/project/master/user | jq -r .[0].id`
+echo "User ID: $userID"
+
 # change-password
+test_api "$URL/project/master/user/$userID/change-password" POST $token "inputs/user_change_password.json"
 
 # logout
-test_api "$URL/project/master/user/$userID/logout" POST $master_access_token
+test_api "$URL/project/master/user/$userID/logout" POST $token
 echo "success to user logout"
