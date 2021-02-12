@@ -1,6 +1,6 @@
 client-id: gatekeeper
 client-secret: secret
-discovery-url: http://localhost:18443/adminapi/v1/project/master
+discovery-url: http://localhost:18443/authapi/v1/project/master
 enable-default-deny: true
 skip-openid-provider-tls-verify: true
 encryption_key: secret

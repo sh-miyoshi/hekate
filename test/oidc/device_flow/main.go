@@ -21,7 +21,7 @@ func main() {
 	values := neturl.Values{}
 	values.Set("scope", "openid")
 	values.Set("client_id", clientID)
-	url := serverAddr + "/adminapi/v1/project/master/oauth/device"
+	url := serverAddr + "/authapi/v1/project/master/oauth/device"
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		fmt.Printf("Failed to create new request: %v\n", err)

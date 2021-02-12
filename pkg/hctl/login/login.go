@@ -91,7 +91,7 @@ func reqHandler(method string, url string, form neturl.Values, insecure bool, ti
 //   show device login page and user code
 //   polling to token endpoint until user login by web browser
 func Do(info Info) (*oidcapi.TokenResponse, error) {
-	url := fmt.Sprintf("%s/adminapi/v1/project/%s/oauth/device", info.ServerAddr, info.ProjectName)
+	url := fmt.Sprintf("%s/authapi/v1/project/%s/oauth/device", info.ServerAddr, info.ProjectName)
 	form := neturl.Values{}
 	form.Add("scope", "openid")
 	form.Add("client_id", info.ClientID)
