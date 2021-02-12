@@ -49,7 +49,8 @@
 export default {
   data() {
     return {
-      showSidebar: true
+      showSidebar: true,
+      project: window.localStorage.getItem('login_project')
     }
   }
 }
