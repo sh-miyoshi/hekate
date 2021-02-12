@@ -8,15 +8,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	adminauditapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/audit"
-	adminauthnapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/authn"
 	adminclientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/client"
 	adminroleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/customrole"
 	adminkeysapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/keys"
-	adminoauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oauth"
-	adminoidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oidc"
 	adminprojectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/project"
 	adminsessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/session"
 	adminuserapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/user"
+	authnapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/authn"
+	oauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oauth"
+	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oidc"
 	userapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/user/v1"
 	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/config"
@@ -57,25 +57,29 @@ func setAPI(r *mux.Router) {
 	cfg := config.Get()
 
 	//------------------------------
-	// Admin APIs
+	// Auth APIs
 	//------------------------------
-	const basePath = "/adminapi/v1"
-
+	basePath := "authapi/v1"
 	// OpenID Connect API
-	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", adminoidcapiv1.ConfigGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/token", adminoidcapiv1.TokenHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/certs", adminoidcapiv1.CertsHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", adminoidcapiv1.AuthGETHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", adminoidcapiv1.AuthPOSTHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/userinfo", adminoidcapiv1.UserInfoHandler).Methods("GET", "POST")
-	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", adminoidcapiv1.RevokeHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", oidcapiv1.ConfigGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/token", oidcapiv1.TokenHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/certs", oidcapiv1.CertsHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", oidcapiv1.AuthGETHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/auth", oidcapiv1.AuthPOSTHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/userinfo", oidcapiv1.UserInfoHandler).Methods("GET", "POST")
+	r.HandleFunc(basePath+"/project/{projectName}/openid-connect/revoke", oidcapiv1.RevokeHandler).Methods("POST")
 
 	// OAuth
-	r.HandleFunc(basePath+"/project/{projectName}/oauth/device", adminoauthapiv1.DeviceRegisterHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/oauth/device", oauthapiv1.DeviceRegisterHandler).Methods("POST")
 
 	// Authenticate API
-	r.HandleFunc(basePath+"/project/{projectName}/authn/login", adminauthnapiv1.UserLoginHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", adminauthnapiv1.ConsentHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
+
+	//------------------------------
+	// Admin APIs
+	//------------------------------
+	basePath = "/adminapi/v1"
 
 	// Project API
 	r.HandleFunc(basePath+"/project", adminprojectapiv1.AllProjectGetHandler).Methods("GET")
@@ -123,16 +127,17 @@ func setAPI(r *mux.Router) {
 	//------------------------------
 	// User APIs
 	//------------------------------
-	r.HandleFunc("/userapi/v1/project/{projectName}/user/{userID}/change-password", userapiv1.ChangePasswordHandler)
-	r.HandleFunc("/userapi/v1/project/{projectName}/user/{userID}/logout", userapiv1.LogoutHandler).Methods("POST")
+	basePath = "/userapi/v1"
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/change-password", userapiv1.ChangePasswordHandler)
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/logout", userapiv1.LogoutHandler).Methods("POST")
 
 	//------------------------------
-	// Other APIs
+	// Other Path
 	//------------------------------
 
 	// Device Login HTML Page
-	r.HandleFunc("/resource/project/{projectName}/devicelogin", adminoauthapiv1.DeviceLoginPageHandler).Methods("GET")
-	r.HandleFunc("/resource/project/{projectName}/deviceverify", adminoauthapiv1.DeviceUserCodeVerifyHandler).Methods("POST")
+	r.HandleFunc("/resource/project/{projectName}/devicelogin", oauthapiv1.DeviceLoginPageHandler).Methods("GET")
+	r.HandleFunc("/resource/project/{projectName}/deviceverify", oauthapiv1.DeviceUserCodeVerifyHandler).Methods("POST")
 	r.HandleFunc("/resource/project/{projectName}/devicecomplete", func(w http.ResponseWriter, r *http.Request) {
 		login.WriteDeviceLoginCompletePage(w)
 	}).Methods("GET")

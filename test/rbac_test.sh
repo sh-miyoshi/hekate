@@ -30,7 +30,7 @@ function login() {
   name=$2
   passwd=$3
 
-  rawToken=`curl --insecure -s -X POST $SERVER_ADDR/adminapi/v1/project/$project/openid-connect/token \
+  rawToken=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/$project/openid-connect/token \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "username=$name" \
     -d "password=$passwd" \

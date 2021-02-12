@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Token get
-token_info=`curl --insecure -s -X POST http://localhost:18443/adminapi/v1/project/master/openid-connect/token \
+token_info=`curl --insecure -s -X POST http://localhost:18443/authapi/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \

@@ -62,7 +62,7 @@ if [ $? != 0 ]; then
 fi
 
 # Get Master Token
-token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+token_info=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \
@@ -121,7 +121,7 @@ echo "success to user create"
 userID=`echo $result | jq -r .id`
 
 # Get User Token
-token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+token_info=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=user1" \
   -d "password=password" \

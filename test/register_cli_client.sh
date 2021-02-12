@@ -2,7 +2,7 @@
 
 SERVER_ADDR=$1
 
-token=`curl --insecure -s -X POST $SERVER_ADDR/adminapi/v1/project/master/openid-connect/token \
+token=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \

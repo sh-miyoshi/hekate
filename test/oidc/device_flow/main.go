@@ -107,7 +107,7 @@ func main() {
 	values.Set("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
 	values.Set("client_id", clientID)
 	values.Set("device_code", res.DeviceCode)
-	url = serverAddr + "/adminapi/v1/project/master/openid-connect/token"
+	url = serverAddr + "/authapi/v1/project/master/openid-connect/token"
 	req, _ = http.NewRequest("POST", url, nil)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.URL.RawQuery = values.Encode()

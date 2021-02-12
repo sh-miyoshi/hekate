@@ -7,7 +7,7 @@ info:
     name: 'Apache 2.0'
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 paths:
-  '/adminapi/v1/project/{projectName}/.well-known/openid-configuration':
+  '/authapi/v1/project/{projectName}/.well-known/openid-configuration':
     get:
       summary: "OpenID Connect Discovery Endpoint"
       tags:
@@ -25,7 +25,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenIDConfiguration'
-  '/adminapi/v1/project/{projectName}/openid-connect/token':
+  '/authapi/v1/project/{projectName}/openid-connect/token':
     post:
       summary: "Token Endpoint"
       tags:
@@ -56,7 +56,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/openid-connect/certs':
+  '/authapi/v1/project/{projectName}/openid-connect/certs':
     get:
       summary: "JSON Web Keys Discovery"
       tags:
@@ -78,7 +78,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/openid-connect/auth':
+  '/authapi/v1/project/{projectName}/openid-connect/auth':
     get:
       summary: "Authorization Endpoint"
       tags:
@@ -150,7 +150,7 @@ paths:
           description: "return error to callback url"
         '500':
           description: "Internal server error"
-  '/adminapi/v1/project/{projectName}/openid-connect/userinfo':
+  '/authapi/v1/project/{projectName}/openid-connect/userinfo':
     get:
       summary: "UserInfo Endpoint"
       tags:
@@ -193,7 +193,7 @@ paths:
           description: "invalid_request"
         '500':
           description: "Internal server error"
-  '/adminapi/v1/project/{projectName}/openid-connect/revoke':
+  '/authapi/v1/project/{projectName}/openid-connect/revoke':
     post:
       summary: "Revoke Token"
       tags:
@@ -216,7 +216,7 @@ paths:
           description: "unsupported token type"
         '500':
           description: "Internal server error"
-  '/adminapi/v1/project/{projectName}/oauth/device':
+  '/authapi/v1/project/{projectName}/oauth/device':
     post:
       summary: "Device Authorization Endpoint"
       tags:
@@ -243,7 +243,7 @@ paths:
           description: "Invalid request"
         '500':
           description: "Internal server error"
-  '/adminapi/v1/project/{projectName}/authn/login':
+  '/authapi/v1/project/{projectName}/authn/login':
     post:
       summary: "Login to hekate"
       tags:
@@ -266,7 +266,7 @@ paths:
           description: "Redirect to callback URL"
         '500':
           description: "Internal server error"
-  '/adminapi/v1/project/{projectName}/authn/consent':
+  '/authapi/v1/project/{projectName}/authn/consent':
     post:
       summary: "Consent to auth"
       tags:
