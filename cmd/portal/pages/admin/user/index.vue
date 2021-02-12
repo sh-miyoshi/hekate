@@ -82,7 +82,7 @@ export default {
       }
     },
     allowEdit(userName) {
-      const loginUser = window.localStorage.getItem('user')
+      const loginUser = window.localStorage.getItem('user_name')
       return userName !== loginUser
     },
     deleteUserConfirm(id) {

@@ -33,7 +33,8 @@ export class AuthHandler {
 
   _setLoginUser(token) {
     const data = jwtdecode(token)
-    window.localStorage.setItem('user', data.preferred_username)
+    window.localStorage.setItem('user_name', data.preferred_username)
+    window.localStorage.setItem('user_id', data.sub)
   }
 
   _genRandom(length) {
@@ -81,7 +82,8 @@ export class AuthHandler {
     window.localStorage.removeItem('refresh_token')
     window.localStorage.removeItem('expires_in')
     window.localStorage.removeItem('refresh_expires_in')
-    window.localStorage.removeItem('user')
+    window.localStorage.removeItem('user_name')
+    window.localStorage.removeItem('user_id')
     window.localStorage.removeItem('login_project')
     window.localStorage.removeItem('redirect_to')
   }
@@ -232,22 +234,21 @@ export class AuthHandler {
   async Logout() {
     const refreshToken = window.localStorage.getItem('refresh_token')
     if (refreshToken) {
-      const opts = {
-        token_type_hint: 'refresh_token',
-        refresh_token: refreshToken
-      }
-
       const headers = {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Bearer ' + window.localStorage.getItem('access_token')
       }
 
       // TODO(use param: timeout)
+      const userID = window.localStorage.getItem('user_id')
       const project = window.localStorage.getItem('login_project')
       const url =
         process.env.HEKATE_SERVER_ADDR +
-        '/authapi/v1/project/' +
+        '/userapi/v1/project/' +
         project +
-        '/openid-connect/revoke'
+        '/user/' +
+        userID +
+        '/logout'
 
       const handler = axios.create({
         headers,
@@ -255,7 +256,7 @@ export class AuthHandler {
       })
 
       try {
-        await handler.post(url, querystring.stringify(opts))
+        await handler.post(url)
       } catch (error) {
         console.log(error)
       }

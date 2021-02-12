@@ -311,7 +311,7 @@ export default {
       this.error = res.message
     },
     allowEdit() {
-      const loginUser = window.localStorage.getItem('user')
+      const loginUser = window.localStorage.getItem('user_name')
       return this.currentUserName !== loginUser
     },
     deleteUserConfirm() {
