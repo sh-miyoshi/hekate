@@ -84,7 +84,7 @@ export RESOURCE_SERVER="http://localhost" # アクセスを制御したいサー
 cat << EOF > config.yaml
 client-id: sample-proxy
 client-secret: $CLIENT_SECRET
-discovery-url: $HEKATE_SERVER/adminapi/v1/project/sample # プロジェクトを変更した場合は適宜修正してください
+discovery-url: $HEKATE_SERVER/authapi/v1/project/sample # プロジェクトを変更した場合は適宜修正してください
 enable-default-deny: true
 skip-openid-provider-tls-verify: true
 encryption_key: secret
