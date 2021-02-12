@@ -1,7 +1,7 @@
 package login
 
 import (
-	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oidc"
+	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/login"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"

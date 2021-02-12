@@ -11,9 +11,8 @@ import (
 	"strings"
 	"time"
 
-	oauthapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oauth"
-	"github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oidc"
-	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/oidc"
+	oauthapi "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oauth"
+	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
@@ -150,7 +149,7 @@ func Do(info Info) (*oidcapi.TokenResponse, error) {
 				}
 				return res, nil
 			case 400:
-				var res oidc.ErrorResponse
+				var res oidcapi.ErrorResponse
 				if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 					return nil, fmt.Errorf("<Program Bug> Failed to parse http response: %v", err)
 				}
