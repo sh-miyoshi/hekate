@@ -10,7 +10,7 @@
           <span class="required">*</span>
         </label>
         <div class="col-sm-7">
-          <input v-model="password" class="form-control" />
+          <input v-model="password" class="form-control" type="password" />
         </div>
       </div>
       <div class="form-group row">
@@ -19,7 +19,7 @@
           <span class="required">*</span>
         </label>
         <div class="col-sm-7">
-          <input v-model="confirm" class="form-control" />
+          <input v-model="confirm" class="form-control" type="password" />
         </div>
       </div>
     </div>
@@ -45,13 +45,31 @@ export default {
     }
   },
   methods: {
-    update() {
+    async update() {
       if (this.password !== this.confirm) {
         this.error = 'password and confirm are not same.'
         return
       }
       this.error = ''
-      // TODO change password
+
+      const project = window.localStorage.getItem('login_project')
+      const userID = window.localStorage.getItem('user_id')
+      const res = await this.$api.UserAPIChangePassword(
+        project,
+        userID,
+        this.password
+      )
+      console.log('change user password result: %o', res)
+      if (!res.ok) {
+        this.error = res.message
+        return
+      }
+
+      // reset password box
+      this.password = ''
+      this.confirm = ''
+
+      this.$bvModal.msgBoxOk('successfully updated.')
     }
   }
 }

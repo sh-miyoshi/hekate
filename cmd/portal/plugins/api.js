@@ -309,6 +309,22 @@ class APIClient {
     const res = await this._request(url, 'GET')
     return res
   }
+
+  // ----------------------------
+  // User API Client
+  // ----------------------------
+
+  async UserAPIChangePassword(projectName, userID, newPassword) {
+    const url =
+      this.serverAddr +
+      '/userapi/v1/project/' +
+      projectName +
+      '/user/' +
+      userID +
+      '/change-password'
+    const res = await this._request(url, 'POST', { password: newPassword })
+    return res
+  }
 }
 
 export default (context, inject) => {
