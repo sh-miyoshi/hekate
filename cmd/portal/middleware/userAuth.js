@@ -5,7 +5,7 @@ export default async function(context) {
 
   const loginProject = window.localStorage.getItem('login_project')
   if (!loginProject) {
-    handler.Login()
+    handler.Login(context.params.name)
     return
   }
 
