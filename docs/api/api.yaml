@@ -729,31 +729,6 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/user/{userID}/logout':
-    post:
-      summary: "Logout User"
-      tags:
-        - user
-      parameters:
-        - name: projectName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: userID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: 'Success'
-        '404':
-          description: 'User or Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
   '/adminapi/v1/project/{projectName}/client':
     post:
       summary: "Create Client"
@@ -1542,14 +1517,3 @@ components:
           description: "The lifetime in seconds of the 'device_code' and 'user_code'"
         interval:
           type: integer
-    DeviceLoginRequest:
-      type: object
-      properties:
-        login_verify_code:
-          type: string
-        username:
-          type: string
-        password:
-          type: string
-        user_code:
-          type: string

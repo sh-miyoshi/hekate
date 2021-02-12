@@ -39,6 +39,31 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
+  '/userapi/v1/project/{projectName}/user/{userID}/logout':
+    post:
+      summary: "Logout user"
+      tags:
+        - userapi
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success'
+        '404':
+          description: 'Project or User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
 components:
   schemas:
     UserChangePasswordRequest:
