@@ -10,7 +10,7 @@ function test_api() {
 
 	if [ $# = 4 ]; then
 		input=$4
-		result=`curl --insecure -s -X $method -d "@$input" \
+		result=`curl --insecure -s -X $method -d "$input" \
 		  -H "Authorization: Bearer $token" $url \
 		  -o /dev/null -w '%{http_code}'`
 		if [ $result -ge 300 ]; then
@@ -75,7 +75,7 @@ userID=`curl --insecure -s -H "Authorization: Bearer $token" $SERVER_ADDR/admina
 echo "User ID: $userID"
 
 # change-password
-test_api "$URL/project/master/user/$userID/change-password" POST $token "inputs/user_change_password.json"
+test_api "$URL/project/master/user/$userID/change-password" POST $token "{\"password\":\"password\"}"
 
 # logout
 test_api "$URL/project/master/user/$userID/logout" POST $token
