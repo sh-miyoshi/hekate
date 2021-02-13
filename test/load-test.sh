@@ -8,11 +8,12 @@ fi
 THREADS=$1
 LOOPS=$2
 
-URL="http://localhost:18443/api/v1"
+SERVER_ADDR="http://localhost:18443"
+URL="$SERVER_ADDR/adminapi/v1"
 PROJECT_NAME="master"
 
 function test() {
-  token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+  token_info=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/master/openid-connect/token \
     -H "Content-Type: application/x-www-form-urlencoded" \
     -d "username=admin" \
     -d "password=password" \

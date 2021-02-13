@@ -7,7 +7,7 @@ import (
 	"os"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
-	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
+	userapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/user"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"

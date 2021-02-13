@@ -37,6 +37,12 @@ jobs:
         cd test
         ./all_api_test.sh
 
+    - name: User API Test
+      run: |
+        cd test
+        chmod 755 user_api_test.sh
+        ./user_api_test.sh
+
     - name: CLI Tool Test
       run: |
         cd test

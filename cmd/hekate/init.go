@@ -7,16 +7,17 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	auditapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/audit"
-	authnapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/authn"
-	clientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
-	roleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
-	keysapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
-	oauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oauth"
-	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
-	projectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
-	sessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/session"
-	userapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/user"
+	adminauditapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/audit"
+	adminclientapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/client"
+	adminroleapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/customrole"
+	adminkeysapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/keys"
+	adminprojectapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/project"
+	adminsessionapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/session"
+	adminuserapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/user"
+	authnapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/authn"
+	oauthapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oauth"
+	oidcapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oidc"
+	userapiv1 "github.com/sh-miyoshi/hekate/pkg/apihandler/user/v1"
 	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/config"
 	"github.com/sh-miyoshi/hekate/pkg/db"
@@ -53,8 +54,12 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 func setAPI(r *mux.Router) {
-	const basePath = "/api/v1"
 	cfg := config.Get()
+
+	//------------------------------
+	// Auth APIs
+	//------------------------------
+	basePath := "/authapi/v1"
 
 	// OpenID Connect API
 	r.HandleFunc(basePath+"/project/{projectName}/.well-known/openid-configuration", oidcapiv1.ConfigGetHandler).Methods("GET")
@@ -72,49 +77,64 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
 
+	//------------------------------
+	// Admin APIs
+	//------------------------------
+	basePath = "/adminapi/v1"
+
 	// Project API
-	r.HandleFunc(basePath+"/project", projectapiv1.AllProjectGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project", projectapiv1.ProjectCreateHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}", projectapiv1.ProjectUpdateHandler).Methods("PUT")
+	r.HandleFunc(basePath+"/project", adminprojectapiv1.AllProjectGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project", adminprojectapiv1.ProjectCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}", adminprojectapiv1.ProjectDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}", adminprojectapiv1.ProjectGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}", adminprojectapiv1.ProjectUpdateHandler).Methods("PUT")
 
 	// Keys API
-	r.HandleFunc(basePath+"/project/{projectName}/keys", keysapiv1.KeysGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/keys/reset", keysapiv1.KeysResetHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/keys", adminkeysapiv1.KeysGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/keys/reset", adminkeysapiv1.KeysResetHandler).Methods("POST")
 
 	// User API
-	r.HandleFunc(basePath+"/project/{projectName}/user", userapiv1.AllUserGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/user", userapiv1.UserCreateHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.UserDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.UserGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.UserUpdateHandler).Methods("PUT")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", userapiv1.UserRoleAddHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", userapiv1.UserRoleDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/change-password", userapiv1.UserChangePasswordHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/unlock", userapiv1.UserUnlockHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/logout", userapiv1.UserLogoutHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user", adminuserapiv1.AllUserGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/user", adminuserapiv1.UserCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", adminuserapiv1.UserDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", adminuserapiv1.UserGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", adminuserapiv1.UserUpdateHandler).Methods("PUT")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", adminuserapiv1.UserRoleAddHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/role/{roleID}", adminuserapiv1.UserRoleDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/reset-password", adminuserapiv1.UserResetPasswordHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/unlock", adminuserapiv1.UserUnlockHandler).Methods("POST")
 
 	// Client API
-	r.HandleFunc(basePath+"/project/{projectName}/client", clientapiv1.AllClientGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/client", clientapiv1.ClientCreateHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/client/{clientID}", clientapiv1.ClientDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectName}/client/{clientID}", clientapiv1.ClientGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/client/{clientID}", clientapiv1.ClientUpdateHandler).Methods("PUT")
+	r.HandleFunc(basePath+"/project/{projectName}/client", adminclientapiv1.AllClientGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/client", adminclientapiv1.ClientCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/client/{clientID}", adminclientapiv1.ClientDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/client/{clientID}", adminclientapiv1.ClientGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/client/{clientID}", adminclientapiv1.ClientUpdateHandler).Methods("PUT")
 
 	// Custom Role API
-	r.HandleFunc(basePath+"/project/{projectName}/role", roleapiv1.AllRoleGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/role", roleapiv1.RoleCreateHandler).Methods("POST")
-	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", roleapiv1.RoleDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", roleapiv1.RoleGetHandler).Methods("GET")
-	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", roleapiv1.RoleUpdateHandler).Methods("PUT")
+	r.HandleFunc(basePath+"/project/{projectName}/role", adminroleapiv1.AllRoleGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/role", adminroleapiv1.RoleCreateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", adminroleapiv1.RoleDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", adminroleapiv1.RoleGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/role/{roleID}", adminroleapiv1.RoleUpdateHandler).Methods("PUT")
 
 	// Session API
-	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", sessionapiv1.SessionDeleteHandler).Methods("DELETE")
-	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", sessionapiv1.SessionGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", adminsessionapiv1.SessionDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/session/{sessionID}", adminsessionapiv1.SessionGetHandler).Methods("GET")
 
 	// Audit API
-	r.HandleFunc(basePath+"/project/{projectName}/audit", auditapiv1.AuditGetHandler).Methods("GET")
+	r.HandleFunc(basePath+"/project/{projectName}/audit", adminauditapiv1.AuditGetHandler).Methods("GET")
+
+	//------------------------------
+	// User APIs
+	//------------------------------
+	basePath = "/userapi/v1"
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/change-password", userapiv1.ChangePasswordHandler)
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/logout", userapiv1.LogoutHandler).Methods("POST")
+
+	//------------------------------
+	// Other Path
+	//------------------------------
 
 	// Device Login HTML Page
 	r.HandleFunc("/resource/project/{projectName}/devicelogin", oauthapiv1.DeviceLoginPageHandler).Methods("GET")

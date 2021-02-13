@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+  title: Hekate Server User API
+  description: User API specification for Hekate Server
+  version: '1.0'
+  license:
+    name: 'Apache 2.0'
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  '/userapi/v1/project/{projectName}/user/{userID}/change-password':
+    post:
+      summary: "Change User Password"
+      tags:
+        - userapi
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserChangePasswordRequest'
+      responses:
+        '200':
+          description: 'Success'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'Project or User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/userapi/v1/project/{projectName}/user/{userID}/logout':
+    post:
+      summary: "Logout user"
+      tags:
+        - userapi
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Success'
+        '404':
+          description: 'Project or User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+components:
+  schemas:
+    UserChangePasswordRequest:
+      type: object
+      properties:
+        password:
+          type: string

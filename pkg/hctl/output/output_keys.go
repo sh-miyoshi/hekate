@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	keysapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/keys"
+	keysapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/keys"
 )
 
 // KeysFormat ...

@@ -311,7 +311,7 @@ export default {
       this.error = res.message
     },
     allowEdit() {
-      const loginUser = window.localStorage.getItem('user')
+      const loginUser = window.localStorage.getItem('user_name')
       return this.currentUserName !== loginUser
     },
     deleteUserConfirm() {
@@ -491,6 +491,7 @@ export default {
         return
       }
       await this.$bvModal.msgBoxOk('Successfully reset password')
+      await this.setUser(userID)
     }
   }
 }

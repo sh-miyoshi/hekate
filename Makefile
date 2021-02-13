@@ -13,3 +13,5 @@ run-windows:
 create-apidocs:
 	cd docs/api && \
 	redoc-cli bundle api.yaml -o api.html
+	cd docs/api && \
+	redoc-cli bundle userapi.yaml -o userapi.html

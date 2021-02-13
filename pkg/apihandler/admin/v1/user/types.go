@@ -32,7 +32,7 @@ type UserPutRequest struct {
 	CustomRoles []string `json:"custom_roles"`
 }
 
-// UserChangePasswordRequest ...
-type UserChangePasswordRequest struct {
+// UserResetPasswordRequest ...
+type UserResetPasswordRequest struct {
 	Password string `json:"password"`
 }

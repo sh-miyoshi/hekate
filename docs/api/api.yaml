@@ -7,7 +7,7 @@ info:
     name: 'Apache 2.0'
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 paths:
-  '/api/v1/project/{projectName}/.well-known/openid-configuration':
+  '/authapi/v1/project/{projectName}/.well-known/openid-configuration':
     get:
       summary: "OpenID Connect Discovery Endpoint"
       tags:
@@ -25,7 +25,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenIDConfiguration'
-  '/api/v1/project/{projectName}/openid-connect/token':
+  '/authapi/v1/project/{projectName}/openid-connect/token':
     post:
       summary: "Token Endpoint"
       tags:
@@ -56,7 +56,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/openid-connect/certs':
+  '/authapi/v1/project/{projectName}/openid-connect/certs':
     get:
       summary: "JSON Web Keys Discovery"
       tags:
@@ -78,7 +78,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/openid-connect/auth':
+  '/authapi/v1/project/{projectName}/openid-connect/auth':
     get:
       summary: "Authorization Endpoint"
       tags:
@@ -150,7 +150,7 @@ paths:
           description: "return error to callback url"
         '500':
           description: "Internal server error"
-  '/api/v1/project/{projectName}/openid-connect/userinfo':
+  '/authapi/v1/project/{projectName}/openid-connect/userinfo':
     get:
       summary: "UserInfo Endpoint"
       tags:
@@ -193,7 +193,7 @@ paths:
           description: "invalid_request"
         '500':
           description: "Internal server error"
-  '/api/v1/project/{projectName}/openid-connect/revoke':
+  '/authapi/v1/project/{projectName}/openid-connect/revoke':
     post:
       summary: "Revoke Token"
       tags:
@@ -216,7 +216,7 @@ paths:
           description: "unsupported token type"
         '500':
           description: "Internal server error"
-  '/api/v1/project/{projectName}/oauth/device':
+  '/authapi/v1/project/{projectName}/oauth/device':
     post:
       summary: "Device Authorization Endpoint"
       tags:
@@ -243,7 +243,7 @@ paths:
           description: "Invalid request"
         '500':
           description: "Internal server error"
-  '/api/v1/project/{projectName}/authn/login':
+  '/authapi/v1/project/{projectName}/authn/login':
     post:
       summary: "Login to hekate"
       tags:
@@ -266,7 +266,7 @@ paths:
           description: "Redirect to callback URL"
         '500':
           description: "Internal server error"
-  '/api/v1/project/{projectName}/authn/consent':
+  '/authapi/v1/project/{projectName}/authn/consent':
     post:
       summary: "Consent to auth"
       tags:
@@ -287,7 +287,7 @@ paths:
           description: "Return error page"
         '302':
           description: "Return error or success to callback URL"
-  '/api/v1/project':
+  '/adminapi/v1/project':
     post:
       summary: "Create Project"
       description: |
@@ -335,7 +335,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}':
+  '/adminapi/v1/project/{projectName}':
     get:
       summary: "Get Project"
       description: |
@@ -413,7 +413,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/keys':
+  '/adminapi/v1/project/{projectName}/keys':
     get:
       summary: "Get project secret info"
       description: |
@@ -436,7 +436,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/keys/reset':
+  '/adminapi/v1/project/{projectName}/keys/reset':
     post:
       summary: "Reset secret info"
       description: |
@@ -459,7 +459,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/user':
+  '/adminapi/v1/project/{projectName}/user':
     post:
       summary: "Create User"
       tags:
@@ -521,7 +521,7 @@ paths:
           description: 'Project Not Found'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/user/{userID}':
+  '/adminapi/v1/project/{projectName}/user/{userID}':
     get:
       summary: "Get User"
       tags:
@@ -605,7 +605,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/user/{userID}/role/{roleID}':
+  '/adminapi/v1/project/{projectName}/user/{userID}/role/{roleID}':
     post:
       summary: "Add Role to User"
       tags:
@@ -672,9 +672,9 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/user/{userID}/change-password':
+  '/adminapi/v1/project/{projectName}/user/{userID}/reset-password':
     post:
-      summary: "Change User Password"
+      summary: "Force reset user password"
       tags:
         - user
       parameters:
@@ -692,7 +692,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserChangePasswordRequest'
+              $ref: '#/components/schemas/UserResetPasswordRequest'
       responses:
         '200':
           description: 'Success'
@@ -704,7 +704,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/user/{userID}/unlock':
+  '/adminapi/v1/project/{projectName}/user/{userID}/unlock':
     post:
       summary: "Unlock user"
       tags:
@@ -729,32 +729,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/user/{userID}/logout':
-    post:
-      summary: "Logout User"
-      tags:
-        - user
-      parameters:
-        - name: projectName
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: userID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: 'Success'
-        '404':
-          description: 'User Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/client':
+  '/adminapi/v1/project/{projectName}/client':
     post:
       summary: "Create Client"
       tags:
@@ -812,7 +787,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/client/{clientID}':
+  '/adminapi/v1/project/{projectName}/client/{clientID}':
     get:
       summary: "Get Client"
       tags:
@@ -896,7 +871,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/role':
+  '/adminapi/v1/project/{projectName}/role':
     post:
       summary: "Create Role"
       tags:
@@ -956,7 +931,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/role/{roleID}':
+  '/adminapi/v1/project/{projectName}/role/{roleID}':
     get:
       summary: "Get Role"
       tags:
@@ -1040,7 +1015,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/session/{sessionID}':
+  '/adminapi/v1/project/{projectName}/session/{sessionID}':
     get:
       summary: "Get Session"
       tags:
@@ -1093,7 +1068,7 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
-  '/api/v1/project/{projectName}/audit':
+  '/adminapi/v1/project/{projectName}/audit':
     get:
       summary: "Get Audit events"
       tags:
@@ -1276,7 +1251,7 @@ components:
           type: array
           items:
             type: string
-    UserChangePasswordRequest:
+    UserResetPasswordRequest:
       type: object
       properties:
         password:
@@ -1542,14 +1517,3 @@ components:
           description: "The lifetime in seconds of the 'device_code' and 'user_code'"
         interval:
           type: integer
-    DeviceLoginRequest:
-      type: object
-      properties:
-        login_verify_code:
-          type: string
-        username:
-          type: string
-        password:
-          type: string
-        user_code:
-          type: string

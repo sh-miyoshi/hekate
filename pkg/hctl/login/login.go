@@ -11,9 +11,8 @@ import (
 	"strings"
 	"time"
 
-	oauthapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oauth"
-	"github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
-	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
+	oauthapi "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oauth"
+	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )
 
@@ -92,7 +91,7 @@ func reqHandler(method string, url string, form neturl.Values, insecure bool, ti
 //   show device login page and user code
 //   polling to token endpoint until user login by web browser
 func Do(info Info) (*oidcapi.TokenResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/oauth/device", info.ServerAddr, info.ProjectName)
+	url := fmt.Sprintf("%s/authapi/v1/project/%s/oauth/device", info.ServerAddr, info.ProjectName)
 	form := neturl.Values{}
 	form.Add("scope", "openid")
 	form.Add("client_id", info.ClientID)
@@ -131,7 +130,7 @@ func Do(info Info) (*oidcapi.TokenResponse, error) {
 		interval = res.Interval
 	}
 
-	url = fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+	url = fmt.Sprintf("%s/authapi/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
 	form.Add("grant_type", "urn:ietf:params:oauth:grant-type:device_code")
 	form.Add("device_code", res.DeviceCode)
 
@@ -150,7 +149,7 @@ func Do(info Info) (*oidcapi.TokenResponse, error) {
 				}
 				return res, nil
 			case 400:
-				var res oidc.ErrorResponse
+				var res oidcapi.ErrorResponse
 				if err := json.NewDecoder(httpRes.Body).Decode(&res); err != nil {
 					return nil, fmt.Errorf("<Program Bug> Failed to parse http response: %v", err)
 				}
@@ -184,7 +183,7 @@ func Do(info Info) (*oidcapi.TokenResponse, error) {
 
 // DoWithRefresh ...
 func DoWithRefresh(refreshToken string, info Info) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+	u := fmt.Sprintf("%s/authapi/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
 
 	form := neturl.Values{}
 	form.Add("refresh_token", refreshToken)
@@ -206,7 +205,7 @@ func DoWithRefresh(refreshToken string, info Info) (*oidcapi.TokenResponse, erro
 
 // DoWithClient ...
 func DoWithClient(info Info) (*oidcapi.TokenResponse, error) {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+	u := fmt.Sprintf("%s/authapi/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
 
 	form := neturl.Values{}
 	form.Add("grant_type", "client_credentials")

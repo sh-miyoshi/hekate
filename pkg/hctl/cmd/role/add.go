@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
-	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/customrole"
+	roleapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/customrole"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/output"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"

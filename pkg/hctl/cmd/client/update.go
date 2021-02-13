@@ -6,7 +6,7 @@ import (
 	"os"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
-	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
+	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/client"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/spf13/cobra"

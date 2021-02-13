@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
+	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/project"
 )
 
 func TestParsePasswordPolicies(t *testing.T) {

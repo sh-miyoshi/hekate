@@ -49,8 +49,9 @@ export default {
   layout: 'index',
   methods: {
     login() {
-      this.$store.commit('setCurrentProject', process.env.LOGIN_PROJECT)
-      this.$auth.Login()
+      const project = process.env.LOGIN_PROJECT
+      this.$store.commit('setCurrentProject', project)
+      this.$auth.Login(project)
     }
   }
 }

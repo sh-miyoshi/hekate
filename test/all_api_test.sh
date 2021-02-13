@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVER_ADDR="http://localhost:18443"
-URL="$SERVER_ADDR/api/v1"
+URL="$SERVER_ADDR/adminapi/v1"
 
 function test_api() {
 	url=$1
@@ -62,7 +62,7 @@ if [ $? != 0 ]; then
 fi
 
 # Get Master Token
-token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+token_info=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=admin" \
   -d "password=password" \
@@ -121,7 +121,7 @@ echo "success to user create"
 userID=`echo $result | jq -r .id`
 
 # Get User Token
-token_info=`curl --insecure -s -X POST $URL/project/master/openid-connect/token \
+token_info=`curl --insecure -s -X POST $SERVER_ADDR/authapi/v1/project/master/openid-connect/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=user1" \
   -d "password=password" \
@@ -154,8 +154,8 @@ echo "success to delete user role"
 test_api "$URL/project/master/user/$userID/role/$roleID" POST $master_access_token
 
 # User Password Change
-test_api "$URL/project/master/user/$userID/change-password" POST $user_access_token 'inputs/change-password.json'
-echo "success to change password"
+test_api "$URL/project/master/user/$userID/reset-password" POST $master_access_token 'inputs/change-password.json'
+echo "success to reset password"
 
 # Get Session
 test_api "$URL/project/master/session/$sessionID" GET $master_access_token
@@ -197,7 +197,3 @@ echo "success to client delete"
 # Audit Events Get
 test_api "$URL/project/master/audit" GET $master_access_token
 echo "success to get audit events"
-
-# User Logout
-test_api "$URL/project/master/user/$userID/logout" POST $master_access_token
-echo "success to user logout"

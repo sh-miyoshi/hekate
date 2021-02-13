@@ -17,7 +17,7 @@
         {{ error.message }}
       </div>
       <div>
-        <nuxt-link to="/" class="btn btn-primary">TOP</nuxt-link>
+        <a href="/" class="btn btn-primary">TOP</a>
       </div>
     </div>
   </div>

@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/oidc"
+	oidcapi "github.com/sh-miyoshi/hekate/pkg/apihandler/auth/v1/oidc"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/login"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 )

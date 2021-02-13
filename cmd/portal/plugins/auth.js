@@ -33,7 +33,8 @@ export class AuthHandler {
 
   _setLoginUser(token) {
     const data = jwtdecode(token)
-    window.localStorage.setItem('user', data.preferred_username)
+    window.localStorage.setItem('user_name', data.preferred_username)
+    window.localStorage.setItem('user_id', data.sub)
   }
 
   _genRandom(length) {
@@ -58,17 +59,38 @@ export class AuthHandler {
     return ''
   }
 
+  _setRedirectTo() {
+    let url = '/admin'
+    const path = this.context.from.path
+    if (path.startsWith('/user/')) {
+      const re = /\/user\/project\/[^/]+/g
+      const found = path.match(re)
+      if (found.length > 0) {
+        url = found[0] + '/info'
+      }
+    }
+
+    window.localStorage.setItem('redirect_to', url)
+  }
+
   RemoveAllData() {
+    // remove cookie data
+    document.cookie = 'HEKATE_LOGIN_SESSION=; max-age=0'
+
+    // remove local storage data
     window.localStorage.removeItem('access_token')
     window.localStorage.removeItem('refresh_token')
     window.localStorage.removeItem('expires_in')
     window.localStorage.removeItem('refresh_expires_in')
-    window.localStorage.removeItem('user')
+    window.localStorage.removeItem('user_name')
+    window.localStorage.removeItem('user_id')
     window.localStorage.removeItem('login_project')
+    window.localStorage.removeItem('redirect_to')
   }
 
-  Login() {
-    const project = process.env.LOGIN_PROJECT
+  Login(project) {
+    this._setRedirectTo()
+
     window.localStorage.setItem('login_project', project)
 
     const state = this._genRandom(8)
@@ -90,7 +112,7 @@ export class AuthHandler {
 
     const url =
       process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
+      '/authapi/v1/project/' +
       project +
       '/openid-connect/auth?' +
       this._encodeQuery(opts)
@@ -107,7 +129,7 @@ export class AuthHandler {
     const project = window.localStorage.getItem('login_project')
     const url =
       process.env.HEKATE_SERVER_ADDR +
-      '/api/v1/project/' +
+      '/authapi/v1/project/' +
       project +
       '/openid-connect/token'
 
@@ -139,7 +161,7 @@ export class AuthHandler {
   }
 
   async AuthCode(authCode, state) {
-    const redirect = '/admin'
+    const redirect = window.localStorage.getItem('redirect_to')
 
     const correctState = window.sessionStorage.getItem('login_state')
     console.log('state: ', correctState, ', received state: ', state)
@@ -212,22 +234,21 @@ export class AuthHandler {
   async Logout() {
     const refreshToken = window.localStorage.getItem('refresh_token')
     if (refreshToken) {
-      const opts = {
-        token_type_hint: 'refresh_token',
-        refresh_token: refreshToken
-      }
-
       const headers = {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: 'Bearer ' + window.localStorage.getItem('access_token')
       }
 
       // TODO(use param: timeout)
+      const userID = window.localStorage.getItem('user_id')
       const project = window.localStorage.getItem('login_project')
       const url =
         process.env.HEKATE_SERVER_ADDR +
-        '/api/v1/project/' +
+        '/userapi/v1/project/' +
         project +
-        '/openid-connect/revoke'
+        '/user/' +
+        userID +
+        '/logout'
 
       const handler = axios.create({
         headers,
@@ -235,15 +256,11 @@ export class AuthHandler {
       })
 
       try {
-        await handler.post(url, querystring.stringify(opts))
+        await handler.post(url)
       } catch (error) {
         console.log(error)
       }
     }
-
-    // remove cookie data
-    document.cookie = 'HEKATE_LOGIN_SESSION=; max-age=0'
-    this.RemoveAllData()
   }
 
   GetUserSystemRoles() {

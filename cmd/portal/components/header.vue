@@ -19,7 +19,14 @@ export default {
   methods: {
     logout() {
       this.$auth.Logout()
-      this.$router.push('/')
+      const redirectPath = window.localStorage.getItem('redirect_to')
+      if (redirectPath.startsWith('/admin')) {
+        this.$router.push('/')
+      } else {
+        // set redirectPath - '/info'
+        this.$router.push(redirectPath.slice(0, -5))
+      }
+      this.$auth.RemoveAllData()
     }
   }
 }

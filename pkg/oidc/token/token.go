@@ -302,7 +302,7 @@ func GetFullIssuer(r *http.Request) string {
 		proto = "https"
 	}
 
-	re := regexp.MustCompile(`/api/v1/project/[^/]+`)
+	re := regexp.MustCompile(`/authapi/v1/project/[^/]+`)
 	url := re.FindString(r.URL.Path)
 	res := fmt.Sprintf("%s://%s%s", proto, r.Host, url)
 	return strings.TrimSuffix(res, "/")

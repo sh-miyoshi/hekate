@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	apiclient "github.com/sh-miyoshi/hekate/pkg/apiclient/v1"
-	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/project"
+	projectapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/project"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/config"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/print"
 	"github.com/sh-miyoshi/hekate/pkg/hctl/util"

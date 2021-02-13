@@ -9,7 +9,7 @@ import (
 
 // Logout ...
 func Logout(serverAddr, projectName, refreshToken string) error {
-	u := fmt.Sprintf("%s/api/v1/project/%s/openid-connect/revoke", serverAddr, projectName)
+	u := fmt.Sprintf("%s/authapi/v1/project/%s/openid-connect/revoke", serverAddr, projectName)
 
 	form := url.Values{}
 	form.Add("token_type_hint", "refresh_token")

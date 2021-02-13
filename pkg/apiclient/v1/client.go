@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 
-	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/v1/client"
+	clientapi "github.com/sh-miyoshi/hekate/pkg/apihandler/admin/v1/client"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 )
 
 // ClientAdd ...
 func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateRequest) (*clientapi.ClientGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/client", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/client", h.serverAddr, projectName)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateReque
 
 // ClientDelete ...
 func (h *Handler) ClientDelete(projectName string, clientID string) error {
-	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
 	httpRes, err := h.request("DELETE", url, nil)
 	if err != nil {
 		return err
@@ -90,7 +90,7 @@ func (h *Handler) ClientDelete(projectName string, clientID string) error {
 
 // ClientGetList ...
 func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/client", h.serverAddr, projectName)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/client", h.serverAddr, projectName)
 	httpRes, err := h.request("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetRespo
 
 // ClientGet ...
 func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetResponse, error) {
-	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
 	httpRes, err := h.request("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -164,7 +164,7 @@ func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetR
 
 // ClientUpdate ...
 func (h *Handler) ClientUpdate(projectName, clientID string, req *clientapi.ClientPutRequest) error {
-	url := fmt.Sprintf("%s/api/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
+	url := fmt.Sprintf("%s/adminapi/v1/project/%s/client/%s", h.serverAddr, projectName, clientID)
 	body, err := json.Marshal(req)
 	if err != nil {
 		return err
