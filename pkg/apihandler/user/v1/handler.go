@@ -10,6 +10,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/otp"
 	"github.com/sh-miyoshi/hekate/pkg/secret"
 )
 
@@ -87,4 +88,29 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserLogoutHandler method successfully finished")
+}
+
+// OTPGenerateHandler ...
+func OTPGenerateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+
+	qrcode, err := otp.Register(projectName)
+	if err != nil {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+	logger.Debug("Generated QR code size: %d", len(qrcode))
+	// start otp session(user_code, expires_in, private_key)
+	// return QR code(private_key, settings)
 }

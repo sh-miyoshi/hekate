@@ -14,6 +14,7 @@ require (
 	github.com/jinzhu/copier v0.2.3
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
 	github.com/rs/cors v1.7.0
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
 	go.mongodb.org/mongo-driver v1.4.6

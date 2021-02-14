@@ -959,6 +959,15 @@ func (m *Manager) DeviceGetList(projectName string, filter *model.DeviceFilter) 
 	return m.device.GetList(projectName, filter)
 }
 
+// OTPAdd ...
+func (m *Manager) OTPAdd(projectName string, ent *model.OTP) *errors.Error {
+	// otp add is used in internal only, so validation is not required
+	return m.transaction.Transaction(func() *errors.Error {
+		// TODO
+		return nil
+	})
+}
+
 // DeleteExpiredSessions ...
 func (m *Manager) DeleteExpiredSessions() *errors.Error {
 	now := time.Now()
