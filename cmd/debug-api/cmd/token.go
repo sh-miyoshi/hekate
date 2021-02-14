@@ -14,7 +14,6 @@ func init() {
 	tokenCmd.Flags().StringP("user", "u", "admin", "user name")
 	tokenCmd.Flags().StringP("password", "p", "password", "password")
 	tokenCmd.Flags().String("project", "master", "project")
-	tokenCmd.Flags().String("server", "http://localhost:18443", "server address")
 }
 
 var tokenCmd = &cobra.Command{
