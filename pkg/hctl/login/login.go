@@ -221,3 +221,23 @@ func DoWithClient(info Info) (*oidcapi.TokenResponse, error) {
 
 	return tokenRequest(httpReq, info.Insecure, info.Timeout)
 }
+
+// DoWithPassword ...
+func DoWithPassword(userName, password string, info Info) (*oidcapi.TokenResponse, error) {
+	u := fmt.Sprintf("%s/authapi/v1/project/%s/openid-connect/token", info.ServerAddr, info.ProjectName)
+
+	form := neturl.Values{}
+	form.Add("grant_type", "password")
+	form.Add("client_id", info.ClientID)
+	form.Add("username", userName)
+	form.Add("password", password)
+
+	body := strings.NewReader(form.Encode())
+	httpReq, err := http.NewRequest("POST", u, body)
+	if err != nil {
+		return nil, fmt.Errorf("<Program Bug> Failed to create http request: %v", err)
+	}
+	httpReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	return tokenRequest(httpReq, info.Insecure, info.Timeout)
+}
