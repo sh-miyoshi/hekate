@@ -3,6 +3,7 @@ package cmd
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -84,6 +85,11 @@ var requestCmd = &cobra.Command{
 		// get, parse and show response
 		res, err := client.Do(req)
 		if err != nil {
+			if errors.Is(err, io.EOF) {
+				print.Print("No response")
+				return
+			}
+
 			print.Error("Failed to get response: %v", err)
 			os.Exit(1)
 		}
