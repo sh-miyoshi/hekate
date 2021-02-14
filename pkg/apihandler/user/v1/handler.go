@@ -111,6 +111,10 @@ func OTPGenerateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Debug("Generated QR code size: %d", len(qrcode))
-	// start otp session(user_code, expires_in, private_key)
-	// return QR code(private_key, settings)
+
+	// Return Response
+	res := &OTPGenerateResponse{
+		QRCodeImage: qrcode,
+	}
+	jwthttp.ResponseWrite(w, "OTPGenerateHandler", res)
 }

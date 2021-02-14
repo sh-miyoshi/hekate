@@ -4,3 +4,8 @@ package userv1
 type ChangePasswordRequest struct {
 	Password string `json:"password"`
 }
+
+// OTPGenerateResponse ...
+type OTPGenerateResponse struct {
+	QRCodeImage string `json:"qrcode"` // base64 encorded png image data
+}
