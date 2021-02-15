@@ -3,6 +3,7 @@ package userv1
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/hekate/pkg/db"
@@ -13,6 +14,44 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/otp"
 	"github.com/sh-miyoshi/hekate/pkg/secret"
 )
+
+// GetHandler ...
+func GetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+	}
+
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
+			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+		} else {
+			errors.Print(errors.Append(err, "Failed to get user"))
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return Response
+	res := &GetResponse{
+		ID:        user.ID,
+		Name:      user.Name,
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
+		OPTInfo: OTPInfo{
+			ID:      user.OTPInfo.ID,
+			Enabled: user.OTPInfo.Enabled,
+		},
+	}
+	jwthttp.ResponseWrite(w, "GetHandler", res)
+}
 
 // ChangePasswordHandler ...
 func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {

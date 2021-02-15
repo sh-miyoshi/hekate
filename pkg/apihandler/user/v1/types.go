@@ -1,5 +1,19 @@
 package userv1
 
+// OTPInfo ...
+type OTPInfo struct {
+	ID      string
+	Enabled bool
+}
+
+// GetResponse ...
+type GetResponse struct {
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	CreatedAt string  `json:"created_at"`
+	OPTInfo   OTPInfo `json:"otp_info"`
+}
+
 // ChangePasswordRequest ...
 type ChangePasswordRequest struct {
 	Password string `json:"password"`
