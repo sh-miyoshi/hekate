@@ -3,7 +3,9 @@
 ## User APIの追加
 
 - OTPの追加
-  - 未着手
+  - API docsのuser apiを修正(user get handler)
+  - Admin APIにOTPInfoを追加
+  - いろいろ
 
 ## Documents
 
@@ -18,6 +20,9 @@
 
 ## server application enhancement
 
+- APIの戻り値のJSONの型名のチェック
+- model.LoginSessionの修正
+  - time.Time型をやめ、expiresIn int64型にする
 - ユーザーのPassword設定ミス時に理由を返す
   - 例: minimun length 8
 - add debug log
