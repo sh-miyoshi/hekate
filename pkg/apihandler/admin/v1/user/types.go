@@ -23,6 +23,7 @@ type UserGetResponse struct {
 	CustomRoles []CustomRole `json:"custom_roles"`
 	Sessions    []string     `json:"sessions"` // Array of session IDs
 	Locked      bool         `json:"locked"`
+	// TODO OTP Info
 }
 
 // UserPutRequest ...

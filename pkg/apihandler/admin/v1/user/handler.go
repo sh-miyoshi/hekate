@@ -259,7 +259,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
 			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
 		} else {
-			errors.Print(errors.Append(err, "Failed toget user"))
+			errors.Print(errors.Append(err, "Failed to get user"))
 			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		}
 		return
