@@ -12,6 +12,13 @@ type LockState struct {
 	VerifyFailedTimes []time.Time
 }
 
+// OTPInfo ...
+type OTPInfo struct {
+	ID         string
+	PrivateKey string
+	Enabled    bool
+}
+
 // UserInfo ...
 type UserInfo struct {
 	ID           string
@@ -22,6 +29,7 @@ type UserInfo struct {
 	SystemRoles  []string
 	CustomRoles  []string
 	LockState    LockState
+	OTPInfo      OTPInfo
 }
 
 // UserFilter ...
@@ -51,6 +59,8 @@ var (
 	ErrNoSuchRoleInUser = errors.New("User do not have such role", "User do not have such role")
 	// ErrUserValidateFailed ...
 	ErrUserValidateFailed = errors.New("User validation failed", "User validation failed")
+	// ErrUserOTPAlreadyEnabled ...
+	ErrUserOTPAlreadyEnabled = errors.New("User OTP already enabled", "User OTP already enabled")
 
 	// RoleSystem ...
 	RoleSystem = RoleType{"system_management"}

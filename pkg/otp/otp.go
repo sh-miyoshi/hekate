@@ -1,6 +1,8 @@
 package otp
 
 import (
+	"crypto/rand"
+	"encoding/base32"
 	"encoding/base64"
 	"fmt"
 	"time"
@@ -10,7 +12,6 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
-	"github.com/sh-miyoshi/hekate/pkg/util"
 	qrcode "github.com/skip2/go-qrcode"
 )
 
@@ -21,18 +22,20 @@ const (
 )
 
 // Register ...
-func Register(projectName string, userName string) (string, *errors.Error) {
-	// generate private key
-	data := model.OTP{
-		ID:              uuid.New().String(),
-		ProjectName:     projectName,
-		PrivateKey:      util.RandomString(32, util.CharTypeDigit|util.CharTypeUpper),
-		InitExpiresDate: time.Now().Add(registerExpiresIn),
+func Register(projectName string, userID, userName string) (string, *errors.Error) {
+	// private key is 20 bytes and base32 encoded
+	privateKey := make([]byte, 20)
+	rand.Read(privateKey)
+
+	data := model.OTPInfo{
+		ID:         uuid.New().String(),
+		PrivateKey: base32.StdEncoding.EncodeToString(privateKey),
+		Enabled:    false,
 	}
 	logger.Debug("set OTP data: %v", data)
 
 	// enter to db
-	if err := db.GetInst().OTPAdd(projectName, &data); err != nil {
+	if err := db.GetInst().OTPAdd(projectName, userID, &data); err != nil {
 		return "", errors.Append(err, "Failed to register OTP data")
 	}
 

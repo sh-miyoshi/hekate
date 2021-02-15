@@ -960,10 +960,27 @@ func (m *Manager) DeviceGetList(projectName string, filter *model.DeviceFilter) 
 }
 
 // OTPAdd ...
-func (m *Manager) OTPAdd(projectName string, ent *model.OTP) *errors.Error {
+func (m *Manager) OTPAdd(projectName string, userID string, ent *model.OTPInfo) *errors.Error {
 	// otp add is used in internal only, so validation is not required
 	return m.transaction.Transaction(func() *errors.Error {
-		// TODO
+		users, err := m.user.GetList(projectName, &model.UserFilter{ID: userID})
+		if err != nil {
+			return errors.Append(err, "Failed to get user of OTP add")
+		}
+		if len(users) == 0 {
+			return model.ErrNoSuchUser
+		}
+		usr := users[0]
+
+		if usr.OTPInfo.Enabled {
+			return model.ErrUserOTPAlreadyEnabled
+		}
+
+		// update user
+		usr.OTPInfo = *ent
+		if err := m.user.Update(projectName, usr); err != nil {
+			return errors.Append(err, "Failed to update user")
+		}
 		return nil
 	})
 }

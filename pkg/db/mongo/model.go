@@ -71,6 +71,12 @@ type lockState struct {
 	VerifyFailedTimes []time.Time `bson:"verify_failed_times"`
 }
 
+type otpInfo struct {
+	ID         string `bson:"id"`
+	PrivateKey string `bson:"private_key"`
+	Enabled    bool   `bson:"enabled"`
+}
+
 type userInfo struct {
 	ID           string    `bson:"id"`
 	ProjectName  string    `bson:"project_name"`
@@ -80,6 +86,7 @@ type userInfo struct {
 	SystemRoles  []string  `bson:"system_roles"`
 	CustomRoles  []string  `bson:"custom_roles"`
 	LockState    lockState `bson:"lock_state"`
+	OTPInfo      otpInfo   `bson:"otp_info"`
 }
 
 type clientInfo struct {

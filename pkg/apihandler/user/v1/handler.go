@@ -104,7 +104,7 @@ func OTPGenerateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	qrcode, err := otp.Register(projectName, claims.UserName)
+	qrcode, err := otp.Register(projectName, userID, claims.UserName)
 	if err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)

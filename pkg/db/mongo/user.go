@@ -68,6 +68,11 @@ func (h *UserInfoHandler) Add(projectName string, ent *model.UserInfo) *errors.E
 			Locked:            ent.LockState.Locked,
 			VerifyFailedTimes: ent.LockState.VerifyFailedTimes,
 		},
+		OTPInfo: otpInfo{
+			ID:         ent.OTPInfo.ID,
+			PrivateKey: ent.OTPInfo.PrivateKey,
+			Enabled:    ent.OTPInfo.Enabled,
+		},
 	}
 
 	uroles := []interface{}{}
@@ -170,6 +175,11 @@ func (h *UserInfoHandler) GetList(projectName string, filter *model.UserFilter) 
 				Locked:            user.LockState.Locked,
 				VerifyFailedTimes: user.LockState.VerifyFailedTimes,
 			},
+			OTPInfo: model.OTPInfo{
+				ID:         user.OTPInfo.ID,
+				PrivateKey: user.OTPInfo.PrivateKey,
+				Enabled:    user.OTPInfo.Enabled,
+			},
 		})
 	}
 
@@ -195,6 +205,11 @@ func (h *UserInfoHandler) Update(projectName string, ent *model.UserInfo) *error
 		LockState: lockState{
 			Locked:            ent.LockState.Locked,
 			VerifyFailedTimes: ent.LockState.VerifyFailedTimes,
+		},
+		OTPInfo: otpInfo{
+			ID:         ent.OTPInfo.ID,
+			PrivateKey: ent.OTPInfo.PrivateKey,
+			Enabled:    ent.OTPInfo.Enabled,
 		},
 	}
 
