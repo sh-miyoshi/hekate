@@ -1,10 +1,13 @@
 package otp
 
 import (
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha1"
 	"encoding/base32"
 	"encoding/base64"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,9 +19,15 @@ import (
 )
 
 const (
-	registerExpiresIn = 10 * time.Minute
-	period            = 30
-	digitLen          = 6
+	period   = 30
+	digitLen = 6
+)
+
+var (
+	// ErrNotEnabled ...
+	ErrNotEnabled = errors.New("Authenticator Application is not set", "User OTP Info is not enabled")
+	// ErrVerifyFailed ...
+	ErrVerifyFailed = errors.New("User Code Verify Failed", "User Code Verify Failed")
 )
 
 // Register ...
@@ -51,6 +60,39 @@ func Register(projectName string, userID, userName string) (string, *errors.Erro
 }
 
 // Verify ...
-func Verify() {
+func Verify(now time.Time, projectName, userID, userCode string) error {
 	// calculate value
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		return errors.Append(err, "Failed to get user OTP info")
+	}
+
+	if !user.OTPInfo.Enabled {
+		return ErrNotEnabled
+	}
+
+	t := now.Unix() / period
+	hs := getMAC([]byte(strconv.FormatInt(t, 10)), []byte(user.OTPInfo.PrivateKey))
+	if len(hs) != 20 {
+		return errors.New("Internal Server Error", "Invalid HMAC-SHA-1 size %d", len(hs))
+	}
+
+	expect := truncate(hs)
+	if strconv.Itoa(expect) != userCode {
+		return ErrVerifyFailed
+	}
+
+	return nil
+}
+
+func getMAC(message, key []byte) []byte {
+	mac := hmac.New(sha1.New, key)
+	mac.Write(message)
+	return mac.Sum(nil)
+}
+
+func truncate(hs []byte) int {
+	offset := hs[19] & 0xf
+	binCode := (int(hs[offset])&0x7f)<<24 | (int(hs[offset+1])&0xff)<<16 | (int(hs[offset+2])&0xff)<<8 | (int(hs[offset+3]) & 0xff)
+	return binCode % 1000000
 }
