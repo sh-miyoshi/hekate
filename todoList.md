@@ -3,8 +3,10 @@
 ## User APIの追加
 
 - OTPの追加
-  - API docsのuser apiを修正(user get handler)
+  - API docsのuser apiを修正(user get, code verify handler)
   - Admin APIにOTPInfoを追加
+  - User Code verifyの実装
+  - portalのmfaページの修正
   - いろいろ
 
 ## Documents
