@@ -314,6 +314,13 @@ class APIClient {
   // User API Client
   // ----------------------------
 
+  async UserAPIGetUser(projectName, userID) {
+    const url =
+      this.serverAddr + '/userapi/v1/project/' + projectName + '/user/' + userID
+    const res = await this._request(url, 'GET')
+    return res
+  }
+
   async UserAPIChangePassword(projectName, userID, newPassword) {
     const url =
       this.serverAddr +
@@ -323,6 +330,18 @@ class APIClient {
       userID +
       '/change-password'
     const res = await this._request(url, 'POST', { password: newPassword })
+    return res
+  }
+
+  async UserAPIOTPGenerate(projectName, userID) {
+    const url =
+      this.serverAddr +
+      '/userapi/v1/project/' +
+      projectName +
+      '/user/' +
+      userID +
+      '/otp'
+    const res = await this._request(url, 'POST')
     return res
   }
 }
