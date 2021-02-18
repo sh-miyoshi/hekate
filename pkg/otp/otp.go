@@ -6,6 +6,7 @@ import (
 	"crypto/sha1"
 	"encoding/base32"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"time"
@@ -27,7 +28,7 @@ var (
 	// ErrNotEnabled ...
 	ErrNotEnabled = errors.New("Authenticator Application is not set", "User OTP Info is not enabled")
 	// ErrVerifyFailed ...
-	ErrVerifyFailed = errors.New("User Code Verify Failed", "User Code Verify Failed")
+	ErrVerifyFailed = errors.New("Invalid User Code", "Invalid User Code")
 )
 
 // Register ...
@@ -61,7 +62,6 @@ func Register(projectName string, userID, userName string) (string, *errors.Erro
 
 // Verify ...
 func Verify(now time.Time, projectName, userID, userCode string) error {
-	// calculate value
 	user, err := db.GetInst().UserGet(projectName, userID)
 	if err != nil {
 		return errors.Append(err, "Failed to get user OTP info")
@@ -71,18 +71,36 @@ func Verify(now time.Time, projectName, userID, userCode string) error {
 		return ErrNotEnabled
 	}
 
-	t := now.Unix() / period
-	hs := getMAC([]byte(strconv.FormatInt(t, 10)), []byte(user.OTPInfo.PrivateKey))
+	keySrc, e := base32.StdEncoding.DecodeString(user.OTPInfo.PrivateKey)
+	if e != nil {
+		return errors.New("Internal Server Error", "Failed to decode private key %v", e)
+	}
+
+	tSrc := zeroPadding(strconv.FormatInt(now.Unix()/period, 16), 16)
+	t := make([]byte, hex.DecodedLen(len(tSrc)))
+	hex.Decode(t, []byte(tSrc))
+	key := make([]byte, hex.DecodedLen(len(keySrc)))
+	hex.Decode(key, keySrc)
+
+	hs := getMAC(t, key)
 	if len(hs) != 20 {
 		return errors.New("Internal Server Error", "Invalid HMAC-SHA-1 size %d", len(hs))
 	}
 
-	expect := truncate(hs)
-	if strconv.Itoa(expect) != userCode {
+	expect := zeroPadding(strconv.Itoa(truncate(hs)), digitLen)
+	if expect != userCode {
+		logger.Debug("Failed to verify user code: expect %s but got %s", expect, userCode)
 		return ErrVerifyFailed
 	}
 
 	return nil
+}
+
+func zeroPadding(d string, length int) string {
+	for i := len(d); i < length; i++ {
+		d = "0" + d
+	}
+	return d
 }
 
 func getMAC(message, key []byte) []byte {
