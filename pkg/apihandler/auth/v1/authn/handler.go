@@ -1,6 +1,7 @@
 package authn
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/sh-miyoshi/hekate/pkg/audit"
 	"github.com/sh-miyoshi/hekate/pkg/db"
+	"github.com/sh-miyoshi/hekate/pkg/db/model"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 	"github.com/sh-miyoshi/hekate/pkg/login"
@@ -15,6 +17,10 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 	"github.com/sh-miyoshi/hekate/pkg/sso"
 	"github.com/stretchr/stew/slice"
+)
+
+var (
+	errSessionEnd = errors.New("Session end", "Session end")
 )
 
 // UserLoginHandler ...
@@ -54,9 +60,11 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	s, err := login.VerifySession(projectName, sessionID)
 	if err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
-		errMsg := "Request failed. internal server error occured."
+		errMsg := "Request failed. Internal server error occured."
 		if errors.Contains(err, errors.ErrSessionExpired) {
-			errMsg = "Request failed. the session was already expired."
+			errMsg = "Request failed. The session was already expired."
+		} else if errors.Contains(err, model.ErrLoginSessionValidationFailed) {
+			errMsg = "Request failed. Invalid request was sent."
 		}
 		login.WriteErrorPage(errMsg, w)
 		return
@@ -100,44 +108,37 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	s.UserID = usr.ID
 	s.LoginDate = time.Now()
 
-	if ok := slice.Contains(s.Prompt, "consent"); ok {
-		// save user id to session info
-		if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
-			errors.Print(errors.Append(err, "Failed to update login session"))
-			login.WriteErrorPage("Request failed. internal server error occuerd", w)
-			return
-		}
+	if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
+		errors.Print(errors.Append(err, "Failed to update login session"))
+		login.WriteErrorPage("Request failed. internal server error occuerd", w)
+		return
+	}
 
-		// show consent page
+	logger.Debug("Successfully verify user login by password")
+
+	// Next Steps.
+	// 1. If required MFA, return MFA page
+	// 2. If required content, return consent page
+	// 3. login session finished, redirect to callback URL
+
+	// TODO MFA Page
+
+	// Consent Page
+	if ok := slice.Contains(s.Prompt, "consent"); ok {
 		login.WriteConsentPage(projectName, sessionID, state, w)
 		return
 	}
 
-	issuer := token.GetFullIssuer(r)
-	req, err := oidc.CreateLoggedInResponse(s, state, issuer)
+	// Login session finished, redirect to callback URL
+	req, err := redirectToCallback(w, r, projectName, s)
 	if err != nil {
-		errors.Print(err)
-		login.WriteErrorPage("Request failed. internal server error occuerd", w)
-		return
-	}
-
-	if ok := slice.Contains(s.ResponseType, "code"); !ok && len(s.ResponseType) > 0 {
-		// delete session
-		err = errors.New("Session end", "Session end")
-	} else {
-		// Update login session info
-		if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
-			errors.Print(errors.Append(err, "Failed to update login session"))
+		if !errors.Contains(err, errSessionEnd) {
+			errors.Print(err)
 			login.WriteErrorPage("Request failed. internal server error occuerd", w)
 			return
 		}
 	}
 
-	if err := sso.SetSSOSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
-		errors.Print(errors.Append(err, "Failed to set cookie"))
-		login.WriteErrorPage("Request failed. internal server error occuerd", w)
-		return
-	}
 	http.Redirect(w, req, req.URL.String(), http.StatusFound)
 }
 
@@ -159,14 +160,24 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug("Form: %v", r.Form)
 	state := r.Form.Get("state")
-
 	sessionID := r.Form.Get("login_session_id")
+
+	var err *errors.Error
+	defer func() {
+		if err != nil {
+			// delete session if login failed
+			db.GetInst().LoginSessionDelete(projectName, sessionID)
+		}
+	}()
+
 	s, err := login.VerifySession(projectName, sessionID)
 	if err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to verify user login session"))
-		errMsg := "Request failed. internal server error occured."
+		errMsg := "Request failed. Internal server error occured."
 		if errors.Contains(err, errors.ErrSessionExpired) {
-			errMsg = "Request failed. the session was already expired."
+			errMsg = "Request failed. The session was already expired."
+		} else if errors.Contains(err, model.ErrLoginSessionValidationFailed) {
+			errMsg = "Request failed. Invalid request was sent."
 		}
 		login.WriteErrorPage(errMsg, w)
 		return
@@ -174,24 +185,43 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch sel {
 	case "yes":
-		issuer := token.GetFullIssuer(r)
-		req, err := oidc.CreateLoggedInResponse(s, state, issuer)
+		req, err := redirectToCallback(w, r, projectName, s)
 		if err != nil {
-			errors.Print(err)
-			login.WriteErrorPage("Request failed. internal server error occuerd", w)
-			return
-		}
-
-		if err := sso.SetSSOSessionToCookie(w, projectName, s.UserID, issuer); err != nil {
-			errors.Print(errors.Append(err, "Failed to set cookie"))
-			login.WriteErrorPage("Request failed. internal server error occuerd", w)
-			return
+			if !errors.Contains(err, errSessionEnd) {
+				errors.Print(err)
+				login.WriteErrorPage("Request failed. internal server error occuerd", w)
+				return
+			}
 		}
 		http.Redirect(w, req, req.URL.String(), http.StatusFound)
 	case "no":
-		errors.RedirectWithOAuthError(w, errors.ErrConsentRequired, r.Method, s.RedirectURI, state)
+		err = errors.ErrConsentRequired
+		errors.RedirectWithOAuthError(w, err, r.Method, s.RedirectURI, state)
 	default:
-		logger.Info("Invalid select type %s. consent page maybe broken.", sel)
+		msg := fmt.Sprintf("Invalid select type %s. consent page maybe broken.", sel)
+		err = errors.New("Invalid select type", msg)
+		logger.Info(msg)
 		login.WriteErrorPage("Request failed. internal server error occuerd", w)
 	}
+}
+
+func redirectToCallback(w http.ResponseWriter, r *http.Request, projectName string, session *model.LoginSession) (*http.Request, *errors.Error) {
+	state := r.Form.Get("state")
+	issuer := token.GetFullIssuer(r)
+
+	req, err := oidc.CreateLoggedInResponse(session, state, issuer)
+	if err != nil {
+		return nil, err
+	}
+
+	if ok := slice.Contains(session.ResponseType, "code"); !ok && len(session.ResponseType) > 0 {
+		// delete session
+		return req, errSessionEnd
+	}
+
+	if err := sso.SetSSOSessionToCookie(w, projectName, session.UserID, issuer); err != nil {
+		return nil, errors.Append(err, "Failed to set cookie")
+	}
+
+	return req, nil
 }
