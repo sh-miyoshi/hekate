@@ -615,13 +615,17 @@ func (m *Manager) LoginSessionDelete(projectName string, sessionID string) *erro
 
 // LoginSessionGet ...
 func (m *Manager) LoginSessionGet(projectName string, sessionID string) (*model.LoginSession, *errors.Error) {
-	// login session is in internal only, so validation is not required
+	if !model.ValidateSessionID(sessionID) {
+		return nil, model.ErrLoginSessionValidationFailed
+	}
 	return m.loginSession.Get(projectName, sessionID)
 }
 
 // LoginSessionGetByCode ...
 func (m *Manager) LoginSessionGetByCode(projectName string, code string) (*model.LoginSession, *errors.Error) {
-	// login session is in internal only, so validation is not required
+	if !model.ValidateAuthCode(code) {
+		return nil, model.ErrLoginSessionValidationFailed
+	}
 	return m.loginSession.GetByCode(projectName, code)
 }
 

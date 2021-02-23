@@ -53,9 +53,12 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, codeVerifier string, r *http.Request) (*oidc.TokenResponse, *errors.Error) {
 	s, err := db.GetInst().LoginSessionGetByCode(project.Name, code)
 	if err != nil {
+		// TODO(revoke all token in code.UserID) <- SHOULD
 		if errors.Contains(err, model.ErrNoSuchLoginSession) {
-			// TODO(revoke all token in code.UserID) <- SHOULD
 			return nil, errors.Append(errors.ErrInvalidGrant, "no such code")
+		}
+		if errors.Contains(err, model.ErrLoginSessionValidationFailed) {
+			return nil, errors.Append(errors.ErrInvalidRequest, "invalid login session code")
 		}
 		return nil, errors.Append(err, "Failed to get login session info")
 	}
