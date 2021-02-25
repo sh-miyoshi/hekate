@@ -35,26 +35,6 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 	tpl.Execute(w, d)
 }
 
-// WriteErrorPage ...
-func WriteErrorPage(errMsg string, w http.ResponseWriter) {
-	cfg := config.Get()
-
-	tpl, err := template.ParseFiles(cfg.LoginResource.ErrorPage)
-	if err != nil {
-		logger.Error("Failed to parse template: %v", err)
-		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Error Page maybe broken", ""), http.StatusInternalServerError)
-		return
-	}
-
-	d := map[string]string{
-		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
-		"Error":              errMsg,
-	}
-
-	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
-	tpl.Execute(w, d)
-}
-
 // WriteConsentPage ...
 func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWriter) {
 	cfg := config.Get()

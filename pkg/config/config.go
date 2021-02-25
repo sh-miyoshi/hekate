@@ -56,7 +56,6 @@ func (c *GlobalConfig) setLoginResource() *errors.Error {
 	// directory struct
 	// .
 	// ├── consent.html  : consent page
-	// ├── error.html    : error page
 	// ├── index.html    : login page
 	// └── static        : directory of static assets
 
@@ -65,10 +64,6 @@ func (c *GlobalConfig) setLoginResource() *errors.Error {
 	c.LoginResource.ConsentPage = path.Join(dir, "/consent.html")
 	if _, err := os.Stat(c.LoginResource.ConsentPage); err != nil {
 		return errors.New(pubMsg, "Failed to get consent page: %v", err)
-	}
-	c.LoginResource.ErrorPage = path.Join(dir, "/error.html")
-	if _, err := os.Stat(c.LoginResource.ErrorPage); err != nil {
-		return errors.New(pubMsg, "Failed to get error page: %v", err)
 	}
 	c.LoginResource.IndexPage = path.Join(dir, "/index.html")
 	if _, err := os.Stat(c.LoginResource.IndexPage); err != nil {
