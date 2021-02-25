@@ -1,0 +1,51 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+
+  <!-- for debug -->
+  <!--   
+  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/css/coreui.min.css" rel="stylesheet">
+  <link href="static/css/style.css" rel="stylesheet">
+  -->
+
+
+  <!-- for production -->
+  <link href="{{.StaticResourcePath}}/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{.StaticResourcePath}}/css/coreui.min.css" rel="stylesheet">
+  <link href="{{.StaticResourcePath}}/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="c-wrapper">
+    <div class="c-body login-form">
+      <div class="card">
+        <form method="POST" action="{{.URL}}">
+          <div class="card-header">
+            <h1>LOGIN to Hekate</h1>
+          </div>
+          <div class="card-body">
+            <div class="form-group row">
+              <label for="code" class="col-sm-5 control-label">
+                Onetime-Code
+              </label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control input" name="code" autofocus />
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="error-msg">{{.Error}}</div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg input">Login</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
