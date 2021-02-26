@@ -16,6 +16,7 @@ type HTTPSConfig struct {
 // LoginResource ...
 type LoginResource struct {
 	IndexPage               string
+	OTPVerifyPage           string
 	ConsentPage             string
 	DeviceLoginPage         string
 	DeviceLoginCompletePage string

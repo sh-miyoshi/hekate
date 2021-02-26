@@ -55,15 +55,20 @@ func (c *GlobalConfig) Validate() *errors.Error {
 func (c *GlobalConfig) setLoginResource() *errors.Error {
 	// directory struct
 	// .
-	// ├── consent.html  : consent page
-	// ├── index.html    : login page
-	// └── static        : directory of static assets
+	// ├── consent.html    : consent page
+	// ├── otp_verify.html : OTP verify page
+	// ├── index.html      : login page
+	// └── static          : directory of static assets
 
 	dir := c.UserLoginResourceDir
 	pubMsg := "invalid login resource directory struct"
 	c.LoginResource.ConsentPage = path.Join(dir, "/consent.html")
 	if _, err := os.Stat(c.LoginResource.ConsentPage); err != nil {
 		return errors.New(pubMsg, "Failed to get consent page: %v", err)
+	}
+	c.LoginResource.OTPVerifyPage = path.Join(dir, "/otp_verify.html")
+	if _, err := os.Stat(c.LoginResource.OTPVerifyPage); err != nil {
+		return errors.New(pubMsg, "Failed to get OTP verify page: %v", err)
 	}
 	c.LoginResource.IndexPage = path.Join(dir, "/index.html")
 	if _, err := os.Stat(c.LoginResource.IndexPage); err != nil {
