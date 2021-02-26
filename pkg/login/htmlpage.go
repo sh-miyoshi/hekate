@@ -1,6 +1,7 @@
 package login
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -29,6 +30,35 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 		"URL":                url,
 		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
 		"Error":              errMsg,
+	}
+
+	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
+	tpl.Execute(w, d)
+}
+
+// WriteOTPVerifyPage ...
+func WriteOTPVerifyPage(projectName, sessionID, userCode, state string, w http.ResponseWriter) {
+	cfg := config.Get()
+
+	tpl, err := template.ParseFiles(cfg.LoginResource.OTPVerifyPage)
+	if err != nil {
+		logger.Error("Failed to parse template: %v", err)
+		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login OTP Verify Page maybe broken", ""), http.StatusInternalServerError)
+		return
+	}
+
+	url := fmt.Sprintf("/authapi/v1/project/%s/authn/otpverify?login_session_id=%s&user_code=%s",
+		projectName,
+		sessionID,
+		userCode,
+	)
+	if state != "" {
+		url += "&state=" + state
+	}
+
+	d := map[string]string{
+		"StaticResourcePath": cfg.LoginStaticResourceURL + "/static",
+		"URL":                url,
 	}
 
 	w.Header().Add("Content-Type", "text/html; charset=UTF-8")
