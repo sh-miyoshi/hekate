@@ -10,8 +10,7 @@ import (
 )
 
 func TestVerify(t *testing.T) {
-	// ASCII string value "12345678901234567890"
-	privateKey := []byte("3132333435363738393031323334353637383930")
+	privateKey := []byte("12345678901234567890")
 
 	user := &model.UserInfo{
 		ID:          uuid.New().String(),

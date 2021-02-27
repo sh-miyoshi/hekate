@@ -66,7 +66,7 @@ func Verify(now time.Time, user *model.UserInfo, userCode string) *errors.Error 
 		return ErrNotEnabled
 	}
 
-	keySrc, e := base32.StdEncoding.DecodeString(user.OTPInfo.PrivateKey)
+	key, e := base32.StdEncoding.DecodeString(user.OTPInfo.PrivateKey)
 	if e != nil {
 		return errors.New("Internal Server Error", "Failed to decode private key %v", e)
 	}
@@ -74,8 +74,6 @@ func Verify(now time.Time, user *model.UserInfo, userCode string) *errors.Error 
 	tSrc := zeroPadding(strconv.FormatInt(now.Unix()/period, 16), 16)
 	t := make([]byte, hex.DecodedLen(len(tSrc)))
 	hex.Decode(t, []byte(tSrc))
-	key := make([]byte, hex.DecodedLen(len(keySrc)))
-	hex.Decode(key, keySrc)
 
 	hs := getMAC(t, key)
 	if len(hs) != 20 {
