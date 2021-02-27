@@ -6,37 +6,23 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/db/model"
 )
 
 func TestVerify(t *testing.T) {
-	userID := uuid.New().String()
-	userName := "admin"
-
 	// ASCII string value "12345678901234567890"
 	privateKey := []byte("3132333435363738393031323334353637383930")
 
-	// Initialize test DB
-	db.InitDBManager("memory", "")
-	db.GetInst().ProjectAdd(&model.ProjectInfo{
-		Name: "master",
-		TokenConfig: &model.TokenConfig{
-			AccessTokenLifeSpan:  model.DefaultAccessTokenExpiresInSec,
-			RefreshTokenLifeSpan: model.DefaultRefreshTokenExpiresInSec,
-			SigningAlgorithm:     "RS256",
-		},
-	})
-	db.GetInst().UserAdd("master", &model.UserInfo{
-		ID:          userID,
+	user := &model.UserInfo{
+		ID:          uuid.New().String(),
 		ProjectName: "master",
-		Name:        userName,
+		Name:        "admin",
 		OTPInfo: model.OTPInfo{
 			ID:         uuid.New().String(),
 			PrivateKey: base32.StdEncoding.EncodeToString(privateKey),
 			Enabled:    true,
 		},
-	})
+	}
 
 	tt := []struct {
 		TimeSec int
@@ -51,7 +37,7 @@ func TestVerify(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		if err := Verify(time.Unix(int64(tc.TimeSec), 0), "master", userID, tc.Expect); err != nil {
+		if err := Verify(time.Unix(int64(tc.TimeSec), 0), user, tc.Expect); err != nil {
 			t.Errorf("Failed to verify user code: %v", err)
 		}
 	}

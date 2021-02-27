@@ -61,12 +61,7 @@ func Register(projectName string, userID, userName string) (string, *errors.Erro
 }
 
 // Verify ...
-func Verify(now time.Time, projectName, userID, userCode string) *errors.Error {
-	user, err := db.GetInst().UserGet(projectName, userID)
-	if err != nil {
-		return errors.Append(err, "Failed to get user OTP info")
-	}
-
+func Verify(now time.Time, user *model.UserInfo, userCode string) *errors.Error {
 	if !user.OTPInfo.Enabled {
 		return ErrNotEnabled
 	}
