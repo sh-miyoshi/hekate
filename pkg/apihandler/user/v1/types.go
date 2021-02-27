@@ -2,8 +2,8 @@ package userv1
 
 // OTPInfo ...
 type OTPInfo struct {
-	ID      string
-	Enabled bool
+	ID      string `json:"id"`
+	Enabled bool   `json:"enabled"`
 }
 
 // GetResponse ...
