@@ -66,7 +66,7 @@ export default {
   data() {
     return {
       user: null,
-      qrcode: 'test',
+      qrcode: '',
       error: '',
       usercode: ''
     }
@@ -107,9 +107,40 @@ export default {
       this.qrcode = ''
       this.error = ''
     },
-    submit() {
-      // TODO verify request to server
-      this.error = 'Not implement yet'
+    async submit() {
+      let res = this.validateUserCode(this.usercode)
+      if (res !== '') {
+        this.error = res
+        return
+      }
+
+      const project = window.localStorage.getItem('login_project')
+      const userID = window.localStorage.getItem('user_id')
+      res = await this.$api.UserAPIOTPVerify(project, userID, this.usercode)
+      if (!res.ok) {
+        this.error = res.message
+        return
+      }
+      this.error = ''
+      this.setUser()
+    },
+    validateUserCode(code) {
+      if (typeof code !== 'string') {
+        return 'The code is not string'
+      }
+
+      if (code.length !== 6) {
+        return 'The length of code is not 6'
+      }
+
+      // all char is only digit
+      for (let i = 0; i < code.length; i++) {
+        if (code[i] < '0' || code[i] > '9') {
+          return 'The code contains non-numeric characters'
+        }
+      }
+
+      return ''
     }
   }
 }
