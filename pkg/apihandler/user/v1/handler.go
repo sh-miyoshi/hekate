@@ -157,3 +157,57 @@ func OTPGenerateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	jwthttp.ResponseWrite(w, "OTPGenerateHandler", res)
 }
+
+// OTPVerifyHandler ...
+func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+	}
+
+	var req OTPVerifyRequest
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
+		err := errors.New("Invalid request", "Failed to decode user otp verify request: %v", e)
+		errors.PrintAsInfo(err)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		return
+	}
+
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		errors.Print(err)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+
+	if !user.OTPInfo.Enabled {
+		user.OTPInfo.Enabled = true
+		logger.Debug("After enabled OTP: %+v", user.OTPInfo)
+		if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+			errors.Print(err)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := otp.Verify(time.Now(), user, req.UserCode); err != nil {
+		if errors.Contains(err, otp.ErrVerifyFailed) {
+			errors.PrintAsInfo(err)
+			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		} else {
+			errors.Print(err)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return 204 (No content) for success
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("OTPVerifyHandler method successfully finished")
+}

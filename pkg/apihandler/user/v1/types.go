@@ -23,3 +23,8 @@ type ChangePasswordRequest struct {
 type OTPGenerateResponse struct {
 	QRCodeImage string `json:"qrcode"` // base64 encorded png image data
 }
+
+// OTPVerifyRequest ...
+type OTPVerifyRequest struct {
+	UserCode string `json:"user_code"`
+}
