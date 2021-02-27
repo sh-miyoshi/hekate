@@ -344,6 +344,18 @@ class APIClient {
     const res = await this._request(url, 'POST')
     return res
   }
+
+  async UserAPIOTPVerify(projectName, userID, userCode) {
+    const url =
+      this.serverAddr +
+      '/userapi/v1/project/' +
+      projectName +
+      '/user/' +
+      userID +
+      '/otp/verify'
+    const res = await this._request(url, 'POST', { user_code: userCode })
+    return res
+  }
 }
 
 export default (context, inject) => {
