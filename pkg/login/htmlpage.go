@@ -1,7 +1,6 @@
 package login
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 
@@ -37,7 +36,7 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 }
 
 // WriteOTPVerifyPage ...
-func WriteOTPVerifyPage(projectName, sessionID, userCode, state string, w http.ResponseWriter) {
+func WriteOTPVerifyPage(projectName, sessionID, state string, w http.ResponseWriter) {
 	cfg := config.Get()
 
 	tpl, err := template.ParseFiles(cfg.LoginResource.OTPVerifyPage)
@@ -47,11 +46,7 @@ func WriteOTPVerifyPage(projectName, sessionID, userCode, state string, w http.R
 		return
 	}
 
-	url := fmt.Sprintf("/authapi/v1/project/%s/authn/otpverify?login_session_id=%s&user_code=%s",
-		projectName,
-		sessionID,
-		userCode,
-	)
+	url := "/authapi/v1/project/" + projectName + "/authn/otpverify?login_session_id=" + sessionID
 	if state != "" {
 		url += "&state=" + state
 	}
