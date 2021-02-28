@@ -1,12 +1,5 @@
 # TODO List
 
-## User APIの追加
-
-- OTP削除の実装
-  - API
-  - Handler
-  - Portal
-
 ## Documents
 
 - login pageの修正方法
