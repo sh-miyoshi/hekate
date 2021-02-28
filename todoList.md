@@ -1,10 +1,5 @@
 # TODO List
 
-## User APIの追加
-
-- OTPの追加
-  - 未着手
-
 ## Documents
 
 - login pageの修正方法
@@ -18,6 +13,11 @@
 
 ## server application enhancement
 
+- User portalを別に分ける
+- TOTPで前後1つも許可する(時刻同期の関係上)
+- APIの戻り値のJSONの型名のチェック
+- model.LoginSessionの修正
+  - time.Time型をやめ、expiresIn int64型にする
 - ユーザーのPassword設定ミス時に理由を返す
   - 例: minimun length 8
 - add debug log

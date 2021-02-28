@@ -261,7 +261,30 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: "Return error page or consent page"
+          description: "Return otp verify page or consent page"
+        '302':
+          description: "Redirect to callback URL"
+        '500':
+          description: "Internal server error"
+  '/authapi/v1/project/{projectName}/authn/otpverify':
+    post:
+      summary: "Login to hekate"
+      tags:
+        - authentication
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OTPVerifyRequest'
+      responses:
+        '200':
+          description: "Return consent page"
         '302':
           description: "Redirect to callback URL"
         '500':
@@ -1410,11 +1433,21 @@ components:
     LoginRequest:
       type: object
       properties:
-        login_verify_code:
+        login_session_id:
           type: string
         username:
           type: string
         password:
+          type: string
+        state:
+          type: string
+    OTPVerifyRequest:
+      type: object
+      properties:
+        login_session_id:
+          type: string
+        code:
+          description: user code(6 digits)
           type: string
         state:
           type: string
@@ -1465,6 +1498,8 @@ components:
     ConsentRequest:
       type: object
       properties:
+        login_session_id:
+          type: string
         select:
           type: string
         state:

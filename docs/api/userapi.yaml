@@ -7,6 +7,35 @@ info:
     name: 'Apache 2.0'
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 paths:
+  '/userapi/v1/project/{projectName}/user/{userID}':
+    get:
+      summary: "Get user info"
+      tags:
+        - userapi
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'User Info'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetResponse'
+        '404':
+          description: 'Project or User Not Found'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
   '/userapi/v1/project/{projectName}/user/{userID}/change-password':
     post:
       summary: "Change User Password"
@@ -27,7 +56,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserChangePasswordRequest'
+              $ref: '#/components/schemas/ChangePasswordRequest'
       responses:
         '200':
           description: 'Success'
@@ -64,10 +93,116 @@ paths:
           description: 'Forbidden'
         '500':
           description: 'Internal Server Error'
+  '/userapi/v1/project/{projectName}/user/{userID}/otp':
+    post:
+      summary: "Generate QR code for OTP"
+      tags:
+        - userapi
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'QR code'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTPGenerateResponse'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+    delete:
+      summary: "Delete OTP setting"
+      tags:
+        - userapi
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Success'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
+  '/userapi/v1/project/{projectName}/user/{userID}/otp/verify':
+    post:
+      summary: "Verify TOTP user code"
+      tags:
+        - userapi
+      parameters:
+        - name: projectName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OTPVerifyRequest'
+      responses:
+        '204':
+          description: 'Success'
+        '400':
+          description: 'Bad Request'
+        '403':
+          description: 'Forbidden'
+        '500':
+          description: 'Internal Server Error'
 components:
   schemas:
-    UserChangePasswordRequest:
+    GetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        created_at:
+          type: string
+        otp_info:
+          type: object
+          properties:
+            id:
+              type: string
+            enabled:
+              type: boolean
+    ChangePasswordRequest:
       type: object
       properties:
         password:
+          type: string
+    OTPGenerateResponse:
+      type: object
+      properties:
+        qrcode:
+          type: string
+          description: base64 encorded png image data
+    OTPVerifyRequest:
+      type: object
+      properties:
+        user_code:
           type: string

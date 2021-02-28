@@ -111,9 +111,14 @@ func Contains(all, err *Error) bool {
 
 // WriteHTTPError ...
 func WriteHTTPError(w http.ResponseWriter, typ string, err *Error, code int) {
+	msg := ""
+	if err != nil {
+		msg = err.publicMsg
+	}
+
 	res := HTTPError{
 		Type:  typ,
-		Error: err.publicMsg,
+		Error: msg,
 		Code:  code,
 	}
 

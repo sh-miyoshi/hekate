@@ -615,13 +615,17 @@ func (m *Manager) LoginSessionDelete(projectName string, sessionID string) *erro
 
 // LoginSessionGet ...
 func (m *Manager) LoginSessionGet(projectName string, sessionID string) (*model.LoginSession, *errors.Error) {
-	// login session is in internal only, so validation is not required
+	if !model.ValidateSessionID(sessionID) {
+		return nil, model.ErrLoginSessionValidationFailed
+	}
 	return m.loginSession.Get(projectName, sessionID)
 }
 
 // LoginSessionGetByCode ...
 func (m *Manager) LoginSessionGetByCode(projectName string, code string) (*model.LoginSession, *errors.Error) {
-	// login session is in internal only, so validation is not required
+	if !model.ValidateAuthCode(code) {
+		return nil, model.ErrLoginSessionValidationFailed
+	}
 	return m.loginSession.GetByCode(projectName, code)
 }
 
@@ -957,6 +961,32 @@ func (m *Manager) DeviceDelete(projectName string, deviceCode string) *errors.Er
 func (m *Manager) DeviceGetList(projectName string, filter *model.DeviceFilter) ([]*model.Device, *errors.Error) {
 	// TODO validate filter
 	return m.device.GetList(projectName, filter)
+}
+
+// OTPAdd ...
+func (m *Manager) OTPAdd(projectName string, userID string, ent *model.OTPInfo) *errors.Error {
+	// otp add is used in internal only, so validation is not required
+	return m.transaction.Transaction(func() *errors.Error {
+		users, err := m.user.GetList(projectName, &model.UserFilter{ID: userID})
+		if err != nil {
+			return errors.Append(err, "Failed to get user of OTP add")
+		}
+		if len(users) == 0 {
+			return model.ErrNoSuchUser
+		}
+		usr := users[0]
+
+		if usr.OTPInfo.Enabled {
+			return model.ErrUserOTPAlreadyEnabled
+		}
+
+		// update user
+		usr.OTPInfo = *ent
+		if err := m.user.Update(projectName, usr); err != nil {
+			return errors.Append(err, "Failed to update user")
+		}
+		return nil
+	})
 }
 
 // DeleteExpiredSessions ...

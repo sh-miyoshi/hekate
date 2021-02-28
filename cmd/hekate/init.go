@@ -75,6 +75,7 @@ func setAPI(r *mux.Router) {
 
 	// Authenticate API
 	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/authn/otpverify", authnapiv1.OTPVerifyHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
 
 	//------------------------------
@@ -129,8 +130,12 @@ func setAPI(r *mux.Router) {
 	// User APIs
 	//------------------------------
 	basePath = "/userapi/v1"
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}", userapiv1.GetHandler).Methods("GET")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/change-password", userapiv1.ChangePasswordHandler)
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/logout", userapiv1.LogoutHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/otp", userapiv1.OTPGenerateHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/otp/verify", userapiv1.OTPVerifyHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/otp", userapiv1.OTPDeleteHandler).Methods("DELETE")
 
 	//------------------------------
 	// Other Path

@@ -3,6 +3,7 @@ package userv1
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/sh-miyoshi/hekate/pkg/db"
@@ -10,8 +11,48 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	jwthttp "github.com/sh-miyoshi/hekate/pkg/http"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/sh-miyoshi/hekate/pkg/otp"
 	"github.com/sh-miyoshi/hekate/pkg/secret"
 )
+
+// GetHandler ...
+func GetHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
+			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
+			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+		} else {
+			errors.Print(errors.Append(err, "Failed to get user"))
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return Response
+	res := &GetResponse{
+		ID:        user.ID,
+		Name:      user.Name,
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
+		OPTInfo: OTPInfo{
+			ID:      user.OTPInfo.ID,
+			Enabled: user.OTPInfo.Enabled,
+		},
+	}
+	jwthttp.ResponseWrite(w, "GetHandler", res)
+}
 
 // ChangePasswordHandler ...
 func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
@@ -24,6 +65,7 @@ func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil || claims.Subject != userID {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
 	}
 
 	var req ChangePasswordRequest
@@ -87,4 +129,125 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	logger.Info("UserLogoutHandler method successfully finished")
+}
+
+// OTPGenerateHandler ...
+func OTPGenerateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+
+	qrcode, err := otp.Register(projectName, userID, claims.UserName)
+	if err != nil {
+		errors.Print(errors.Append(err, "Failed to register OTP"))
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+	logger.Debug("Generated QR code size: %d", len(qrcode))
+
+	// Return Response
+	res := &OTPGenerateResponse{
+		QRCodeImage: qrcode,
+	}
+	jwthttp.ResponseWrite(w, "OTPGenerateHandler", res)
+}
+
+// OTPVerifyHandler ...
+func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+
+	var req OTPVerifyRequest
+	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
+		err := errors.New("Invalid request", "Failed to decode user otp verify request: %v", e)
+		errors.PrintAsInfo(err)
+		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		return
+	}
+
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		errors.Print(err)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+
+	if !user.OTPInfo.Enabled {
+		user.OTPInfo.Enabled = true
+		logger.Debug("After enabled OTP: %+v", user.OTPInfo)
+		if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+			errors.Print(err)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err := otp.Verify(time.Now(), user, req.UserCode); err != nil {
+		if errors.Contains(err, otp.ErrVerifyFailed) {
+			errors.PrintAsInfo(err)
+			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		} else {
+			errors.Print(err)
+			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// Return 204 (No content) for success
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("OTPVerifyHandler method successfully finished")
+}
+
+// OTPDeleteHandler ...
+func OTPDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		errors.Print(err)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+
+	// Remove OTP Settings
+	user.OTPInfo.Enabled = false
+	user.OTPInfo.ID = ""
+	user.OTPInfo.PrivateKey = ""
+
+	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+		errors.Print(err)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+
+	// Return 204 (No content) for success
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("OTPDeleteHandler method successfully finished")
 }
