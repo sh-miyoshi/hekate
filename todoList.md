@@ -2,12 +2,10 @@
 
 ## User APIの追加
 
-- OTPの追加
-  - API docsのuser apiを修正(user get, code verify handler)
-  - Admin APIにOTPInfoを追加
-  - User Code verifyの実装
-  - portalのmfaページの修正
-  - いろいろ
+- OTP削除の実装
+  - API
+  - Handler
+  - Portal
 
 ## Documents
 
@@ -22,6 +20,8 @@
 
 ## server application enhancement
 
+- User portalを別に分ける
+- TOTPで前後1つも許可する(時刻同期の関係上)
 - APIの戻り値のJSONの型名のチェック
 - model.LoginSessionの修正
   - time.Time型をやめ、expiresIn int64型にする
