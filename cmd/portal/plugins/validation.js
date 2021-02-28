@@ -33,3 +33,22 @@ export function ValidateRoleName(name) {
 
   return { ok: true, message: '' }
 }
+
+export function ValidateUserCode(code) {
+  if (typeof code !== 'string') {
+    return { ok: false, message: 'The code is not string' }
+  }
+
+  if (code.length !== 6) {
+    return { ok: false, message: 'The length of code is not 6' }
+  }
+
+  // all char is only digit
+  for (let i = 0; i < code.length; i++) {
+    if (code[i] < '0' || code[i] > '9') {
+      return { ok: false, message: 'The code contains non-numeric characters' }
+    }
+  }
+
+  return { ok: true, message: '' }
+}

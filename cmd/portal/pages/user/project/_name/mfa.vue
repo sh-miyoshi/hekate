@@ -4,8 +4,35 @@
       <h3>Authenticator Application</h3>
     </div>
     <div v-if="isOTPEnabled()" class="card-body">
+      <div>
+        <b-modal
+          id="confirm-remove"
+          ref="confirm-remove"
+          title="Confirm"
+          cancel-variant="outline-dark"
+          ok-variant="danger"
+          ok-title="Remove MFA Device"
+          @ok="remove"
+        >
+          <p class="mb-0">Are you sure to remove MFA device ?</p>
+        </b-modal>
+      </div>
+
       <div class="form-group row">
-        TODO: show OTP setting
+        <label for="id" class="col-sm-2 control-label">
+          ID
+        </label>
+        <div class="col-sm-7">
+          <input v-model="user.otp_info.id" class="form-control" disabled />
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="enabled" class="col-sm-2 control-label">
+          Enabled
+        </label>
+        <div class="col-sm-7">
+          <img src="~/assets/img/ok.png" />
+        </div>
       </div>
     </div>
     <div v-else class="card-body">
@@ -51,15 +78,22 @@
         </div>
       </div>
     </div>
-    <div v-if="error" class="card-footer">
-      <div class="alert alert-danger">
+    <div class="card-footer">
+      <div v-if="error" class="alert alert-danger">
         {{ error }}
+      </div>
+      <div v-if="isOTPEnabled()">
+        <button class="btn btn-danger mr-2" @click="removeConfirm">
+          Remove
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { ValidateUserCode } from '~/plugins/validation'
+
 export default {
   layout: 'user',
   middleware: 'userAuth',
@@ -108,9 +142,9 @@ export default {
       this.error = ''
     },
     async submit() {
-      let res = this.validateUserCode(this.usercode)
-      if (res !== '') {
-        this.error = res
+      let res = ValidateUserCode(this.usercode)
+      if (!res.ok) {
+        this.error = res.message
         return
       }
 
@@ -124,23 +158,21 @@ export default {
       this.error = ''
       this.setUser()
     },
-    validateUserCode(code) {
-      if (typeof code !== 'string') {
-        return 'The code is not string'
+    removeConfirm() {
+      this.$refs['confirm-remove'].show()
+    },
+    async remove() {
+      const project = window.localStorage.getItem('login_project')
+      const userID = window.localStorage.getItem('user_id')
+      const res = await this.$api.UserAPIOTPDelete(project, userID)
+      if (!res.ok) {
+        this.error = res.message
+        return
       }
-
-      if (code.length !== 6) {
-        return 'The length of code is not 6'
-      }
-
-      // all char is only digit
-      for (let i = 0; i < code.length; i++) {
-        if (code[i] < '0' || code[i] > '9') {
-          return 'The code contains non-numeric characters'
-        }
-      }
-
-      return ''
+      this.error = ''
+      this.qrcode = ''
+      await this.$bvModal.msgBoxOk('Successfully remove MFA device.')
+      this.setUser()
     }
   }
 }

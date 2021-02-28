@@ -3,9 +3,11 @@
     <div class="c-wrapper">
       <div class="c-body">
         <h4>Welcome to Hekate!</h4>
-        <button class="btn btn-primary" @click="login">
-          Login
-        </button>
+        <div class="card-body">
+          <button class="btn btn-primary" @click="login">
+            Login
+          </button>
+        </div>
       </div>
     </div>
     <footer class="c-footer"></footer>

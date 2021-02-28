@@ -356,6 +356,18 @@ class APIClient {
     const res = await this._request(url, 'POST', { user_code: userCode })
     return res
   }
+
+  async UserAPIOTPDelete(projectName, userID) {
+    const url =
+      this.serverAddr +
+      '/userapi/v1/project/' +
+      projectName +
+      '/user/' +
+      userID +
+      '/otp'
+    const res = await this._request(url, 'DELETE')
+    return res
+  }
 }
 
 export default (context, inject) => {
