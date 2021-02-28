@@ -26,6 +26,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil || claims.Subject != userID {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
 	}
 
 	user, err := db.GetInst().UserGet(projectName, userID)
@@ -64,6 +65,7 @@ func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil || claims.Subject != userID {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
 	}
 
 	var req ChangePasswordRequest
@@ -169,6 +171,7 @@ func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil || claims.Subject != userID {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
 		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
 	}
 
 	var req OTPVerifyRequest
@@ -210,4 +213,41 @@ func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	// Return 204 (No content) for success
 	w.WriteHeader(http.StatusNoContent)
 	logger.Info("OTPVerifyHandler method successfully finished")
+}
+
+// OTPDeleteHandler ...
+func OTPDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectName := vars["projectName"]
+	userID := vars["userID"]
+
+	// Authorize API Request
+	claims, err := jwthttp.ValidateAPIToken(r)
+	if err != nil || claims.Subject != userID {
+		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
+		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		return
+	}
+
+	user, err := db.GetInst().UserGet(projectName, userID)
+	if err != nil {
+		errors.Print(err)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+
+	// Remove OTP Settings
+	user.OTPInfo.Enabled = false
+	user.OTPInfo.ID = ""
+	user.OTPInfo.PrivateKey = ""
+
+	if err := db.GetInst().UserUpdate(projectName, user); err != nil {
+		errors.Print(err)
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		return
+	}
+
+	// Return 204 (No content) for success
+	w.WriteHeader(http.StatusNoContent)
+	logger.Info("OTPDeleteHandler method successfully finished")
 }

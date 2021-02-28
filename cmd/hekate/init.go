@@ -135,8 +135,7 @@ func setAPI(r *mux.Router) {
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/logout", userapiv1.LogoutHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/otp", userapiv1.OTPGenerateHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/otp/verify", userapiv1.OTPVerifyHandler).Methods("POST")
-	// TODO
-	// r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/otp", userapiv1.OTPDeleteHandler).Methods("DELETE")
+	r.HandleFunc(basePath+"/project/{projectName}/user/{userID}/otp", userapiv1.OTPDeleteHandler).Methods("DELETE")
 
 	//------------------------------
 	// Other Path
