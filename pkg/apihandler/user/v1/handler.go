@@ -145,8 +145,8 @@ func OTPGenerateHandler(w http.ResponseWriter, r *http.Request) {
 
 	qrcode, err := otp.Register(projectName, userID, claims.UserName)
 	if err != nil {
-		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.Print(errors.Append(err, "Failed to register OTP"))
+		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
 		return
 	}
 	logger.Debug("Generated QR code size: %d", len(qrcode))
