@@ -5,6 +5,6 @@
 ## コマンド一覧
 
 - token
-  - tokenを取得し`tno/token.json`に格納する
+  - tokenを取得し`tmp/token.json`に格納する
 - show config
 - request
