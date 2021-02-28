@@ -75,8 +75,7 @@ func setAPI(r *mux.Router) {
 
 	// Authenticate API
 	r.HandleFunc(basePath+"/project/{projectName}/authn/login", authnapiv1.UserLoginHandler).Methods("POST")
-	// TODO
-	// r.HandleFunc(basePath+"/project/{projectName}/authn/otpverify", authnapiv1.OTPVerifyHandler).Methods("POST")
+	r.HandleFunc(basePath+"/project/{projectName}/authn/otpverify", authnapiv1.OTPVerifyHandler).Methods("POST")
 	r.HandleFunc(basePath+"/project/{projectName}/authn/consent", authnapiv1.ConsentHandler).Methods("POST")
 
 	//------------------------------
