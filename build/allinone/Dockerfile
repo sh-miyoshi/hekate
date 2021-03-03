@@ -24,7 +24,9 @@ FROM mongo as mongo-installer
 
 FROM ubuntu:18.04
 
-RUN apt update -y && apt install -y nodejs npm curl
+RUN apt update -y && apt install -y curl
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt install -y nodejs
 WORKDIR /hekate
 RUN mkdir -p server && mkdir -p portal && mkdir -p mongo
 COPY cmd/hekate/_data/testcerts /hekate/secret
