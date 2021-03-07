@@ -51,8 +51,6 @@
     - Project Name, user ID, client ID など
 - パスワード以外でのユーザーのログイン
   - 証明書
-  - ワンタイムパスワード
-  - デバイス認証
 - Client Secretに証明書を追加できるようにする
   - portalのアップデートだけでよい？
 - OpenID Connect部分のエンハンス
