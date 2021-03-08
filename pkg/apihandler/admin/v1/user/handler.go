@@ -27,7 +27,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -42,10 +42,10 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "User Get List Failed"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to get user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -54,7 +54,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 	customRoles, err := db.GetInst().CustomRoleGetList(projectName, nil)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get custom role list"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -84,7 +84,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
 		if err != nil {
 			errors.Print(errors.Append(err, "Failed to get session list"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 			return
 		}
 
@@ -118,7 +118,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -127,7 +127,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
 		err = errors.New("Invalid request", "Failed to decode user create request: %v", e)
 		errors.PrintAsInfo(err)
-		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		return
 	}
 
@@ -135,13 +135,13 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 
 	if err = secret.CheckPassword(request.Name, request.Password, project.PasswordPolicy); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "The password does not much the policy"))
-		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		return
 	}
 
@@ -159,13 +159,13 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().UserAdd(projectName, &user); err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "user validation failed"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else if errors.Contains(err, model.ErrUserAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is already exists", user.Name))
-			errors.WriteHTTPError(w, "Conflict", err, http.StatusConflict)
+			errors.WriteToHTTP(w, err, http.StatusConflict, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to create user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -175,7 +175,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		r, err := db.GetInst().CustomRoleGet(projectName, rid)
 		if err != nil {
 			errors.Print(errors.Append(err, "Failed to get user %s custom role %s info", user.ID, r.ID))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 			return
 		}
 		roles = append(roles, CustomRole{
@@ -218,7 +218,7 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -226,10 +226,10 @@ func UserDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().UserDelete(projectName, userID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -249,7 +249,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -257,10 +257,10 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) || errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to get user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -270,7 +270,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 		r, err := db.GetInst().CustomRoleGet(projectName, rid)
 		if err != nil {
 			errors.Print(errors.Append(err, "Failed to get user %s custom role %s info", user.ID, r.ID))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 			return
 		}
 		roles = append(roles, CustomRole{
@@ -291,7 +291,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	sessions, err := db.GetInst().SessionGetList(projectName, &model.SessionFilter{UserID: user.ID})
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get session list"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -323,16 +323,16 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
 	// Parse Request
 	var request UserPutRequest
 	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
-		err = errors.New("Invalid request", "Failed to decode user update request: %v", e)
+		err = errors.Append(errors.ErrInvalidRequest, "Failed to decode user update request: %v", e)
 		errors.PrintAsInfo(err)
-		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		return
 	}
 
@@ -341,13 +341,13 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid user ID format"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to update user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -362,10 +362,10 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().UserUpdate(projectName, user); err != nil {
 		if errors.Contains(err, model.ErrUserValidateFailed) || errors.Contains(err, model.ErrUserAlreadyExists) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid user request format"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to update user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -396,7 +396,7 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -408,22 +408,22 @@ func UserRoleAddHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().UserAddRole(projectName, userID, roleType, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else if errors.Contains(err, model.ErrRoleAlreadyAppended) {
 			logger.Info("Role %s is already appended", roleID)
-			errors.WriteHTTPError(w, "Conflict", err, http.StatusConflict)
+			errors.WriteToHTTP(w, err, http.StatusConflict, "")
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			if !model.ValidateUserID(userID) {
 				logger.Info("UserID %s is invalid id format", userID)
-				errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+				errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 			} else {
 				// Includes role not found
 				errors.PrintAsInfo(errors.Append(err, "Invalid role was specified"))
-				errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+				errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 			}
 		} else {
 			errors.Print(errors.Append(err, "Failed to add role to user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -454,7 +454,7 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -462,21 +462,21 @@ func UserRoleDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().UserDeleteRole(projectName, userID, roleID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else if errors.Contains(err, model.ErrNoSuchRoleInUser) {
 			logger.Info("User %s do not have Role %s", userID, roleID)
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			if !model.ValidateUserID(userID) {
 				logger.Info("UserID %s is invalid id format", userID)
-				errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+				errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 			} else {
 				errors.PrintAsInfo(errors.Append(err, "Invalid ID was specified"))
-				errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+				errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 			}
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete role from user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -506,36 +506,36 @@ func UserResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
 	var req UserResetPasswordRequest
 	if e := json.NewDecoder(r.Body).Decode(&req); e != nil {
-		err = errors.New("Invalid request", "Failed to decode user reset password request: %v", e)
+		err = errors.Append(errors.ErrInvalidRequest, "Failed to decode user reset password request: %v", e)
 		errors.PrintAsInfo(err)
-		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		return
 	}
 
 	if err = db.GetInst().UserChangePassword(projectName, userID, req.Password); err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			logger.Info("No such user: %s", userID)
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			if !model.ValidateUserID(userID) {
 				logger.Info("UserID %s is invalid id format", userID)
-				errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+				errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 			} else {
 				errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
-				errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+				errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 			}
 		} else if errors.Contains(err, secret.ErrPasswordPolicyFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to reset user password"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -565,7 +565,7 @@ func UserUnlockHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -573,13 +573,13 @@ func UserUnlockHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchUser) {
 			errors.PrintAsInfo(errors.Append(err, "User %s is not found", userID))
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else if errors.Contains(err, model.ErrUserValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid user ID format"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to get user"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -588,7 +588,7 @@ func UserUnlockHandler(w http.ResponseWriter, r *http.Request) {
 	user.LockState = model.LockState{}
 	if err = db.GetInst().UserUpdate(projectName, user); err != nil {
 		errors.Print(errors.Append(err, "Failed to update user lock state"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 

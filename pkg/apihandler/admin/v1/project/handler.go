@@ -21,14 +21,14 @@ func AllProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, "", role.ResCluster, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
 	projects, err := db.GetInst().ProjectGetList(nil)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project list"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -92,7 +92,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, "", role.ResCluster, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -101,7 +101,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
 		err = errors.New("Invalid request", "Failed to decode project create request: %v", e)
 		errors.PrintAsInfo(err)
-		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		return
 	}
 
@@ -111,7 +111,7 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 		v, err := model.GetGrantType(t)
 		if err != nil {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get grant type %s", t))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 			return
 		}
 		grantTypes = append(grantTypes, v)
@@ -148,13 +148,13 @@ func ProjectCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().ProjectAdd(&project); err != nil {
 		if errors.Contains(err, model.ErrProjectAlreadyExists) {
 			logger.Info("Project %s is already exists", request.Name)
-			errors.WriteHTTPError(w, "Conflict", err, http.StatusConflict)
+			errors.WriteToHTTP(w, err, http.StatusConflict, "")
 		} else if errors.Contains(err, model.ErrProjectValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid project entry is specified"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to create project"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -208,17 +208,17 @@ func ProjectDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResCluster, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
 	if err = db.GetInst().ProjectDelete(projectName); err != nil {
 		if errors.Contains(err, model.ErrDeleteBlockedProject) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to delete blocked project"))
-			errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+			errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete project"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -237,7 +237,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -245,7 +245,7 @@ func ProjectGetHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -303,7 +303,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -312,7 +312,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if e := json.NewDecoder(r.Body).Decode(&request); e != nil {
 		err = errors.New("Invalid request", "Failed to decode project update request: %v", e)
 		errors.PrintAsInfo(err)
-		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		return
 	}
 
@@ -320,7 +320,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -339,7 +339,7 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		v, err := model.GetGrantType(t)
 		if err != nil {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get grant type %s", t))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 			return
 		}
 		project.AllowGrantTypes = append(project.AllowGrantTypes, v)
@@ -355,10 +355,10 @@ func ProjectUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	if err = db.GetInst().ProjectUpdate(project); err != nil {
 		if errors.Contains(err, model.ErrProjectValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Project info validation failed"))
-			errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to update project"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}

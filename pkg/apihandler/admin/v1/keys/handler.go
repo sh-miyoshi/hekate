@@ -23,7 +23,7 @@ func KeysGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -31,7 +31,7 @@ func KeysGetHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 
@@ -66,14 +66,14 @@ func KeysResetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
 	// update project secret
 	if err = db.GetInst().ProjectSecretReset(projectName); err != nil {
 		errors.Print(errors.Append(err, "Failed to reset project secret"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 

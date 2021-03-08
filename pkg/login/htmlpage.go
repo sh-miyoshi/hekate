@@ -16,7 +16,9 @@ func WriteUserLoginPage(projectName, sessionID, errMsg, state string, w http.Res
 	tpl, err := template.ParseFiles(cfg.LoginResource.IndexPage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Page maybe broken", ""), http.StatusInternalServerError)
+		e := errors.ErrServerError
+		e.SetDescription("User Login Page maybe broken")
+		errors.WriteToHTTP(w, e, 0, "")
 		return
 	}
 
@@ -42,7 +44,9 @@ func WriteOTPVerifyPage(projectName, sessionID, state string, w http.ResponseWri
 	tpl, err := template.ParseFiles(cfg.LoginResource.OTPVerifyPage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login OTP Verify Page maybe broken", ""), http.StatusInternalServerError)
+		e := errors.ErrServerError
+		e.SetDescription("User Login OTP Verify Page maybe broken")
+		errors.WriteToHTTP(w, e, 0, "")
 		return
 	}
 
@@ -67,7 +71,9 @@ func WriteConsentPage(projectName, sessionID, state string, w http.ResponseWrite
 	tpl, err := template.ParseFiles(cfg.LoginResource.ConsentPage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		errors.WriteHTTPError(w, "Page Broken", errors.New("User Login Consent Page maybe broken", ""), http.StatusInternalServerError)
+		e := errors.ErrServerError
+		e.SetDescription("User Login Consent Page maybe broken")
+		errors.WriteToHTTP(w, e, 0, "")
 		return
 	}
 
@@ -92,7 +98,9 @@ func WriteDeviceLoginPage(projectName, errMsg string, w http.ResponseWriter) {
 	tpl, err := template.ParseFiles(cfg.LoginResource.DeviceLoginPage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		errors.WriteHTTPError(w, "Page Broken", errors.New("User Device Login Page maybe broken", ""), http.StatusInternalServerError)
+		e := errors.ErrServerError
+		e.SetDescription("User Device Login Page maybe broken")
+		errors.WriteToHTTP(w, e, 0, "")
 		return
 	}
 
@@ -114,7 +122,9 @@ func WriteDeviceLoginCompletePage(w http.ResponseWriter) {
 	tpl, err := template.ParseFiles(cfg.LoginResource.DeviceLoginCompletePage)
 	if err != nil {
 		logger.Error("Failed to parse template: %v", err)
-		errors.WriteHTTPError(w, "Page Broken", errors.New("User Device Login Complete Page maybe broken", ""), http.StatusInternalServerError)
+		e := errors.ErrServerError
+		e.SetDescription("User Device Login Complete Page maybe broken")
+		errors.WriteToHTTP(w, e, 0, "")
 		return
 	}
 

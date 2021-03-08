@@ -35,17 +35,17 @@ func SessionDeleteHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err = jwthttp.Authorize(r, projectName, role.ResProject, role.TypeWrite); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
 	if err = db.GetInst().SessionDelete(projectName, sessionID); err != nil {
 		if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to delete session"))
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to delete session info"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}
@@ -65,7 +65,7 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -73,10 +73,10 @@ func SessionGetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Contains(err, model.ErrNoSuchSession) || errors.Contains(err, model.ErrSessionValidateFailed) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get session"))
-			errors.WriteHTTPError(w, "Not Found", err, http.StatusNotFound)
+			errors.WriteToHTTP(w, err, http.StatusNotFound, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to get session info"))
-			errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
 	}

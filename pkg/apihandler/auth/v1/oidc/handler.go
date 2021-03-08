@@ -32,7 +32,7 @@ func ConfigGetHandler(w http.ResponseWriter, r *http.Request) {
 	prj, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project info"))
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 	grantTypes := []string{}
@@ -94,7 +94,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequestObject, 0, "")
 		return
 	}
 
@@ -105,7 +105,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project info"))
-		errors.WriteOAuthError(w, errors.ErrServerError, state)
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 		return
 	}
 
@@ -117,7 +117,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		i, s, ok := r.BasicAuth()
 		if !ok {
 			logger.Info("Failed to get client ID from request, Request header: %v", r.Header)
-			errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
+			errors.WriteToHTTP(w, errors.ErrInvalidClient, 0, state)
 			return
 		}
 		clientID = i
@@ -127,10 +127,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	if err = oidc.ClientAuth(projectName, clientID, clientSecret); err != nil {
 		if errors.Contains(err, errors.ErrInvalidClient) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate client %s", clientID))
-			errors.WriteOAuthError(w, errors.ErrInvalidClient, state)
+			errors.WriteToHTTP(w, errors.ErrInvalidClient, 0, state)
 		} else {
 			errors.Print(errors.Append(err, "Failed to authenticate client"))
-			errors.WriteOAuthError(w, errors.ErrServerError, state)
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 		}
 		return
 	}
@@ -142,10 +142,10 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 		if err = oidc.CheckRedirectURL(projectName, clientID, r.Form.Get("redirect_uri")); err != nil {
 			if errors.Contains(err, oidc.ErrNoRedirectURL) {
 				logger.Info("Redirect URL %s is not in Allowed list", r.Form.Get("redirect_uri"))
-				errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, state)
+				errors.WriteToHTTP(w, errors.ErrInvalidRequestURI, 0, state)
 			} else {
 				errors.Print(errors.Append(err, "Failed to get allowed callback urls in client"))
-				errors.WriteOAuthError(w, errors.ErrServerError, state)
+				errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 			}
 			return
 		}
@@ -156,12 +156,12 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	gt, err := model.GetGrantType(gtStr)
 	if err != nil {
 		logger.Info("No such Grant Type: %s", gtStr)
-		errors.WriteOAuthError(w, errors.ErrInvalidGrant, state)
+		errors.WriteToHTTP(w, errors.ErrInvalidGrant, 0, state)
 		return
 	}
 	if ok := slice.Contains(project.AllowGrantTypes, gt); !ok {
 		logger.Info("Grant Type %s is not in allowed list %v", gtStr, project.AllowGrantTypes)
-		errors.WriteOAuthError(w, errors.ErrUnsupportedGrantType, state)
+		errors.WriteToHTTP(w, errors.ErrUnsupportedGrantType, 0, state)
 		return
 	}
 
@@ -178,7 +178,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil && errors.Contains(err, model.ErrNoSuchSession) {
 			logger.Info("Refresh token is already revoked")
-			errors.WriteOAuthError(w, errors.ErrInvalidGrant, state)
+			errors.WriteToHTTP(w, errors.ErrInvalidGrant, 0, state)
 			return
 		}
 	case model.GrantTypeAuthorizationCode:
@@ -191,13 +191,13 @@ func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		if err.GetHTTPStatusCode() != 0 {
-			errors.PrintAsInfo(errors.Append(err, "Failed to verify request"))
-			errors.WriteOAuthError(w, err, state)
+		err = errors.Append(err, "Failed to verify request")
+		if err.StatusCode() != 0 {
+			errors.PrintAsInfo(err)
 		} else {
-			errors.Print(errors.Append(err, "Failed to verify request"))
-			errors.WriteOAuthError(w, errors.ErrServerError, state)
+			errors.Print(err)
 		}
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, state)
 		return
 	}
 
@@ -223,14 +223,14 @@ func CertsHandler(w http.ResponseWriter, r *http.Request) {
 	project, err := db.GetInst().ProjectGet(projectName)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get project"))
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 
 	res, err := oidc.GenerateJWKSet(project.TokenConfig.SigningAlgorithm, project.TokenConfig.SignPublicKey)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to generate JWT set"))
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 
@@ -259,7 +259,7 @@ func AuthPOSTHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequestObject, 0, "")
 		return
 	}
 
@@ -275,7 +275,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	claims, err := jwthttp.ValidateAPIToken(r)
 	if err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to validate header"))
-		errors.WriteOAuthError(w, errors.ErrInvalidRequest, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequest, 0, "")
 		return
 	}
 
@@ -283,7 +283,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// If token validate accepted, user absolutely exists
 		errors.Print(errors.Append(err, "Failed to get user"))
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 
@@ -305,7 +305,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequestObject, 0, "")
 		return
 	}
 
@@ -316,7 +316,7 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch tokenType {
 	case "access_token":
-		errors.WriteOAuthError(w, errors.ErrUnsupportedTokenType, r.Form.Get("state"))
+		errors.WriteToHTTP(w, errors.ErrUnsupportedTokenType, 0, r.Form.Get("state"))
 	case "refresh_token":
 		refreshToken := r.Form.Get("token")
 		claims := &token.RefreshTokenClaims{}
@@ -333,13 +333,13 @@ func RevokeHandler(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			} else {
 				errors.Print(errors.Append(err, "Failed to revoke session"))
-				errors.WriteOAuthError(w, errors.ErrServerError, r.Form.Get("state"))
+				errors.WriteToHTTP(w, errors.ErrServerError, 0, r.Form.Get("state"))
 			}
 			return
 		}
 		w.WriteHeader(http.StatusOK)
 	default:
-		errors.WriteOAuthError(w, errors.ErrUnsupportedTokenType, r.Form.Get("state"))
+		errors.WriteToHTTP(w, errors.ErrUnsupportedTokenType, 0, r.Form.Get("state"))
 	}
 }
 
@@ -363,21 +363,21 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 	if err = oidc.CheckRedirectURL(projectName, authReq.ClientID, authReq.RedirectURI); err != nil {
 		if errors.Contains(err, oidc.ErrNoRedirectURL) {
 			errors.PrintAsInfo(errors.Append(err, "Redirect URL %s is not in Allowed list", authReq.RedirectURI))
-			errors.WriteOAuthError(w, errors.ErrInvalidRequestURI, authReq.State)
+			errors.WriteToHTTP(w, errors.ErrInvalidRequestURI, 0, authReq.State)
 		} else if errors.Contains(err, model.ErrNoSuchClient) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to get allowed callback urls: No such client %s", authReq.ClientID))
-			errors.WriteOAuthError(w, errors.ErrInvalidClient, authReq.State)
+			errors.WriteToHTTP(w, errors.ErrInvalidClient, 0, authReq.State)
 		} else {
 			errors.Print(errors.Append(err, "Failed to get allowed callback urls in client"))
-			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, authReq.State)
 		}
 		return
 	}
 
 	if err = authReq.Validate(); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to validate request"))
-		if err.GetHTTPStatusCode() == 0 {
-			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+		if err.StatusCode() == 0 {
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, authReq.State)
 		} else {
 			errors.RedirectWithOAuthError(w, err, r.Method, authReq.RedirectURI, authReq.State)
 		}
@@ -401,7 +401,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 		lsID, err := login.StartLoginSession(projectName, authReq)
 		if err != nil {
 			errors.Print(errors.Append(err, "Failed to start login session"))
-			errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, authReq.State)
 			return
 		}
 
@@ -451,7 +451,7 @@ func authHandler(w http.ResponseWriter, r *http.Request, projectName string, req
 	lsID, err := login.StartLoginSession(projectName, authReq)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to start login session"))
-		errors.WriteOAuthError(w, errors.ErrServerError, authReq.State)
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, authReq.State)
 		return
 	}
 
