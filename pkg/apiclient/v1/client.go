@@ -34,7 +34,7 @@ func (h *Handler) ClientAdd(projectName string, req *clientapi.ClientCreateReque
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -70,7 +70,7 @@ func (h *Handler) ClientDelete(projectName string, clientID string) error {
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -107,7 +107,7 @@ func (h *Handler) ClientGetList(projectName string) ([]*clientapi.ClientGetRespo
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -144,7 +144,7 @@ func (h *Handler) ClientGet(projectName, clientID string) (*clientapi.ClientGetR
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -180,7 +180,7 @@ func (h *Handler) ClientUpdate(projectName, clientID string, req *clientapi.Clie
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {

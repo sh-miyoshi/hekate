@@ -56,7 +56,7 @@ func (h *Handler) RoleAdd(projectName string, req *roleapi.CustomRoleCreateReque
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -97,7 +97,7 @@ func (h *Handler) RoleDelete(projectName string, roleName string) error {
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -154,7 +154,7 @@ func (h *Handler) RoleGetList(projectName string, roleName string) ([]*roleapi.C
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
