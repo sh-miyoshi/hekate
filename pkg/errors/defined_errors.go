@@ -190,4 +190,16 @@ var (
 		publicMsg:        "already_session_expired",
 		httpResponseCode: http.StatusBadRequest,
 	}
+
+	// ErrProjectNotFound ...
+	ErrProjectNotFound = &Error{
+		publicMsg:        "project_not_found",
+		httpResponseCode: http.StatusNotFound,
+	}
+
+	// ErrUnpermitted ...
+	ErrUnpermitted = &Error{
+		publicMsg:        "no_permission",
+		httpResponseCode: http.StatusForbidden,
+	}
 )

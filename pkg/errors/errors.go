@@ -11,10 +11,25 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/logger"
 )
 
+// Error ...
+type Error struct {
+	privateInfo      []info
+	publicMsg        string
+	description      string
+	httpResponseCode int
+}
+
 type info struct {
 	msg   string
 	fname string
 	line  int
+}
+
+// HTTPResponse ...
+type HTTPResponse struct {
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
+	State            string `json:"state"`
 }
 
 // Error ...
@@ -27,15 +42,21 @@ func (e *Error) Copy() *Error {
 	res := Error{
 		publicMsg:        e.publicMsg,
 		httpResponseCode: e.httpResponseCode,
+		description:      e.description,
 		privateInfo:      append([]info{}, e.privateInfo...),
 	}
 
 	return &res
 }
 
-// GetHTTPStatusCode ...
-func (e *Error) GetHTTPStatusCode() int {
+// StatusCode ...
+func (e *Error) StatusCode() int {
 	return e.httpResponseCode
+}
+
+// SetDescription ...
+func (e *Error) SetDescription(format string, a ...interface{}) {
+	e.description = fmt.Sprintf(format, a...)
 }
 
 // New ...
@@ -78,17 +99,6 @@ func Append(err *Error, format string, a ...interface{}) *Error {
 	return resErr
 }
 
-// UpdatePublicMsg ...
-func UpdatePublicMsg(err *Error, format string, a ...interface{}) *Error {
-	if err == nil {
-		return nil
-	}
-
-	msg := fmt.Sprintf(format, a...)
-	err.publicMsg = msg
-	return err
-}
-
 // Contains ...
 func Contains(all, err *Error) bool {
 	if all == nil || err == nil {
@@ -109,43 +119,30 @@ func Contains(all, err *Error) bool {
 	return false
 }
 
-// WriteHTTPError ...
-func WriteHTTPError(w http.ResponseWriter, typ string, err *Error, code int) {
-	msg := ""
-	if err != nil {
-		msg = err.publicMsg
-	}
-
-	res := HTTPError{
-		Type:  typ,
-		Error: msg,
-		Code:  code,
+// WriteToHTTP ...
+func WriteToHTTP(w http.ResponseWriter, err *Error, statusCode int, state string) {
+	res := HTTPResponse{
+		Error:            err.publicMsg,
+		ErrorDescription: err.description,
+		State:            state,
 	}
 
 	w.Header().Add("Content-Type", "application/json")
 
-	w.WriteHeader(code)
-	if err := json.NewEncoder(w).Encode(res); err != nil {
-		logger.Error("Failed to encode response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-}
-
-// WriteOAuthError ...
-func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
-	res := map[string]interface{}{
-		"error": err.publicMsg,
-		// TODO(error_description)
-		"state": state,
+	c := statusCode
+	if c == 0 {
+		if err.httpResponseCode == 0 {
+			logger.Error("Failed to get status code in error response: %v", res)
+			res.Error = "Internal Server Error"
+			c = http.StatusInternalServerError
+		} else {
+			c = err.httpResponseCode
+		}
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-
-	// TODO(code == 0 -> panic)
 	w.WriteHeader(err.httpResponseCode)
 
-	logger.Debug("Return OAuth error: code %d, body %v", err.httpResponseCode, res)
+	logger.Debug("Return http error: code %d, body %v", err.httpResponseCode, res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		logger.Error("Failed to encode response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -155,12 +152,18 @@ func WriteOAuthError(w http.ResponseWriter, err *Error, state string) {
 
 // RedirectWithOAuthError ...
 func RedirectWithOAuthError(w http.ResponseWriter, err *Error, method, redirectURL, state string) {
+	if err == nil {
+		return
+	}
+
 	values := url.Values{}
+	values.Set("error", err.publicMsg)
+	if err.description != "" {
+		values.Set("error_description", err.description)
+	}
 	if state != "" {
 		values.Set("state", state)
 	}
-	values.Set("error", err.publicMsg)
-	// TODO(error_description)
 
 	req, _ := http.NewRequest(method, redirectURL, nil)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
