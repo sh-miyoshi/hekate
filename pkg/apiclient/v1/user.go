@@ -51,7 +51,7 @@ func (h *Handler) UserAdd(projectName string, req *userapi.UserCreateRequest) (*
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -92,7 +92,7 @@ func (h *Handler) UserDelete(projectName string, userName string) error {
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -147,7 +147,7 @@ func (h *Handler) UserGetList(projectName string, userName string) ([]*userapi.U
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -189,7 +189,7 @@ func (h *Handler) UserRoleAdd(projectName string, userName string, roleName stri
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -235,7 +235,7 @@ func (h *Handler) UserRoleDelete(projectName string, userName string, roleName s
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -278,7 +278,7 @@ func (h *Handler) UserChangePassword(projectName string, userName string, newPas
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -317,7 +317,7 @@ func (h *Handler) UserUnlock(projectName string, userName string) error {
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {

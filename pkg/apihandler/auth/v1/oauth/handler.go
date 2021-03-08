@@ -42,7 +42,7 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequestObject, 0, "")
 		return
 	}
 
@@ -56,7 +56,7 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 		i, s, ok := r.BasicAuth()
 		if !ok {
 			logger.Info("Failed to get client ID from request, Request header: %v", r.Header)
-			errors.WriteOAuthError(w, errors.ErrInvalidClient, "")
+			errors.WriteToHTTP(w, errors.ErrInvalidClient, 0, "")
 			return
 		}
 		clientID = i
@@ -66,10 +66,10 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if err = oidc.ClientAuth(projectName, clientID, clientSecret); err != nil {
 		if errors.Contains(err, errors.ErrInvalidClient) {
 			errors.PrintAsInfo(errors.Append(err, "Failed to authenticate client %s", clientID))
-			errors.WriteOAuthError(w, errors.ErrInvalidClient, "")
+			errors.WriteToHTTP(w, errors.ErrInvalidClient, 0, "")
 		} else {
 			errors.Print(errors.Append(err, "Failed to authenticate client"))
-			errors.WriteOAuthError(w, errors.ErrServerError, "")
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		}
 		return
 	}
@@ -77,7 +77,7 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 	scope := r.Form.Get("scope")
 	if !slice.Contains(config.Get().SupportedScope, scope) {
 		errors.PrintAsInfo(errors.New("Invalid scope", "Invalid scope request: %s", scope))
-		errors.WriteOAuthError(w, errors.ErrRequestNotSupported, "")
+		errors.WriteToHTTP(w, errors.ErrRequestNotSupported, 0, "")
 		return
 	}
 
@@ -92,7 +92,7 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 	lsID, err := login.StartLoginSession(projectName, authReq)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to start device login session"))
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 
@@ -111,7 +111,7 @@ func DeviceRegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := db.GetInst().DeviceAdd(projectName, ent); err != nil {
 		errors.Print(errors.Append(err, "Failed to add device"))
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 
@@ -158,14 +158,14 @@ func DeviceUserCodeVerifyHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrInvalidRequestObject, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequestObject, 0, "")
 		return
 	}
 	userCode := r.Form.Get("code")
 	devices, err := db.GetInst().DeviceGetList(projectName, &model.DeviceFilter{UserCode: userCode})
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get device"))
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 	if len(devices) == 0 {

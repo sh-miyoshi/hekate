@@ -33,7 +33,7 @@ func (h *Handler) ProjectAdd(req *projectapi.ProjectCreateRequest) (*projectapi.
 		return &res, nil
 	}
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -67,7 +67,7 @@ func (h *Handler) ProjectDelete(projectName string) error {
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -104,7 +104,7 @@ func (h *Handler) ProjectGetList() ([]*projectapi.ProjectGetResponse, error) {
 		return res, nil
 	}
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -138,7 +138,7 @@ func (h *Handler) ProjectGet(projectName string) (*projectapi.ProjectGetResponse
 		return &res, nil
 	}
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -174,7 +174,7 @@ func (h *Handler) ProjectUpdate(projectName string, req *projectapi.ProjectPutRe
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {
@@ -213,7 +213,7 @@ func (h *Handler) ProjectKeysGet(projectName string) (*keysapi.KeysGetResponse, 
 	}
 
 	message := ""
-	var res errors.HTTPError
+	var res errors.HTTPResponse
 	if err := json.NewDecoder(httpRes.Body).Decode(&res); err == nil {
 		message = res.Error
 	} else {

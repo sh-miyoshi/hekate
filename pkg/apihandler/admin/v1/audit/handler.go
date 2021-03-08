@@ -21,7 +21,7 @@ func AuditGetHandler(w http.ResponseWriter, r *http.Request) {
 	// Authorize API Request
 	if err := jwthttp.Authorize(r, projectName, role.ResProject, role.TypeRead); err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to authorize header"))
-		errors.WriteHTTPError(w, "Forbidden", err, http.StatusForbidden)
+		errors.WriteToHTTP(w, errors.ErrUnpermitted, 0, "")
 		return
 	}
 
@@ -31,14 +31,14 @@ func AuditGetHandler(w http.ResponseWriter, r *http.Request) {
 	req, err := audit.ParseQuery(&queries)
 	if err != nil {
 		errors.PrintAsInfo(errors.Append(err, "Failed to parse query"))
-		errors.WriteHTTPError(w, "Bad Request", err, http.StatusBadRequest)
+		errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		return
 	}
 
 	audits, err := audit.GetInst().Get(projectName, *req)
 	if err != nil {
 		errors.Print(errors.Append(err, "Failed to get audit events"))
-		errors.WriteHTTPError(w, "Internal Server Error", err, http.StatusInternalServerError)
+		errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		return
 	}
 

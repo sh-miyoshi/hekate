@@ -33,7 +33,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrServerError, "")
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, "")
 		return
 	}
 
@@ -65,7 +65,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Contains(err, model.ErrLoginSessionValidationFailed) {
 			err = errors.ErrInvalidRequest
 		}
-		errors.WriteOAuthError(w, err, state)
+		errors.WriteToHTTP(w, err, 0, state)
 		return
 	}
 
@@ -80,7 +80,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			lsID, err := renewSession(projectName, s, state)
 			if err != nil {
 				errors.Print(err)
-				errors.WriteOAuthError(w, errors.ErrServerError, state)
+				errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 				return
 			}
 
@@ -88,7 +88,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 			err = nil // do not delete session in defer function
 		} else {
 			errors.Print(errors.Append(err, "Failed to verify user"))
-			errors.WriteOAuthError(w, errors.ErrServerError, state)
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 		}
 		return
 	}
@@ -98,7 +98,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err = db.GetInst().LoginSessionUpdate(projectName, s); err != nil {
 		errors.Print(errors.Append(err, "Failed to update login session"))
-		errors.WriteOAuthError(w, errors.ErrServerError, state)
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 		return
 	}
 
@@ -126,7 +126,7 @@ func UserLoginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if !errors.Contains(err, errSessionEnd) {
 			errors.Print(err)
-			errors.WriteOAuthError(w, errors.ErrServerError, state)
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 			return
 		}
 	}
@@ -145,7 +145,7 @@ func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrInvalidRequest, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequest, 0, "")
 		return
 	}
 
@@ -170,14 +170,14 @@ func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Contains(err, model.ErrLoginSessionValidationFailed) {
 			err = errors.ErrInvalidRequest
 		}
-		errors.WriteOAuthError(w, err, state)
+		errors.WriteToHTTP(w, err, 0, state)
 		return
 	}
 
 	user, err := db.GetInst().UserGet(projectName, s.UserID)
 	if err != nil {
 		err = errors.ErrServerError
-		errors.WriteOAuthError(w, err, state)
+		errors.WriteToHTTP(w, err, 0, state)
 		return
 	}
 
@@ -188,7 +188,7 @@ func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
 			lsID, err := renewSession(projectName, s, state)
 			if err != nil {
 				errors.Print(err)
-				errors.WriteOAuthError(w, errors.ErrServerError, state)
+				errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 				return
 			}
 			// write OTP verify page again
@@ -196,7 +196,7 @@ func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		errors.Print(err)
-		errors.WriteOAuthError(w, errors.ErrServerError, state)
+		errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 		return
 	}
 
@@ -215,7 +215,7 @@ func OTPVerifyHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if !errors.Contains(err, errSessionEnd) {
 			errors.Print(err)
-			errors.WriteOAuthError(w, errors.ErrServerError, state)
+			errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 			return
 		}
 	}
@@ -233,7 +233,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 	// Get data form Form
 	if err := r.ParseForm(); err != nil {
 		logger.Info("Failed to parse form: %v", err)
-		errors.WriteOAuthError(w, errors.ErrInvalidRequest, "")
+		errors.WriteToHTTP(w, errors.ErrInvalidRequest, 0, "")
 		return
 	}
 
@@ -258,7 +258,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		} else if errors.Contains(err, model.ErrLoginSessionValidationFailed) {
 			err = errors.ErrInvalidRequest
 		}
-		errors.WriteOAuthError(w, err, state)
+		errors.WriteToHTTP(w, err, 0, state)
 		return
 	}
 
@@ -268,7 +268,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			if !errors.Contains(err, errSessionEnd) {
 				errors.Print(err)
-				errors.WriteOAuthError(w, errors.ErrServerError, state)
+				errors.WriteToHTTP(w, errors.ErrServerError, 0, state)
 				return
 			}
 		}
@@ -279,7 +279,7 @@ func ConsentHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		err = errors.ErrServerError
 		logger.Error("Invalid select type %s. consent page maybe broken.", sel)
-		errors.WriteOAuthError(w, err, state)
+		errors.WriteToHTTP(w, err, 0, state)
 	}
 }
 
