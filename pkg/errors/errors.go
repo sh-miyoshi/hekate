@@ -140,9 +140,9 @@ func WriteToHTTP(w http.ResponseWriter, err *Error, statusCode int, state string
 		}
 	}
 
-	w.WriteHeader(err.httpResponseCode)
+	logger.Debug("Return http error: code %d, body %v", c, res)
+	w.WriteHeader(c)
 
-	logger.Debug("Return http error: code %d, body %v", err.httpResponseCode, res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		logger.Error("Failed to encode response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
