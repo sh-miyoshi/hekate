@@ -36,6 +36,7 @@ type AccessTokenClaims struct {
 	ResourceAccess RoleSet  `json:"resource_access"`
 	UserName       string   `json:"preferred_username"`
 	Format         string   `json:"format"`
+	EMail          *string  `json:"email"`
 }
 
 // RefreshTokenClaims ...

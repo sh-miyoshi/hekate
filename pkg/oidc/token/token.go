@@ -47,6 +47,11 @@ func GenerateAccessToken(audiences []string, request Request) (string, *errors.E
 
 	now := time.Now()
 	expires := time.Second * time.Duration(request.ExpiresIn)
+	email := &user.EMail
+	if user.EMail == "" {
+		email = nil
+	}
+
 	claims := AccessTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
@@ -65,11 +70,10 @@ func GenerateAccessToken(audiences []string, request Request) (string, *errors.E
 		},
 		user.Name,
 		"access",
+		email,
 	}
 
-	for _, role := range user.SystemRoles {
-		claims.ResourceAccess.SystemManagement.Roles = append(claims.ResourceAccess.SystemManagement.Roles, role)
-	}
+	claims.ResourceAccess.SystemManagement.Roles = append(claims.ResourceAccess.SystemManagement.Roles, user.SystemRoles...)
 	for _, rid := range user.CustomRoles {
 		role, err := db.GetInst().CustomRoleGet(request.ProjectName, rid)
 		if err != nil {
