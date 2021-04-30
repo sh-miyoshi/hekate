@@ -12,6 +12,9 @@ docker:
 run-windows:
 	cd deployments && \
 	run-windows.bat
+run-linux:
+	cd deployments && \
+	./run-linux.sh
 apidocs:
 	cd docs/api && \
 	redoc-cli bundle api.yaml -o api.html
