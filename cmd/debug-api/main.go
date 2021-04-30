@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	if err := os.MkdirAll("./tmp", os.ModeDir); err != nil {
+	if err := os.MkdirAll("./tmp", 0775); err != nil {
 		print.Error("Failed to create tmp directory: %v", err)
 		os.Exit(1)
 	}
