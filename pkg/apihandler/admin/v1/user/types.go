@@ -9,6 +9,7 @@ type CustomRole struct {
 // UserCreateRequest ...
 type UserCreateRequest struct {
 	Name        string   `json:"name"`
+	EMail       string   `json:"email"`
 	Password    string   `json:"password"`
 	SystemRoles []string `json:"system_roles"`
 	CustomRoles []string `json:"custom_roles"`
@@ -18,6 +19,7 @@ type UserCreateRequest struct {
 type UserGetResponse struct {
 	ID          string       `json:"id"`
 	Name        string       `json:"name"`
+	EMail       string       `json:"email"`
 	CreatedAt   string       `json:"createdAt"`
 	SystemRoles []string     `json:"system_roles"`
 	CustomRoles []CustomRole `json:"custom_roles"`
@@ -29,6 +31,7 @@ type UserGetResponse struct {
 // UserPutRequest ...
 type UserPutRequest struct {
 	Name        string   `json:"name"`
+	EMail       string   `json:"email"`
 	SystemRoles []string `json:"system_roles"`
 	CustomRoles []string `json:"custom_roles"`
 }

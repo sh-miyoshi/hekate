@@ -98,3 +98,12 @@ func ValidateCustomRoleName(name string) bool {
 func ValidateAuthCode(code string) bool {
 	return govalidator.IsUUID(code)
 }
+
+func ValidateEMail(email string) bool {
+	// Allow empty
+	if email == "" {
+		return true
+	}
+
+	return govalidator.IsEmail(email)
+}

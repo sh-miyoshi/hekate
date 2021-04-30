@@ -31,6 +31,7 @@ type TokenResponse struct {
 type UserInfo struct {
 	Subject  string `json:"sub"`
 	UserName string `json:"preferred_username"`
+	EMail    string `json:"email"`
 }
 
 // ErrorResponse ...

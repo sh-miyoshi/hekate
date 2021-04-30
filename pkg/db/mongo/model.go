@@ -81,6 +81,7 @@ type userInfo struct {
 	ID           string    `bson:"id"`
 	ProjectName  string    `bson:"project_name"`
 	Name         string    `bson:"name"`
+	EMail        string    `bson:"email"`
 	CreatedAt    time.Time `bson:"created_at"`
 	PasswordHash string    `bson:"password_hash"`
 	SystemRoles  []string  `bson:"system_roles"`
