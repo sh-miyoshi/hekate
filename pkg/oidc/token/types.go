@@ -14,6 +14,7 @@ type Request struct {
 	UserID          string
 	Nonce           string
 	EndUserAuthTime time.Time
+	Scopes          []string
 }
 
 // RoleValue ...
@@ -47,6 +48,7 @@ type RefreshTokenClaims struct {
 	SessionID string   `json:"sessionID"`
 	Audience  []string `json:"aud"`
 	Format    string   `json:"format"`
+	Scope     string   `json:"scope"`
 }
 
 // IDTokenClaims ...

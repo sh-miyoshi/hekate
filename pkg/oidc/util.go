@@ -79,6 +79,7 @@ func CreateLoggedInResponse(session *model.LoginSession, state, tokenIssuer stri
 				UserID:          session.UserID,
 				Nonce:           session.Nonce,
 				EndUserAuthTime: session.LoginDate,
+				Scopes:          session.Scopes,
 			}
 			tkn, err := token.GenerateIDToken(audiences, tokenReq)
 			if err != nil {
@@ -97,6 +98,7 @@ func CreateLoggedInResponse(session *model.LoginSession, state, tokenIssuer stri
 				ExpiresIn:   int64(prj.TokenConfig.AccessTokenLifeSpan),
 				ProjectName: session.ProjectName,
 				UserID:      session.UserID,
+				Scopes:      session.Scopes,
 			}
 			tkn, err := token.GenerateAccessToken(audiences, tokenReq)
 			if err != nil {

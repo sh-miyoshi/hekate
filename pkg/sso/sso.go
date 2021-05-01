@@ -3,6 +3,7 @@ package sso
 import (
 	"crypto/x509"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -105,7 +106,7 @@ func Handle(method string, projectName string, userID string, tokenIssuer string
 				LoginDate:           s.LastAuthTime,
 				RedirectURI:         authReq.RedirectURI,
 				ResponseMode:        authReq.ResponseMode,
-				Scope:               authReq.Scope,
+				Scopes:              strings.Split(authReq.Scope, " "),
 				Prompt:              authReq.Prompt,
 				ExpiresDate:         time.Now().Add(expires),
 				CodeChallenge:       authReq.CodeChallenge,

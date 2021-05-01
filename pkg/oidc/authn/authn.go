@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -18,12 +19,17 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/oidc/token"
 )
 
+var (
+	defaultScopes = []string{"openid", "email"}
+)
+
 type option struct {
 	audiences       []string
 	genRefreshToken bool
 	genIDToken      bool
 	nonce           string
 	endUserAuthTime time.Time
+	scopes          []string
 }
 
 // ReqAuthByPassword ...
@@ -46,6 +52,7 @@ func ReqAuthByPassword(project *model.ProjectInfo, userName string, password str
 		audiences:       audiences,
 		genRefreshToken: true,
 		endUserAuthTime: time.Unix(0, 0),
+		scopes:          defaultScopes,
 	})
 }
 
@@ -106,6 +113,7 @@ func ReqAuthByCode(project *model.ProjectInfo, clientID string, code string, cod
 		genIDToken:      true,
 		nonce:           s.Nonce,
 		endUserAuthTime: s.LoginDate,
+		scopes:          s.Scopes,
 	})
 }
 
@@ -143,6 +151,7 @@ func ReqAuthByRefreshToken(project *model.ProjectInfo, clientID string, refreshT
 		audiences:       claims.Audience,
 		genRefreshToken: true,
 		endUserAuthTime: s.LastAuthTime,
+		scopes:          strings.Split(claims.Scope, " "),
 	})
 }
 
@@ -204,6 +213,7 @@ func ReqAuthByDeviceCode(project *model.ProjectInfo, clientID string, deviceCode
 		audiences:       audiences,
 		genRefreshToken: true,
 		endUserAuthTime: s.LoginDate,
+		scopes:          s.Scopes,
 	})
 }
 
@@ -219,6 +229,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 		ExpiresIn:   int64(project.TokenConfig.AccessTokenLifeSpan),
 		ProjectName: project.Name,
 		UserID:      userID,
+		Scopes:      opt.scopes,
 	}
 
 	audiences := []string{
@@ -241,6 +252,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 			ExpiresIn:   int64(res.RefreshExpiresIn),
 			ProjectName: project.Name,
 			UserID:      userID,
+			Scopes:      opt.scopes,
 		}
 
 		sessionID := uuid.New().String()
@@ -277,6 +289,7 @@ func genTokenRes(userID string, project *model.ProjectInfo, r *http.Request, opt
 			UserID:          userID,
 			Nonce:           opt.nonce,
 			EndUserAuthTime: opt.endUserAuthTime,
+			Scopes:          opt.scopes,
 		}
 		res.IDToken, err = token.GenerateIDToken(audiences, idTokenReq)
 		if err != nil {

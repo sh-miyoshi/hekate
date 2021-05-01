@@ -14,6 +14,7 @@ import (
 	"github.com/sh-miyoshi/hekate/pkg/db"
 	"github.com/sh-miyoshi/hekate/pkg/errors"
 	"github.com/sh-miyoshi/hekate/pkg/logger"
+	"github.com/stretchr/stew/slice"
 )
 
 func signToken(projectName string, claims jwt.Claims) (string, *errors.Error) {
@@ -47,9 +48,9 @@ func GenerateAccessToken(audiences []string, request Request) (string, *errors.E
 
 	now := time.Now()
 	expires := time.Second * time.Duration(request.ExpiresIn)
-	email := &user.EMail
-	if user.EMail == "" {
-		email = nil
+	var email *string
+	if slice.Contains(request.Scopes, "email") {
+		email = &user.EMail
 	}
 
 	claims := AccessTokenClaims{
@@ -89,6 +90,12 @@ func GenerateAccessToken(audiences []string, request Request) (string, *errors.E
 func GenerateRefreshToken(sessionID string, audiences []string, request Request) (string, *errors.Error) {
 	now := time.Now()
 	expires := time.Second * time.Duration(request.ExpiresIn)
+	scope := ""
+	for _, s := range request.Scopes {
+		scope += s + " "
+	}
+	scope = strings.TrimSuffix(scope, " ")
+
 	claims := &RefreshTokenClaims{
 		jwt.StandardClaims{
 			Id:        uuid.New().String(),
@@ -102,6 +109,7 @@ func GenerateRefreshToken(sessionID string, audiences []string, request Request)
 		sessionID,
 		audiences,
 		"refresh",
+		scope,
 	}
 
 	return signToken(request.ProjectName, claims)

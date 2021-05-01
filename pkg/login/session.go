@@ -1,6 +1,7 @@
 package login
 
 import (
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -27,6 +28,7 @@ func StartLoginSession(projectName string, req *oidc.AuthRequest) (string, *erro
 		Prompt:              req.Prompt,
 		CodeChallenge:       req.CodeChallenge,
 		CodeChallengeMethod: req.CodeChallengeMethod,
+		Scopes:              strings.Split(req.Scope, " "),
 	}
 	// *) userID, code will be set in after
 

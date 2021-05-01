@@ -11,7 +11,7 @@ type LoginSession struct {
 	SessionID           string
 	Code                string
 	ExpiresDate         time.Time
-	Scope               string
+	Scopes              []string
 	ResponseType        []string
 	ClientID            string
 	RedirectURI         string
