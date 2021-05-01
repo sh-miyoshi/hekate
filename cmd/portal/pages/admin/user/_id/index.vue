@@ -353,7 +353,8 @@ export default {
       const data = {
         name: this.user.name,
         system_roles: this.user.system_roles,
-        custom_roles: roles
+        custom_roles: roles,
+        email: this.user.email
       }
       const res = await this.$api.UserUpdate(projectName, userID, data)
       if (!res.ok) {
