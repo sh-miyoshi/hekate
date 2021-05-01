@@ -101,7 +101,7 @@ export class AuthHandler {
     const challenge = this._createCodeChallenge(verifier, 'S256')
 
     const opts = {
-      scope: 'openid',
+      scope: 'openid email',
       response_type: 'code',
       client_id: process.env.CLIENT_ID,
       redirect_uri: process.env.HEKATE_PORTAL_ADDR + '/callback',
