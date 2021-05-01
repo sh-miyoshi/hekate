@@ -24,6 +24,7 @@ type UserInfo struct {
 	ID           string
 	ProjectName  string
 	Name         string
+	EMail        string
 	CreatedAt    time.Time
 	PasswordHash string
 	SystemRoles  []string

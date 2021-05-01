@@ -52,7 +52,7 @@ type loginSession struct {
 	SessionID           string    `bson:"session_id"`
 	Code                string    `bson:"code"`
 	ExpiresDate         time.Time `bson:"expires_in"`
-	Scope               string    `bson:"scope"`
+	Scopes              []string  `bson:"scopes"`
 	ResponseType        []string  `bson:"response_type"`
 	ClientID            string    `bson:"client_id"`
 	RedirectURI         string    `bson:"redirect_uri"`
@@ -81,6 +81,7 @@ type userInfo struct {
 	ID           string    `bson:"id"`
 	ProjectName  string    `bson:"project_name"`
 	Name         string    `bson:"name"`
+	EMail        string    `bson:"email"`
 	CreatedAt    time.Time `bson:"created_at"`
 	PasswordHash string    `bson:"password_hash"`
 	SystemRoles  []string  `bson:"system_roles"`

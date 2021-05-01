@@ -76,6 +76,7 @@ func AllUserGetHandler(w http.ResponseWriter, r *http.Request) {
 		tmp := &UserGetResponse{
 			ID:          user.ID,
 			Name:        user.Name,
+			EMail:       user.EMail,
 			CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 			SystemRoles: user.SystemRoles,
 			CustomRoles: roles,
@@ -150,6 +151,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 		ID:           uuid.New().String(),
 		ProjectName:  projectName,
 		Name:         request.Name,
+		EMail:        request.EMail,
 		CreatedAt:    time.Now(),
 		PasswordHash: util.CreateHash(request.Password),
 		SystemRoles:  request.SystemRoles,
@@ -188,6 +190,7 @@ func UserCreateHandler(w http.ResponseWriter, r *http.Request) {
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
+		EMail:       user.EMail,
 		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
@@ -282,6 +285,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	res := UserGetResponse{
 		ID:          user.ID,
 		Name:        user.Name,
+		EMail:       user.EMail,
 		CreatedAt:   user.CreatedAt.Format(time.RFC3339),
 		SystemRoles: user.SystemRoles,
 		CustomRoles: roles,
@@ -355,6 +359,7 @@ func UserUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	// Update Parameters
 	// name, roles
 	user.Name = request.Name
+	user.EMail = request.EMail
 	user.SystemRoles = request.SystemRoles
 	user.CustomRoles = request.CustomRoles
 

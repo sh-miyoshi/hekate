@@ -10,6 +10,7 @@ type OTPInfo struct {
 type GetResponse struct {
 	ID        string  `json:"id"`
 	Name      string  `json:"name"`
+	EMail     string  `json:"email"`
 	CreatedAt string  `json:"created_at"`
 	OPTInfo   OTPInfo `json:"otp_info"`
 }

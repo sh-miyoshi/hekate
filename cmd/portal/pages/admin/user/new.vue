@@ -25,6 +25,22 @@
       </div>
 
       <div class="form-group row">
+        <label for="email" class="col-sm-2 col-form-label"> E-mail </label>
+        <div class="col-md-5">
+          <input
+            v-model="email"
+            type="text"
+            class="form-control"
+            :class="{ 'is-invalid': emailValidateError }"
+            @blur="validateEMail()"
+          />
+          <div class="invalid-feedback">
+            {{ emailValidateError }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
         <label for="password" class="col-sm-2 col-form-label">
           Password
           <span class="required">*</span>
@@ -62,6 +78,8 @@ export default {
     return {
       name: '',
       nameValidateError: '',
+      email: '',
+      emailValidateError: '',
       password: '',
       passwordValidateError: '',
       error: ''
@@ -71,7 +89,8 @@ export default {
     async create() {
       if (
         this.nameValidateError.length > 0 ||
-        this.passwordValidateError.length > 0
+        this.passwordValidateError.length > 0 ||
+        this.emailValidateError.length > 0
       ) {
         this.error = 'Please fix validation error before create.'
         return
@@ -79,6 +98,7 @@ export default {
 
       const data = {
         name: this.name,
+        email: this.email,
         password: this.password
       }
       const projectName = this.$store.state.current_project
@@ -99,6 +119,9 @@ export default {
       } else {
         this.nameValidateError = ''
       }
+    },
+    validateEMail() {
+      // TODO
     }
   }
 }

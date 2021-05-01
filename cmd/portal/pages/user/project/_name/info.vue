@@ -5,19 +5,21 @@
     </div>
     <div class="card-body">
       <div class="form-group row">
-        <label for="id" class="col-sm-2 control-label">
-          ID
-        </label>
+        <label for="id" class="col-sm-2 control-label"> ID </label>
         <div class="col-sm-7">
           <input v-model="id" class="form-control" disabled />
         </div>
       </div>
       <div class="form-group row">
-        <label for="name" class="col-sm-2 control-label">
-          Name
-        </label>
+        <label for="name" class="col-sm-2 control-label"> Name </label>
         <div class="col-sm-7">
           <input v-model="name" class="form-control" disabled />
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="email" class="col-sm-2 control-label"> E-mail </label>
+        <div class="col-sm-7">
+          <input v-model="email" class="form-control" disabled />
         </div>
       </div>
     </div>
@@ -33,7 +35,8 @@ export default {
   data() {
     return {
       id: '',
-      name: ''
+      name: '',
+      email: ''
     }
   },
   mounted() {
@@ -45,6 +48,7 @@ export default {
       const data = jwtdecode(token)
       this.id = data.sub
       this.name = data.preferred_username
+      this.email = data.email
     }
   }
 }

@@ -290,6 +290,7 @@ func UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	res := &UserInfo{
 		Subject:  claims.Subject,
 		UserName: user.Name,
+		EMail:    user.EMail,
 	}
 
 	w.Header().Add("Cache-Control", "no-store")

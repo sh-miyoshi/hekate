@@ -45,6 +45,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	res := &GetResponse{
 		ID:        user.ID,
 		Name:      user.Name,
+		EMail:     user.EMail,
 		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 		OPTInfo: OTPInfo{
 			ID:      user.OTPInfo.ID,

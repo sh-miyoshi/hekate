@@ -14,6 +14,7 @@ type Request struct {
 	UserID          string
 	Nonce           string
 	EndUserAuthTime time.Time
+	Scopes          []string
 }
 
 // RoleValue ...
@@ -36,6 +37,7 @@ type AccessTokenClaims struct {
 	ResourceAccess RoleSet  `json:"resource_access"`
 	UserName       string   `json:"preferred_username"`
 	Format         string   `json:"format"`
+	EMail          *string  `json:"email"`
 }
 
 // RefreshTokenClaims ...
@@ -46,6 +48,7 @@ type RefreshTokenClaims struct {
 	SessionID string   `json:"sessionID"`
 	Audience  []string `json:"aud"`
 	Format    string   `json:"format"`
+	Scope     string   `json:"scope"`
 }
 
 // IDTokenClaims ...

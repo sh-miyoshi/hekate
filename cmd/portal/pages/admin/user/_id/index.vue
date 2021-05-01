@@ -48,9 +48,7 @@
             </div>
 
             <div class="form-group row">
-              <label for="id" class="col-sm-2 control-label">
-                ID
-              </label>
+              <label for="id" class="col-sm-2 control-label"> ID </label>
               <div class="col-sm-5">
                 <input
                   v-if="user"
@@ -62,11 +60,16 @@
             </div>
 
             <div class="form-group row">
-              <label for="name" class="col-sm-2 control-label">
-                Name
-              </label>
+              <label for="name" class="col-sm-2 control-label"> Name </label>
               <div class="col-sm-5">
                 <input v-if="user" v-model="user.name" class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="email" class="col-sm-2 control-label"> E-mail </label>
+              <div class="col-sm-5">
+                <input v-if="user" v-model="user.email" class="form-control" />
               </div>
             </div>
 
@@ -111,9 +114,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-else>
-                  No assigned roles
-                </div>
+                <div v-else>No assigned roles</div>
               </div>
               <div class="col-sm-5">
                 <b-form-select
@@ -147,9 +148,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-else>
-                  No assigned roles
-                </div>
+                <div v-else>No assigned roles</div>
               </div>
               <div class="col-sm-5">
                 <b-form-select
@@ -207,7 +206,7 @@
         </div>
         <div class="tab-pane" :class="{ active: activePanel == 'credentials' }">
           <div class="card-body">
-            <div class=" ml-3">
+            <div class="ml-3">
               <div class="form-group row">
                 <h4>Force Reset Password</h4>
               </div>
@@ -354,7 +353,8 @@ export default {
       const data = {
         name: this.user.name,
         system_roles: this.user.system_roles,
-        custom_roles: roles
+        custom_roles: roles,
+        email: this.user.email
       }
       const res = await this.$api.UserUpdate(projectName, userID, data)
       if (!res.ok) {
