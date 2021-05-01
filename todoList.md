@@ -13,6 +13,9 @@
 
 ## server application enhancement
 
+- Scopeの修正
+  - profileの追加(usernameは設定された時のみ)
+  - email_verifiedの追加
 - User portalを別に分ける
 - TOTPで前後1つも許可する(時刻同期の関係上)
 - APIの戻り値のJSONの型名のチェック
