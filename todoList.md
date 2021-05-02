@@ -21,8 +21,6 @@
 - APIの戻り値のJSONの型名のチェック
 - model.LoginSessionの修正
   - time.Time型をやめ、expiresIn int64型にする
-- ユーザーのPassword設定ミス時に理由を返す
-  - 例: minimun length 8
 - add debug log
 - db manager validationの追加
 - masterプロジェクト初期構成時にpassword grantを外す
@@ -136,3 +134,4 @@
 - add release pipeline
   - create binary files
 - Benchmark
+- exampleサイトの作成
