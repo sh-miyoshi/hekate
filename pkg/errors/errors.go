@@ -100,16 +100,20 @@ func Append(err *Error, format string, a ...interface{}) *Error {
 }
 
 // Contains ...
-func Contains(all, err *Error) bool {
-	if all == nil || err == nil {
+func Contains(err, target *Error) bool {
+	if target == nil {
+		return err == target
+	}
+
+	if err == nil {
 		return false
 	}
 
-	if all.publicMsg == err.publicMsg {
-		if len(all.privateInfo) == 0 || len(err.privateInfo) == 0 {
+	if err.publicMsg == target.publicMsg {
+		if len(err.privateInfo) == 0 || len(target.privateInfo) == 0 {
 			return false
 		}
-		if all.privateInfo[0].msg != err.privateInfo[0].msg {
+		if err.privateInfo[0].msg != target.privateInfo[0].msg {
 			return false
 		}
 
