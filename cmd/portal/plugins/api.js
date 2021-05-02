@@ -53,9 +53,17 @@ class APIClient {
       console.log(error)
       if (error.response) {
         if (error.response.status >= 400 && error.response.status < 500) {
+          let msg = error.response.data.error
+          if (
+            error.response.data.error_description != null &&
+            error.response.data.error_description.length > 0
+          ) {
+            msg = error.response.data.error_description
+          }
+
           return {
             ok: false,
-            message: error.response.data.error,
+            message: msg,
             statusCode: error.response.status
           }
         }
