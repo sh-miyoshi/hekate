@@ -11,49 +11,54 @@
   - 掲示板アプリにログイン機能を実装する方法
 - 開発者向け構成図
 
-## server application enhancement
+## Server application enhancement
 
-- Scopeの修正
-  - profileの追加(usernameは設定された時のみ)
-  - email_verifiedの追加
-- User portalを別に分ける
-- TOTPで前後1つも許可する(時刻同期の関係上)
+- errors.WriteOAuthErrorのエラーハンドリング
 - APIの戻り値のJSONの型名のチェック
 - model.LoginSessionの修正
   - time.Time型をやめ、expiresIn int64型にする
-- add debug log
+- 結合テストの追加
+  - DBGCのテスト
+  - mongo db test
+    - custom role
+    - login session
+    - session
+    - user
+  - transaction test
+  - PKCE
+    - 正常系
+    - challengeなしの正常系
+    - challnge失敗
 - db manager validationの追加
+- unit testの追加
+  - pkg/apiclient
+  - pkg/apihandler
+  - pkg/client
+  - pkg/db
+  - pkg/db/memory
+    - user filter test
+  - pkg/oidc
+- Scopeの修正
+  - profileの追加(usernameは設定された時のみ)
+  - email_verifiedの追加
 - masterプロジェクト初期構成時にpassword grantを外す
-- errors.WriteOAuthErrorのエラーハンドリング
-- テストの追加
-  - unit test
-    - pkg/apiclient
-    - pkg/apihandler
-    - pkg/client
-    - pkg/db
-    - pkg/db/memory
-      - user filter test
-    - pkg/oidc
-  - 結合テスト
-    - DBGCのテスト
-    - mongo db test
-      - custom role
-      - login session
-      - session
-      - user
-    - transaction test
-    - PKCE
-      - 正常系
-      - challengeなしの正常系
-      - challnge失敗
+- User portalを別に分ける
+- ユーザー情報の追加
+  - first/last name
+- User Authentication HTMLの拡充
+  - Client IDを表示(optional)
+  - Project名を表示
+- kong対応
+  - URL: [https://konghq.com/](https://konghq.com/)
+- (project/user) enabledの有効化
 - APIの修正
   - Custom RoleにDescriptionを追加
   - Audit EventにFilter Ruleを追加
     - Project Name, user ID, client ID など
-- パスワード以外でのユーザーのログイン
-  - 証明書
-- Client Secretに証明書を追加できるようにする
-  - portalのアップデートだけでよい？
+- SQL DBの追加
+- user federation
+  - user情報を外部に保存し、それと連携する
+  - LDAP連携？
 - OpenID Connect部分のエンハンス
   - Consentページの追加
     - TokenHandlerからconsent処理
@@ -71,20 +76,12 @@
   - RS256以外のSigining Algorithmのサポート
   - auth requestをparseする
   - type noneのサポート
-- user federation
-  - user情報を外部に保存し、それと連携する
-  - LDAP連携？
-- SQL DBの追加
-- ユーザー情報の追加
-  - email
-  - first/last name
-- kong対応
-  - URL: [https://konghq.com/](https://konghq.com/)
-- (project/user) enabledの有効化
+- TOTPで前後1つも許可する(時刻同期の関係上)
 - projectのimport/export
-- User Authentication HTMLの拡充
-  - Client IDを表示(optional)
-  - Project名を表示
+- Client Secretに証明書を追加できるようにする
+  - portalのアップデートだけでよい？
+- ~~パスワード以外でのユーザーのログイン~~
+  - ~~証明書~~
 - ~~SAML対応~~
 
 ## Portal(Admin Console) enhancement
