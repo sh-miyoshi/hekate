@@ -21,8 +21,8 @@ func TestContains(t *testing.T) {
 		t.Errorf("Unexpect result: Err2 contains Err3")
 	}
 
-	if Contains(nil, nil) {
-		t.Errorf("Unexpect result: nil contains nil")
+	if !Contains(nil, nil) {
+		t.Errorf("Unexpect result: nil does not contain nil")
 	}
 
 	if Contains(err1, nil) {
