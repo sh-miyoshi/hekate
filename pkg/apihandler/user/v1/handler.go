@@ -93,7 +93,7 @@ func ChangePasswordHandler(w http.ResponseWriter, r *http.Request) {
 			errors.PrintAsInfo(errors.Append(err, "Invalid password was specified"))
 			errors.WriteToHTTP(w, err, http.StatusBadRequest, "")
 		} else {
-			errors.Print(errors.Append(err, "Failed to change yser password"))
+			errors.Print(errors.Append(err, "Failed to change user password"))
 			errors.WriteToHTTP(w, err, http.StatusInternalServerError, "")
 		}
 		return
