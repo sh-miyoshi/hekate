@@ -1,7 +1,7 @@
 {
-	"tokenConfig": {
-		"accessTokenLifeSpan": 300,
-		"refreshTokenLifeSpan": 3600,
-		"signingAlgorithm": "RS256"
+	"token_config": {
+		"access_token_life_span": 300,
+		"refresh_token_life_span": 3600,
+		"signing_algorithm": "RS256"
 	}
 }

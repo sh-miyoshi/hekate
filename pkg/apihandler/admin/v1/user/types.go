@@ -20,7 +20,7 @@ type UserGetResponse struct {
 	ID          string       `json:"id"`
 	Name        string       `json:"name"`
 	EMail       string       `json:"email"`
-	CreatedAt   string       `json:"createdAt"`
+	CreatedAt   string       `json:"created_at"`
 	SystemRoles []string     `json:"system_roles"`
 	CustomRoles []CustomRole `json:"custom_roles"`
 	Sessions    []string     `json:"sessions"` // Array of session IDs

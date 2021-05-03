@@ -36,9 +36,7 @@
           <p class="text-break">
             {{ secret.publicKey }}
           </p>
-          <button class="btn btn-primary" @click="hidePublicKey()">
-            OK
-          </button>
+          <button class="btn btn-primary" @click="hidePublicKey()">OK</button>
         </b-modal>
       </div>
 
@@ -141,9 +139,7 @@
         </button>
         <div v-if="showPasswordPolicy" class="card-body">
           <div class="form-group row">
-            <label class="col-sm-4 control-label">
-              Minimum Length
-            </label>
+            <label class="col-sm-4 control-label"> Minimum Length </label>
             <div class="col-sm-3">
               <input
                 v-model.number="passwordPolicy.minimumLength"
@@ -153,9 +149,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-4 control-label">
-              Not User Name
-            </label>
+            <label class="col-sm-4 control-label"> Not User Name </label>
             <div class="col-sm-3">
               <label
                 class="c-switch c-switch-label c-switch-pill c-switch-primary"
@@ -174,9 +168,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-4 control-label">
-              BlackList
-            </label>
+            <label class="col-sm-4 control-label"> BlackList </label>
             <div class="col-sm-5">
               <div
                 v-for="(value, index) in passwordPolicy.blackList"
@@ -205,17 +197,13 @@
                   type="text"
                 />
                 <div class="input-group-append" @click="appendBlackList">
-                  <span class="input-group-text icon">
-                    +
-                  </span>
+                  <span class="input-group-text icon"> + </span>
                 </div>
               </div>
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-4 control-label">
-              Includes
-            </label>
+            <label class="col-sm-4 control-label"> Includes </label>
             <div class="col-md-7 col-form-label">
               <div
                 v-if="
@@ -307,9 +295,7 @@
         </button>
         <div v-if="showUserLock" class="card-body">
           <div class="form-group row">
-            <label class="col-sm-4 control-label">
-              Enabled
-            </label>
+            <label class="col-sm-4 control-label"> Enabled </label>
             <div class="col-sm-3">
               <label
                 class="c-switch c-switch-label c-switch-pill c-switch-primary"
@@ -329,9 +315,7 @@
           </div>
           <div v-if="userLock.enabled">
             <div class="form-group row">
-              <label class="col-sm-4 control-label">
-                Max Login Failure
-              </label>
+              <label class="col-sm-4 control-label"> Max Login Failure </label>
               <div class="col-sm-3">
                 <input
                   v-model.number="userLock.maxLoginFailure"
@@ -341,9 +325,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="col-sm-4 control-label">
-                Lock Duration
-              </label>
+              <label class="col-sm-4 control-label"> Lock Duration </label>
               <div class="col-sm-3">
                 <input
                   v-model.number="userLock.lockDuration"
@@ -364,9 +346,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label class="col-sm-4 control-label">
-                Failure Reset Time
-              </label>
+              <label class="col-sm-4 control-label"> Failure Reset Time </label>
               <div class="col-sm-3">
                 <input
                   v-model.number="userLock.failureResetTime"
@@ -425,9 +405,7 @@
         </button>
         <div v-if="showSecret" class="card-body">
           <div class="form-group row">
-            <label class="col-sm-4 control-label">
-              Type
-            </label>
+            <label class="col-sm-4 control-label"> Type </label>
             <div class="col-sm-5">
               <input
                 v-model="secret.type"
@@ -437,9 +415,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-4 control-label">
-              Public Key
-            </label>
+            <label class="col-sm-4 control-label"> Public Key </label>
             <div class="col-sm-7">
               <button class="btn btn-primary" @click="showPublicKey">
                 Show
@@ -577,34 +553,34 @@ export default {
       }
 
       const data = {
-        tokenConfig: {
-          accessTokenLifeSpan: this.getSpan(
+        token_config: {
+          access_token_life_span: this.getSpan(
             this.tokenConfig.accessTokenLifeSpan,
             this.tokenConfig.accessTokenUnit
           ),
-          refreshTokenLifeSpan: this.getSpan(
+          refresh_token_life_span: this.getSpan(
             this.tokenConfig.refreshTokenLifeSpan,
             this.tokenConfig.refreshTokenUnit
           ),
-          signingAlgorithm: this.tokenConfig.signingAlgorithm
+          signing_algorithm: this.tokenConfig.signingAlgorithm
         },
-        passwordPolicy: {
+        password_policy: {
           length: this.passwordPolicy.minimumLength,
-          notUserName: this.passwordPolicy.notUserName,
-          blackList: this.passwordPolicy.blackList,
-          useCharacter: this.getPasswordPolicyCharacter(),
-          useDigit: this.passwordPolicy.includes.digit.checked,
-          useSpecialCharacter: this.passwordPolicy.includes.special.checked
+          not_user_name: this.passwordPolicy.notUserName,
+          black_list: this.passwordPolicy.blackList,
+          use_character: this.getPasswordPolicyCharacter(),
+          use_digit: this.passwordPolicy.includes.digit.checked,
+          use_special_character: this.passwordPolicy.includes.special.checked
         },
-        allowGrantTypes: grantTypes,
-        userLock: {
+        allow_grant_types: grantTypes,
+        user_lock: {
           enabled: this.userLock.enabled,
-          maxLoginFailure: this.userLock.maxLoginFailure,
-          lockDuration: this.getSpan(
+          max_login_failure: this.userLock.maxLoginFailure,
+          lock_duration: this.getSpan(
             this.userLock.lockDuration,
             this.userLock.lockDurationUnit
           ),
-          failureResetTime: this.getSpan(
+          failure_reset_time: this.getSpan(
             this.userLock.failureResetTime,
             this.userLock.failureResetTimeUnit
           )
@@ -631,22 +607,23 @@ export default {
       }
       console.log('project info: ', res.data)
 
-      let t = this.setUnit(res.data.tokenConfig.accessTokenLifeSpan)
+      let t = this.setUnit(res.data.token_config.access_token_life_span)
       this.tokenConfig.accessTokenLifeSpan = t.span
       this.tokenConfig.accessTokenUnit = t.unit
-      t = this.setUnit(res.data.tokenConfig.refreshTokenLifeSpan)
+      t = this.setUnit(res.data.token_config.refresh_token_life_span)
       this.tokenConfig.refreshTokenLifeSpan = t.span
       this.tokenConfig.refreshTokenUnit = t.unit
-      this.tokenConfig.signingAlgorithm = res.data.tokenConfig.signingAlgorithm
+      this.tokenConfig.signingAlgorithm =
+        res.data.token_config.signing_algorithm
 
-      this.passwordPolicy.minimumLength = res.data.passwordPolicy.length
-      this.passwordPolicy.notUserName = res.data.passwordPolicy.notUserName
-      this.passwordPolicy.blackList = res.data.passwordPolicy.blackList
+      this.passwordPolicy.minimumLength = res.data.password_policy.length
+      this.passwordPolicy.notUserName = res.data.password_policy.not_user_name
+      this.passwordPolicy.blackList = res.data.password_policy.black_list
       this.passwordPolicy.includes.digit.checked =
-        res.data.passwordPolicy.useDigit
+        res.data.password_policy.use_digit
       this.passwordPolicy.includes.special.checked =
-        res.data.passwordPolicy.useSpecial
-      switch (res.data.passwordPolicy.useCharacter) {
+        res.data.password_policy.use_special
+      switch (res.data.password_policy.use_character) {
         case 'either':
           this.passwordPolicy.includes.caseInsensitive.checked = true
           break
@@ -663,7 +640,7 @@ export default {
       }
 
       // set allow grant types
-      for (const type of res.data.allowGrantTypes) {
+      for (const type of res.data.allow_grant_types) {
         for (const t of this.grantTypes) {
           if (type === t.value) {
             t.checked = true
@@ -672,12 +649,12 @@ export default {
       }
 
       // set user lock setting
-      this.userLock.enabled = res.data.userLock.enabled
-      this.userLock.maxLoginFailure = res.data.userLock.maxLoginFailure
-      t = this.setUnit(res.data.userLock.lockDuration)
+      this.userLock.enabled = res.data.user_lock.enabled
+      this.userLock.maxLoginFailure = res.data.user_lock.max_login_failure
+      t = this.setUnit(res.data.user_lock.lock_duration)
       this.userLock.lockDuration = t.span
       this.userLock.lockDurationUnit = t.unit
-      t = this.setUnit(res.data.userLock.failureResetTime)
+      t = this.setUnit(res.data.user_lock.failure_reset_time)
       this.userLock.failureResetTime = t.span
       this.userLock.failureResetTimeUnit = t.unit
     },
@@ -773,7 +750,7 @@ export default {
           return
         }
         this.secret.type = res.data.type
-        this.secret.publicKey = res.data.publicKey
+        this.secret.publicKey = res.data.public_key
       }
     },
     showPublicKey() {

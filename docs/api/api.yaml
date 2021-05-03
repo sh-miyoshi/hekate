@@ -2,12 +2,12 @@ openapi: 3.0.0
 info:
   title: Hekate Server
   description: API specification for Hekate Server
-  version: '1.0'
+  version: "1.0"
   license:
-    name: 'Apache 2.0'
+    name: "Apache 2.0"
     url: https://www.apache.org/licenses/LICENSE-2.0.html
 paths:
-  '/authapi/v1/project/{projectName}/.well-known/openid-configuration':
+  "/authapi/v1/project/{projectName}/.well-known/openid-configuration":
     get:
       summary: "OpenID Connect Discovery Endpoint"
       tags:
@@ -19,13 +19,13 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Get configuration'
+        "200":
+          description: "Get configuration"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OpenIDConfiguration'
-  '/authapi/v1/project/{projectName}/openid-connect/token':
+                $ref: "#/components/schemas/OpenIDConfiguration"
+  "/authapi/v1/project/{projectName}/openid-connect/token":
     post:
       summary: "Token Endpoint"
       tags:
@@ -40,23 +40,23 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenRequest'  
+              $ref: "#/components/schemas/TokenRequest"
       responses:
-        '200':
-          description: 'Get Token'
+        "200":
+          description: "Get Token"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenResponse'
-        '400':
-          description: 'invalid_request_object, invalid_request_uri, invalid_grant, unsupported_grant_type'
-        '403':
-          description: 'invalid_client, request_unauthorized'
-        '404':
-          description: 'Project Not Found'
-        '500':
-          description: 'Internal Server Error'
-  '/authapi/v1/project/{projectName}/openid-connect/certs':
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          description: "invalid_request_object, invalid_request_uri, invalid_grant, unsupported_grant_type"
+        "403":
+          description: "invalid_client, request_unauthorized"
+        "404":
+          description: "Project Not Found"
+        "500":
+          description: "Internal Server Error"
+  "/authapi/v1/project/{projectName}/openid-connect/certs":
     get:
       summary: "JSON Web Keys Discovery"
       tags:
@@ -68,17 +68,17 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: "Get Certificate"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JWKSet'
-        '404':
-          description: 'Project Not Found'
-        '500':
-          description: 'Internal Server Error'
-  '/authapi/v1/project/{projectName}/openid-connect/auth':
+                $ref: "#/components/schemas/JWKSet"
+        "404":
+          description: "Project Not Found"
+        "500":
+          description: "Internal Server Error"
+  "/authapi/v1/project/{projectName}/openid-connect/auth":
     get:
       summary: "Authorization Endpoint"
       tags:
@@ -114,15 +114,15 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: "Success"
-        '400':
+        "400":
           description: "invalid_request_uri"
-        '403':
+        "403":
           description: "invalid_client"
-        '302':
+        "302":
           description: "return error to callback url"
-        '500':
+        "500":
           description: "Internal server error"
     post:
       summary: "Authorization Endpoint"
@@ -138,19 +138,19 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AuthRequest'  
+              $ref: "#/components/schemas/AuthRequest"
       responses:
-        '200':
+        "200":
           description: "Success"
-        '400':
+        "400":
           description: "invalid_request_uri, invalid_request_object"
-        '403':
+        "403":
           description: "invalid_client"
-        '302':
+        "302":
           description: "return error to callback url"
-        '500':
+        "500":
           description: "Internal server error"
-  '/authapi/v1/project/{projectName}/openid-connect/userinfo':
+  "/authapi/v1/project/{projectName}/openid-connect/userinfo":
     get:
       summary: "UserInfo Endpoint"
       tags:
@@ -162,15 +162,15 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: "Get UserInfo"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfo'
-        '400':
+                $ref: "#/components/schemas/UserInfo"
+        "400":
           description: "invalid_request"
-        '500':
+        "500":
           description: "Internal server error"
     post:
       summary: "UserInfo Endpoint"
@@ -183,17 +183,17 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: "Get UserInfo"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfo'
-        '400':
+                $ref: "#/components/schemas/UserInfo"
+        "400":
           description: "invalid_request"
-        '500':
+        "500":
           description: "Internal server error"
-  '/authapi/v1/project/{projectName}/openid-connect/revoke':
+  "/authapi/v1/project/{projectName}/openid-connect/revoke":
     post:
       summary: "Revoke Token"
       tags:
@@ -208,15 +208,15 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenRevokeRequest' 
+              $ref: "#/components/schemas/TokenRevokeRequest"
       responses:
-        '200':
+        "200":
           description: "ok"
-        '400':
+        "400":
           description: "unsupported token type"
-        '500':
+        "500":
           description: "Internal server error"
-  '/authapi/v1/project/{projectName}/oauth/device':
+  "/authapi/v1/project/{projectName}/oauth/device":
     post:
       summary: "Device Authorization Endpoint"
       tags:
@@ -231,19 +231,19 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/DeviceAuthorizationRequest'
+              $ref: "#/components/schemas/DeviceAuthorizationRequest"
       responses:
-        '200':
+        "200":
           description: "Return Device Authorization Response"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeviceAuthorizationResponse'
-        '400':
+                $ref: "#/components/schemas/DeviceAuthorizationResponse"
+        "400":
           description: "Invalid request"
-        '500':
+        "500":
           description: "Internal server error"
-  '/authapi/v1/project/{projectName}/authn/login':
+  "/authapi/v1/project/{projectName}/authn/login":
     post:
       summary: "Login to hekate"
       tags:
@@ -258,15 +258,15 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: "#/components/schemas/LoginRequest"
       responses:
-        '200':
+        "200":
           description: "Return otp verify page or consent page"
-        '302':
+        "302":
           description: "Redirect to callback URL"
-        '500':
+        "500":
           description: "Internal server error"
-  '/authapi/v1/project/{projectName}/authn/otpverify':
+  "/authapi/v1/project/{projectName}/authn/otpverify":
     post:
       summary: "Login to hekate"
       tags:
@@ -281,15 +281,15 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/OTPVerifyRequest'
+              $ref: "#/components/schemas/OTPVerifyRequest"
       responses:
-        '200':
+        "200":
           description: "Return consent page"
-        '302':
+        "302":
           description: "Redirect to callback URL"
-        '500':
+        "500":
           description: "Internal server error"
-  '/authapi/v1/project/{projectName}/authn/consent':
+  "/authapi/v1/project/{projectName}/authn/consent":
     post:
       summary: "Consent to auth"
       tags:
@@ -304,13 +304,13 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ConsentRequest'
+              $ref: "#/components/schemas/ConsentRequest"
       responses:
-        '200':
+        "200":
           description: "Return error page"
-        '302':
+        "302":
           description: "Return error or success to callback URL"
-  '/adminapi/v1/project':
+  "/adminapi/v1/project":
     post:
       summary: "Create Project"
       description: |
@@ -322,22 +322,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectCreateRequest'
+              $ref: "#/components/schemas/ProjectCreateRequest"
       responses:
-        '200':
-          description: 'Created'
+        "200":
+          description: "Created"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectGetResponse'
-        '400':
-          description: 'Bad Request'
-        '403':
-          description: 'Forbidden'
-        '409':
-          description: 'Project Already Exists'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/ProjectGetResponse"
+        "400":
+          description: "Bad Request"
+        "403":
+          description: "Forbidden"
+        "409":
+          description: "Project Already Exists"
+        "500":
+          description: "Internal Server Error"
     get:
       summary: "Get List of Projects"
       description: |
@@ -346,19 +346,19 @@ paths:
       tags:
         - project
       responses:
-        '200':
-          description: 'Get projects'
+        "200":
+          description: "Get projects"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProjectGetResponse'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}':
+                  $ref: "#/components/schemas/ProjectGetResponse"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}":
     get:
       summary: "Get Project"
       description: |
@@ -373,18 +373,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Successfully get project info'
-          content: 
+        "200":
+          description: "Successfully get project info"
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectGetResponse'
-        '404':
-          description: 'Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/ProjectGetResponse"
+        "404":
+          description: "Project Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     put:
       summary: "Update Project"
       description: |
@@ -402,18 +402,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectPutRequest'
+              $ref: "#/components/schemas/ProjectPutRequest"
       responses:
-        '204':
-          description: 'Updated'
-        '400':
-          description: 'Bad Request'
-        '403':
-          description: 'Forbidden'
-        '404':
-          description: 'Project Not Found'
-        '500':
-          description: 'Internal Server Error'
+        "204":
+          description: "Updated"
+        "400":
+          description: "Bad Request"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Project Not Found"
+        "500":
+          description: "Internal Server Error"
     delete:
       summary: "Delete Project"
       description: |
@@ -428,15 +428,15 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Deleted'
-        '403':
-          description: 'Do not have permission or blocked project'
-        '404':
-          description: 'Project Not Found'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/keys':
+        "204":
+          description: "Deleted"
+        "403":
+          description: "Do not have permission or blocked project"
+        "404":
+          description: "Project Not Found"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/keys":
     get:
       summary: "Get project secret info"
       description: |
@@ -451,15 +451,15 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'successfully get'
-        '403':
-          description: 'Forbidden'
-        '404':
-          description: 'Project Not Found'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/keys/reset':
+        "200":
+          description: "successfully get"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Project Not Found"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/keys/reset":
     post:
       summary: "Reset secret info"
       description: |
@@ -474,15 +474,15 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'successfully reset'
-        '403':
-          description: 'Forbidden'
-        '404':
-          description: 'Project Not Found'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/user':
+        "200":
+          description: "successfully reset"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Project Not Found"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/user":
     post:
       summary: "Create User"
       tags:
@@ -497,24 +497,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCreateRequest'
+              $ref: "#/components/schemas/UserCreateRequest"
       responses:
-        '200':
-          description: 'Created'
+        "200":
+          description: "Created"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserGetResponse'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'Project Not Found'
-        '409':
-          description: 'User Already Exists'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/UserGetResponse"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Project Not Found"
+        "409":
+          description: "User Already Exists"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     get:
       summary: "Get List of Users"
       tags:
@@ -530,21 +530,21 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Get All Users'
+        "200":
+          description: "Get All Users"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserGetResponse'
-        '403':
-          description: 'Forbidden'
-        '404':
-          description: 'Project Not Found'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/user/{userID}':
+                  $ref: "#/components/schemas/UserGetResponse"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Project Not Found"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/user/{userID}":
     get:
       summary: "Get User"
       tags:
@@ -561,18 +561,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Successfully get user info'
-          content: 
+        "200":
+          description: "Successfully get user info"
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserGetResponse'
-        '403':
-          description: 'Forbidden'
-        '404':
-          description: 'User or Project Not Found'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/UserGetResponse"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "User or Project Not Found"
+        "500":
+          description: "Internal Server Error"
     put:
       summary: "Update User"
       tags:
@@ -592,18 +592,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPutRequest'
+              $ref: "#/components/schemas/UserPutRequest"
       responses:
-        '204':
-          description: 'Updated'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'User or Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+        "204":
+          description: "Updated"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "User or Project Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     delete:
       summary: "Delete User"
       tags:
@@ -620,20 +620,20 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Deleted'
-        '404':
-          description: 'User or Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/user/{userID}/role/{roleID}':
+        "204":
+          description: "Deleted"
+        "404":
+          description: "User or Project Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/user/{userID}/role/{roleID}":
     post:
       summary: "Add Role to User"
       tags:
         - user
-      description: 'Add a role to the user'
+      description: "Add a role to the user"
       parameters:
         - name: projectName
           in: path
@@ -651,23 +651,23 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Added'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'User or Project Not Found'
-        '409':
-          description: 'Role Already Appended'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+        "204":
+          description: "Added"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "User or Project Not Found"
+        "409":
+          description: "Role Already Appended"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     delete:
       summary: "Delete Role from User"
       tags:
         - user
-      description: 'Delete a role from the user'
+      description: "Delete a role from the user"
       parameters:
         - name: projectName
           in: path
@@ -685,17 +685,17 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Deleted'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'User or Project or Role Not Found or No Such Role in User'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/user/{userID}/reset-password':
+        "204":
+          description: "Deleted"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "User or Project or Role Not Found or No Such Role in User"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/user/{userID}/reset-password":
     post:
       summary: "Force reset user password"
       tags:
@@ -715,19 +715,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserResetPasswordRequest'
+              $ref: "#/components/schemas/UserResetPasswordRequest"
       responses:
-        '200':
-          description: 'Success'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'Project or User Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/user/{userID}/unlock':
+        "200":
+          description: "Success"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Project or User Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/user/{userID}/unlock":
     post:
       summary: "Unlock user"
       tags:
@@ -744,15 +744,15 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Success'
-        '404':
-          description: 'User Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/client':
+        "204":
+          description: "Success"
+        "404":
+          description: "User Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/client":
     post:
       summary: "Create Client"
       tags:
@@ -767,24 +767,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClientCreateRequest'
+              $ref: "#/components/schemas/ClientCreateRequest"
       responses:
-        '200':
-          description: 'Created'
+        "200":
+          description: "Created"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientGetResponse'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'Project Not Found'
-        '409':
-          description: 'Client Already Exists'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/ClientGetResponse"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Project Not Found"
+        "409":
+          description: "Client Already Exists"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     get:
       summary: "Get List of Clients"
       tags:
@@ -796,21 +796,21 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Get All Clients'
+        "200":
+          description: "Get All Clients"
           content:
             application/json:
               schema:
                 type: array
                 items:
                   type: string
-        '404':
-          description: 'Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/client/{clientID}':
+        "404":
+          description: "Project Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/client/{clientID}":
     get:
       summary: "Get Client"
       tags:
@@ -827,18 +827,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Successfully get client info'
-          content: 
+        "200":
+          description: "Successfully get client info"
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClientGetResponse'
-        '404':
-          description: 'Client Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/ClientGetResponse"
+        "404":
+          description: "Client Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     put:
       summary: "Update Client"
       tags:
@@ -858,18 +858,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClientPutRequest'
+              $ref: "#/components/schemas/ClientPutRequest"
       responses:
-        '204':
-          description: 'Updated'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'Client Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+        "204":
+          description: "Updated"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Client Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     delete:
       summary: "Delete Client"
       tags:
@@ -886,15 +886,15 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Deleted'
-        '404':
-          description: 'Client or Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/role':
+        "204":
+          description: "Deleted"
+        "404":
+          description: "Client or Project Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/role":
     post:
       summary: "Create Role"
       tags:
@@ -909,24 +909,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomRoleCreateRequest'
+              $ref: "#/components/schemas/CustomRoleCreateRequest"
       responses:
-        '200':
-          description: 'Created'
+        "200":
+          description: "Created"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomRoleGetResponse'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'Project Not Found'
-        '409':
-          description: 'Role Already Exists'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/CustomRoleGetResponse"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Project Not Found"
+        "409":
+          description: "Role Already Exists"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     get:
       summary: "Get List of Roles"
       tags:
@@ -942,19 +942,19 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Get All Custom Roles'
+        "200":
+          description: "Get All Custom Roles"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CustomRoleGetResponse'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/role/{roleID}':
+                  $ref: "#/components/schemas/CustomRoleGetResponse"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/role/{roleID}":
     get:
       summary: "Get Role"
       tags:
@@ -971,18 +971,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Successfully get custom role info'
-          content: 
+        "200":
+          description: "Successfully get custom role info"
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomRoleGetResponse'
-        '404':
-          description: 'Role Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/CustomRoleGetResponse"
+        "404":
+          description: "Role Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     put:
       summary: "Update Role"
       tags:
@@ -1002,18 +1002,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomRolePutRequest'
+              $ref: "#/components/schemas/CustomRolePutRequest"
       responses:
-        '204':
-          description: 'Updated'
-        '400':
-          description: 'Bad Request'
-        '404':
-          description: 'Role Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+        "204":
+          description: "Updated"
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Role Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     delete:
       summary: "Delete Role"
       tags:
@@ -1030,15 +1030,15 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Deleted'
-        '404':
-          description: 'Role Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/session/{sessionID}':
+        "204":
+          description: "Deleted"
+        "404":
+          description: "Role Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/session/{sessionID}":
     get:
       summary: "Get Session"
       tags:
@@ -1055,18 +1055,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: 'Successfully get session'
-          content: 
+        "200":
+          description: "Successfully get session"
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionGetResponse'
-        '404':
-          description: 'Session or Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                $ref: "#/components/schemas/SessionGetResponse"
+        "404":
+          description: "Session or Project Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
     delete:
       summary: "Delete Session"
       tags:
@@ -1083,15 +1083,15 @@ paths:
           schema:
             type: string
       responses:
-        '204':
-          description: 'Deleted'
-        '404':
-          description: 'Session or Project Not Found'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
-  '/adminapi/v1/project/{projectName}/audit':
+        "204":
+          description: "Deleted"
+        "404":
+          description: "Session or Project Not Found"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
+  "/adminapi/v1/project/{projectName}/audit":
     get:
       summary: "Get Audit events"
       tags:
@@ -1115,18 +1115,18 @@ paths:
           schema:
             type: number
       responses:
-        '200':
-          description: 'Successfully get audit event list'
+        "200":
+          description: "Successfully get audit event list"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AuditGetResponse'
-        '403':
-          description: 'Forbidden'
-        '500':
-          description: 'Internal Server Error'
+                  $ref: "#/components/schemas/AuditGetResponse"
+        "403":
+          description: "Forbidden"
+        "500":
+          description: "Internal Server Error"
 components:
   schemas:
     ProjectCreateRequest:
@@ -1134,84 +1134,86 @@ components:
       properties:
         name:
           type: string
-        tokenConfig:
-          $ref: '#/components/schemas/TokenConfig'
-        passwordPolicy:
-          $ref: '#/components/schemas/PasswordPolicy' 
-        allowGrantTypes:
+        token_config:
+          $ref: "#/components/schemas/TokenConfig"
+        password_policy:
+          $ref: "#/components/schemas/PasswordPolicy"
+        allow_grant_types:
           type: array
           items:
             type: string
-        userLock:
-          $ref: '#/components/schemas/UserLock'
+        user_lock:
+          $ref: "#/components/schemas/UserLock"
     ProjectGetResponse:
       type: object
       properties:
         name:
           type: string
-        createdAt:
+        created_at:
           type: string
           format: date
-        tokenConfig:
-          $ref: '#/components/schemas/TokenConfig'
-        passwordPolicy:
-          $ref: '#/components/schemas/PasswordPolicy' 
-        allowGrantTypes:
+        token_config:
+          $ref: "#/components/schemas/TokenConfig"
+        password_policy:
+          $ref: "#/components/schemas/PasswordPolicy"
+        allow_grant_types:
           type: array
           items:
             type: string
-        userLock:
-          $ref: '#/components/schemas/UserLock'
+        user_lock:
+          $ref: "#/components/schemas/UserLock"
     ProjectPutRequest:
       type: object
       properties:
-        tokenConfig:
-          $ref: '#/components/schemas/TokenConfig'
-        passwordPolicy:
-          $ref: '#/components/schemas/PasswordPolicy' 
-        allowGrantTypes:
+        token_config:
+          $ref: "#/components/schemas/TokenConfig"
+        password_policy:
+          $ref: "#/components/schemas/PasswordPolicy"
+        allow_grant_types:
           type: array
           items:
             type: string
-        userLock:
-          $ref: '#/components/schemas/UserLock'
+        user_lock:
+          $ref: "#/components/schemas/UserLock"
     TokenConfig:
       type: object
       properties:
-        accessTokenLifeSpan:
+        access_token_life_span:
           type: integer
-        refreshTokenLifeSpan:
+        refresh_token_life_span:
           type: integer
+        signing_algorithm:
+          type: string
     PasswordPolicy:
       type: object
       properties:
         length:
           type: integer
-          description: 'Minimum length of password'
-        notUserName:
+          description: "Minimum length of password"
+        not_user_name:
           type: boolean
-        blackList:
+        black_list:
           type: array
           items:
             type: string
-        useCharacter:
+        use_character:
           type: string
           enum: [lower, upper, both, either]
-        useDigit:
+        use_digit:
           type: boolean
-        useSpecialCharacter:
+        use_special_character:
           type: boolean
     UserLock:
       type: object
       properties:
         enabled:
           type: boolean
-        maxLoginFailure:
+        max_login_failure:
           type: integer
-        lockDuration:
+        lock_duration:
           type: string
           format: date
-        failureResetTime:
+        failure_reset_time:
           type: string
           format: date
     UserCreateRequest:
@@ -1219,16 +1221,18 @@ components:
       properties:
         name:
           type: string
+        email:
+          type: string
         password:
           type: string
           format: password
         system_roles:
-          description: 'Array of system role IDs'
+          description: "Array of system role IDs"
           type: array
           items:
             type: string
         custom_roles:
-          description: 'Array of custom role IDs'
+          description: "Array of custom role IDs"
           type: array
           items:
             type: string
@@ -1239,16 +1243,18 @@ components:
           type: string
         name:
           type: string
-        createdAt:
+        email:
+          type: string
+        created_at:
           type: string
           format: date
         system_roles:
-          description: 'Array of system role IDs'
+          description: "Array of system role IDs"
           type: array
           items:
             type: string
         custom_roles:
-          description: 'Array of custom roles'
+          description: "Array of custom roles"
           type: array
           items:
             type: object
@@ -1257,6 +1263,10 @@ components:
                 type: string
               name:
                 type: string
+        sessions:
+          type: array
+          items:
+            type: string
         locked:
           type: boolean
     UserPutRequest:
@@ -1264,13 +1274,15 @@ components:
       properties:
         name:
           type: string
+        email:
+          type: string
         system_roles:
-          description: 'Array of system role IDs'
+          description: "Array of system role IDs"
           type: array
           items:
             type: string
         custom_roles:
-          description: 'Array of custom role IDs'
+          description: "Array of custom role IDs"
           type: array
           items:
             type: string
@@ -1331,7 +1343,7 @@ components:
           type: string
         name:
           type: string
-        projectName:
+        project_name:
           type: string
         created_at:
           type: string
@@ -1429,6 +1441,8 @@ components:
         sub:
           type: string
         preferred_username:
+          type: string
+        email:
           type: string
     LoginRequest:
       type: object
