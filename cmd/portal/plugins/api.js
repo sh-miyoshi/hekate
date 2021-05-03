@@ -91,12 +91,12 @@ class APIClient {
   async ProjectCreate(projectName) {
     const data = {
       name: projectName,
-      tokenConfig: {
-        accessTokenLifeSpan: 300, // 5 minutes
-        refreshTokenLifeSpan: 1209600, // 2 weeks
-        signingAlgorithm: 'RS256'
+      token_config: {
+        access_token_life_span: 300, // 5 minutes
+        refresh_token_life_span: 1209600, // 2 weeks
+        signing_algorithm: 'RS256'
       },
-      allowGrantTypes: [
+      allow_grant_types: [
         // set default allow grant types
         'authorization_code',
         'client_credentials',
