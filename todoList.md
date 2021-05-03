@@ -13,8 +13,6 @@
 
 ## Server application enhancement
 
-- errors.WriteOAuthErrorのエラーハンドリング
-- APIの戻り値のJSONの型名のチェック
 - model.LoginSessionの修正
   - time.Time型をやめ、expiresIn int64型にする
 - 結合テストの追加
