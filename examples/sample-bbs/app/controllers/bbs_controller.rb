@@ -12,7 +12,7 @@ class BbsController < ApplicationController
     state = SecureRandom.hex(12)
     verifier = SecureRandom.hex(128)
     challenge = get_code_challenge(verifier)
-    redirect_uri = "#{request.remote_ip}/bbs/callback"
+    redirect_uri = "#{Settings.login[:bbs_addr]}/bbs/callback"
 
     queries = {
       'scope' => 'openid email',
