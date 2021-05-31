@@ -1,4 +1,8 @@
 class BbsController < ApplicationController
+  def index; end
+
+  def callback; end
+
   def show
     @messages = Message.all
   end
