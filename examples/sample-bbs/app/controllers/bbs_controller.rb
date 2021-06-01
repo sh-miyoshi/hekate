@@ -25,13 +25,19 @@ class BbsController < ApplicationController
     }
     uri.query = URI.encode_www_form(queries)
 
+    session[:state] = state
+    session[:verifier] = verifier
+
     logger.debug("login redirect to #{uri}")
-    # TODO
-    # redirect to hekate server /auth with params
     redirect_to uri.to_s
   end
 
-  def callback; end
+  def callback
+    code = request.query_parameters[:code]
+    state = request.query_parameters[:state]
+    exchange_code(code, state)
+    redirect_to action: 'show'
+  end
 
   def show
     @messages = Message.all
@@ -51,13 +57,32 @@ class BbsController < ApplicationController
   def get_code_challenge(verifier)
     # currentryl supported only S256
     digest = OpenSSL::Digest.new('sha256')
-    Base64.urlsafe_encode64(digest.update(verifier).digest)
+    Base64.urlsafe_encode64(digest.update(verifier).digest).delete('=')
   end
 
-  def exchange_code
+  def exchange_code(code, state)
     # TODO
     # exchange auth code to token
     # redirect to top page
+    logger.debug("current state: #{session[:state]}, got state: #{state}")
+    raise 'invalid authentication state got' if state != session[:state]
+
+    params = {
+      'grant_type' => 'authorization_code',
+      'client_id' => Settings.login[:client_id],
+      'code' => code,
+      'code_verifier' => session[:verifier],
+      'state' => state
+    }
+
+    uri = URI.parse("#{Settings.login[:server_addr]}/authapi/v1/project/#{Settings.login[:project]}/openid-connect/token")
+    res = Net::HTTP.post_form(uri, params)
+    logger.debug("code exchange response: #{res.body}")
+
+    raise 'failed to got token' if res.code > 300
+
+    session[:access_token] = res.body[:access_token]
+    session[:refresh_token] = res.body[:refresh_token]
   end
 
   def find_user_info
