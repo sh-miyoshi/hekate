@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_03_105407) do
+ActiveRecord::Schema.define(version: 2021_06_03_121236) do
+
+  create_table "login_sessions", force: :cascade do |t|
+    t.string "refresh_token"
+    t.datetime "expires_at"
+    t.datetime "refresh_expires_at"
+    t.string "user_name"
+    t.string "user_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
 
   create_table "messages", force: :cascade do |t|
     t.string "text"

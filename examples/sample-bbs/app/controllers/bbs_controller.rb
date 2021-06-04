@@ -2,8 +2,12 @@ require 'net/https'
 require 'securerandom'
 require 'openssl'
 require 'base64'
+require 'json'
+require 'jwt'
 
 class BbsController < ApplicationController
+  before_action :find_user_info, only: %i[show add]
+
   def index; end
 
   def login
@@ -46,7 +50,7 @@ class BbsController < ApplicationController
   def add
     Message.create(
       text: params[:text],
-      userid: 0 # debug
+      userid: @user_id
     )
 
     redirect_to action: 'show'
@@ -60,10 +64,17 @@ class BbsController < ApplicationController
     Base64.urlsafe_encode64(digest.update(verifier).digest).delete('=')
   end
 
+  def token_request(params)
+    uri = URI.parse("#{Settings.login[:server_addr]}/authapi/v1/project/#{Settings.login[:project]}/openid-connect/token")
+    res = Net::HTTP.post_form(uri, params)
+    logger.debug("code exchange response: #{res.body}")
+
+    raise 'failed to got token' if res.code.to_i > 300
+
+    JSON.parse(res.body)
+  end
+
   def exchange_code(code, state)
-    # TODO
-    # exchange auth code to token
-    # redirect to top page
     logger.debug("current state: #{session[:state]}, got state: #{state}")
     raise 'invalid authentication state got' if state != session[:state]
 
@@ -75,19 +86,38 @@ class BbsController < ApplicationController
       'state' => state
     }
 
-    uri = URI.parse("#{Settings.login[:server_addr]}/authapi/v1/project/#{Settings.login[:project]}/openid-connect/token")
-    res = Net::HTTP.post_form(uri, params)
-    logger.debug("code exchange response: #{res.body}")
+    info = token_request(params)
+    now = Time.current
+    token = JWT.decode(info['access_token'], nil, false)
+    logger.debug("Access token info: #{token}")
 
-    raise 'failed to got token' if res.code > 300
+    s = LoginSession.create(
+      expires_at: now.since(info['expires_in'].to_i),
+      user_name: token[0]['preferred_username'],
+      user_id: token[0]['sub']
+    )
 
-    session[:access_token] = res.body[:access_token]
-    session[:refresh_token] = res.body[:refresh_token]
+    session[:id] = s.id
   end
 
   def find_user_info
-    # TODO
-    # get user info from JWT in web storage or cookie
-    # if not exists, redirect to index page
+    if session[:id].nil?
+      logger.debug('no session')
+      redirect_to action: 'index'
+      return
+    end
+
+    s = LoginSession.find(session[:id])
+    now = Time.current
+
+    # redirect if refresh token is expired
+    if now >= s.expires_at
+      logger.debug("token was expired. now: #{now}, expired at: #{s.expires_at}")
+      redirect_to action: 'index'
+      return
+    end
+
+    @user_id = s.user_id
+    @user_name = s.user_name
   end
 end

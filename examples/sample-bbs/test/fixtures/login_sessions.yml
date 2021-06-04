@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  refresh_token: MyString
+  expires_at: 2021-06-03 21:12:36
+  refresh_expires_at: 2021-06-03 21:12:36
+  user_name: MyString
+  user_id: MyString
+
+two:
+  refresh_token: MyString
+  expires_at: 2021-06-03 21:12:36
+  refresh_expires_at: 2021-06-03 21:12:36
+  user_name: MyString
+  user_id: MyString

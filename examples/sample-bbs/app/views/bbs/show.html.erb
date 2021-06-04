@@ -1,4 +1,6 @@
 <h1>BBS messages</h1>
+<h2>Logged in as <%= @user_name %></h2>
+
 <div>
   <% @messages.each do |msg| %>
     <div> <%= msg.text %></div>
