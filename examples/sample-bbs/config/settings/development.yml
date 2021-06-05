@@ -1,0 +1,5 @@
+login:
+  server_addr: "http://localhost:18443"
+  project: "master"
+  client_id: "sample-bbs"
+  bbs_addr: "http://localhost:3000"

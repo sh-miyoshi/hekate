@@ -1,0 +1,15 @@
+<h1>BBS messages</h1>
+<h2>Logged in as <%= @user_name %></h2>
+
+<div>
+  <% @messages.each do |msg| %>
+    <div> <%= msg.text %></div>
+  <% end %>
+</div>
+
+<div>
+  <%= form_with url: bbs_add_path do |f| %>
+    <%= f.text_field :text %>
+    <%= f.submit "Add" %>
+  <% end %>
+</div>
