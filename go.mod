@@ -18,7 +18,7 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/stew v0.0.0-20130812190256-80ef0842b48b
 	go.mongodb.org/mongo-driver v1.4.6
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.1.0
 	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c
 	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0
